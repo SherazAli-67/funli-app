@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "41844358248",
+    "project_id": "funli-app",
+    "storage_bucket": "funli-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:41844358248:android:dc5458bc9ba7d41c9b8fdd",
+        "android_client_info": {
+          "package_name": "com.example.funli_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "41844358248-5i6gvlrli1qnis80314mrq47bp2eacdd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.funli_app",
+            "certificate_hash": "799cfbd9921d0ad1f3e4b4229bfd0a3c8e2e86cc"
+          }
+        },
+        {
+          "client_id": "41844358248-r405kggl01sgb61b1nbi4v7trtotbiai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuPUvNNrRuMuNj3pPzIeXyYGbiYFRyLao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "41844358248-r405kggl01sgb61b1nbi4v7trtotbiai.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "41844358248-u5ku7rabb2nmc0mf0epae88a5hrt0no2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.funliApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
