@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       title: AppConstants.appTitle,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        fontFamily: AppConstants.appFontFamily
       ),
       home: WelcomePage(),
     );
