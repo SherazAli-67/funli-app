@@ -38,6 +38,8 @@ dependencies:
   firebase_auth: ^5.5.3
   cloud_firestore: ^5.6.7
   flutter_native_splash: ^2.4.6
+  carousel_slider: ^5.0.0
+  flutter_svg: ^2.1.0
 
 dev_dependencies:
   flutter_test:
