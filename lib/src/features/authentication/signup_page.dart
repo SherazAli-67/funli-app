@@ -1,27 +1,28 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:funli_app/src/features/authentication/signup_page.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
-import 'package:funli_app/src/widgets/app_back_button.dart';
 import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
 
-class LoginPage extends StatefulWidget {
+import '../../widgets/app_back_button.dart';
 
-  const LoginPage({super.key});
+class SignupPage extends StatefulWidget {
+
+  const SignupPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignupPageState extends State<SignupPage> {
 
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -57,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(31), topRight: Radius.circular(31))
               ),
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: SpacingConstants.screenHorizontalPadding, vertical: 30),
+                padding: EdgeInsets.symmetric(horizontal: SpacingConstants.screenHorizontalPadding, vertical: 40),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 28,
@@ -72,17 +73,21 @@ class _LoginPageState extends State<LoginPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Text("Welcome Back! 🎉", style: AppTextStyles.headingTextStyle3,),
+                            Text("Join the Mood Movement!", style: AppTextStyles.headingTextStyle3,),
                             const SizedBox(height: 14,),
-                            Text("Let’s get you watchin’", style: AppTextStyles.bodyTextStyle,)
+                            Text("Let’s get you onboard 👊’", style: AppTextStyles.bodyTextStyle,)
                           ],
                         ),
                       ],
                     ),
-
                     Column(
                       spacing: 16,
                       children: [
+                        AppTextField(textController: _nameController,
+                            prefixIcon: AppIcons.icUser,
+                            hintText: "i.e John Doe",
+                            titleText: "Full name"),
+
                         AppTextField(textController: _emailController,
                             prefixIcon: AppIcons.icLoginEmail,
                             hintText: "iejohndoe@gmail.com",
@@ -106,16 +111,16 @@ class _LoginPageState extends State<LoginPage> {
                     Column(
                       children: [
 
-                        PrimaryBtn(btnText: "Login", icon: AppIcons.icArrowNext, onTap: (){}),
+                        PrimaryBtn(btnText: "Create Account", icon: AppIcons.icArrowNext, onTap: (){}),
                         const SizedBox(height: 30,),
                         RichText(text: TextSpan(
                           children: [
-                            TextSpan(text: "Don’t have any account? ", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.colorBlack, fontFamily: AppConstants.appFontFamily)),
+                            TextSpan(text: "Already have any account? ", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.colorBlack, fontFamily: AppConstants.appFontFamily)),
                             TextSpan(
                                 recognizer: TapGestureRecognizer()..onTap = (){
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> SignupPage()));
+                                  debugPrint("ON tap");
                                 },
-                                text: "Create one!", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontFamily: AppConstants.appFontFamily)),
+                                text: "Sign in!", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontFamily: AppConstants.appFontFamily)),
 
                           ]
                         ))
