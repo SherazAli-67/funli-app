@@ -10,31 +10,34 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
 import 'package:funli_app/src/widgets/app_textfield.dart';
-import 'package:funli_app/src/widgets/auth_pages_header_text_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
 
-class LoginPage extends StatefulWidget {
+import '../../widgets/auth_pages_header_text_widget.dart';
 
-  const LoginPage({super.key});
+class ResetPasswordPage extends StatefulWidget {
+
+  const ResetPasswordPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
-  final TextEditingController _emailController = TextEditingController();
+
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _confirmPasswordController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return PrimaryGradientBackground(
       child: Column(
         children: [
@@ -47,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                 color: Colors.white,
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(31), topRight: Radius.circular(31))
               ),
-              child: SingleChildScrollView(
+              child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: SpacingConstants.screenHorizontalPadding, vertical: 30),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,15 +60,16 @@ class _LoginPageState extends State<LoginPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: 15,
                       children: [
-
                         AppBackButton(),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Text("Welcome Back! 🎉", style: AppTextStyles.headingTextStyle3,),
+                            Text("Create a Password", style: AppTextStyles.headingTextStyle3,),
                             const SizedBox(height: 14,),
-                            Text("Let’s get you watchin’", style: AppTextStyles.bodyTextStyle,)
+                            SizedBox(
+                                width: size.width*0.8,
+                                child: Text("Nice! Reset your password and don’t worry if you forgot again.", style: AppTextStyles.bodyTextStyle,))
                           ],
                         ),
                       ],
@@ -74,46 +78,20 @@ class _LoginPageState extends State<LoginPage> {
                     Column(
                       spacing: 16,
                       children: [
-                        AppTextField(textController: _emailController,
-                            prefixIcon: AppIcons.icLoginEmail,
-                            hintText: "iejohndoe@gmail.com",
-                            titleText: "Email/Username"),
-
                         AppTextField(textController: _passwordController,
+                          prefixIcon: AppIcons.icPasswordLock,
+                          hintText: "**************",
+                          titleText: "New Password", isPassword: true,),
+
+                        AppTextField(textController: _confirmPasswordController,
                             prefixIcon: AppIcons.icPasswordLock,
                             hintText: "**************",
-                            titleText: "Password", isPassword: true,),
-
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: TextButton(onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> ForgetPasswordPage()));
-                          }, child: Text(
-                            "Oops! Forgot your password?",
-                            style: AppTextStyles.bodyTextStyle.copyWith(
-                                color: AppColors.purpleColor),)),
-                        )
+                            titleText: "Confirm New Password", isPassword: true,),
 
                       ],
                     ),
-                    Column(
-                      children: [
-
-                        PrimaryBtn(btnText: "Login", icon: AppIcons.icArrowNext, onTap: (){}),
-                        const SizedBox(height: 30,),
-                        RichText(text: TextSpan(
-                          children: [
-                            TextSpan(text: "Don’t have any account? ", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.colorBlack, fontFamily: AppConstants.appFontFamily)),
-                            TextSpan(
-                                recognizer: TapGestureRecognizer()..onTap = (){
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> SignupPage()));
-                                },
-                                text: "Create one!", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontFamily: AppConstants.appFontFamily)),
-
-                          ]
-                        ))
-                      ],
-                    ),
+                    const Spacer(),
+                    PrimaryBtn(btnText: "Awesome, Let’s Go!", icon: AppIcons.icArrowNext, onTap: (){}),
                   ],
                 ),
               ),
@@ -124,3 +102,5 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
+

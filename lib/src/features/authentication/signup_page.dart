@@ -7,6 +7,7 @@ import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
 import 'package:funli_app/src/widgets/app_textfield.dart';
+import 'package:funli_app/src/widgets/auth_pages_header_text_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
 
@@ -37,18 +38,7 @@ class _SignupPageState extends State<SignupPage> {
     return PrimaryGradientBackground(
       child: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.only(
-              top: 65,
-              left: SpacingConstants.screenHorizontalPadding,
-              right: SpacingConstants.screenHorizontalPadding,
-            ),
-            child: Column(children: [
-              SvgPicture.asset(AppIcons.icFunliHeaderLogo),
-              Text("Capture your mood and share your vibe.", style: AppTextStyles.buttonTextStyle,),
-              const SizedBox(height: 60,),
-            ]),
-          ),
+          AuthPagesHeaderTextWidget(),
 
           Expanded(
             child: Container(
