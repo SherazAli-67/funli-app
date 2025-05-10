@@ -7,6 +7,7 @@ class AppIcons {
   static const String icLoginEmail = 'assets/icons/ic_login_mail.svg';
   static const String icPasswordLock = 'assets/icons/ic_password.svg';
   static const String icUser = 'assets/icons/ic_user.svg';
+  static const String icFunliHeaderLogo = 'assets/icons/ic_funli_header.svg';
 
 
   static const String onboarding1 = 'assets/icons/onboarding_img1.png';

@@ -11,7 +11,7 @@ class PrimaryGradientBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       // Allows body to extend behind AppBar if you use one
-      extendBodyBehindAppBar: true,
+      // extendBodyBehindAppBar: true,
       body: Container(
         height: height,
         width: width,

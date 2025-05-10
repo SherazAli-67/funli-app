@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/res/app_constants.dart';
-import 'package:funli_app/src/welcome_page.dart';
+import 'package:funli_app/src/features/welcome_page.dart';
 
 void main() {
   runApp(const MyApp());
