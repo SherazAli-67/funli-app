@@ -1,10 +1,5 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/authentication/reset_password_page.dart';
-import 'package:funli_app/src/features/authentication/signup_page.dart';
-import 'package:funli_app/src/res/app_colors.dart';
-import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
