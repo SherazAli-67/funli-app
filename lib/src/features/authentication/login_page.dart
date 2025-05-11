@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/authentication/forget_password_page.dart';
 import 'package:funli_app/src/features/authentication/signup_page.dart';
+import 'package:funli_app/src/features/personalization/personalization_page.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -99,7 +100,9 @@ class _LoginPageState extends State<LoginPage> {
                     Column(
                       children: [
 
-                        PrimaryBtn(btnText: "Login", icon: AppIcons.icArrowNext, onTap: (){}),
+                        PrimaryBtn(btnText: "Login", icon: AppIcons.icArrowNext, onTap: (){
+                          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> PersonalizationPage()), (val)=> false);
+                        }),
                         const SizedBox(height: 30,),
                         RichText(text: TextSpan(
                           children: [

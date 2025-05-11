@@ -8,6 +8,10 @@ class AppIcons {
   static const String icPasswordLock = 'assets/icons/ic_password.svg';
   static const String icUser = 'assets/icons/ic_user.svg';
   static const String icFunliHeaderLogo = 'assets/icons/ic_funli_header.svg';
+  static const String icMale = 'assets/icons/ic_male.svg';
+  static const String icFemale = 'assets/icons/ic_female.svg';
+  static const String icGenderRatherNotToSay = 'assets/icons/ic_gender_nottosay.svg';
+
 
 
   static const String onboarding1 = 'assets/icons/onboarding_img1.png';
