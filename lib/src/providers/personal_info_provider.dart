@@ -36,7 +36,7 @@ class PersonalInfoProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  void setInterestList(String interest){
+  void addToInterest(String interest){
     if(_selectedInterests.contains(interest)){
       _selectedInterests.remove(interest);
     }else{

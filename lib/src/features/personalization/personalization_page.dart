@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/features/home_page.dart';
 import 'package:funli_app/src/features/personalization/age_gender_page.dart';
 import 'package:funli_app/src/features/personalization/interest_page.dart';
 import 'package:funli_app/src/features/personalization/mood_detection_page.dart';
@@ -57,7 +58,11 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
               return _pages[_currentPage];
             })),
             PrimaryBtn(btnText: "Next", icon: AppIcons.icArrowNext, onTap: (){
-
+              if(_currentPage == _pages.length-1){
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> HomePage()), (val)=> false);
+              }else{
+                _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+              }
             })
           ],
         ),
