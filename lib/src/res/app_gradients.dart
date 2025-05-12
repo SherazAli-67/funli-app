@@ -22,4 +22,26 @@ class AppGradients {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
+
+  static final LinearGradient uploadBtnGradient = LinearGradient(
+    colors: [
+      Color.fromRGBO(100, 149, 237, 1),
+      Color.fromRGBO(138, 43, 226, 1),
+      Color.fromRGBO(191, 244, 80, 1),
+      Color.fromRGBO(127, 255, 212, 1),
+      Color.fromRGBO(255, 215, 0, 1),
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static final LinearGradient bottomNavigationBarGradient = LinearGradient(
+    colors: [
+      Color.fromRGBO(0, 0, 0, 1),
+      Color.fromRGBO(34, 34, 34, 1),
+      Color.fromRGBO(0, 0, 0, 1),
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 }

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
 import 'package:funli_app/src/features/personalization/personalization_page.dart';
 import 'package:funli_app/src/providers/personal_info_provider.dart';
+import 'package:funli_app/src/providers/tab_change_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
-import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_)=> PersonalInfoProvider())
+        ChangeNotifierProvider(create: (_)=> PersonalInfoProvider()),
+        ChangeNotifierProvider(create: (_)=> MainMenuTabChangeProvider()),
+
       ],
       child: const MyApp()));
 }
@@ -26,7 +29,7 @@ class MyApp extends StatelessWidget {
         fontFamily: AppConstants.appFontFamily,
         scaffoldBackgroundColor: Colors.white
       ),
-      home: PersonalizationPage(),
+      home: MainMenuPage(),
     );
   }
 }

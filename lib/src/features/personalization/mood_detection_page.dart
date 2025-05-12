@@ -5,7 +5,7 @@ class MoodDetectionPage extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return MoodSetupScreen();
+    return CardStackAnimation();
   }
 }
 
