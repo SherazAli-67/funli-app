@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -11,6 +13,7 @@ import 'package:funli_app/src/widgets/auth_pages_header_text_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
 
+import '../../bloc_cubit/auth_states.dart';
 import '../../widgets/app_back_button.dart';
 
 class SignupPage extends StatefulWidget {
@@ -80,6 +83,7 @@ class _SignupPageState extends State<SignupPage> {
 
                         AppTextField(textController: _emailController,
                             prefixIcon: AppIcons.icLoginEmail,
+                            textInputType: TextInputType.emailAddress,
                             hintText: "iejohndoe@gmail.com",
                             titleText: "Email/Username"),
 
@@ -101,7 +105,21 @@ class _SignupPageState extends State<SignupPage> {
                     Column(
                       children: [
 
-                        PrimaryBtn(btnText: "Create Account", icon: AppIcons.icArrowNext, onTap: (){}),
+                        BlocConsumer<AuthCubit, AuthStates>(
+                          listener: (ctx, state){
+                            if(state is SigningUpFailed){
+                            }
+                          },
+                          builder: (ctx, state){
+                            return PrimaryBtn(btnText: "Create Account", icon: AppIcons.icArrowNext, onTap: (){
+                              String email = _emailController.text.trim();
+                              String password = _passwordController.text.trim();
+                              String name = _nameController.text.trim();
+                              context.read<AuthCubit>().onSignupWithEmail(email: email, password: password, name: name);
+                            });
+                          },
+                        ),
+
                         const SizedBox(height: 30,),
                         RichText(text: TextSpan(
                           children: [
