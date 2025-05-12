@@ -1,8 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
+import 'package:funli_app/src/features/authentication/login_page.dart';
+import 'package:funli_app/src/features/personalization/personalization_page.dart';
+import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -12,7 +14,6 @@ import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/auth_pages_header_text_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
-
 import '../../bloc_cubit/auth_states.dart';
 import '../../widgets/app_back_button.dart';
 
@@ -108,15 +109,13 @@ class _SignupPageState extends State<SignupPage> {
                         BlocConsumer<AuthCubit, AuthStates>(
                           listener: (ctx, state){
                             if(state is SigningUpFailed){
+                              SnackbarMessagesHelper.showErrorSnacbarMessage(context: context, title: "Account Creation Failed", message: state.errorMessage);
+                            }else if(state is SignedUp){
+                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> PersonalizationPage()), (val)=> false);
                             }
                           },
                           builder: (ctx, state){
-                            return PrimaryBtn(btnText: "Create Account", icon: AppIcons.icArrowNext, onTap: (){
-                              String email = _emailController.text.trim();
-                              String password = _passwordController.text.trim();
-                              String name = _nameController.text.trim();
-                              context.read<AuthCubit>().onSignupWithEmail(email: email, password: password, name: name);
-                            });
+                            return PrimaryBtn(btnText: "Create Account", icon: AppIcons.icArrowNext, onTap: _onSignupTap);
                           },
                         ),
 
@@ -126,7 +125,7 @@ class _SignupPageState extends State<SignupPage> {
                             TextSpan(text: "Already have any account? ", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.colorBlack, fontFamily: AppConstants.appFontFamily)),
                             TextSpan(
                                 recognizer: TapGestureRecognizer()..onTap = (){
-                                  debugPrint("ON tap");
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> LoginPage()));
                                 },
                                 text: "Sign in!", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontFamily: AppConstants.appFontFamily)),
 
@@ -142,5 +141,24 @@ class _SignupPageState extends State<SignupPage> {
         ],
       ),
     );
+  }
+
+  void _onSignupTap(){
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+    String name = _nameController.text.trim();
+
+    if(email.isEmpty || password.isEmpty || name.isEmpty){
+
+      if(email.isEmpty){
+        //Display Enter email snackbar
+      }else if(password.isEmpty){
+        //Display Enter password snackbar
+      }else if(name.isEmpty){
+        //Display Enter name snacbar
+      }
+      return;
+    }
+    context.read<AuthCubit>().onSignupWithEmail(email: email, password: password, name: name);
   }
 }

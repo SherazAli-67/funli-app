@@ -1,18 +1,17 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/bloc_cubit/auth_states.dart';
 import 'package:funli_app/src/features/authentication/forget_password_page.dart';
 import 'package:funli_app/src/features/authentication/signup_page.dart';
-import 'package:funli_app/src/features/personalization/personalization_page.dart';
+import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
+import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
-import 'package:funli_app/src/services/auth_service.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
 import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/auth_pages_header_text_widget.dart';
@@ -108,16 +107,13 @@ class _LoginPageState extends State<LoginPage> {
                         BlocConsumer<AuthCubit, AuthStates>(
                           listener: (ctx, state){
                             if(state is SigningInFailed){
-                              _showLoginError(context, state.errorMessage);
+                              SnackbarMessagesHelper.showErrorSnacbarMessage(context: context, title: "Login Failed", message: state.errorMessage);
+                            }else if(state is SignedIn){
+                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);
                             }
                           },
                           builder: (ctx, state){
-                            return PrimaryBtn(btnText: "Login", icon: AppIcons.icArrowNext, onTap: (){
-
-                              String email = _emailController.text.trim();
-                              String password = _passwordController.text.trim();
-                              context.read<AuthCubit>().signInWithEmail(email: email, password: password,);
-                            }, isLoading: state is SigningIn,);
+                            return PrimaryBtn(btnText: "Login", icon: AppIcons.icArrowNext, onTap: _onLoginTap, isLoading: state is SigningIn,);
                           },
                         ),
                         const SizedBox(height: 30,),
@@ -143,21 +139,14 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-  void _showLoginError(BuildContext context, String errorMessage) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Login failed', style: AppTextStyles.subHeadingTextStyle,),
-            Text(errorMessage, style: AppTextStyles.bodyTextStyle,)
-          ],
-        ),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        duration: Duration(seconds: 3),
-      ),
-    );
-  }
 
+
+  void _onLoginTap() {
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+    if(email.isEmpty || password.isEmpty){
+      return;
+    }
+    context.read<AuthCubit>().signInWithEmail(email: email, password: password,);
+  }
 }
