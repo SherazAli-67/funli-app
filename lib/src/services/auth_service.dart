@@ -1,6 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:funli_app/src/res/firebase_constants.dart';
 
 class AuthService {
   // Step 1: Private constructor
@@ -13,7 +14,7 @@ class AuthService {
   // Step 3: Public getter to access the instance
   static AuthService get instance => _instance;
 
-  final CollectionReference _userColRef = FirebaseFirestore.instance.collection('users');
+  final CollectionReference _userColRef = FirebaseFirestore.instance.collection(userCollection);
   // FirebaseAuth instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
 

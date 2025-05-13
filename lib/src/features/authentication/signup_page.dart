@@ -111,11 +111,12 @@ class _SignupPageState extends State<SignupPage> {
                             if(state is SigningUpFailed){
                               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Account Creation Failed", message: state.errorMessage);
                             }else if(state is SignedUp){
+                              SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedUpSuccessTitle, message: AppConstants.signedUpSuccessMessage);
                               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> PersonalizationPage()), (val)=> false);
                             }
                           },
                           builder: (ctx, state){
-                            return PrimaryBtn(btnText: "Create Account", icon: AppIcons.icArrowNext, onTap: _onSignupTap);
+                            return PrimaryBtn(btnText: "Create Account", icon: AppIcons.icArrowNext, onTap: _onSignupTap, isLoading: state is SigningUp,);
                           },
                         ),
 

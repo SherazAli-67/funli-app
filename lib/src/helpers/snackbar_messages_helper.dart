@@ -5,24 +5,24 @@ import '../res/app_textstyles.dart';
 
 class SnackbarMessagesHelper {
   static void showSnackBarMessage({required BuildContext context, required String title, required String message, bool isError = false}){
-   /* final snackBar = SnackBar(
+    final snackBar = SnackBar(
       elevation: 0,
       behavior: SnackBarBehavior.floating,
       backgroundColor: Colors.transparent,
       content: AwesomeSnackbarContent(
         title: title,
         message: message,
-        titleTextStyle: AppTextStyles.headingTextStyle3,
-        messageTextStyle: AppTextStyles.bodyTextStyle,
+        titleTextStyle: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),
+        messageTextStyle: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),
         contentType: isError ? ContentType.failure : ContentType.success,
       ),
     );
 
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(snackBar);*/
+      ..showSnackBar(snackBar);
 
-    final materialBanner = MaterialBanner(
+   /* final materialBanner = MaterialBanner(
       elevation: 0,
       backgroundColor: Colors.transparent,
       forceActionsBelow: true,
@@ -32,15 +32,12 @@ class SnackbarMessagesHelper {
         contentType:  isError ? ContentType.failure : ContentType.success,
         // to configure for material banner
         inMaterialBanner: true,
-
-        titleTextStyle: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),
-        messageTextStyle: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),
       ),
       actions: const [SizedBox.shrink()],
     );
 
     ScaffoldMessenger.of(context)
       ..hideCurrentMaterialBanner()
-      ..showMaterialBanner(materialBanner);
+      ..showMaterialBanner(materialBanner);*/
   }
 }

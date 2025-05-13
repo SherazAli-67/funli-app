@@ -90,6 +90,7 @@ class WelcomePage extends StatelessWidget {
             )
           ]),
           BlocConsumer<AuthCubit, AuthStates>(builder: (_, state){
+            // debugPrint("State: ${state}");
             if(state is SigningInGoogle){
               return Container(
                   width: size.width,
@@ -104,6 +105,7 @@ class WelcomePage extends StatelessWidget {
             if(state is SigningInFailed){
               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Sign in with Google Failed", message: state.errorMessage, isError: true);
             }else if(state is SignedInGoogle){
+              SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedInSuccessTitle, message: AppConstants.signedInSuccessMessage);
               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> MainMenuPage()), (val)=> false);
             }else if(state is SignedUpGoogle){
               context.read<PersonalInfoProvider>().setUserName(state.user.user!.displayName ?? '');

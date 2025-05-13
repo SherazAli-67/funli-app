@@ -84,7 +84,7 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
                   }else{
                     _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
                   }
-                }, isLoading: false,);
+                }, isLoading: state is CompletingUserSignupInfo,);
               }
             )
           ],

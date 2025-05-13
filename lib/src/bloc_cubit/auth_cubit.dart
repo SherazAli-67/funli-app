@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/bloc_cubit/auth_states.dart';
+import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/services/auth_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -53,10 +55,11 @@ class AuthCubit extends Cubit<AuthStates>{
           try {
             UserCredential? userCredential = await auth.signInWithCredential(credential);
             if (userCredential.additionalUserInfo!.isNewUser) {
-              await authService.updateUserInfo(updatedMap: {
+              Map<String, dynamic> userMap = {
                 'userID' : userCredential.user!.uid,
                 'userName' : userCredential.user!.displayName
-              });
+              };
+              await FirebaseFirestore.instance.collection(userCollection).doc(userCredential.user!.uid).set(userMap);
               emit(SignedUpGoogle(user: userCredential));
             } else {
 
@@ -120,9 +123,10 @@ class AuthCubit extends Cubit<AuthStates>{
       }else {
         emit(SigningInFailed(errorMessage: "Failed to create account, Please check your internet connection and try again!"));
       }
-    }catch(e){
+    } on FirebaseAuthException catch(error){
+      emit(SigningInFailed(errorMessage: _getErrorMessage(error.code)));
+    } catch(e){
       String errorMessage = e.toString();
-
       if(e is PlatformException){
         errorMessage = e.message!;
       }
@@ -147,6 +151,61 @@ class AuthCubit extends Cubit<AuthStates>{
       }
 
       emit(CompletedUserSignupInfoFailed(errorMessage: errorMessage));
+    }
+  }
+
+
+  String _getErrorMessage(String errorCode) {
+    debugPrint("Error code: $errorCode");
+    switch (errorCode) {
+      case 'invalid-email':
+        return 'The email address is not valid.';
+      case 'user-disabled':
+        return 'This user account has been disabled.';
+      case 'user-not-found':
+        return 'No account found with this email.';
+      case 'wrong-password':
+        return 'Incorrect password. Please try again.';
+      case 'email-already-in-use':
+        return 'This email is already registered.';
+      case 'operation-not-allowed':
+        return 'This sign-in method is not allowed.';
+      case 'weak-password':
+        return 'Password is too weak. Please choose a stronger one.';
+      case 'too-many-requests':
+        return 'Too many attempts. Please try again later.';
+      case 'network-request-failed':
+        return 'Network error. Please check your connection.';
+      case 'invalid-credential':
+        return 'Invalid credentials. Please try signing in again.';
+      case 'account-exists-with-different-credential':
+        return 'An account already exists with a different sign-in method.';
+      case 'invalid-verification-code':
+        return 'The verification code is incorrect.';
+      case 'invalid-verification-id':
+        return 'Invalid verification ID. Please try again.';
+      case 'credential-already-in-use':
+        return 'This credential is already associated with another account.';
+      case 'requires-recent-login':
+        return 'Please log in again to complete this action.';
+      case 'missing-verification-code':
+        return 'Please enter the verification code.';
+      case 'missing-verification-id':
+        return 'Missing verification ID. Please try again.';
+      case 'user-mismatch':
+        return 'The credentials do not match this user.';
+      case 'invalid-phone-number':
+        return 'The phone number entered is invalid.';
+      case 'quota-exceeded':
+        return 'SMS quota exceeded. Please try again later.';
+      case 'app-not-authorized':
+        return 'This app is not authorized to use Firebase Authentication.';
+      case 'captcha-check-failed':
+        return 'CAPTCHA verification failed. Please try again.';
+      case 'missing-email':
+        return 'Email address is required.';
+      default:
+        return 'Something went wrong. Please try again.';
     }
   }
 }
