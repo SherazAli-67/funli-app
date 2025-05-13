@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                         BlocConsumer<AuthCubit, AuthStates>(
                           listener: (ctx, state){
                             if(state is SigningInFailed){
-                              SnackbarMessagesHelper.showErrorSnacbarMessage(context: context, title: "Login Failed", message: state.errorMessage);
+                              SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Login Failed", message: state.errorMessage);
                             }else if(state is SignedIn){
                               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);
                             }

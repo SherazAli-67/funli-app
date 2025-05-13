@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
+import 'package:funli_app/src/bloc_cubit/auth_states.dart';
 import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
 import 'package:funli_app/src/features/personalization/age_gender_page.dart';
 import 'package:funli_app/src/features/personalization/interest_page.dart';
 import 'package:funli_app/src/features/personalization/mood_detection_page.dart';
+import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
+import 'package:funli_app/src/providers/personal_info_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
+import 'package:provider/provider.dart';
 
 class PersonalizationPage extends StatefulWidget{
   const PersonalizationPage({super.key});
@@ -57,13 +63,30 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
                 itemBuilder: (ctx, index){
               return _pages[_currentPage];
             })),
-            PrimaryBtn(btnText: "Next", icon: AppIcons.icArrowNext, onTap: (){
-              if(_currentPage == _pages.length-1){
-                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);
-              }else{
-                _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+            BlocConsumer<AuthCubit, AuthStates>(
+              listener: (_, state){
+                if(state is CompletedUserSignupInfoFailed){
+                  SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Failed to Update!", message: state.errorMessage, isError: true);
+                }else if(state is CompletedUserSignupInfo){
+                  SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.accountSetupSuccessTitle, message: AppConstants.accountSetupSuccessMessage);
+                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);
+                }
+              },
+              builder: (_, state) {
+                return PrimaryBtn(btnText: "Next", icon: AppIcons.icArrowNext, onTap: (){
+                  if(_currentPage == _pages.length-1){
+                    final infoProvider = Provider.of<PersonalInfoProvider>(context, listen: false);
+                    DateTime dob = DateTime(infoProvider.selectedYear, infoProvider.selectedMonth, infoProvider.selectedDay);
+                    List<String> interests = infoProvider.selectedInterests;
+                    
+                    context.read<AuthCubit>().onCompleteUserSignup(dob: dob, interests: interests);
+                    //
+                  }else{
+                    _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+                  }
+                }, isLoading: false,);
               }
-            })
+            )
           ],
         ),
       )),

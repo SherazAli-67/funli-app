@@ -109,7 +109,7 @@ class _SignupPageState extends State<SignupPage> {
                         BlocConsumer<AuthCubit, AuthStates>(
                           listener: (ctx, state){
                             if(state is SigningUpFailed){
-                              SnackbarMessagesHelper.showErrorSnacbarMessage(context: context, title: "Account Creation Failed", message: state.errorMessage);
+                              SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Account Creation Failed", message: state.errorMessage);
                             }else if(state is SignedUp){
                               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> PersonalizationPage()), (val)=> false);
                             }

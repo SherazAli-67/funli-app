@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 
 class PersonalInfoProvider extends ChangeNotifier{
-
+  String _userName = '';
   String _selectedGender = '';
-  List<String> _selectedInterests = [];
+  final List<String> _selectedInterests = [];
   int  _selectedDay = 0;
   int _selectedMonth = 0;
   int _selectedYear = 0;
 
+  PersonalInfoProvider(){
+    DateTime now = DateTime.now();
+    _selectedMonth = now.month;
+    _selectedYear = now.year;
+    _selectedDay = now.day;
+    notifyListeners();
+  }
 
+  String get userName => _userName;
   String get selectedGender => _selectedGender;
   int get selectedDay => _selectedDay;
   int get selectedMonth => _selectedMonth;
@@ -16,6 +24,10 @@ class PersonalInfoProvider extends ChangeNotifier{
 
   List<String> get selectedInterests => _selectedInterests;
 
+  void setUserName(String userName){
+    _userName = userName;
+    notifyListeners();
+  }
   void setDay(int day){
     _selectedDay = day;
     notifyListeners();

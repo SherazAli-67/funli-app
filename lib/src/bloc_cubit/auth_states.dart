@@ -30,3 +30,10 @@ class SignedUpGoogle extends AuthStates{
 }
 
 class SignedInGoogle extends AuthStates{}
+
+class CompletingUserSignupInfo extends AuthStates{}
+class CompletedUserSignupInfo extends AuthStates{}
+class CompletedUserSignupInfoFailed extends AuthStates{
+  final String errorMessage;
+  CompletedUserSignupInfoFailed({required this.errorMessage});
+}

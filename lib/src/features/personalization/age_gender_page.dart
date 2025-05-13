@@ -19,9 +19,7 @@ class _AgeGenderPageState extends State<AgeGenderPage> {
   final days = List<int>.generate(31, (i) => i + 1);
   final years = List<int>.generate(101, (i) => 1925 + i);
 
-  int selectedMonth = 0;
-  int selectedDay = 0;
-  int selectedYear = 0;
+
 
   double itemExtent = 60;
 
@@ -82,63 +80,67 @@ class _AgeGenderPageState extends State<AgeGenderPage> {
 
   @override
   void initState() {
-    DateTime now = DateTime.now();
-    selectedMonth = now.month;
-    selectedYear = now.year;
-    selectedDay = now.day;
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Column(
-            children: [
-              Text("How old are you?", style: AppTextStyles.subHeadingTextStyle.copyWith(fontWeight: FontWeight.w400),),
-              Expanded(child:  Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+    return Consumer<PersonalInfoProvider>(
+      builder: (_, provider, _){
+        String selectedGender = provider.selectedGender;
+        return Column(
+          children: [
+            Expanded(
+                child: Column(
+                    children: [
+                      Text("How old are you?", style: AppTextStyles.subHeadingTextStyle.copyWith(fontWeight: FontWeight.w400),),
+                      Expanded(child:  Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          buildPicker<String>(
+                            items: months,
+                            selectedIndex: provider.selectedMonth,
+                            onSelectedItemChanged: (month){
+                              provider.setMonth(month);
+                            },
+                          ),
+                          buildPicker<int>(
+                            items: days,
+                            selectedIndex: provider.selectedDay,
+                            onSelectedItemChanged: (day){
+                              provider.setDay(day);
+                            },
+                          ),
+                          buildPicker<int>(
+                            items: years,
+                            selectedIndex: provider.selectedYear,
+                            onSelectedItemChanged: (year){
+                              provider.setYear(year);
+                            },
+                          ),
+                        ],
+                      ),)
+                    ])
+            ),
+            Expanded(
+              child: Column(
+                spacing: 16,
                 children: [
-                  buildPicker<String>(
-                    items: months,
-                    selectedIndex: selectedMonth,
-                    onSelectedItemChanged: (i) => setState(() => selectedMonth = i),
-                  ),
-                  buildPicker<int>(
-                    items: days,
-                    selectedIndex: selectedDay,
-                    onSelectedItemChanged: (i) => setState(() => selectedDay = i),
-                  ),
-                  buildPicker<int>(
-                    items: years,
-                    selectedIndex: selectedYear,
-                    onSelectedItemChanged: (i) => setState(() => selectedYear = i),
-                  ),
-                ],
-              ),)
-        ])
-          ),
-        Expanded(
-          child: Column(
-            spacing: 16,
-            children: [
-              Text("What is your gender?", style: AppTextStyles.subHeadingTextStyle.copyWith(fontWeight: FontWeight.w400),),
-              Expanded(child: Consumer<PersonalInfoProvider>(builder: (ctx, provider,_){
-                String selectedGender = provider.selectedGender;
-                return Column(
-                  spacing: 13,
-                  children: [
-                    _buildGenderItem(title: "Male", icon: AppIcons.icMale, selectedGender: selectedGender, provider:   provider),
-                    _buildGenderItem(title: "Female", icon: AppIcons.icFemale, selectedGender: selectedGender, provider:   provider),
-                    _buildGenderItem(title: "Rather not say", icon: AppIcons.icGenderRatherNotToSay, selectedGender: selectedGender, provider:   provider),
+                  Text("What is your gender?", style: AppTextStyles.subHeadingTextStyle.copyWith(fontWeight: FontWeight.w400),),
+                  Expanded(child: Column(
+                    spacing: 13,
+                    children: [
+                      _buildGenderItem(title: "Male", icon: AppIcons.icMale, selectedGender: selectedGender, provider:   provider),
+                      _buildGenderItem(title: "Female", icon: AppIcons.icFemale, selectedGender: selectedGender, provider:   provider),
+                      _buildGenderItem(title: "Rather not say", icon: AppIcons.icGenderRatherNotToSay, selectedGender: selectedGender, provider:   provider),
 
-                  ],
-                );
-              }))
-            ],
-          ),
-        )
-      ],
+                    ],
+                  )),
+                ],
+              ),
+            )
+          ],
+        );
+      },
     );
   }
 

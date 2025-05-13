@@ -8,6 +8,8 @@ import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
 import 'package:funli_app/src/features/personalization/personalization_page.dart';
 import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/models/onboarding_model.dart';
+import 'package:funli_app/src/providers/personal_info_provider.dart';
+import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
@@ -100,10 +102,12 @@ class WelcomePage extends StatelessWidget {
             return SizedBox();
           }, listener: (_, state){
             if(state is SigningInFailed){
-              SnackbarMessagesHelper.showErrorSnacbarMessage(context: context, title: "Sign in with Google Failed", message: state.errorMessage);
+              SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Sign in with Google Failed", message: state.errorMessage, isError: true);
             }else if(state is SignedInGoogle){
               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> MainMenuPage()), (val)=> false);
             }else if(state is SignedUpGoogle){
+              context.read<PersonalInfoProvider>().setUserName(state.user.user!.displayName ?? '');
+              SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedUpSuccessTitle, message: AppConstants.signedUpSuccessMessage);
               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> PersonalizationPage()), (val)=> false);
             }
           })

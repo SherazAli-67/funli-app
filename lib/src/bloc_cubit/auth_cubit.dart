@@ -53,9 +53,13 @@ class AuthCubit extends Cubit<AuthStates>{
           try {
             UserCredential? userCredential = await auth.signInWithCredential(credential);
             if (userCredential.additionalUserInfo!.isNewUser) {
-
+              await authService.updateUserInfo(updatedMap: {
+                'userID' : userCredential.user!.uid,
+                'userName' : userCredential.user!.displayName
+              });
               emit(SignedUpGoogle(user: userCredential));
             } else {
+
               emit(SignedInGoogle());
             }
           } on FirebaseAuthException catch (e) {
@@ -126,5 +130,23 @@ class AuthCubit extends Cubit<AuthStates>{
     }
   }
 
+  Future<void> onCompleteUserSignup({required DateTime dob, required List<String> interests})async{
+    emit(CompletedUserSignupInfo());
+    try{
+      Map<String, dynamic> userMap = {
+        'dob' : dob.toIso8601String(),
+        'interests': interests
+      };
 
+      await authService.updateUserInfo(updatedMap: userMap);
+      emit(CompletedUserSignupInfo());
+    }catch(e){
+      String errorMessage = e.toString();
+      if(e is PlatformException){
+        errorMessage = e.message!;
+      }
+
+      emit(CompletedUserSignupInfoFailed(errorMessage: errorMessage));
+    }
+  }
 }

@@ -13,7 +13,7 @@ class AuthService {
   // Step 3: Public getter to access the instance
   static AuthService get instance => _instance;
 
-  final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
+  final CollectionReference _userColRef = FirebaseFirestore.instance.collection('users');
   // FirebaseAuth instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -22,10 +22,11 @@ class AuthService {
     UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
     if (userCredential.user != null) {
       Map<String, dynamic> userMap = {
+        'userID': userCredential.user!.uid,
         'name': userName,
         'email': email
       };
-      await _fireStore.doc(userCredential.user!.uid).set(userMap);
+      await _userColRef.doc(userCredential.user!.uid).set(userMap);
       return userCredential;
     }
 
@@ -35,7 +36,7 @@ class AuthService {
   Future<void> updateUserInfo({required Map<String, dynamic> updatedMap})async{
     if(FirebaseAuth.instance.currentUser != null){
       String userID = FirebaseAuth.instance.currentUser!.uid;
-      await _fireStore.doc(userID).update(updatedMap);
+      await _userColRef.doc(userID).update(updatedMap);
     }
   }
 
