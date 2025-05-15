@@ -129,9 +129,9 @@ class _AgeGenderPageState extends State<AgeGenderPage> {
                   Expanded(child: Column(
                     spacing: 13,
                     children: [
-                      _buildGenderItem(title: "Male", icon: AppIcons.icMale, selectedGender: selectedGender, provider:   provider),
-                      _buildGenderItem(title: "Female", icon: AppIcons.icFemale, selectedGender: selectedGender, provider:   provider),
-                      _buildGenderItem(title: "Rather not say", icon: AppIcons.icGenderRatherNotToSay, selectedGender: selectedGender, provider:   provider),
+                      _buildGenderItem(gender: "Male", icon: AppIcons.icMale, selectedGender: selectedGender, provider:   provider),
+                      _buildGenderItem(gender: "Female", icon: AppIcons.icFemale, selectedGender: selectedGender, provider:   provider),
+                      _buildGenderItem(gender: "Rather not say", icon: AppIcons.icGenderRatherNotToSay, selectedGender: selectedGender, provider:   provider),
 
                     ],
                   )),
@@ -144,8 +144,51 @@ class _AgeGenderPageState extends State<AgeGenderPage> {
     );
   }
 
-  Widget _buildGenderItem({required String title, required String icon,  required String selectedGender, required PersonalInfoProvider provider}) {
-    return CheckboxListTile(
+  Widget _buildGenderItem({required String gender, required String icon,  required String selectedGender, required PersonalInfoProvider provider}) {
+    bool isSelected = selectedGender == gender;
+    Color txtIconColor = isSelected ? Colors.white : AppColors.lightBlackColor;
+    return GestureDetector(
+      onTap: ()=> provider.setGender(gender),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(9),
+          border: Border.all(color: AppColors.borderColor),
+          color: !isSelected ? Colors.white : null,
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            if(isSelected)
+              ClipRRect(
+                  borderRadius: BorderRadius.circular(9),
+                  child: Image.asset(AppIcons.primaryBgGradient, width: double.infinity, fit: BoxFit.cover, height: 75,)),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 21, vertical: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      spacing: 11,
+                      children: [
+                        SvgPicture.asset(icon, colorFilter: ColorFilter.mode(txtIconColor, BlendMode.srcIn),),
+                        Text(gender, style: AppTextStyles.bodyTextStyle.copyWith(color: txtIconColor),)
+                      ],
+                    ),
+                  ),
+                  if(isSelected)
+                    CircleAvatar(
+                      radius: 13,
+                      backgroundColor: Colors.white,
+                      child: Center(child: Icon(Icons.done, color: Colors.black, size: 15,),),
+                    )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    /*return CheckboxListTile(
       tileColor: Colors.white,
 
       shape: RoundedRectangleBorder(
@@ -164,6 +207,6 @@ class _AgeGenderPageState extends State<AgeGenderPage> {
       secondary: SvgPicture.asset(icon),
       checkboxShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(99)),
-    );
+    );*/
   }
 }
