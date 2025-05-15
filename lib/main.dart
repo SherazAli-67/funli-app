@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
           fontFamily: AppConstants.appFontFamily,
           scaffoldBackgroundColor: Colors.white
         ),
-        home: WelcomePage(),
+          home: WelcomePage()
       ),
     );
   }

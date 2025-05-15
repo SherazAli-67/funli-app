@@ -156,7 +156,6 @@ class AuthCubit extends Cubit<AuthStates>{
 
 
   String _getErrorMessage(String errorCode) {
-    debugPrint("Error code: $errorCode");
     switch (errorCode) {
       case 'invalid-email':
         return 'The email address is not valid.';
