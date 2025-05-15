@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
+import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
-import '../res/app_colors.dart';
 import '../res/app_textstyles.dart';
 import '../res/spacing_constants.dart';
 
@@ -22,7 +22,7 @@ class PrimaryBtn extends StatelessWidget {
       onTap: _onTap,
       child: Container(
         decoration: BoxDecoration(
-          gradient: AppGradients.btnGradient,
+          gradient: AppGradients.btnOuterGradient,
             boxShadow: [
               BoxShadow(
                   color: Color(0xffC9BAFF),
@@ -30,32 +30,38 @@ class PrimaryBtn extends StatelessWidget {
                   offset: Offset(0, 6)
               )
             ],
-          borderRadius: BorderRadius.circular(SpacingConstants.borderRadius),
+          borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
         ),
-        padding: EdgeInsets.all(2),
+        // padding: EdgeInsets.all(2),
         child: Container(
           width: double.infinity,
           height: SpacingConstants.buttonHeight,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(SpacingConstants.borderRadius),
-              color: AppColors.colorBlack,
-              boxShadow: [
+              borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
+              // gradient: AppGradients.btnInnerGradient,
+              /*boxShadow: [
                 BoxShadow(
                     color: Color(0xffC9BAFF),
                     blurRadius: 17.6,
                     offset: Offset(0, 6)
                 )
-              ]
+              ]*/
           ),
-          child: _isLoading ? LoadingWidget() : Row(
-            spacing: 10,
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Stack(
+            alignment: Alignment.center,
             children: [
-              if(_isPrefix)
-                SvgPicture.asset(_icon),
-              Text(_text, style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),),
-              if(!_isPrefix)
-                SvgPicture.asset(_icon),
+              Image.asset(AppIcons.btnBgGradient, fit: BoxFit.cover, width: double.infinity,),
+              _isLoading ? LoadingWidget() : Row(
+                spacing: 10,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if(_isPrefix)
+                    SvgPicture.asset(_icon),
+                  Text(_text, style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),),
+                  if(!_isPrefix)
+                    SvgPicture.asset(_icon),
+                ],
+              ),
             ],
           ),
         ),

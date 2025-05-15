@@ -20,6 +20,11 @@ class AppIcons {
 
 
 
+  // Gradients
+  static const String primaryBgGradient = 'assets/icons/ic_splash_bg.png';
+  static const String btnBgGradient = 'assets/icons/btn_bg.png';
+
+  //Pngs
   static const String onboarding1 = 'assets/icons/onboarding_img1.png';
   static const String onboarding2 = 'assets/icons/onboarding_img2.png';
   static const String onboarding3 = 'assets/icons/onboarding_img3.png';

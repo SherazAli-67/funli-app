@@ -84,11 +84,11 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Humanist
+    - family: Poppins
       fonts:
-        - asset: assets/fonts/Hum777Rm.ttf
-        - asset: assets/fonts/Humanist 777 Bold BT.ttf
-        - asset: assets/fonts/Humanst970 BT Bold.ttf
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
 #          weight: 700
 #          style: italic
   #   - family: Trajan Pro

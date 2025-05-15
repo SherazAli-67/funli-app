@@ -44,8 +44,8 @@ class WelcomePage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 14,
                         children: [
-                          Text(item.title, style: AppTextStyles.headingTextStyle3,),
-                          Text(item.subTitle, style: AppTextStyles.bodyTextStyle,),
+                          Text(item.title, style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                          Text(item.subTitle, style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),),
                           Expanded(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(20),
@@ -58,7 +58,7 @@ class WelcomePage extends StatelessWidget {
                     options: CarouselOptions(
                       height: size.height*0.75,
                       aspectRatio: 16/9,
-                      viewportFraction: 0.88,
+                      viewportFraction: 0.85,
                       initialPage: 0,
                       enableInfiniteScroll: true,
                       reverse: false,
@@ -75,8 +75,11 @@ class WelcomePage extends StatelessWidget {
               ),
             ),
             Container(
-              color: Colors.white,
               width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(32), topRight: Radius.circular(32)),
+                color: Colors.white,
+              ),
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 47.0, horizontal: SpacingConstants.screenHorizontalPadding),
                 child: Column(
