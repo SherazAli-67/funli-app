@@ -80,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         AppTextField(textController: _emailController,
                             prefixIcon: AppIcons.icLoginEmail,
-                            hintText: "iejohndoe@gmail.com",
+                            hintText: "e.g. john@email.com",
                             textInputType: TextInputType.emailAddress,
                             titleText: "Email/Username"),
 
@@ -96,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                           }, child: Text(
                             "Oops! Forgot your password?",
                             style: AppTextStyles.bodyTextStyle.copyWith(
-                                color: AppColors.purpleColor),)),
+                                color: AppColors.purpleColor, fontWeight: FontWeight.w400),)),
                         )
 
                       ],
@@ -120,12 +120,12 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 30,),
                         RichText(text: TextSpan(
                           children: [
-                            TextSpan(text: "Don’t have any account? ", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.colorBlack, fontFamily: AppConstants.appFontFamily)),
+                            TextSpan(text: "Don’t have any account? ", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.colorBlack, fontFamily: AppConstants.appFontFamily, fontWeight: FontWeight.w400)),
                             TextSpan(
                                 recognizer: TapGestureRecognizer()..onTap = (){
                                   Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> SignupPage()));
                                 },
-                                text: "Create one!", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontFamily: AppConstants.appFontFamily)),
+                                text: "Create one!", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontFamily: AppConstants.appFontFamily, fontWeight: FontWeight.w400)),
 
                           ]
                         ))

@@ -48,13 +48,14 @@ class _AppTextFieldState extends State<AppTextField> {
               alignLabelWithHint: true,
               enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: AppColors.colorBlack)
+                  borderSide: BorderSide(color: AppColors.borderColor)
               ),
               focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: AppColors.colorBlack)
               ),
               hintText: widget._hintText,
+              hintStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.hintTextColor),
               prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 20),
               prefixIcon: SvgPicture.asset(widget._prefixIcon),
               suffixIcon: widget.isPassword ? IconButton(onPressed: ()=> setState(() => hidePassword = !hidePassword), icon: hidePassword ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off)) : null,

@@ -147,6 +147,7 @@ class _AgeGenderPageState extends State<AgeGenderPage> {
   Widget _buildGenderItem({required String title, required String icon,  required String selectedGender, required PersonalInfoProvider provider}) {
     return CheckboxListTile(
       tileColor: Colors.white,
+
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(9),
         side: BorderSide(

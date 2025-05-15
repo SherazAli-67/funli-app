@@ -43,7 +43,6 @@ class _SignupPageState extends State<SignupPage> {
       child: Column(
         children: [
           AuthPagesHeaderTextWidget(),
-
           Expanded(
             child: Container(
               width: double.infinity,
@@ -61,7 +60,6 @@ class _SignupPageState extends State<SignupPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: 15,
                       children: [
-
                         AppBackButton(),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,13 +91,13 @@ class _SignupPageState extends State<SignupPage> {
                             hintText: "**************",
                             titleText: "Password", isPassword: true,),
 
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: TextButton(onPressed: () {}, child: Text(
-                            "Oops! Forgot your password?",
-                            style: AppTextStyles.bodyTextStyle.copyWith(
-                                color: AppColors.purpleColor),)),
-                        )
+                        RichText(text: TextSpan(
+                          children: [
+                            TextSpan(text: '*By tapping ', style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: AppConstants.appFontFamily)),
+                            TextSpan(text: '‘Create Account’, ', style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontWeight: FontWeight.w400, fontFamily: AppConstants.appFontFamily)),
+                            TextSpan(text: 'you’re cool with our Terms & Privacy. 💯*', style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.black, fontWeight: FontWeight.w400, fontFamily: AppConstants.appFontFamily))
+                          ]
+                        ))
 
                       ],
                     ),
