@@ -150,6 +150,7 @@ class _AgeGenderPageState extends State<AgeGenderPage> {
     return GestureDetector(
       onTap: ()=> provider.setGender(gender),
       child: Container(
+        height: 65,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(9),
           border: Border.all(color: AppColors.borderColor),
@@ -161,7 +162,7 @@ class _AgeGenderPageState extends State<AgeGenderPage> {
             if(isSelected)
               ClipRRect(
                   borderRadius: BorderRadius.circular(9),
-                  child: Image.asset(AppIcons.primaryBgGradient, width: double.infinity, fit: BoxFit.cover, height: 75,)),
+                  child: Image.asset(AppIcons.primaryBgGradient, width: double.infinity, fit: BoxFit.cover, height: 65,)),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 21, vertical: 20),
               child: Row(

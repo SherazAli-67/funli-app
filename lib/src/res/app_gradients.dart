@@ -14,8 +14,9 @@ class AppGradients {
   );*/
   static final LinearGradient primaryGradient = LinearGradient(
     colors: [
-      Color.fromRGBO(255, 59, 48, 0.8),
-      Color.fromRGBO(255, 149, 0, 1),
+      // Color.fromRGBO(255, 59, 48, 0),
+      // Color.fromRGBO(255, 149, 0, 0.5),
+      Color.fromRGBO(255, 204, 0, 1),
       Color.fromRGBO(255, 204, 0, 1),
       Color.fromRGBO(52, 199, 89, 1),
       Color.fromRGBO(0, 122, 255, 1),
