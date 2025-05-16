@@ -16,8 +16,7 @@ class AppIcons {
   static const icSearch = 'assets/icons/ic_search.svg';
   static const icNotification = 'assets/icons/ic_notification.svg';
   static const icUserProfile = 'assets/icons/ic_user_profile.svg';
-
-
+  static const icMic = 'assets/icons/ic_mic.svg';
 
 
   // Gradients
@@ -29,4 +28,5 @@ class AppIcons {
   static const String onboarding1 = 'assets/icons/onboarding_img1.png';
   static const String onboarding2 = 'assets/icons/onboarding_img2.png';
   static const String onboarding3 = 'assets/icons/onboarding_img3.png';
+  static const emojiHappyMoodDetected = 'assets/icons/ic_mood_happy_detected.png';
 }

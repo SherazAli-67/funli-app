@@ -11,8 +11,9 @@ class AppTextField extends StatefulWidget {
     required String titleText,
     this.isPassword = false,
     this.isReadOnly = false,
-    TextInputType textInputType = TextInputType.text
-  }) : _textController = textController, _prefixIcon = prefixIcon, _hintText = hintText, _titleText = titleText, _textInputType = textInputType;
+    TextInputType textInputType = TextInputType.text,
+    TextStyle hintTextStyle = AppTextStyles.hintTextStyle,
+  }) : _textController = textController, _prefixIcon = prefixIcon, _hintText = hintText, _titleText = titleText, _textInputType = textInputType, _hintTextStyle = hintTextStyle;
 
   final TextEditingController _textController;
   final String _prefixIcon;
@@ -21,6 +22,7 @@ class AppTextField extends StatefulWidget {
   final bool isPassword;
   final bool isReadOnly;
   final TextInputType _textInputType;
+  final TextStyle _hintTextStyle;
   @override
   State<AppTextField> createState() => _AppTextFieldState();
 }
@@ -55,7 +57,7 @@ class _AppTextFieldState extends State<AppTextField> {
                   borderSide: BorderSide(color: AppColors.colorBlack)
               ),
               hintText: widget._hintText,
-              hintStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.hintTextColor),
+              hintStyle: widget._hintTextStyle,
               prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 20),
               prefixIcon: SvgPicture.asset(widget._prefixIcon),
               suffixIcon: widget.isPassword ? IconButton(onPressed: ()=> setState(() => hidePassword = !hidePassword), icon: hidePassword ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off)) : null,

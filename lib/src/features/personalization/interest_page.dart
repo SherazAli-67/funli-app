@@ -85,33 +85,6 @@ class _InterestPageState extends State<InterestPage> {
               }).toList(),
             ));
           },),
-        /*
-        * Color color = interestList[index]['color'];
-              String interest = interestList[index]['interest'];
-
-              bool isSelected = provider.selectedInterests.contains(interest);
-              return GestureDetector(
-                onTap: ()=> provider.addToInterest(interest),
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(19)
-                  ),
-                  child: isSelected ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 10,
-                    children: [
-                      CircleAvatar(
-                        radius: 12,
-                        backgroundColor: Colors.white,
-                        child: Center(child: Icon(Icons.done, color: AppColors.purpleColor, size: 20,),),
-                      ),
-                      Text(interest, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w600, color: Colors.white),)
-                    ],
-                  ) : Center(child: Text(interest, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w600),),),
-                ),
-              );
-        * */
       ],
     );
   }

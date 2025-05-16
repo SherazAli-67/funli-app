@@ -13,6 +13,7 @@ import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
+import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:provider/provider.dart';
 
 class PersonalizationPage extends StatefulWidget{
@@ -28,7 +29,7 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
   final List<Widget> _pages = [
     AgeGenderPage(),
     InterestPage(),
-    MoodDetectionSetup()
+    // MoodDetectionSetup()
   ];
   int _currentPage = 0;
 
@@ -56,7 +57,8 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
                 )
               ],
             ),
-            Expanded(child: PageView.builder(
+            Expanded(
+                child: PageView.builder(
                 controller: _pageController,
                 itemCount: _pages.length,
                 onPageChanged: (index)=> setState(() => _currentPage = index),
@@ -73,7 +75,23 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
                 }
               },
               builder: (_, state) {
-                return PrimaryBtn(btnText: "Next", icon: AppIcons.icArrowNext, onTap: (){
+                return _currentPage == _pages.length-1 ? SizedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 22),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 17,
+                      children: [
+                        Expanded(child: SecondaryBtn(btnText: "Back", icon: AppIcons.icArrowBack, onTap: (){
+                          _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+                        }, isPrefix: true,)),
+                        Expanded(child: PrimaryBtn(btnText: "Let’s Go!", icon: AppIcons.icArrowNext, onTap: (){
+                          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> MoodDetectionSetup()), (val)=> false);
+                        }))
+                      ],
+                    ),
+                  ),
+                ) : PrimaryBtn(btnText: "Next", icon: AppIcons.icArrowNext, onTap: (){
                   if(_currentPage == _pages.length-1){
                     final infoProvider = Provider.of<PersonalInfoProvider>(context, listen: false);
                     DateTime dob = DateTime(infoProvider.selectedYear, infoProvider.selectedMonth, infoProvider.selectedDay);
@@ -86,7 +104,9 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
                   }
                 }, isLoading: state is CompletingUserSignupInfo,);
               }
-            )
+            ),
+            InkWell(
+                onTap: (){}, child: Text("Skip for now", style: AppTextStyles.buttonTextStyle,))
           ],
         ),
       )),

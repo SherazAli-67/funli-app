@@ -50,15 +50,18 @@ class PrimaryBtn extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              Image.asset(AppIcons.btnBgGradient, fit: BoxFit.cover, width: double.infinity,),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
+                child: Image.asset(AppIcons.btnBgGradient, fit: BoxFit.cover, width: double.infinity, height: SpacingConstants.buttonHeight,),
+              ),
               _isLoading ? LoadingWidget() : Row(
                 spacing: 10,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if(_isPrefix)
+                  if(_isPrefix && _icon.isNotEmpty)
                     SvgPicture.asset(_icon),
                   Text(_text, style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),),
-                  if(!_isPrefix)
+                  if(!_isPrefix && _icon.isNotEmpty)
                     SvgPicture.asset(_icon),
                 ],
               ),
