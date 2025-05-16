@@ -28,7 +28,7 @@ class MainMenuPage extends StatelessWidget{
                 child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-                gradient: AppGradients.bottomNavigationBarGradient
+                gradient: AppGradients.primaryGradient
               ),
               child: Padding(
                 padding: const EdgeInsets.only(left: 10.0, bottom: 25,top: 10, right: 10),
@@ -74,7 +74,7 @@ class MainMenuPage extends StatelessWidget{
     provider.onTabChange(index);
   }
   Widget _buildBottomNavigationItemWidget({required String icon, required bool isSelected, required VoidCallback onTap}) =>
-      IconButton(onPressed: onTap, icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(isSelected ? AppColors.purpleColor : Colors.white, BlendMode.srcIn),));
+      IconButton(onPressed: onTap, icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(isSelected ? Colors.black : Colors.white, BlendMode.srcIn),));
   /*  BottomNavigationBarItem(
         icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(
             isSelected ? AppColors.primaryColor : Colors.grey,

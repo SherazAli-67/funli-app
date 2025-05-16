@@ -64,7 +64,7 @@ class _InterestPageState extends State<InterestPage> {
                       borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
                       border: Border.all(color: AppColors.borderColor),
                       color: !isSelected ? Colors.white : null,
-                      gradient: isSelected ? AppGradients.primaryGradient : null
+                      gradient: isSelected ? AppGradients.interestItemGradient : null
                     ),
                     child: Stack(
                       alignment: Alignment.center,
