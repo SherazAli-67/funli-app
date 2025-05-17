@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/features/upload_feel/edit_feel_page.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -8,6 +9,7 @@ import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
 import 'package:provider/provider.dart';
@@ -84,22 +86,20 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    // final scale = 1 / (_controller.value.aspectRatio * size.aspectRatio);
+    final scale = 1 / (_controller.value.aspectRatio * size.aspectRatio);
 
     return Scaffold(
       body: _isCameraInitialized
           ? Stack(
         children: [
-          Image.network(AppIcons.icDummyImgUrl,fit: BoxFit.cover, height: size.height,),
-          /*Transform.scale(
+          // Image.network(AppIcons.icDummyImgUrl,fit: BoxFit.cover, height: size.height,),
+          Transform.scale(
             scale: scale,
             alignment: Alignment.topCenter,
-            child: Image.network(AppIcons.icDummyImgUrl,fit: BoxFit.fitHeight,)
-            
-            // CameraPreview(_controller),
-          ),*/
+            child: CameraPreview(_controller),
+          ),
           Positioned(
-            bottom: 45,
+            bottom: 0,
             left: 30,
             right: 30,
             child: Consumer<RecordUploadProvider>(
@@ -136,7 +136,13 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                             child: IconButton(onPressed: (){}, icon: SvgPicture.asset(AppIcons.icRecordVideo)),
                           ),
                         ),
-                        IconButton(onPressed: (){}, icon: SvgPicture.asset(AppIcons.icUpload))
+                        IconButton(onPressed: ()async{
+                          final ImagePicker picker = ImagePicker();
+                         XFile? pickedVideo = await picker.pickVideo(source: ImageSource.gallery);
+                         if(pickedVideo != null){
+                             // Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> EditFeelPage()));
+                         }
+                        }, icon: SvgPicture.asset(AppIcons.icUpload))
                       ],
                     )
                   ],
@@ -145,7 +151,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
             ),
           ),
           Positioned(
-            top: 45,
+            top: 65 ,
             left: 30,
             right: 30,
             child: Consumer<RecordUploadProvider>(
