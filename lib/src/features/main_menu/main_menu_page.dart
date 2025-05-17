@@ -4,7 +4,7 @@ import 'package:funli_app/src/features/main_menu/home_page.dart';
 import 'package:funli_app/src/features/main_menu/notification_page.dart';
 import 'package:funli_app/src/features/main_menu/search_page.dart';
 import 'package:funli_app/src/features/main_menu/user_profile_page.dart';
-import 'package:funli_app/src/res/app_colors.dart';
+import 'package:funli_app/src/features/upload_feel/create_upload_feel_page.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:provider/provider.dart';
 
@@ -51,7 +51,9 @@ class MainMenuPage extends StatelessWidget{
                           color: Colors.black,
                             borderRadius: BorderRadius.circular(35)
                         ),
-                        child: IconButton(onPressed: (){}, icon: Icon(Icons.add, color: Colors.white,)),
+                        child: IconButton(onPressed: (){
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()));
+                        }, icon: Icon(Icons.add, color: Colors.white,)),
                       ),
                     ),
 
