@@ -10,4 +10,7 @@ class AppColors {
   static const Color greyColor = Color(0xffEAEAEA);
   static const Color pinkColor = Color(0xffFF47DD);
   static const Color hintTextColor = Color(0xff989898);
+  static const Color lightDarkBgColor = Color.fromRGBO(53, 56, 63, 0.6);
+  static const greyTextColor = Color(0xff9E9E9E);
+  static const yellowAccentColor = Color(0xffE4FF17);
 }
