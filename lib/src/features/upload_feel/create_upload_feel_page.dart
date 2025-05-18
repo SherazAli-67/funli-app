@@ -1,7 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:funli_app/src/features/upload_feel/edit_feel_page.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -10,8 +9,8 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' show join;
+// import 'package:path_provider/path_provider.dart';
+// import 'package:path/path.dart' show join;
 import 'package:provider/provider.dart';
 
 class CreateUploadFeelPage extends StatefulWidget {
@@ -24,7 +23,7 @@ class CreateUploadFeelPage extends StatefulWidget {
 class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with WidgetsBindingObserver {
   late CameraController _controller;
   late List<CameraDescription> _cameras;
-  bool _isRecording = false;
+  // bool _isRecording = false;
   bool _isCameraInitialized = false;
 
 
@@ -45,7 +44,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
     });
   }
 
-  Future<void> _startVideoRecording() async {
+/*  Future<void> _startVideoRecording() async {
     if (!_controller.value.isInitialized || _isRecording) return;
 
     final directory = await getTemporaryDirectory();
@@ -63,7 +62,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
 
     debugPrint("Video recorded to: ${file.path}");
     // TODO: Save or upload the video file as needed
-  }
+  }*/
 
   @override
   void dispose() {
