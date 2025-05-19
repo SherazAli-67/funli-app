@@ -8,6 +8,8 @@ class RecordUploadProvider extends ChangeNotifier{
 
   String currentMood = 'Happy';
   String? recordedVideoPath;
+  double playbackSpeed = 1;
+  bool isMuted = false;
 
   void toggleRecording(){
     isRecording = !isRecording;
@@ -36,6 +38,15 @@ class RecordUploadProvider extends ChangeNotifier{
 
   void setRecordedVideoPath(String path){
     recordedPath = path;
+    notifyListeners();
+  }
+  void setPlaybackSpeed(double playbackSpeed){
+    this.playbackSpeed = playbackSpeed;
+    notifyListeners();
+  }
+
+  void setMuted(bool val){
+    isMuted = val;
     notifyListeners();
   }
 }

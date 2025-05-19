@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.0 <4.0.0"
+  sdk: 3.7.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -51,6 +51,7 @@ dependencies:
   video_player: ^2.9.5
 #  video_trimmer: ^4.0.0
   awesome_snackbar_content: ^0.1.5
+  fluttertoast: ^8.2.12
 
 dev_dependencies:
   flutter_test:

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +22,11 @@ class EditUploadedFeelPage extends StatefulWidget{
 class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
   late VideoPlayerController _controller;
 
+  bool _showTrimmer = false;
+  bool _showPlaybackSpeed = false;
+  bool _isMuted = false;
+
+  late RecordUploadProvider _provider;
   @override
   void initState() {
     super.initState();
@@ -38,6 +44,7 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
   }
   @override
   Widget build(BuildContext context) {
+    _provider = Provider.of<RecordUploadProvider>(context);
     return Scaffold(
       body: Stack(
         children: [
@@ -93,27 +100,42 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
               gradient: AppGradients.primaryGradient,
               borderRadius: BorderRadius.circular(24)
             ),
-                child: Row(
+                child: _showTrimmer ? _buildTrimmerWidget() : _showPlaybackSpeed ? _buildPlaybackSpeedWidget() : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(onPressed: (){}, icon: Column(
+                    IconButton(onPressed: ()=> setState(()=> _showTrimmer = true), icon: Column(
                       spacing: 4,
                       children: [
                         SvgPicture.asset(AppIcons.icTrim),
                         Text("Trim", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
                       ],
                     )),
-                    TextButton(onPressed: (){}, child: Column(
+                    TextButton(onPressed: ()=> setState(()=> _showPlaybackSpeed = true), child: Column(
                       spacing: 4,
                       children: [
                         Text("2x", style: AppTextStyles.headingTextStyle.copyWith(color: Colors.white)),
                         Text("Trim", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
                       ],
                     )),
-                    IconButton(onPressed: (){}, icon: Column(
+                    IconButton(onPressed: (){
+                      if(_isMuted){
+                        _isMuted = false;
+                        _controller.setVolume(1.0);
+                        _controller.play();
+                        _provider.setMuted(false);
+                        printToastMsg("Video is un muted!");
+                      }else{
+                        _isMuted = true;
+                        _controller.setVolume(0.0);
+                        _controller.play();
+                        _provider.setMuted(false);
+                        printToastMsg("Video is muted!");
+                      }
+                      setState(() {});
+                    }, icon: Column(
                       spacing: 4,
                       children: [
-                       SvgPicture.asset(AppIcons.icVolumeUp),
+                        SvgPicture.asset(_isMuted ? AppIcons.icMute : AppIcons.icVolumeUp),
                         Text("Sound", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
                       ],
                     )),
@@ -124,5 +146,56 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
       ),
 
     );
+  }
+
+  Widget _buildTrimmerWidget() {
+    return const SizedBox();
+  }
+
+  Widget _buildPlaybackSpeedWidget() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              spacing: 10,
+              children: [
+                Icon(Icons.close, color: Colors.white,),
+                Text("Playback Speed", style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),)
+              ],
+            ),
+            TextButton(onPressed: ()=> setState(() => _showPlaybackSpeed = false), child: Text("DONE", style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildPlaybackSpeedItem(playbackSpeed: 0.5),
+            _buildPlaybackSpeedItem(playbackSpeed: 1),
+            _buildPlaybackSpeedItem(playbackSpeed: 2),
+            _buildPlaybackSpeedItem(playbackSpeed: 3),
+
+          ],
+        )
+      ],
+    );
+  }
+
+  Widget _buildPlaybackSpeedItem({required double playbackSpeed}) {
+    bool isSelected = _provider.playbackSpeed == playbackSpeed;
+    String playbackSpeedTxt = playbackSpeed % 1 == 0 ? playbackSpeed.ceil().toString() : playbackSpeed.toString();
+    return TextButton(onPressed: () {
+      _provider.setPlaybackSpeed(playbackSpeed);
+      _controller.setPlaybackSpeed(playbackSpeed);
+      _controller.play();
+    },
+        child: Text("${playbackSpeedTxt}x",
+          style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white,
+              fontWeight: isSelected ? FontWeight.w900 : FontWeight.w300),));
+  }
+
+  void printToastMsg(String msg){
+    Fluttertoast.showToast(msg: msg);
   }
 }
