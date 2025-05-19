@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 class RecordUploadProvider extends ChangeNotifier{
   bool isRecording = false;
   bool isRecorded = false;
-  String? recordedPath;
+  String? _recordedPath;
   String videoRecordingDuration = '30s';
 
   String currentMood = 'Happy';
-  String? recordedVideoPath;
   double playbackSpeed = 1;
   bool isMuted = false;
 
+  String? get recordedPath => _recordedPath;
   void toggleRecording(){
     isRecording = !isRecording;
     notifyListeners();
@@ -22,7 +22,7 @@ class RecordUploadProvider extends ChangeNotifier{
   }
 
   void setRecordingPath(String path){
-    recordedPath = path;
+    _recordedPath = path;
     notifyListeners();
   }
 
@@ -37,7 +37,7 @@ class RecordUploadProvider extends ChangeNotifier{
   }
 
   void setRecordedVideoPath(String path){
-    recordedPath = path;
+    _recordedPath = path;
     notifyListeners();
   }
   void setPlaybackSpeed(double playbackSpeed){

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:funli_app/src/features/upload_feel/publish_reel_page.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:provider/provider.dart';
@@ -42,6 +43,7 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
     _controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     _provider = Provider.of<RecordUploadProvider>(context);
@@ -80,7 +82,10 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
                           children: [
                             AppBackButton(color: Colors.white,),
                             Text("Create a Feel", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
-                            TextButton(onPressed: (){}, child: Text("Next", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),))
+                            TextButton(onPressed: (){
+                              provider.setRecordingPath(widget.videoPath);
+                              Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> PublishReelPage()));
+                            }, child: Text("Next", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),))
                           ],
                         ),
 
