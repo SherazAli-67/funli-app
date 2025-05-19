@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/features/upload_feel/edit_uploaded_feel.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -88,7 +89,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
     setState(()=> _isRecording = false);
 
     _recordUploadProvider.setRecordingPath(file.path);
-    // Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> EditUploadedFeelPage(videoPath: file.path,)));
+    Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> EditUploadedFeelPage(videoPath: file.path,)));
   }
 
   void _onScaleStart(ScaleStartDetails details) {
@@ -150,7 +151,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
               left: 30,
               right: 30,
               child: Consumer<RecordUploadProvider>(
-                builder: (_, provider, _) {
+                builder: (ctx, provider, _) {
                   return Column(
                     spacing: 16,
                     children: [
@@ -213,7 +214,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
               left: 30,
               right: 30,
               child: Consumer<RecordUploadProvider>(
-                  builder: (_, provider, _) {
+                  builder: (ctx, provider, _) {
                     return Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Column(
@@ -250,8 +251,8 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
               ),
             ),
 
-            ],
-           ),
+                    ],
+                  ),
           )
           : Center(child: CircularProgressIndicator()),
     );

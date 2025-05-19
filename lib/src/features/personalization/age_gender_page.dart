@@ -85,7 +85,7 @@ class _AgeGenderPageState extends State<AgeGenderPage> {
   @override
   Widget build(BuildContext context) {
     return Consumer<PersonalInfoProvider>(
-      builder: (_, provider, _){
+      builder: (ctx, provider, _){
         String selectedGender = provider.selectedGender;
         return Column(
           children: [

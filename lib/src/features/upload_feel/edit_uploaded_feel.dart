@@ -1,0 +1,128 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/res/app_gradients.dart';
+import 'package:funli_app/src/res/app_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
+
+import '../../providers/record_upload_provider.dart';
+import '../../res/app_textstyles.dart';
+import '../../widgets/app_back_button.dart';
+
+class EditUploadedFeelPage extends StatefulWidget{
+  const EditUploadedFeelPage({super.key, required this.videoPath});
+  final String videoPath;
+  @override
+  State<EditUploadedFeelPage> createState() => _EditUploadedFeelPageState();
+}
+
+class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.file(File(widget.videoPath))
+      ..initialize().then((_) {
+        setState(() {}); // Refresh to show the initialized video
+        _controller.play(); // Auto-play
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Center(
+            child: _controller.value.isInitialized
+                ? SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.cover,
+
+                child: SizedBox(
+                  width: _controller.value.size.width,
+                  height: _controller.value.size.height,
+                  child: VideoPlayer(_controller),
+                ),
+              ),
+            )
+                : CircularProgressIndicator(),
+          ),
+          Positioned(
+            top: 65 ,
+            left: 10,
+            right: 10,
+            child: Consumer<RecordUploadProvider>(
+                builder: (ctx, provider, _) {
+                  return Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      spacing: 16,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AppBackButton(color: Colors.white,),
+                            Text("Create a Feel", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                            TextButton(onPressed: (){}, child: Text("Next", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),))
+                          ],
+                        ),
+
+                      ],
+                    ),
+                  );
+                }
+            ),
+          ),
+          Positioned(
+              bottom: 40,
+              left: 20,
+              right: 20,
+              child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 29, vertical: 5),
+            decoration: BoxDecoration(
+              gradient: AppGradients.primaryGradient,
+              borderRadius: BorderRadius.circular(24)
+            ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(onPressed: (){}, icon: Column(
+                      spacing: 4,
+                      children: [
+                        SvgPicture.asset(AppIcons.icTrim),
+                        Text("Trim", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
+                      ],
+                    )),
+                    TextButton(onPressed: (){}, child: Column(
+                      spacing: 4,
+                      children: [
+                        Text("2x", style: AppTextStyles.headingTextStyle.copyWith(color: Colors.white)),
+                        Text("Trim", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
+                      ],
+                    )),
+                    IconButton(onPressed: (){}, icon: Column(
+                      spacing: 4,
+                      children: [
+                       SvgPicture.asset(AppIcons.icVolumeUp),
+                        Text("Sound", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
+                      ],
+                    )),
+                  ],
+                ),
+          ))
+        ],
+      ),
+
+    );
+  }
+}
