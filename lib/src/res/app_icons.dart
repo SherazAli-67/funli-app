@@ -19,6 +19,10 @@ class AppIcons {
   static const icMic = 'assets/icons/ic_mic.svg';
   static const icUpload = 'assets/icons/ic_upload.svg';
   static const icRecordVideo = 'assets/icons/ic_video_record.svg';
+  static const icStopRecording = 'assets/icons/ic_stop_recording.svg';
+  static const icTrim = 'assets/icons/ic_trim.svg';
+  static const icMute = 'assets/icons/ic_mute.svg';
+  static const icVolumeUp = 'assets/icons/ic_volume_up.svg';
 
   // Gradients
   static const String primaryBgGradient = 'assets/icons/ic_splash_bg.png';

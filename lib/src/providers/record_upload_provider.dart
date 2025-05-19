@@ -7,6 +7,7 @@ class RecordUploadProvider extends ChangeNotifier{
   String videoRecordingDuration = '30s';
 
   String currentMood = 'Happy';
+  String? recordedVideoPath;
 
   void toggleRecording(){
     isRecording = !isRecording;
@@ -30,6 +31,11 @@ class RecordUploadProvider extends ChangeNotifier{
 
   void changeMood(String mood){
     currentMood = mood;
+    notifyListeners();
+  }
+
+  void setRecordedVideoPath(String path){
+    recordedPath = path;
     notifyListeners();
   }
 }
