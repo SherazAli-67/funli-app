@@ -13,4 +13,5 @@ class AppColors {
   static const Color lightDarkBgColor = Color.fromRGBO(53, 56, 63, 0.6);
   static const greyTextColor = Color(0xff9E9E9E);
   static const yellowAccentColor = Color(0xffE4FF17);
+  static const textFieldBorderColor = Color(0xffD3D3D3);
 }

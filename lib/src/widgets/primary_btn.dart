@@ -9,13 +9,14 @@ import '../res/spacing_constants.dart';
 class PrimaryBtn extends StatelessWidget {
   const PrimaryBtn({
     super.key,
-    required String btnText, required String icon, required VoidCallback onTap, bool isPrefix = false, bool isLoading = false
-  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _isLoading = isLoading;
+    required String btnText, required String icon, required VoidCallback onTap, String bgGradient = AppIcons.btnBgGradient, bool isPrefix = false, bool isLoading = false
+  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _isLoading = isLoading, _bgGradient = bgGradient;
   final String _text;
   final String _icon;
   final VoidCallback _onTap;
   final bool _isPrefix;
   final bool _isLoading;
+  final String _bgGradient;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -52,7 +53,7 @@ class PrimaryBtn extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
-                child: Image.asset(AppIcons.btnBgGradient, fit: BoxFit.cover, width: double.infinity, height: SpacingConstants.buttonHeight,),
+                child: Image.asset(_bgGradient, fit: BoxFit.cover, width: double.infinity, height: SpacingConstants.buttonHeight,),
               ),
               _isLoading ? LoadingWidget() : Row(
                 spacing: 10,

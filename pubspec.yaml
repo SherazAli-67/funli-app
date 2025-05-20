@@ -52,6 +52,7 @@ dependencies:
 #  video_trimmer: ^4.0.0
   awesome_snackbar_content: ^0.1.5
   fluttertoast: ^8.2.12
+  extended_text_field: ^16.0.2
 
 dev_dependencies:
   flutter_test:

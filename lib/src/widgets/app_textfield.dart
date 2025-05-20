@@ -13,7 +13,15 @@ class AppTextField extends StatefulWidget {
     this.isReadOnly = false,
     TextInputType textInputType = TextInputType.text,
     TextStyle hintTextStyle = AppTextStyles.hintTextStyle,
-  }) : _textController = textController, _prefixIcon = prefixIcon, _hintText = hintText, _titleText = titleText, _textInputType = textInputType, _hintTextStyle = hintTextStyle;
+    int maxLines = 1,
+  })
+      : _textController = textController,
+        _prefixIcon = prefixIcon,
+        _hintText = hintText,
+        _titleText = titleText,
+        _textInputType = textInputType,
+        _hintTextStyle = hintTextStyle,
+        _maxLines = maxLines;
 
   final TextEditingController _textController;
   final String _prefixIcon;
@@ -23,6 +31,7 @@ class AppTextField extends StatefulWidget {
   final bool isReadOnly;
   final TextInputType _textInputType;
   final TextStyle _hintTextStyle;
+  final int _maxLines;
   @override
   State<AppTextField> createState() => _AppTextFieldState();
 }
@@ -34,10 +43,16 @@ class _AppTextFieldState extends State<AppTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget._titleText, style: AppTextStyles.bodyTextStyle,),
-        const SizedBox(height: 5,),
+        if(widget._titleText.isNotEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(widget._titleText, style: AppTextStyles.bodyTextStyle,),
+              const SizedBox(height: 5,),
+            ],
+          ),
         SizedBox(
-          height: 48,
+          height:  widget._maxLines > 1 ? null : 48,
           child: TextField(
             controller: widget._textController,
             style: AppTextStyles.bodyTextStyle,
@@ -45,7 +60,7 @@ class _AppTextFieldState extends State<AppTextField> {
             readOnly: widget.isReadOnly,
             obscureText: widget.isPassword && hidePassword,
             cursorColor: Colors.grey,
-
+            maxLines: widget._maxLines,
             decoration: InputDecoration(
               alignLabelWithHint: true,
               enabledBorder: OutlineInputBorder(
@@ -59,7 +74,7 @@ class _AppTextFieldState extends State<AppTextField> {
               hintText: widget._hintText,
               hintStyle: widget._hintTextStyle,
               prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 20),
-              prefixIcon: SvgPicture.asset(widget._prefixIcon),
+              prefixIcon: widget._prefixIcon.isNotEmpty ? SvgPicture.asset(widget._prefixIcon) : null,
               suffixIcon: widget.isPassword ? IconButton(onPressed: ()=> setState(() => hidePassword = !hidePassword), icon: hidePassword ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off)) : null,
 
             ),
