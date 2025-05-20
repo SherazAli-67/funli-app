@@ -133,15 +133,8 @@ class _PublishReelPageState extends State<PublishReelPage> {
                     debugPrint("Text found: $text");
                   },
                 ),
-                PrimaryBtn(btnText: "Feeling 😄 Happy!", icon: '', onTap: (){
-                  showModalBottomSheet(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(topRight: Radius.circular(32), topLeft: Radius.circular(32))
-                      ),
-                      context: context, builder: (_){
-                        return MoodWheelSheet();
-                  });
+                PrimaryBtn(btnText: "Feeling 😄 Happy!", icon: '', onTap: ()async{
+
                 }, bgGradient: AppIcons.primaryBgGradient,)
 
               ],

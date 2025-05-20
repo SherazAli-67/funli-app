@@ -1,84 +1,113 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-class MoodWheelSheet extends StatefulWidget {
+class MoodWheelScreen extends StatefulWidget {
   @override
-  _MoodWheelSheetState createState() => _MoodWheelSheetState();
+  _MoodWheelScreenState createState() => _MoodWheelScreenState();
 }
 
-class _MoodWheelSheetState extends State<MoodWheelSheet> {
-  List<String> moods = ["😢", "😐", "😄", "😒", "🤣"];
+class _MoodWheelScreenState extends State<MoodWheelScreen> {
+  final List<Map<String, String>> moods = [
+    {'emoji': '😢', 'label': 'Sad'},
+    {'emoji': '😥', 'label': 'Crying'},
+    {'emoji': '😄', 'label': 'Happy'},
+    {'emoji': '😒', 'label': 'Annoyed'},
+    {'emoji': '🤣', 'label': 'Laughing'},
+    {'emoji': '😡', 'label': 'Angry'},
+  ];
+
+  late PageController _controller;
   int currentIndex = 2;
 
-  void rotateLeft() {
-    setState(() {
-      currentIndex = (currentIndex + 1) % moods.length;
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController(
+      initialPage: currentIndex,
+      viewportFraction: 0.3,
+    );
+
+    _controller.addListener(() {
+      final newIndex = _controller.page!.round();
+      if (newIndex != currentIndex) {
+        setState(() {
+          currentIndex = newIndex;
+        });
+      }
     });
   }
 
-  void rotateRight() {
-    setState(() {
-      currentIndex = (currentIndex - 1 + moods.length) % moods.length;
-    });
+  void scrollLeft() {
+    if (currentIndex < moods.length - 1) {
+      _controller.animateToPage(currentIndex + 1,
+          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+    }
+  }
+
+  void scrollRight() {
+    if (currentIndex > 0) {
+      _controller.animateToPage(currentIndex - 1,
+          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    double radius = 90;
     return Container(
-      padding: EdgeInsets.only(top: 24, bottom: 40),
-      height: 400, // Important: set fixed height
+      height: 420,
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      ),
       child: Column(
         children: [
-          Text(
-            "Change your mood!",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 24),
+          Text("Change your mood!",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 24),
 
-          // Fixed height + Stack
           SizedBox(
-            width: double.infinity,
-            height: 180,
-            child: Stack(
-              alignment: Alignment.center,
-              children: List.generate(moods.length, (i) {
-                double angle = 2 * pi * (i - currentIndex + moods.length) % moods.length / moods.length;
-                double x = radius * cos(angle);
-                double y = radius * sin(angle);
+            height: 160,
+            child: PageView.builder(
+              scrollDirection: Axis.horizontal,
+              controller: _controller,
+              itemCount: moods.length,
+              itemBuilder: (_, index) {
+                final offset = (index - currentIndex).toDouble();
+                final scale = max(0.8, 1.2 - offset.abs() * 0.3);
+                final verticalOffset = offset.abs() * 20;
 
-                return Positioned(
-                  left: MediaQuery.of(context).size.width / 2 + x - 20,
-                  top: 70 + y,
+                return Transform.translate(
+                  offset: Offset(0, verticalOffset),
                   child: Opacity(
-                    opacity: i == currentIndex ? 1.0 : 0.5,
-                    child: Text(
-                      moods[i],
-                      style: TextStyle(fontSize: i == currentIndex ? 44 : 28),
+                    opacity: offset.abs() > 2 ? 0.0 : 1.0,
+                    child: Center(
+                      child: Text(
+                        moods[index]['emoji']!,
+                        style: TextStyle(fontSize: 60 * scale),
+                      ),
                     ),
                   ),
                 );
-              }),
+              },
             ),
           ),
 
-          SizedBox(height: 24),
-          Text(getMoodName(moods[currentIndex]), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-          Text("(Current)", style: TextStyle(color: Colors.grey)),
+          const SizedBox(height: 16),
+          Text(
+            moods[currentIndex]['label']!,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const Text("(Current)", style: TextStyle(color: Colors.grey)),
+          const Spacer(),
 
-          Spacer(),
-
-          // Colorful button with tap detection
           GestureDetector(
             onTapDown: (details) {
-              final box = context.findRenderObject() as RenderBox;
-              final localPos = box.globalToLocal(details.globalPosition);
-              final width = box.size.width;
-
-              if (localPos.dx < width / 2) {
-                rotateRight(); // Tap on left side
+              final width = MediaQuery.of(context).size.width;
+              if (details.globalPosition.dx < width / 2) {
+                scrollRight(); // Left tap
               } else {
-                rotateLeft(); // Tap on right side
+                scrollLeft(); // Right tap
               }
             },
             child: Container(
@@ -100,26 +129,9 @@ class _MoodWheelSheetState extends State<MoodWheelSheet> {
                 child: Icon(Icons.compare_arrows, color: Colors.white, size: 36),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
-  }
-
-  String getMoodName(String emoji) {
-    switch (emoji) {
-      case "😄":
-        return "Happy";
-      case "😢":
-        return "Sad";
-      case "😐":
-        return "Neutral";
-      case "😒":
-        return "Annoyed";
-      case "🤣":
-        return "Laughing";
-      default:
-        return "Mood";
-    }
   }
 }

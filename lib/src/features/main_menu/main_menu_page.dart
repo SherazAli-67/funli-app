@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/tab_change_provider.dart';
 import '../../res/app_icons.dart';
+import '../../widgets/mood_wheel_scroll_widget.dart';
 
 class MainMenuPage extends StatelessWidget{
   const MainMenuPage({super.key});
@@ -51,8 +52,17 @@ class MainMenuPage extends StatelessWidget{
                           color: Colors.black,
                             borderRadius: BorderRadius.circular(35)
                         ),
-                        child: IconButton(onPressed: (){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()));
+                        child: IconButton(onPressed: ()async{
+                          // Show the wheel selector in a modal bottom sheet
+                          showModalBottomSheet(
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(topRight: Radius.circular(32), topLeft: Radius.circular(32))
+                              ),
+                              context: context, builder: (_){
+                            return MoodWheelScreen();
+                          });
+                          // Navigator.of(context).push(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()));
                         }, icon: Icon(Icons.add, color: Colors.white,)),
                       ),
                     ),
