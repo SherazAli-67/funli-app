@@ -7,7 +7,6 @@ import 'package:funli_app/src/providers/personal_info_provider.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/providers/tab_change_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
-import 'package:funli_app/src/social_media/my_home_page.dart';
 import 'package:provider/provider.dart';
 
 void main() async{
@@ -39,7 +38,7 @@ class MyApp extends StatelessWidget {
           fontFamily: AppConstants.appFontFamily,
           scaffoldBackgroundColor: Colors.white
         ),
-          home: MyHomePage(title: "title")
+          home: MainMenuPage()
       ),
     );
   }
