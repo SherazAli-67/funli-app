@@ -1,5 +1,5 @@
 
-import 'package:funli_app/src/social_media/social_api_service.dart';
+import 'package:funli_app/src/testing/social_media/social_api_service.dart';
 
 class AppData {
   static List<String> interestList = [

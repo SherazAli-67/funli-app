@@ -1,18 +1,15 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
-import 'package:funli_app/src/widgets/mood_wheel_scroll_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
-import 'package:funli_app/src/widgets/primary_gradient_btn.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import '../../providers/record_upload_provider.dart';
-import '../../social_media/enhanced_social_text_field.dart';
+import '../../testing/social_media/enhanced_social_text_field.dart';
 
 class PublishReelPage extends StatefulWidget{
   const PublishReelPage({super.key});

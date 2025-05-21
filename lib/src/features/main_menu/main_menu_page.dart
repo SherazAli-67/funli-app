@@ -1,17 +1,16 @@
+import 'package:circle_wheel_scroll/circle_wheel_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/features/main_menu/home_page.dart';
 import 'package:funli_app/src/features/main_menu/notification_page.dart';
 import 'package:funli_app/src/features/main_menu/search_page.dart';
 import 'package:funli_app/src/features/main_menu/user_profile_page.dart';
-import 'package:funli_app/src/features/upload_feel/create_upload_feel_page.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/widgets/mood_selecting_scroll_wheel_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/tab_change_provider.dart';
 import '../../res/app_icons.dart';
-import '../../widgets/mood_wheel_scroll_widget.dart';
 
 class MainMenuPage extends StatelessWidget{
   const MainMenuPage({super.key});

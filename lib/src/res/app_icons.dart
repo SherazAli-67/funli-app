@@ -27,7 +27,7 @@ class AppIcons {
   // Gradients
   static const String primaryBgGradient = 'assets/icons/ic_splash_bg.png';
   static const String btnBgGradient = 'assets/icons/btn_bg.png';
-
+  static const String circleBtnGradient = 'assets/icons/ic_circle_btn_gradient.svg';
   //Pngs
   static const String icSplashLogo = 'assets/icons/ic_splash_logo.png';
   static const String onboarding1 = 'assets/icons/onboarding_img1.png';
