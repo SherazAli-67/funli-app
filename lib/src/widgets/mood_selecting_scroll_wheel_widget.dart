@@ -1,11 +1,6 @@
-
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:circle_wheel_scroll/circle_wheel_scroll_view.dart';
+import 'package:circle_wheel_scroll/circle_wheel_scroll_view.dart' as circleWheel;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/res/app_colors.dart';
-import 'package:funli_app/src/res/app_gradients.dart';
-import 'package:funli_app/src/res/app_icons.dart';
 
 class MoodSelectingScrollWheelWidget extends StatefulWidget{
   const MoodSelectingScrollWheelWidget({super.key});
@@ -24,47 +19,13 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
     {'emoji': '😡', 'label': 'Angry'},
   ];
 
-  late PageController _controller;
   int currentIndex = 2;
-
-  CarouselSliderController buttonCarouselController = CarouselSliderController();
+  late circleWheel.FixedExtentScrollController _controller;
 
   @override
   void initState() {
+    _controller = circleWheel.FixedExtentScrollController(initialItem: currentIndex);
     super.initState();
-    _controller = PageController(
-      initialPage: currentIndex,
-      viewportFraction: 0.3,
-    );
-
-    _controller.addListener(() {
-      final newIndex = _controller.page!.round();
-      if (newIndex != currentIndex) {
-        setState(() {
-          currentIndex = newIndex;
-        });
-      }
-    });
-  }
-
-  void scrollLeft() {
-    buttonCarouselController.previousPage(
-        duration: Duration(milliseconds: 300), curve: Curves.linear);
-    /*if (currentIndex < moods.length - 1) {
-      _controller.animateToPage(currentIndex + 1,
-          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
-    }*/
-  }
-
-  void scrollRight() {
-    buttonCarouselController.nextPage(
-        duration: Duration(milliseconds: 300), curve: Curves.linear);
-  /*  if (currentIndex > 0) {
-      buttonCarouselController.nextPage(
-          duration: Duration(milliseconds: 300), curve: Curves.linear);
-      _controller.animateToPage(currentIndex - 1,
-          duration: Duration(milliseconds: 300), curve: Curves.easeIn);
-    }*/
   }
 
   @override
@@ -83,8 +44,7 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 24),
 
-          Container(
-            color: Colors.black,
+          SizedBox(
             height: size.height*0.19,
             child: Stack(
               alignment: Alignment.center,
@@ -93,11 +53,12 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
                   backgroundColor: AppColors.tealColor,
                   radius: 45,
                 ),
-                CircleListScrollView(
-                  physics: CircleFixedExtentScrollPhysics(),
+                circleWheel.CircleListScrollView(
+                  physics: circleWheel.CircleFixedExtentScrollPhysics(),
                   axis: Axis.horizontal,
                   itemExtent: 80,
                   radius: size.width*0.5,
+                  controller: _controller,
                   onSelectedItemChanged: (val){
                     currentIndex = val;
                     setState(() {});
@@ -126,26 +87,29 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
           const Text("(Current)", style: TextStyle(color: Colors.grey)),
 
           ResizeHorizontalButton(onLeftTap: (){
-            debugPrint("on left tap");
-          }, onRightTap: (){
-            debugPrint("On right tap");
-          })
-          /*Stack(
-            alignment: Alignment.center,
-            children: [
-              ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  child: SvgPicture.asset(AppIcons.circleBtnGradient, height: size.height*0.14,)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(onTap: (){}, child: Icon(Icons.arrow_back, color: Colors.white,)),
+            if (currentIndex > 0) {
+              currentIndex--;
 
-                  GestureDetector(onTap: (){}, child: Icon(Icons.arrow_forward, color: Colors.white,)),
-                ],
-              )
-            ],
-          )*/
+              _controller.animateToItem(
+                currentIndex,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+              setState(() {});
+            }
+          }, onRightTap: (){
+            if (currentIndex < moods.length - 1) {
+              currentIndex++;
+              _controller.animateToItem(
+                currentIndex,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+              setState(() {
+
+              });
+            }
+          })
         ],
       ),
     );
