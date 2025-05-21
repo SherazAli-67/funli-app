@@ -6,6 +6,7 @@ import 'package:funli_app/src/features/main_menu/search_page.dart';
 import 'package:funli_app/src/features/main_menu/user_profile_page.dart';
 import 'package:funli_app/src/features/upload_feel/create_upload_feel_page.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
+import 'package:funli_app/src/widgets/mood_selecting_scroll_wheel_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/tab_change_provider.dart';
@@ -54,13 +55,14 @@ class MainMenuPage extends StatelessWidget{
                         ),
                         child: IconButton(onPressed: ()async{
                           // Show the wheel selector in a modal bottom sheet
+
                           showModalBottomSheet(
                               backgroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.only(topRight: Radius.circular(32), topLeft: Radius.circular(32))
                               ),
                               context: context, builder: (_){
-                            return MoodWheelScreen();
+                            return MoodSelectingScrollWheelWidget();
                           });
                           // Navigator.of(context).push(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()));
                         }, icon: Icon(Icons.add, color: Colors.white,)),
