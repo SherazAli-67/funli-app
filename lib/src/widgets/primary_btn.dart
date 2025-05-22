@@ -9,14 +9,15 @@ import '../res/spacing_constants.dart';
 class PrimaryBtn extends StatelessWidget {
   const PrimaryBtn({
     super.key,
-    required String btnText, required String icon, required VoidCallback onTap, String bgGradient = AppIcons.btnBgGradient, bool isPrefix = false, bool isLoading = false
-  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _isLoading = isLoading, _bgGradient = bgGradient;
+    required String btnText, required String icon, required VoidCallback onTap, String bgGradient = AppIcons.btnBgGradient, bool isPrefix = false, bool isLoading = false, double borderRadius = SpacingConstants.btnBorderRadius
+  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _isLoading = isLoading, _bgGradient = bgGradient, _borderRadius = borderRadius;
   final String _text;
   final String _icon;
   final VoidCallback _onTap;
   final bool _isPrefix;
   final bool _isLoading;
   final String _bgGradient;
+  final double _borderRadius;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -31,28 +32,20 @@ class PrimaryBtn extends StatelessWidget {
                   offset: Offset(0, 6)
               )
             ],
-          borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
+          borderRadius: BorderRadius.circular(_borderRadius),
         ),
         // padding: EdgeInsets.all(2),
         child: Container(
           width: double.infinity,
           height: SpacingConstants.buttonHeight,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
-              // gradient: AppGradients.btnInnerGradient,
-              /*boxShadow: [
-                BoxShadow(
-                    color: Color(0xffC9BAFF),
-                    blurRadius: 17.6,
-                    offset: Offset(0, 6)
-                )
-              ]*/
+              borderRadius: BorderRadius.circular(_borderRadius),
           ),
           child: Stack(
             alignment: Alignment.center,
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
+                borderRadius: BorderRadius.circular(_borderRadius),
                 child: Image.asset(_bgGradient, fit: BoxFit.cover, width: double.infinity, height: SpacingConstants.buttonHeight,),
               ),
               _isLoading ? LoadingWidget() : Row(

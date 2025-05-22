@@ -1,30 +1,31 @@
-import 'package:circle_wheel_scroll/circle_wheel_scroll_view.dart' as circleWheel;
+import 'package:circle_wheel_scroll/circle_wheel_scroll_view.dart' as circle_wheel;
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/res/app_colors.dart';
+import 'package:funli_app/src/res/app_constants.dart';
 
 class MoodSelectingScrollWheelWidget extends StatefulWidget{
-  const MoodSelectingScrollWheelWidget({super.key});
-
+  const MoodSelectingScrollWheelWidget({super.key, required this.onMoodChange});
+  final Function(String mood) onMoodChange;
   @override
   State<MoodSelectingScrollWheelWidget> createState() => _MoodSelectingScrollWheelWidgetState();
 }
 
 class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWheelWidget> {
   final List<Map<String, String>> moods = [
-    {'emoji': '😢', 'label': 'Sad'},
-    {'emoji': '😥', 'label': 'Crying'},
-    {'emoji': '😄', 'label': 'Happy'},
-    {'emoji': '😒', 'label': 'Annoyed'},
-    {'emoji': '🤣', 'label': 'Laughing'},
-    {'emoji': '😡', 'label': 'Angry'},
+    {'emoji': AppConstants.sadEmoji, 'label': 'Sad'},
+    {'emoji': AppConstants.cryingEmoji, 'label': 'Crying'},
+    {'emoji': AppConstants.happyEmoji, 'label': 'Happy'},
+    {'emoji': AppConstants.annoyedEmoji, 'label': 'Annoyed'},
+    {'emoji': AppConstants.laughingEmoji, 'label': 'Laughing'},
+    {'emoji': AppConstants.angryEmoji, 'label': 'Angry'},
   ];
 
   int currentIndex = 2;
-  late circleWheel.FixedExtentScrollController _controller;
+  late circle_wheel.FixedExtentScrollController _controller;
 
   @override
   void initState() {
-    _controller = circleWheel.FixedExtentScrollController(initialItem: currentIndex);
+    _controller = circle_wheel.FixedExtentScrollController(initialItem: currentIndex);
     super.initState();
   }
 
@@ -33,15 +34,21 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
     Size size = MediaQuery.of(context).size;
     return Container(
       height: size.height*0.5,
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: Column(
         children: [
-          Text("Change your mood!",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+         Row(
+           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+           children: [
+             Text("Change your mood!",
+                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+             IconButton(onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close))
+           ],
+         ),
           const SizedBox(height: 24),
 
           SizedBox(
@@ -53,8 +60,8 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
                   backgroundColor: AppColors.tealColor,
                   radius: 45,
                 ),
-                circleWheel.CircleListScrollView(
-                  physics: circleWheel.CircleFixedExtentScrollPhysics(),
+                circle_wheel.CircleListScrollView(
+                  physics: circle_wheel.CircleFixedExtentScrollPhysics(),
                   axis: Axis.horizontal,
                   itemExtent: 80,
                   radius: size.width*0.5,
@@ -62,6 +69,7 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
                   onSelectedItemChanged: (val){
                     currentIndex = val;
                     setState(() {});
+                    widget.onMoodChange(moods[currentIndex]['label'].toString());
                   },
                   children: List.generate(moods.length, (index){
                     bool isSelected = currentIndex == index;
@@ -85,7 +93,7 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const Text("(Current)", style: TextStyle(color: Colors.grey)),
-
+          const SizedBox(height: 20,),
           ResizeHorizontalButton(onLeftTap: (){
             if (currentIndex > 0) {
               currentIndex--;

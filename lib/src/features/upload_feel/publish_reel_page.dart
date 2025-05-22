@@ -1,14 +1,18 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
+import 'package:funli_app/src/widgets/loading_widget.dart';
+import 'package:funli_app/src/widgets/mood_selecting_scroll_wheel_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import '../../providers/record_upload_provider.dart';
+import '../../res/spacing_constants.dart';
 import '../../testing/social_media/enhanced_social_text_field.dart';
 
 class PublishReelPage extends StatefulWidget{
@@ -20,31 +24,27 @@ class PublishReelPage extends StatefulWidget{
 
 class _PublishReelPageState extends State<PublishReelPage> {
   String selectedPrivacyMode = 'Public';
-
   late VideoPlayerController _controller;
 
-  final _captionTextEditingController = TextEditingController();
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_){
 
+      final provider = Provider.of<RecordUploadProvider>(context, listen: false);
+      _controller = VideoPlayerController.file(File(provider.recordedPath!))
+        ..initialize().then((_) {
+          setState(() {}); // Refresh to show the initialized video
+          _controller.setVolume(provider.isMuted ? 0.0 : 1.0);
+          _controller.setPlaybackSpeed(provider.playbackSpeed);
+          // _controller.play(); // Auto-play
+        });
+    });
     super.initState();
   }
   @override
-  void didChangeDependencies() {
-    final provider = Provider.of<RecordUploadProvider>(context);
-    _controller = VideoPlayerController.file(File(provider.recordedPath!))
-      ..initialize().then((_) {
-        setState(() {}); // Refresh to show the initialized video
-        _controller.setVolume(provider.isMuted ? 0.0 : 1.0);
-        _controller.setPlaybackSpeed(provider.playbackSpeed);
-        // _controller.play(); // Auto-play
-      });
-    super.didChangeDependencies();
-  }
-  @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    final provider = Provider.of<RecordUploadProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -83,24 +83,23 @@ class _PublishReelPageState extends State<PublishReelPage> {
           ],
       ),
       body: SafeArea(child: SingleChildScrollView(
-        padding: EdgeInsets.only(bottom: 100),
+        padding: EdgeInsets.only(bottom: 40),
         child: Column(
           spacing: 14,
           children: [
             Stack(
               alignment: Alignment.center,
               children: [
-                Padding(
+                _controller.value.isInitialized ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: SizedBox(
-                      width: _controller.value.size.width,
-                      height: size.height*0.4,
+                    child: AspectRatio(
+                      aspectRatio: _controller.value.aspectRatio,
                       child: VideoPlayer(_controller),
                     ),
                   ),
-                ),
+                ) : LoadingWidget(),
                 Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -118,6 +117,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
               ],
             ),
             Padding(padding: EdgeInsets.symmetric(horizontal: 22), child: Column(
+              spacing: 40,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 EnhancedSocialTextField(
@@ -130,10 +130,33 @@ class _PublishReelPageState extends State<PublishReelPage> {
                     debugPrint("Text found: $text");
                   },
                 ),
-                PrimaryBtn(btnText: "Feeling 😄 Happy!", icon: '', onTap: ()async{
+                _feelingWidget((){
+                  showModalBottomSheet(context: context, builder: (_){
+                    return MoodSelectingScrollWheelWidget(onMoodChange: (mood){
+                      provider.setCurrentMood(mood);
+                    });
+                  });
+                }, provider.currentMood),
 
-                }, bgGradient: AppIcons.primaryBgGradient,)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Row(
+                    spacing: 16,
+                    children: [
+                      Expanded(child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          side: BorderSide(color: AppColors.textFieldBorderColor),
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                          onPressed: (){}, child: Text("Save as draft", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.black),))),
 
+                      Expanded(child: PrimaryBtn(btnText: "Publish", icon: "", onTap: (){}, bgGradient: AppIcons.primaryBgGradient, borderRadius: 16,))
+                    ],
+                  ),
+                )
               ],
             ),)
           ],
@@ -142,5 +165,51 @@ class _PublishReelPageState extends State<PublishReelPage> {
     );
   }
 
-  
+  Widget _feelingWidget(VoidCallback onTap, String currentMood, ){
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: AppGradients.btnOuterGradient,
+          boxShadow: [
+            BoxShadow(
+                color: Color(0xffC9BAFF),
+                blurRadius: 17.6,
+                offset: Offset(0, 6)
+            )
+          ],
+          borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
+        ),
+        // padding: EdgeInsets.all(2),
+        child: Container(
+          width: double.infinity,
+          height: SpacingConstants.buttonHeight,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
+                child: Image.asset(AppIcons.primaryBgGradient, fit: BoxFit.cover, width: double.infinity, height: SpacingConstants.buttonHeight,),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Row(
+                  spacing: 10,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+
+                    Text("Feeling ${AppData.getEmojiByMood(currentMood)} $currentMood", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),),
+                    Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white,)
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

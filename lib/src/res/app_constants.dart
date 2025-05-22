@@ -11,6 +11,12 @@ class AppConstants {
   static const accountSetupSuccessTitle = 'Welcome to the FUNLI Vibe Zone!';
   static const accountSetupSuccessMessage = 'Ready to roll? Your journey starts now!';
 
+  static const happyEmoji = '😄';
+  static const sadEmoji = '😔';
+  static const angryEmoji = '😡';
+  static const cryingEmoji = '😥';
+  static const laughingEmoji = '🤣';
+  static const annoyedEmoji = '😒';
 
-  //Firebase collections
+//Firebase collections
 }

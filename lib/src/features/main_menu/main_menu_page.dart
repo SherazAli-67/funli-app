@@ -1,4 +1,3 @@
-import 'package:circle_wheel_scroll/circle_wheel_scroll_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/features/main_menu/home_page.dart';
@@ -6,11 +5,10 @@ import 'package:funli_app/src/features/main_menu/notification_page.dart';
 import 'package:funli_app/src/features/main_menu/search_page.dart';
 import 'package:funli_app/src/features/main_menu/user_profile_page.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
-import 'package:funli_app/src/widgets/mood_selecting_scroll_wheel_widget.dart';
 import 'package:provider/provider.dart';
-
 import '../../providers/tab_change_provider.dart';
 import '../../res/app_icons.dart';
+import '../upload_feel/create_upload_feel_page.dart';
 
 class MainMenuPage extends StatelessWidget{
   const MainMenuPage({super.key});
@@ -55,15 +53,7 @@ class MainMenuPage extends StatelessWidget{
                         child: IconButton(onPressed: ()async{
                           // Show the wheel selector in a modal bottom sheet
 
-                          showModalBottomSheet(
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(topRight: Radius.circular(32), topLeft: Radius.circular(32))
-                              ),
-                              context: context, builder: (_){
-                            return MoodSelectingScrollWheelWidget();
-                          });
-                          // Navigator.of(context).push(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()));
                         }, icon: Icon(Icons.add, color: Colors.white,)),
                       ),
                     ),

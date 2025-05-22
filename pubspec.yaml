@@ -54,6 +54,7 @@ dependencies:
   fluttertoast: ^8.2.12
   extended_text_field: ^16.0.2
   circle_wheel_scroll: ^0.0.3
+  file_picker: ^10.1.9
 
 dev_dependencies:
   flutter_test:

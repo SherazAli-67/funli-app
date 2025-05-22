@@ -4,13 +4,14 @@ class RecordUploadProvider extends ChangeNotifier{
   bool isRecording = false;
   bool isRecorded = false;
   String? _recordedPath;
+  String _currentMood = 'Happy';
   String videoRecordingDuration = '30s';
 
-  String currentMood = 'Happy';
   double playbackSpeed = 1;
   bool isMuted = false;
 
   String? get recordedPath => _recordedPath;
+  String get currentMood => _currentMood;
   void toggleRecording(){
     isRecording = !isRecording;
     notifyListeners();
@@ -31,8 +32,8 @@ class RecordUploadProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  void changeMood(String mood){
-    currentMood = mood;
+  void setCurrentMood(String mood){
+    _currentMood = mood;
     notifyListeners();
   }
 
@@ -49,4 +50,5 @@ class RecordUploadProvider extends ChangeNotifier{
     isMuted = val;
     notifyListeners();
   }
+
 }

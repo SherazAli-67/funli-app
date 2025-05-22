@@ -1,4 +1,5 @@
 
+import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/testing/social_media/social_api_service.dart';
 
 class AppData {
@@ -25,4 +26,31 @@ class AppData {
     HashtagSuggestion(tag: "songs", count: 876923),
 
   ];
+
+
+  static String getEmojiByMood(String mood){
+    switch(mood){
+      case 'Happy':
+        return AppConstants.happyEmoji;
+
+      case 'Sad':
+        return AppConstants.sadEmoji;
+
+      case 'Angry':
+        return AppConstants.angryEmoji;
+
+      case 'Laughing':
+        return AppConstants.laughingEmoji;
+
+      case 'Crying':
+        return AppConstants.cryingEmoji;
+
+      case 'Annoyed':
+        return AppConstants.annoyedEmoji;
+
+      default:
+        return AppConstants.happyEmoji;
+
+    }
+  }
 }

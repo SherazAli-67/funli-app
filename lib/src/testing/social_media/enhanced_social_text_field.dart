@@ -377,6 +377,9 @@ class _EnhancedSocialTextFieldState extends State<EnhancedSocialTextField> {
           focusNode: _focusNode,
           maxLines: widget.maxLines,
           minLines: widget.minLines,
+          textInputAction: TextInputAction.done,
+          onTapOutside: (_)=> FocusManager.instance.primaryFocus?.unfocus(),
+          // onTapOutside: (_)=> FocusManager.instance.primaryFocus?.unfocus(),
           decoration: InputDecoration(
             hintText: widget.hintText,
             border: OutlineInputBorder(

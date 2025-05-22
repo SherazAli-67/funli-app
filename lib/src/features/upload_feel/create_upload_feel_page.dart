@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/upload_feel/edit_uploaded_feel.dart';
@@ -9,7 +10,6 @@ import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -196,11 +196,10 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                             ),
                           ),
                           IconButton(onPressed: ()async{
-                            final ImagePicker picker = ImagePicker();
-                           XFile? pickedVideo = await picker.pickVideo(source: ImageSource.gallery);
-                           if(pickedVideo != null){
-                               // Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> EditFeelPage()));
-                           }
+                            String? selectedVideoPath = await _onSelectVideoFromGalleryTap();
+                            if(selectedVideoPath != null){
+                              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> EditUploadedFeelPage(videoPath: selectedVideoPath)));
+                            }
                           }, icon: SvgPicture.asset(AppIcons.icUpload))
                         ],
                       )
@@ -273,4 +272,21 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
       ),
     );
   }
+
+  Future<String?> _onSelectVideoFromGalleryTap() async{
+    FilePicker filePicker = FilePicker.platform;
+    FilePickerResult? result = await filePicker.pickFiles(
+      type: FileType.video,
+      allowMultiple: false
+    );
+
+    if(result != null){
+      PlatformFile file = result.files.first;
+
+      return file.path;
+    }
+
+    return null;
+  }
+
 }
