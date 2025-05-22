@@ -59,6 +59,8 @@ dependencies:
   firebase_storage: ^12.4.6
   firebase_messaging: ^15.2.6
   flutter_local_notifications: ^19.2.1
+  whitecodel_reels: ^0.0.6
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:

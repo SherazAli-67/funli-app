@@ -30,6 +30,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
     return Consumer<MainMenuTabChangeProvider>(builder: (ctx, provider, _){
       return Scaffold(
         body: Stack(
+          alignment: Alignment.bottomCenter,
           children: [
            _buildPage(provider.currentIndex),
             Positioned(
@@ -92,10 +93,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
   Widget _buildBottomNavigationItemWidget({required String icon, required bool isSelected, required VoidCallback onTap}) =>
       IconButton(onPressed: onTap, icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(isSelected ? Colors.black : Colors.white, BlendMode.srcIn),));
 
-  /*  BottomNavigationBarItem(
-        icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(
-            isSelected ? AppColors.primaryColor : Colors.grey,
-            BlendMode.srcIn)), label: label,);*/
   Widget _buildPage(int currentIndex) {
     switch(currentIndex){
       case 0:
