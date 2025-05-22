@@ -2,6 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
+
+import '../../../widgets/post_comment_widget.dart';
+import '../../../widgets/post_like_widget.dart';
+import '../../../widgets/post_share_widget.dart';
 class HomePage extends StatelessWidget{
   const HomePage({super.key});
 
@@ -74,6 +78,18 @@ class HomePage extends StatelessWidget{
                   );
                 },
               ),
+            ],
+          ),
+        ),
+        Positioned(
+          bottom: 120,
+          right: 10,
+          child: Column(
+            spacing: 10,
+            children: [
+              PostLikeWidget( iconColor: Colors.white, isReel: true,),
+              PostCommentWidget(iconColor: Colors.white, isReel: true,),
+              PostShareWidget( iconColor: Colors.white,),
             ],
           ),
         ),

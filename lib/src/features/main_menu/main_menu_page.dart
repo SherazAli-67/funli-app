@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:funli_app/src/features/main_menu/home_page.dart';
+import 'package:funli_app/src/features/main_menu/reels_home_page/home_page.dart';
 import 'package:funli_app/src/features/main_menu/notification_page.dart';
 import 'package:funli_app/src/features/main_menu/search_page.dart';
 import 'package:funli_app/src/features/main_menu/user_profile_page.dart';

@@ -23,6 +23,10 @@ class AppIcons {
   static const icTrim = 'assets/icons/ic_trim.svg';
   static const icMute = 'assets/icons/ic_mute.svg';
   static const icVolumeUp = 'assets/icons/ic_volume_up.svg';
+  static const icComment = 'assets/icons/ic_comments.svg';
+  static const icLike = 'assets/icons/ic_like.svg';
+  static const icShare = 'assets/icons/ic_share.svg';
+
 
   // Gradients
   static const String primaryBgGradient = 'assets/icons/ic_splash_bg.png';
