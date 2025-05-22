@@ -60,12 +60,8 @@ class RecordUploadProvider extends ChangeNotifier{
   }
 
   void publishReel({required String caption, required String visibility}) async{
-    await Future.delayed(const Duration(seconds: 2));
-    NotificationService.show(
-      title: "Upload Completed",
-      body: 'Your reel has been uploaded successfully.',
-    );
-     /*File thumbnailPath = await VideoCompress.getFileThumbnail(_recordedPath!);
+    debugPrint("Video size before compression: ${await File(_recordedPath!).length()}");
+    File thumbnailPath = await VideoCompress.getFileThumbnail(_recordedPath!);
 
     final MediaInfo? compressedVideo = await VideoCompress.compressVideo(
       _recordedPath!,
@@ -76,6 +72,7 @@ class RecordUploadProvider extends ChangeNotifier{
     if (compressedVideo == null || compressedVideo.file == null) {
       throw Exception('Video compression failed');
     }
+    debugPrint("Video size after compression: ${await compressedVideo.file!.length()}");
      String reelID = DateTime.now().microsecondsSinceEpoch.toString();
 
     String? thumbnailUrl = await PublishReelService.getThumbnailUrl(reelID: reelID, file: thumbnailPath);
@@ -102,6 +99,6 @@ class RecordUploadProvider extends ChangeNotifier{
         title: "Upload Completed",
         body: 'Your reel has been uploaded successfully.',
       );
-    }*/
+    }
   }
 }
