@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
+import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:funli_app/src/providers/personal_info_provider.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/providers/tab_change_provider.dart';
@@ -12,6 +14,7 @@ import 'package:provider/provider.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
   runApp(MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_)=> PersonalInfoProvider()),
@@ -38,7 +41,7 @@ class MyApp extends StatelessWidget {
           fontFamily: AppConstants.appFontFamily,
           scaffoldBackgroundColor: Colors.white
         ),
-          home: MainMenuPage()
+          home: FirebaseAuth.instance.currentUser != null ? MainMenuPage() : WelcomePage()
       ),
     );
   }

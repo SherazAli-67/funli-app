@@ -1,4 +1,12 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/models/reel_model.dart';
+import 'package:funli_app/src/notification_service/notification_service.dart';
+import 'package:funli_app/src/services/publish_reel_service.dart';
+import 'package:video_compress/video_compress.dart';
 
 class RecordUploadProvider extends ChangeNotifier{
   bool isRecording = false;
@@ -51,4 +59,49 @@ class RecordUploadProvider extends ChangeNotifier{
     notifyListeners();
   }
 
+  void publishReel({required String caption, required String visibility}) async{
+    await Future.delayed(const Duration(seconds: 2));
+    NotificationService.show(
+      title: "Upload Completed",
+      body: 'Your reel has been uploaded successfully.',
+    );
+     /*File thumbnailPath = await VideoCompress.getFileThumbnail(_recordedPath!);
+
+    final MediaInfo? compressedVideo = await VideoCompress.compressVideo(
+      _recordedPath!,
+      quality: VideoQuality.MediumQuality,
+      deleteOrigin: false, // Set true to delete original file
+    );
+
+    if (compressedVideo == null || compressedVideo.file == null) {
+      throw Exception('Video compression failed');
+    }
+     String reelID = DateTime.now().microsecondsSinceEpoch.toString();
+
+    String? thumbnailUrl = await PublishReelService.getThumbnailUrl(reelID: reelID, file: thumbnailPath);
+     String? videoUrl = await PublishReelService.getReelUploadedUrl(reelID: reelID, file: compressedVideo.file!);
+
+     String userID = FirebaseAuth.instance.currentUser!.uid;
+    DateTime createdAt = DateTime.now();
+    ReelModel reel = ReelModel(reelID: reelID,
+        userID: userID,
+        videoUrl: videoUrl!,
+        thumbnailUrl: thumbnailUrl!,
+        caption: caption,
+        hashtags: [],
+        mentions: [],
+        commentsCount: 0,
+        shareCount: 0,
+        moodTag: currentMood,
+        visibility: visibility,
+        createdAt: createdAt);
+
+    bool isUploaded = await PublishReelService.uploadReel(reel: reel);
+    if(isUploaded){
+      NotificationService.show(
+        title: "Upload Completed",
+        body: 'Your reel has been uploaded successfully.',
+      );
+    }*/
+  }
 }

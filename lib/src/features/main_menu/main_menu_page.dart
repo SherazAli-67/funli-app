@@ -6,13 +6,25 @@ import 'package:funli_app/src/features/main_menu/search_page.dart';
 import 'package:funli_app/src/features/main_menu/user_profile_page.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:provider/provider.dart';
+import '../../notification_service/notification_service.dart';
 import '../../providers/tab_change_provider.dart';
 import '../../res/app_icons.dart';
 import '../upload_feel/create_upload_feel_page.dart';
 
-class MainMenuPage extends StatelessWidget{
+class MainMenuPage extends StatefulWidget{
   const MainMenuPage({super.key});
 
+  @override
+  State<MainMenuPage> createState() => _MainMenuPageState();
+}
+
+class _MainMenuPageState extends State<MainMenuPage> {
+
+  @override
+  void initState() {
+    _initNotificationService();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Consumer<MainMenuTabChangeProvider>(builder: (ctx, provider, _){
@@ -76,13 +88,14 @@ class MainMenuPage extends StatelessWidget{
   void _onNavigationItemTap(int index, MainMenuTabChangeProvider provider){
     provider.onTabChange(index);
   }
+
   Widget _buildBottomNavigationItemWidget({required String icon, required bool isSelected, required VoidCallback onTap}) =>
       IconButton(onPressed: onTap, icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(isSelected ? Colors.black : Colors.white, BlendMode.srcIn),));
+
   /*  BottomNavigationBarItem(
         icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(
             isSelected ? AppColors.primaryColor : Colors.grey,
             BlendMode.srcIn)), label: label,);*/
-
   Widget _buildPage(int currentIndex) {
     switch(currentIndex){
       case 0:
@@ -102,4 +115,17 @@ class MainMenuPage extends StatelessWidget{
     }
   }
 
+  void _initNotificationService()async{
+    //Get notification permission then
+    await NotificationService.requestPermissions().then((value) {});
+    try{
+      await NotificationService.initializeLocalNotifications();
+      await NotificationService.initializeFirebaseMessaging().then((value) {
+        NotificationService.startNotificationListeners();
+      });
+      NotificationService.startNotificationClickListeners();
+    }catch(e){
+      debugPrint("Exception while notification configuration: ${e.toString()}");
+    }
+  }
 }

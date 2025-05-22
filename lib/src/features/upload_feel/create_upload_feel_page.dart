@@ -73,12 +73,10 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
     if (!_controller.value.isInitialized || _isRecording) return;
 
     final directory = await getTemporaryDirectory();
-    final path = join(directory.path, '${DateTime.now().millisecondsSinceEpoch}.mp4');
+    join(directory.path, '${DateTime.now().millisecondsSinceEpoch}.mp4');
 
     await _controller.startVideoRecording();
-    setState(() {
-      _isRecording = true;
-    });
+    setState(()=>  _isRecording = true);
     debugPrint("Recording started");
   }
 

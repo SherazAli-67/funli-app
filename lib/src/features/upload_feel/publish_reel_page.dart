@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_data.dart';
+import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -23,7 +24,7 @@ class PublishReelPage extends StatefulWidget{
 }
 
 class _PublishReelPageState extends State<PublishReelPage> {
-  String selectedPrivacyMode = 'Public';
+  String visibility = 'Public';
   late VideoPlayerController _controller;
 
 
@@ -60,10 +61,10 @@ class _PublishReelPageState extends State<PublishReelPage> {
             PopupMenuButton(
               position: PopupMenuPosition.under,
                 color: Colors.white,
-                onSelected: (val)=> setState(() =>selectedPrivacyMode = val.toString()),
+                onSelected: (val)=> setState(() =>visibility = val.toString()),
                 icon: Row(
                   children: [
-                    Text(selectedPrivacyMode, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400),),
+                    Text(visibility, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400),),
                     Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black,)
                   ],
                 ),
@@ -153,7 +154,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
                         ),
                           onPressed: (){}, child: Text("Save as draft", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.black),))),
 
-                      Expanded(child: PrimaryBtn(btnText: "Publish", icon: "", onTap: (){}, bgGradient: AppIcons.primaryBgGradient, borderRadius: 16,))
+                      Expanded(child: PrimaryBtn(btnText: "Publish", icon: "", onTap: _onPublishReelTap, bgGradient: AppIcons.primaryBgGradient, borderRadius: 16,))
                     ],
                   ),
                 )
@@ -211,5 +212,13 @@ class _PublishReelPageState extends State<PublishReelPage> {
         ),
       ),
     );
+  }
+
+  void _onPublishReelTap() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Uploading your video. You’ll be notified once it’s done.')),
+    );
+    context.read<RecordUploadProvider>().publishReel(caption: "", visibility: visibility);
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> MainMenuPage()), (val)=> false);
   }
 }

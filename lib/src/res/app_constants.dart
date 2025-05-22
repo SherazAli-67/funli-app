@@ -19,4 +19,5 @@ class AppConstants {
   static const annoyedEmoji = '😒';
 
 //Firebase collections
+  static const reelsCollection = 'reels';
 }
