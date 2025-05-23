@@ -14,4 +14,5 @@ class AppColors {
   static const greyTextColor = Color(0xff9E9E9E);
   static const yellowAccentColor = Color(0xffE4FF17);
   static const textFieldBorderColor = Color(0xffD3D3D3);
+  static const lightGreyColor = Color(0xffF2F2F2);
 }
