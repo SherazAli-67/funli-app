@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 
@@ -87,6 +89,43 @@ class HomePage extends StatelessWidget{
           child: Column(
             spacing: 10,
             children: [
+              Stack(
+                children: [
+                  GestureDetector(
+                    onTap: (){},
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white, width: 2),
+                        shape: BoxShape.circle
+                      ),
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundImage: CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    left: 0,
+                    child:
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.deepPurpleColor,
+                        shape: BoxShape.circle
+                      ),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                          style: const ButtonStyle(
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: (){}, icon: SvgPicture.asset(AppIcons.icAdd, height: 20,))
+                    ),
+                  )
+                ],
+              ),
               PostLikeWidget( iconColor: Colors.white, isReel: true,),
               PostCommentWidget(iconColor: Colors.white, isReel: true,),
               PostShareWidget( iconColor: Colors.white,),
