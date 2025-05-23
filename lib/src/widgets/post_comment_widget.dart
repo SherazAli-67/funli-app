@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/features/main_menu/reels_home_page/comments_page.dart';
@@ -14,9 +15,27 @@ class PostCommentWidget extends StatelessWidget{
     return Column(
       children: [
         IconButton(onPressed: (){
-          showModalBottomSheet(context: context, builder: (_){
-            return CommentsPage();
-          });
+          /*showCupertinoSheet(
+
+              context: context, pageBuilder: (_){
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: CommentsPage(),
+            );
+          });*/
+          showModalBottomSheet<void>(
+            context: context,
+            backgroundColor: Colors.white,
+            isScrollControlled: true,
+            builder: (BuildContext context) {
+              return Padding(
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                  child: FractionallySizedBox(
+                    heightFactor: 0.8,
+                    child: CommentsPage(),
+                  ));
+            },
+          );
         }, icon: SvgPicture.asset(AppIcons.icComment,
           colorFilter:  ColorFilter
               .mode(

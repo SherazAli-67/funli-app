@@ -8,13 +8,14 @@ import 'package:funli_app/src/widgets/post_like_widget.dart';
 
 class CommentsPage extends StatelessWidget{
   const CommentsPage({super.key});
-
+  
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 28),
+      padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 22),
       child: Column(
         spacing: 14,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -22,12 +23,13 @@ class CommentsPage extends StatelessWidget{
               Text('Comments (204,755)', style: AppTextStyles.headingTextStyle3,),
               IconButton(
                   style: IconButton.styleFrom(
-                    backgroundColor: AppColors.lightGreyColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(99))
+                      backgroundColor: AppColors.lightGreyColor,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(99))
                   ),
-                  onPressed: (){}, icon: Icon(Icons.close))
+                  onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close))
             ],
           ),
+
           Expanded(child: ListView.builder(
               itemCount: 10,
               itemBuilder: (ctx, index){
@@ -57,7 +59,36 @@ class CommentsPage extends StatelessWidget{
                     ],
                   ),
                 );
-          }))
+              })),
+
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.commentTextFieldFillColor,
+              borderRadius: BorderRadius.circular(13),
+              border: Border.all(color: AppColors.borderColor)
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      IconButton(onPressed: (){}, icon: Icon(Icons.emoji_emotions_outlined)),
+                      Expanded(child: TextField(
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          hintText: "Say something nice...",
+                          hintStyle: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.commentHintTextColor)
+                        ),
+                      ))
+                    ],
+                  ),
+                ),
+                IconButton(onPressed: (){}, icon: SvgPicture.asset(AppIcons.icSendBtn))
+              ],
+            ),
+          )
         ],
       ),
     );
