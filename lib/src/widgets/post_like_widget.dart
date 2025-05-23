@@ -8,7 +8,8 @@ import 'package:like_button/like_button.dart';
 class PostLikeWidget extends StatelessWidget{
   final Color iconColor;
   final bool isReel;
-  const PostLikeWidget({super.key, this.iconColor = Colors.grey, this.isReel = false});
+  final String icon;
+  const PostLikeWidget({super.key, this.icon = AppIcons.icLike, this.iconColor = Colors.grey, this.isReel = false});
   @override
   Widget build(BuildContext context) {
     return LikeButton(
@@ -24,10 +25,9 @@ class PostLikeWidget extends StatelessWidget{
       },
       countPostion: isReel ? CountPostion.bottom : CountPostion.right,
       likeBuilder: (isLiked){
-        return  SvgPicture.asset(
-          AppIcons.icLike,
-          colorFilter: ColorFilter.mode(isLiked
-              ? AppColors.purpleColor : iconColor, BlendMode.srcIn),
+        return isLiked ? SvgPicture.asset(AppIcons.icLikedIcon): SvgPicture.asset(
+          icon,
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
         );
       },
       countBuilder: (_, isSelected, text){
@@ -40,7 +40,7 @@ class PostLikeWidget extends StatelessWidget{
           )
               : Text(
             text,
-            style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),
+            style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
           ),
         );
       },

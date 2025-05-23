@@ -8,7 +8,10 @@ class AppTextStyles {
   static const subHeadingTextStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.w700,);
   static const buttonTextStyle = TextStyle(fontSize: 18, fontWeight: FontWeight.w400,);
   static const bodyTextStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.w300,);
+  static const tileTitleTextStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.w700,);
   static const smallTextStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w400, );
   static const captionTextStyle = TextStyle(fontSize: 12, fontWeight: FontWeight.w400, );
   static const hintTextStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.w300, color: AppColors.hintTextColor);
+  static const commentTextStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w300, color: AppColors.commentTextColor);
+
 }

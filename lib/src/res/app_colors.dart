@@ -15,4 +15,6 @@ class AppColors {
   static const yellowAccentColor = Color(0xffE4FF17);
   static const textFieldBorderColor = Color(0xffD3D3D3);
   static const lightGreyColor = Color(0xffF2F2F2);
+  static const commentTextColor = Color(0xff212121);
+  static const icCommentGreyColor = Color(0xff616161);
 }

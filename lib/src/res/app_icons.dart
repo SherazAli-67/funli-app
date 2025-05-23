@@ -26,6 +26,9 @@ class AppIcons {
   static const icComment = 'assets/icons/ic_comments.svg';
   static const icLike = 'assets/icons/ic_like.svg';
   static const icShare = 'assets/icons/ic_share.svg';
+  static const icMore = 'assets/icons/ic_more.svg';
+  static const icLikedIcon = 'assets/icons/ic_liked_icon.svg';
+  static const icLikeOutlined = 'assets/icons/ic_like_outlined.svg';
 
 
   // Gradients
