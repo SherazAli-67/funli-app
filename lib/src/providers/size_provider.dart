@@ -6,7 +6,7 @@ class SizeProvider extends ChangeNotifier{
 
   double get height => _height;
   double get width => _width;
-
+  Size get size => Size(_width, _height);
   void setSize(Size size){
     _height = size.height;
     _width = size.width;

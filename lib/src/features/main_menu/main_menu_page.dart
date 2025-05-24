@@ -130,7 +130,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   void _initSize() {
-    Size size = MediaQuery.of(context).size;
-    context.read<SizeProvider>().setSize(size);
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      Size size = MediaQuery.of(context).size;
+      context.read<SizeProvider>().setSize(size);
+    });
   }
 }
