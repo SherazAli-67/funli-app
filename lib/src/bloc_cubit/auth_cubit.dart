@@ -134,12 +134,13 @@ class AuthCubit extends Cubit<AuthStates>{
     }
   }
 
-  Future<void> onCompleteUserSignup({required DateTime dob, required List<String> interests})async{
-    emit(CompletedUserSignupInfo());
+  Future<void> onCompleteUserSignup({required DateTime dob, required List<String> interests, required String gender})async{
+    emit(CompletingUserSignupInfo());
     try{
       Map<String, dynamic> userMap = {
         'dob' : dob.toIso8601String(),
-        'interests': interests
+        'interests': interests,
+        'gender' : gender
       };
 
       await authService.updateUserInfo(updatedMap: userMap);

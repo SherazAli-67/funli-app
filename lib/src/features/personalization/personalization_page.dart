@@ -75,7 +75,10 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
                 }
               },
               builder: (_, state) {
-                return _currentPage == _pages.length-1 ? SizedBox(
+
+
+                return _currentPage == _pages.length-1
+                    ? SizedBox(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 22),
                     child: Row(
@@ -86,22 +89,19 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
                           _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
                         }, isPrefix: true,)),
                         Expanded(child: PrimaryBtn(btnText: "Let’s Go!", icon: AppIcons.icArrowNext, onTap: (){
-                          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> MoodDetectionSetup()), (val)=> false);
-                        }))
+                          final infoProvider = Provider.of<PersonalInfoProvider>(context, listen: false);
+                          DateTime dob = DateTime(infoProvider.selectedYear, infoProvider.selectedMonth, infoProvider.selectedDay);
+                          List<String> interests = infoProvider.selectedInterests;
+
+                          context.read<AuthCubit>().onCompleteUserSignup(dob: dob, interests: interests, gender: infoProvider.selectedGender);
+                         /* Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> MoodDetectionSetup()), (val)=> false);*/
+                        }, isLoading: state is CompletingUserSignupInfo,))
                       ],
                     ),
                   ),
-                ) : PrimaryBtn(btnText: "Next", icon: AppIcons.icArrowNext, onTap: (){
-                  if(_currentPage == _pages.length-1){
-                    final infoProvider = Provider.of<PersonalInfoProvider>(context, listen: false);
-                    DateTime dob = DateTime(infoProvider.selectedYear, infoProvider.selectedMonth, infoProvider.selectedDay);
-                    List<String> interests = infoProvider.selectedInterests;
-                    
-                    context.read<AuthCubit>().onCompleteUserSignup(dob: dob, interests: interests);
-                    //
-                  }else{
-                    _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
-                  }
+                )
+                    : PrimaryBtn(btnText: "Next", icon: AppIcons.icArrowNext, onTap: (){
+                  _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
                 }, isLoading: state is CompletingUserSignupInfo,);
               }
             ),

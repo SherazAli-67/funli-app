@@ -1,4 +1,5 @@
 
+import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/testing/social_media/social_api_service.dart';
 
@@ -50,7 +51,30 @@ class AppData {
 
       default:
         return AppConstants.happyEmoji;
-
     }
+  }
+
+  static List<ReelModel> getReels(){
+    String userID = 'RurOyejb8iQERN1R9OqJ81eokg02';
+    String reelID = DateTime.now().microsecondsSinceEpoch.toString();
+
+    List<String> urls = [
+      'https://videos.pexels.com/video-files/1321208/1321208-sd_640_360_30fps.mp4',
+      'https://videos.pexels.com/video-files/3629511/3629511-sd_360_450_24fps.mp4',
+      'https://videos.pexels.com/video-files/2759477/2759477-sd_640_360_30fps.mp4',
+      'https://videos.pexels.com/video-files/8859849/8859849-sd_360_640_25fps.mp4',
+      'https://videos.pexels.com/video-files/3833491/3833491-sd_360_640_30fps.mp4',
+      'https://videos.pexels.com/video-files/6924608/6924608-sd_360_640_24fps.mp4',
+      'https://videos.pexels.com/video-files/3048183/3048183-sd_640_360_24fps.mp4',
+      'https://videos.pexels.com/video-files/6010489/6010489-sd_360_640_25fps.mp4',
+      'https://videos.pexels.com/video-files/5667135/5667135-sd_506_960_30fps.mp4',
+      'https://videos.pexels.com/video-files/6190918/6190918-sd_360_640_30fps.mp4',
+      'https://videos.pexels.com/video-files/6624888/6624888-sd_360_640_30fps.mp4',
+      'https://videos.pexels.com/video-files/4199353/4199353-sd_640_360_25fps.mp4',
+      'https://videos.pexels.com/video-files/4169986/4169986-sd_640_360_30fps.mp4'
+    ];
+    return [
+      // ReelModel(reelID: reelID, userID: userID, videoUrl: "videoUrl", thumbnailUrl: thumbnailUrl, caption: caption, hashtags: hashtags, mentions: mentions, commentsCount: commentsCount, shareCount: shareCount, moodTag: moodTag, visibility: visibility, createdAt: createdAt)
+    ];
   }
 }

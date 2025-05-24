@@ -32,7 +32,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         body: Stack(
           alignment: Alignment.bottomCenter,
           children: [
-           _buildPage(provider.currentIndex),
+           SizedBox.expand(child: _buildPage(provider.currentIndex)),
             Positioned(
                 bottom: 0,
                 right: 0,

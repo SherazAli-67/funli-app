@@ -7,7 +7,6 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
 import 'package:provider/provider.dart';
 
-import '../../res/app_icons.dart';
 
 class InterestPage extends StatefulWidget{
   const InterestPage({super.key});
@@ -17,32 +16,7 @@ class InterestPage extends StatefulWidget{
 }
 
 class _InterestPageState extends State<InterestPage> {
-  List<Map<String, dynamic>> interestList = [
-    {
-      'color' : Colors.black,
-      'interest' : 'Music'
-    },
-    {
-      'color' : AppColors.lightPurple,
-      'interest' : 'Football'
-    },
-    {
-      'color' : AppColors.tealColor,
-      'interest' : 'Poetry'
-    },
-    {
-      'color' : AppColors.greyColor,
-      'interest' : 'Fitness'
-    },
-    {
-      'color' : AppColors.greyColor,
-      'interest' : 'Motivation'
-    },
-    {
-      'color' : AppColors.pinkColor,
-      'interest' : 'Movies'
-    },
-  ];
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -69,11 +43,6 @@ class _InterestPageState extends State<InterestPage> {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        // if(isSelected)
-                        //   ClipRRect(
-                        //       borderRadius: BorderRadius.circular(9),
-                        //       child: Image.asset(AppIcons.primaryBgGradient, fit: BoxFit.cover, height: 45,)),
-                        //
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                           child: Text(interest, style: AppTextStyles.bodyTextStyle.copyWith(color: txtIconColor),)
