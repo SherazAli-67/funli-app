@@ -215,6 +215,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
   }
 
   void _onPublishReelTap() {
+    context.read<RecordUploadProvider>().publishReels();
    /* ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Uploading your video. You’ll be notified once it’s done.')),
     );

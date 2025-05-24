@@ -86,6 +86,8 @@ class AppData {
       "When the mood takes over 🔥 #ExpressYourself #MoodSwing #ReelMood #Unfiltered",
       "Let emotions do the talking 🗣️ #RealTalk #EmotionalVibes #RawMood #HeartOnSleeve",
       "Dancing with my feelings 💃🕺 #DanceTherapy #FeelTheBeat #MoodMovement #GrooveOn",
+
+      "Let emotions do the talking 🗣️ #RealTalk #EmotionalVibes #RawMood #HeartOnSleeve",
     ];
 
     final List<List<String>> hashtags = [
@@ -106,7 +108,7 @@ class AppData {
       ["#Happy",  "Smile", "Laughing"],
     ];
     return List.generate(urls.length, (index){
-      return ReelModel(reelID: reelID,
+      return ReelModel(reelID: '${reelID}_$index',
           userID: userID,
           videoUrl: urls[index],
           caption: moodCaptions[index],

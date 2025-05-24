@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
@@ -8,9 +9,9 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 import '../../../widgets/post_comment_widget.dart';
 import '../../../widgets/post_like_widget.dart';
 import '../../../widgets/post_share_widget.dart';
-class HomePage extends StatelessWidget{
-  const HomePage({super.key});
-
+class ReelItemWidget extends StatelessWidget{
+  const ReelItemWidget({super.key, required ReelModel reel}): _reel = reel;
+  final ReelModel _reel;
   @override
   Widget build(BuildContext context) {
     return Stack(

@@ -7,6 +7,8 @@ import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:funli_app/src/providers/personal_info_provider.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
+import 'package:funli_app/src/providers/reels_provider.dart';
+import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/providers/tab_change_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +22,8 @@ void main() async{
         ChangeNotifierProvider(create: (_)=> PersonalInfoProvider()),
         ChangeNotifierProvider(create: (_)=> MainMenuTabChangeProvider()),
         ChangeNotifierProvider(create: (_)=> RecordUploadProvider()),
+        ChangeNotifierProvider(create: (_)=> ReelProvider()),
+        ChangeNotifierProvider(create: (_)=> SizeProvider()),
       ],
       child: const MyApp()));
 }

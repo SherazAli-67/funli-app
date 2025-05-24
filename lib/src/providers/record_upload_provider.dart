@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/notification_service/notification_service.dart';
 import 'package:funli_app/src/services/publish_reel_service.dart';
@@ -100,5 +101,18 @@ class RecordUploadProvider extends ChangeNotifier{
         body: 'Your reel has been uploaded successfully.',
       );
     }
+  }
+
+  void publishReels() {
+    List<ReelModel> reels = AppData.getReels();
+    reels.forEach((reel) async {
+      bool isUploaded = await PublishReelService.uploadReel(reel: reel);
+      if(isUploaded){
+        NotificationService.show(
+          title: "Upload Completed",
+          body: 'Your reel has been uploaded successfully.',
+        );
+      }
+    });
   }
 }

@@ -1,115 +1,76 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+// screens/reels_screen.dart
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/features/main_menu/reels_home_page/reels_item_widget.dart';
+import 'package:funli_app/src/widgets/loading_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:whitecodel_reels/whitecodel_reels.dart';
 
-class ReelFeedWidget extends StatefulWidget {
-  final String currentUserId;
-  final String selectedMood;
+import '../../../providers/reels_provider.dart';
+class ReelsPage extends StatefulWidget {
 
-  const ReelFeedWidget({
-    required this.currentUserId,
-    required this.selectedMood,
-    super.key,
-  });
+  const ReelsPage({super.key});
 
   @override
-  State<ReelFeedWidget> createState() => _ReelFeedWidgetState();
+  State<ReelsPage> createState() => _ReelsPageState();
 }
 
-class _ReelFeedWidgetState extends State<ReelFeedWidget> {
-  List<DocumentSnapshot> _reels = [];
-  bool _isLoading = false;
-  DocumentSnapshot? _lastDoc;
-  bool _hasMore = true;
-  final int _limit = 10;
+class _ReelsPageState extends State<ReelsPage> {
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-    _fetchReels();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      final provider = Provider.of<ReelProvider>(context, listen: false);
+      provider.fetchReels();
+
+      _scrollController = ScrollController()
+        ..addListener(() {
+          if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent - 200) {
+            provider.fetchReels();
+          }
+        });
+    });
   }
 
-  Future<void> _fetchReels() async {
-    if (_isLoading || !_hasMore) return;
-    setState(() => _isLoading = true);
-
-    try {
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.currentUserId)
-          .get();
-
-      final List<String> followings =
-      List<String>.from(userDoc.data()?['followings'] ?? []);
-
-      Query baseQuery = FirebaseFirestore.instance.collection('reels');
-
-      if (followings.isEmpty) {
-        // New user: trending + mood
-        baseQuery = baseQuery
-            .where('mood', isEqualTo: widget.selectedMood)
-            .orderBy('likes', descending: true)
-            .orderBy('createdAt', descending: true);
-      } else {
-        // Low/active user: fetch from followings
-        baseQuery = baseQuery
-            .where('creatorId', whereIn: followings.take(10).toList())
-            .orderBy('createdAt', descending: true);
-      }
-
-      if (_lastDoc != null) {
-        baseQuery = baseQuery.startAfterDocument(_lastDoc!);
-      }
-
-      final QuerySnapshot snapshot = await baseQuery.limit(_limit).get();
-
-      if (snapshot.docs.isNotEmpty) {
-        setState(() {
-          _lastDoc = snapshot.docs.last;
-          _reels.addAll(snapshot.docs);
-          _hasMore = snapshot.docs.length == _limit;
-        });
-      } else {
-        _hasMore = false;
-      }
-    } catch (e) {
-      debugPrint('Error fetching reels: $e');
-    }
-
-    setState(() => _isLoading = false);
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (scroll) {
-        if (scroll.metrics.pixels >= scroll.metrics.maxScrollExtent - 300 &&
-            !_isLoading && _hasMore) {
-          _fetchReels();
-        }
-        return false;
-      },
-      child: ListView.builder(
-        itemCount: _reels.length + (_isLoading ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index >= _reels.length) {
-            return const Center(child: Padding(
-              padding: EdgeInsets.all(16),
-              child: CircularProgressIndicator(),
-            ));
-          }
+    return Consumer<ReelProvider>(
+      builder: (context, provider, _) {
+        final reels = provider.reels;
 
-          final reel = _reels[index].data() as Map<String, dynamic>;
-          return ListTile(
-            title: Text("Mood: ${reel['mood']}"),
-            subtitle: Text("Likes: ${reel['likes']}"),
-            trailing: Text(
-              DateTime.fromMillisecondsSinceEpoch(
-                  (reel['createdAt'] as Timestamp).millisecondsSinceEpoch)
-                  .toString(),
-            ),
-          );
-        },
-      ),
+        if (provider.isLoading && reels.isEmpty) {
+          return LoadingWidget();
+        }
+
+        if (reels.isEmpty) {
+          return const Center(child: Text("No reels available."));
+        }
+
+        return Center(child: Text("Reels found: ${reels.length}"),);
+       /* return ListView.builder(
+          controller: _scrollController,
+          itemCount: reels.length + (provider.hasMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == reels.length) {
+              return const Center(child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: LoadingWidget(),
+              ));
+            }
+
+            final reel = reels[index];
+            return ReelItemWidget(reel: reel);
+          },
+        );*/
+      },
     );
   }
 }

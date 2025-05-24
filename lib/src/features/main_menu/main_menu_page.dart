@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:funli_app/src/features/main_menu/reels_home_page/home_page.dart';
+import 'package:funli_app/src/features/main_menu/reels_home_page/reels_item_widget.dart';
 import 'package:funli_app/src/features/main_menu/notification_page.dart';
+import 'package:funli_app/src/features/main_menu/reels_home_page/reels_page.dart';
 import 'package:funli_app/src/features/main_menu/search_page.dart';
 import 'package:funli_app/src/features/main_menu/user_profile_page.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:provider/provider.dart';
 import '../../notification_service/notification_service.dart';
+import '../../providers/size_provider.dart';
 import '../../providers/tab_change_provider.dart';
 import '../../res/app_icons.dart';
 import '../upload_feel/create_upload_feel_page.dart';
@@ -23,6 +25,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
   @override
   void initState() {
     _initNotificationService();
+    _initSize();
     super.initState();
   }
   @override
@@ -96,7 +99,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
   Widget _buildPage(int currentIndex) {
     switch(currentIndex){
       case 0:
-        return HomePage();
+        return ReelsPage();
 
       case 1:
         return SearchPage();
@@ -108,7 +111,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
         return UserProfilePage();
 
       default:
-        return HomePage();
+        return ReelsPage();
     }
   }
 
@@ -124,5 +127,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
     }catch(e){
       debugPrint("Exception while notification configuration: ${e.toString()}");
     }
+  }
+
+  void _initSize() {
+    Size size = MediaQuery.of(context).size;
+    context.read<SizeProvider>().setSize(size);
   }
 }
