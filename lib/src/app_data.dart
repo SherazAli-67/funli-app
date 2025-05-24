@@ -73,8 +73,50 @@ class AppData {
       'https://videos.pexels.com/video-files/4199353/4199353-sd_640_360_25fps.mp4',
       'https://videos.pexels.com/video-files/4169986/4169986-sd_640_360_30fps.mp4'
     ];
-    return [
-      // ReelModel(reelID: reelID, userID: userID, videoUrl: "videoUrl", thumbnailUrl: thumbnailUrl, caption: caption, hashtags: hashtags, mentions: mentions, commentsCount: commentsCount, shareCount: shareCount, moodTag: moodTag, visibility: visibility, createdAt: createdAt)
+    final List<String> moodCaptions = [
+      "Vibes don't lie 💫 #MoodVibes #GoodEnergy #ReelFeels #ChillMode",
+      "Feeling unstoppable today 💥 #BossMood #ConfidenceOn #MotivationVibes #GrindTime",
+      "Chasing peace, not perfection 🌿 #MentalWellness #InnerPeace #ChillVibes #StayCalm",
+      "This is what happy looks like 😄 #HappyMood #JoyfulVibes #SmileMore #PositiveEnergy",
+      "Moody but make it aesthetic 🎭 #AestheticMood #MoodyVibes #DeepFeels #VibeCheck",
+      "Lost in the moment 🌀 #InTheZone #MindfulLiving #NowPlaying #FeelTheBeat",
+      "Just vibin' through life 🎶 #JustVibes #LaidBack #CarefreeMood #FlowState",
+      "From chill to thrill in 5 seconds ⚡ #MoodSwitch #HighEnergy #LetsGo #HypeVibes",
+      "Serving calm energy today 🌊 #PeacefulMind #SlowLiving #SoftMood #ZenTime",
+      "When the mood takes over 🔥 #ExpressYourself #MoodSwing #ReelMood #Unfiltered",
+      "Let emotions do the talking 🗣️ #RealTalk #EmotionalVibes #RawMood #HeartOnSleeve",
+      "Dancing with my feelings 💃🕺 #DanceTherapy #FeelTheBeat #MoodMovement #GrooveOn",
     ];
+
+    final List<List<String>> hashtags = [
+      ["#Happy",  "Smile", "Laughing"],
+      ["#Sad",  "Annoyed",],
+      ["#Happy",  "Smile", "Laughing"],
+      ["#Angry",  "Sad"],
+
+      ["#Happy",  "Smile", "Laughing"],
+      ["#Sad",  "Annoyed",],
+      ["#Happy",  "Smile", "Laughing"],
+      ["#Angry",  "Sad"],
+
+      ["#Happy",  "Smile", "Laughing"],
+      ["#Sad",  "Annoyed",],
+      ["#Happy",  "Smile", "Laughing"],
+      ["#Angry",  "Sad"],
+      ["#Happy",  "Smile", "Laughing"],
+    ];
+    return List.generate(urls.length, (index){
+      return ReelModel(reelID: reelID,
+          userID: userID,
+          videoUrl: urls[index],
+          caption: moodCaptions[index],
+          hashtags:  hashtags[index],
+          mentions: [],
+          commentsCount: 0,
+          shareCount: 0,
+          moodTag: "Happy",
+          visibility: 'Public',
+          createdAt: DateTime.now());
+    });
   }
 }

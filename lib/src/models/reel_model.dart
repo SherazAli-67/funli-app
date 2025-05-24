@@ -4,7 +4,7 @@ class ReelModel {
   final String reelID;
   final String userID;
   final String videoUrl;
-  final String thumbnailUrl;
+  final String? thumbnailUrl;
   final String caption;
   final List<String> hashtags;
   final List<String> mentions;
@@ -20,7 +20,7 @@ class ReelModel {
     required this.reelID,
     required this.userID,
     required this.videoUrl,
-    required this.thumbnailUrl,
+    this.thumbnailUrl,
     required this.caption,
     required this.hashtags,
     required this.mentions,
