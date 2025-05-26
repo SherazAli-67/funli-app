@@ -4,10 +4,11 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:funli_app/src/features/main_menu/reels_home_page/reels_item_widget.dart';
 import 'package:funli_app/src/models/reel_model.dart';
+import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
+import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:whitecodel_reels/whitecodel_reels.dart';
@@ -145,7 +146,18 @@ class _ReelsPageState extends State<ReelsPage> {
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Text("Sheraz Ali", style: AppTextStyles.subHeadingTextStyle.copyWith(color: Colors.white),),
+                                                FutureBuilder(future: UserService.getUserByID(userID: reel.userID), builder: (ctx, snap){
+                                                  if(snap.hasData && snap.requireData != null){
+                                                    UserModel user = snap.requireData!;
+                                                    return Text(user.userName, style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),);
+                                                  }else if(snap.connectionState == ConnectionState.waiting){
+                                                    return Align(
+                                                        alignment: Alignment.topLeft,
+                                                        child: LoadingWidget());
+                                                  }
+
+                                                  return const SizedBox();
+                                                }),
                                                 Text(
                                                   reel.caption,
                                                   // maxLines:
