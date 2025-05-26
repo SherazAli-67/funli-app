@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:funli_app/src/models/like_model.dart';
+import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 
 import '../models/reel_model.dart';
@@ -30,7 +33,7 @@ class ReelsService {
           .map((doc) => doc['userID'] as String)
           .toList();*/
 
-      Query baseQuery = _firestore.collection('reels');
+      Query baseQuery = _firestore.collection(AppConstants.reelsCollection);
 
      /* if (followings.isEmpty) {
         baseQuery = baseQuery
@@ -48,7 +51,6 @@ class ReelsService {
       }*/
 
       final snapshot = await baseQuery.limit(limit).get();
-      debugPrint("Reels found: ${snapshot.size}");
       if (snapshot.docs.isNotEmpty) {
         onLastDoc(snapshot.docs.last);
         onHasMore(snapshot.docs.length == limit);
@@ -65,4 +67,61 @@ class ReelsService {
     return fetchedReels;
   }
 
+  static Stream<List<String>> getReelLikes({required String reelID}) {
+
+    final likeDocRef = FirebaseFirestore.instance
+        .collection(AppConstants.reelsCollection)
+        .doc(reelID)
+        .collection(AppConstants.likesCollection);
+
+    return likeDocRef.snapshots().map((snapshot)=> snapshot.docs.map((doc)=> doc.id).toList());
+  }
+
+
+  static Future<bool> addLikeToReel({required String reelID, required bool isRemove})async{
+    bool isLiked = false;
+
+    try {
+      String currentUID = FirebaseAuth.instance.currentUser!.uid;
+
+      final firebaseFirestore = FirebaseFirestore.instance;
+      final userLikeRef = firebaseFirestore
+          .collection(userCollection)
+          .doc(currentUID)
+          .collection(AppConstants.likesCollection)
+          .doc(reelID);
+
+      final postLikeRef = firebaseFirestore
+          .collection(AppConstants.reelsCollection)
+          .doc(reelID)
+          .collection(AppConstants.likesCollection)
+          .doc(currentUID);
+      if (isRemove) {
+        // removing liked post from users collection
+        await userLikeRef.delete();
+        //removing like from likes collection
+        await postLikeRef.delete();
+        isLiked = true;
+      } else {
+        //adding post to user like collections
+        await userLikeRef.set({
+          'reel' : reelID
+        });
+
+        String userID = FirebaseAuth.instance.currentUser!.uid;
+        DateTime dateTime = DateTime.now();
+        LikeModel like = LikeModel(likedBy: userID, dateTime: dateTime);
+        // adding like to post likes collection
+
+        /// The fav algo is like set by author (quote with favorites)
+        await postLikeRef.set(like.toMap());
+        isLiked = true;
+      }
+    } catch (e) {
+      debugPrint("Exception while adding author to Favorites: ${e.toString()}");
+    }
+
+
+    return isLiked;
+  }
 }

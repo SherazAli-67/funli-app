@@ -3,47 +3,26 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
+import 'package:funli_app/src/services/reels_service.dart';
 import 'package:like_button/like_button.dart';
 
 class PostLikeWidget extends StatelessWidget{
   final Color iconColor;
   final bool isReel;
   final String icon;
-  const PostLikeWidget({super.key, this.icon = AppIcons.icLike, this.iconColor = Colors.grey, this.isReel = false});
+  final String reelID;
+  const PostLikeWidget({super.key, required this.reelID, this.icon = AppIcons.icLike, this.iconColor = Colors.grey, this.isReel = false});
   @override
   Widget build(BuildContext context) {
-    return LikeButton(
-      size: 35,
-      mainAxisAlignment: MainAxisAlignment.start,
-      circleSize: 24,
-      isLiked: false,
-      padding: EdgeInsets.zero,
-      likeCount: 999,
-      onTap: (isLiked)async{
-        // await PostsService.likePost(post: post, isRemove: isLiked);
-        return !isLiked;
-      },
-      countPostion: isReel ? CountPostion.bottom : CountPostion.right,
-      likeBuilder: (isLiked){
-        return isLiked ? SvgPicture.asset(AppIcons.icLikedIcon): SvgPicture.asset(
-          icon,
-          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-        );
-      },
-      countBuilder: (_, isSelected, text){
-        return text == '0' ? const SizedBox(): IconButton(
-          onPressed: (){},
-          icon: isSelected
-              ? Text(
-            text,
-            style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
-          )
-              : Text(
-            text,
-            style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
-          ),
-        );
-      },
+    return StreamBuilder(
+      stream: ReelsService.getReelLikes(reelID: reelID),
+      builder: (context, snapshot) {
+        if(snapshot.hasData){
+          return _buildLikeButton(snapshot.requireData);
+        }
+        
+        return _buildLikeButton([]);
+      }
     );
    /* return StreamBuilder(
         stream: PostsService.getPostLikedUsers(postID: post.postID),
@@ -91,6 +70,42 @@ class PostLikeWidget extends StatelessWidget{
 
           return const SizedBox();
         });*/
+  }
+
+  LikeButton _buildLikeButton(List<String> likedUsers) {
+    return LikeButton(
+          size: 35,
+          mainAxisAlignment: MainAxisAlignment.start,
+          circleSize: 24,
+          isLiked: false,
+          padding: EdgeInsets.zero,
+          likeCount: likedUsers.length,
+          onTap: (isLiked)async{
+            await ReelsService.addLikeToReel(reelID: reelID, isRemove: isLiked);
+            return !isLiked;
+          },
+          countPostion: isReel ? CountPostion.bottom : CountPostion.right,
+          likeBuilder: (isLiked){
+            return isLiked ? SvgPicture.asset(AppIcons.icLikedIcon): SvgPicture.asset(
+              icon,
+              colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+            );
+          },
+          countBuilder: (_, isSelected, text){
+            return text == '0' ? const SizedBox(): IconButton(
+              onPressed: (){},
+              icon: isSelected
+                  ? Text(
+                text,
+                style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
+              )
+                  : Text(
+                text,
+                style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
+              ),
+            );
+          },
+        );
   }
 
  /* bool getIsLiked(List<UserModel> favorites) {

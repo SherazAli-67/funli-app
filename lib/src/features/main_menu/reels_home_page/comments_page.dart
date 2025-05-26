@@ -51,7 +51,7 @@ class CommentsPage extends StatelessWidget{
                       Row(
                         spacing: 20,
                         children: [
-                          PostLikeWidget(iconColor: Colors.black, icon: AppIcons.icLikeOutlined,),
+                          PostLikeWidget(reelID: '',iconColor: Colors.black, icon: AppIcons.icLikeOutlined,),
                           Text("2 days ago", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),),
                           TextButton(onPressed: (){}, child: Text("Reply", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),))
                         ],

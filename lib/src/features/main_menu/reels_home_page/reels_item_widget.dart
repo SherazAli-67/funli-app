@@ -183,7 +183,7 @@ class ReelItemWidget extends StatelessWidget{
                   )
                 ],
               ),
-              PostLikeWidget( iconColor: Colors.white, isReel: true,),
+              // PostLikeWidget( iconColor: Colors.white, isReel: true,),
               PostCommentWidget(iconColor: Colors.white, isReel: true,),
               PostShareWidget( iconColor: Colors.white,),
             ],

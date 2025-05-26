@@ -20,4 +20,6 @@ class AppConstants {
 
 //Firebase collections
   static const reelsCollection = 'reels';
+  static const likesCollection = 'likes';
+  static const commentsCollection = 'comments';
 }
