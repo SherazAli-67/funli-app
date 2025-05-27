@@ -39,7 +39,7 @@ class CommentLikeWidget extends StatelessWidget{
           padding: EdgeInsets.zero,
           likeCount: likedUsers.length,
           onTap: (isLiked)async{
-            await ReelsService.addLikeToReel(reelID: commentID, isRemove: isLiked);
+            await ReelsService.addLikeToComment(reelID: reelID, commentID: commentID, isRemove: isLiked);
             return !isLiked;
           },
           countPostion: CountPostion.right,

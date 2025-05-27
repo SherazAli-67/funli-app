@@ -154,19 +154,19 @@ class ReelsService {
     try {
       String currentUID = FirebaseAuth.instance.currentUser!.uid;
 
-      final postLikeRef = FirebaseFirestore.instance
+      final commentLikeRef = FirebaseFirestore.instance
           .collection(AppConstants.reelsCollection)
           .doc(reelID)
           .collection(AppConstants.commentsCollection).doc(commentID).collection(
           AppConstants.likesCollection).doc(currentUID);
       if (isRemove) {
         //removing like from likes collection
-        await postLikeRef.delete();
+        await commentLikeRef.delete();
         isLiked = true;
       } else {
         DateTime dateTime = DateTime.now();
         LikeModel like = LikeModel(likedBy: currentUID, dateTime: dateTime);
-        await postLikeRef.set(like.toMap());
+        await commentLikeRef.set(like.toMap());
         isLiked = true;
       }
     } catch (e) {

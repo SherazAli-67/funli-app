@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:funli_app/src/helpers/time_ago_helper.dart';
 import 'package:funli_app/src/models/comment_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/services/user_service.dart';
@@ -51,7 +52,7 @@ class CommentItemWidget extends StatelessWidget {
           spacing: 20,
           children: [
             CommentLikeWidget(reelID: _reelID, commentID: _comment.commentID),
-            Text("2 days ago", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),),
+            Text(DateTimeHelper.timeAgo(_comment.dateTime), style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),),
             TextButton(onPressed: (){}, child: Text("Reply", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),))
           ],
         )
