@@ -78,6 +78,16 @@ class ReelsService {
     return likeDocRef.snapshots().map((snapshot)=> snapshot.docs.map((doc)=> doc.id).toList());
   }
 
+  static Stream<List<String>> getCommentLikes({required String reelID, required String commentID}) {
+    final likeDocRef = FirebaseFirestore.instance
+        .collection(AppConstants.reelsCollection)
+        .doc(reelID)
+        .collection(AppConstants.commentsCollection).doc(commentID).collection(
+        AppConstants.likesCollection);
+
+    return likeDocRef.snapshots().map((snapshot)=> snapshot.docs.map((doc)=> doc.id).toList());
+  }
+
   static Stream<int> getReelCommentCount({required String reelID}) {
     return  FirebaseFirestore.instance
         .collection(AppConstants.reelsCollection)
@@ -136,6 +146,35 @@ class ReelsService {
 
     return isLiked;
   }
+
+
+  static Future<bool> addLikeToComment({required String reelID, required String commentID, required bool isRemove})async{
+    bool isLiked = false;
+
+    try {
+      String currentUID = FirebaseAuth.instance.currentUser!.uid;
+
+      final postLikeRef = FirebaseFirestore.instance
+          .collection(AppConstants.reelsCollection)
+          .doc(reelID)
+          .collection(AppConstants.commentsCollection).doc(commentID).collection(
+          AppConstants.likesCollection).doc(currentUID);
+      if (isRemove) {
+        //removing like from likes collection
+        await postLikeRef.delete();
+        isLiked = true;
+      } else {
+        DateTime dateTime = DateTime.now();
+        LikeModel like = LikeModel(likedBy: currentUID, dateTime: dateTime);
+        await postLikeRef.set(like.toMap());
+        isLiked = true;
+      }
+    } catch (e) {
+      debugPrint("Exception while adding author to Favorites: ${e.toString()}");
+    }
+    return isLiked;
+  }
+
 
   static Future<void> addCommentToReel({required String reelID, required String commentText})async{
 

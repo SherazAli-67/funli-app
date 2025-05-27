@@ -4,11 +4,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/models/comment_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/services/user_service.dart';
-
+import 'package:funli_app/src/widgets/comment_like_widget.dart';
 import '../../../res/app_colors.dart';
 import '../../../res/app_icons.dart';
 import '../../../res/app_textstyles.dart';
-import '../../../widgets/post_like_widget.dart';
 
 class CommentItemWidget extends StatelessWidget {
   const CommentItemWidget({
@@ -51,7 +50,7 @@ class CommentItemWidget extends StatelessWidget {
         Row(
           spacing: 20,
           children: [
-            PostLikeWidget(reelID: _reelID,iconColor: Colors.black, icon: AppIcons.icLikeOutlined,),
+            CommentLikeWidget(reelID: _reelID, commentID: _comment.commentID),
             Text("2 days ago", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),),
             TextButton(onPressed: (){}, child: Text("Reply", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),))
           ],
