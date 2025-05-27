@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/res/app_colors.dart';
@@ -18,6 +19,7 @@ class PostLikeWidget extends StatelessWidget{
       stream: ReelsService.getReelLikes(reelID: reelID),
       builder: (context, snapshot) {
         if(snapshot.hasData){
+          // debugPrint("Count found: ${snapshot.requireData.length}");
           return _buildLikeButton(snapshot.requireData);
         }
         
@@ -73,11 +75,12 @@ class PostLikeWidget extends StatelessWidget{
   }
 
   LikeButton _buildLikeButton(List<String> likedUsers) {
+    bool isLiked = likedUsers.contains(FirebaseAuth.instance.currentUser!.uid);
     return LikeButton(
           size: 35,
           mainAxisAlignment: MainAxisAlignment.start,
           circleSize: 24,
-          isLiked: false,
+          isLiked: isLiked,
           padding: EdgeInsets.zero,
           likeCount: likedUsers.length,
           onTap: (isLiked)async{
