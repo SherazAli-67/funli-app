@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:funli_app/src/models/comment_model.dart';
 import 'package:funli_app/src/models/like_model.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
@@ -94,6 +95,7 @@ class ReelsService {
       String currentUID = FirebaseAuth.instance.currentUser!.uid;
 
       final firebaseFirestore = FirebaseFirestore.instance;
+
       final userLikeRef = firebaseFirestore
           .collection(userCollection)
           .doc(currentUID)
@@ -112,17 +114,18 @@ class ReelsService {
         await postLikeRef.delete();
         isLiked = true;
       } else {
-        //adding post to user like collections
-        await userLikeRef.set({
-          'reel' : reelID
-        });
-
         String userID = FirebaseAuth.instance.currentUser!.uid;
         DateTime dateTime = DateTime.now();
-        LikeModel like = LikeModel(likedBy: userID, dateTime: dateTime);
-        // adding like to post likes collection
 
-        /// The fav algo is like set by author (quote with favorites)
+        //adding reel to user like collections
+        await userLikeRef.set({
+          'reel' : reelID,
+          'dateTime': dateTime
+        });
+
+
+
+        LikeModel like = LikeModel(likedBy: userID, dateTime: dateTime);
         await postLikeRef.set(like.toMap());
         isLiked = true;
       }
@@ -132,5 +135,24 @@ class ReelsService {
 
 
     return isLiked;
+  }
+
+  static Future<void> addCommentToReel({required String reelID, required String commentText})async{
+
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    DateTime now = DateTime.now();
+    String commentID = now.microsecondsSinceEpoch.toString();
+
+    AddCommentModel comment = AddCommentModel(
+        commentID: commentID,
+        commentBy: currentUID,
+        dateTime: DateTime.now(),
+        comment: commentText);
+    await FirebaseFirestore.instance
+        .collection(AppConstants.reelsCollection)
+        .doc(reelID)
+        .collection(AppConstants.commentsCollection)
+        .doc(commentID).set(comment.toMap());
+
   }
 }

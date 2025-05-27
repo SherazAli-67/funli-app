@@ -17,7 +17,7 @@ class LikeModel {
 
   factory LikeModel.fromMap(Map<String, dynamic> map) {
     return LikeModel(
-      likedBy: map['userID'],
+      likedBy: map['likedBy'],
       dateTime: DateTime.tryParse(map['dateTime'])!,
     );
   }

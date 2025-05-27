@@ -7,8 +7,8 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/post_like_widget.dart';
 
 class CommentsPage extends StatelessWidget{
-  const CommentsPage({super.key});
-  
+  const CommentsPage({super.key, required String reelID}) : _reelID = reelID;
+  final String _reelID;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -51,7 +51,7 @@ class CommentsPage extends StatelessWidget{
                       Row(
                         spacing: 20,
                         children: [
-                          PostLikeWidget(reelID: '',iconColor: Colors.black, icon: AppIcons.icLikeOutlined,),
+                          PostLikeWidget(reelID: _reelID,iconColor: Colors.black, icon: AppIcons.icLikeOutlined,),
                           Text("2 days ago", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),),
                           TextButton(onPressed: (){}, child: Text("Reply", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),))
                         ],
