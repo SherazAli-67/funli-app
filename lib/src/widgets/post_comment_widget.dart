@@ -19,7 +19,6 @@ class PostCommentWidget extends StatelessWidget{
         if(snapshot.hasData){
           return _buildCommentWidget(context, totalComments: snapshot.requireData);
         }
-
         return _buildCommentWidget(context, totalComments: 0);
       }
     );

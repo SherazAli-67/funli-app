@@ -155,4 +155,11 @@ class ReelsService {
         .doc(commentID).set(comment.toMap());
 
   }
+
+  static Stream<List<AddCommentModel>> getReelsComment({required String reelID}) {
+    return FirebaseFirestore.instance
+        .collection(AppConstants.reelsCollection)
+        .doc(reelID)
+        .collection(AppConstants.commentsCollection).snapshots().map((snapshot)=> snapshot.docs.map((doc)=> AddCommentModel.fromMap(doc.data())).toList());
+  }
 }

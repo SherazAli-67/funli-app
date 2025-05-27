@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
+import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/widgets/post_like_widget.dart';
 
 class CommentsPage extends StatelessWidget{
@@ -20,7 +21,14 @@ class CommentsPage extends StatelessWidget{
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Comments (204,755)', style: AppTextStyles.headingTextStyle3,),
+              StreamBuilder(
+                  stream: ReelsService.getReelCommentCount(reelID: _reelID),
+                  builder: (ctx, snapshot) {
+                    if(snapshot.hasData && snapshot.requireData > 0){
+                      return Text('Comments (${snapshot.requireData})', style: AppTextStyles.headingTextStyle3,);
+                    }
+                    return Text('Comments ', style: AppTextStyles.headingTextStyle3,);
+                  }),
               IconButton(
                   style: IconButton.styleFrom(
                       backgroundColor: AppColors.lightGreyColor,
@@ -30,36 +38,48 @@ class CommentsPage extends StatelessWidget{
             ],
           ),
 
-          Expanded(child: ListView.builder(
-              itemCount: 10,
-              itemBuilder: (ctx, index){
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 24.0),
-                  child: Column(
-                    spacing: 10,
-                    children: [
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: CircleAvatar(
-                          backgroundImage: CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
-                        ),
-                        title: Text("Kristen Watson", style: AppTextStyles.tileTitleTextStyle,),
-                        trailing: IconButton(
-                            onPressed: (){}, icon: SvgPicture.asset(AppIcons.icMore)),
-                      ),
-                      Text("You're looking absolutely amazing. The apparel looks stunning on you and the combo of you guyz ❤️. Looking forward to see more from you guyz.", style: AppTextStyles.commentTextStyle,),
-                      Row(
-                        spacing: 20,
+          StreamBuilder(stream: ReelsService.getReelsComment(reelID: _reelID), builder: (ctx, snapshot){
+            if(snapshot.hasData && snapshot.requireData.isNotEmpty){
+              return Expanded(child: ListView.builder(
+                  itemCount: 10,
+                  itemBuilder: (ctx, index){
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 24.0),
+                      child: Column(
+                        spacing: 10,
                         children: [
-                          PostLikeWidget(reelID: _reelID,iconColor: Colors.black, icon: AppIcons.icLikeOutlined,),
-                          Text("2 days ago", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),),
-                          TextButton(onPressed: (){}, child: Text("Reply", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),))
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: CircleAvatar(
+                              backgroundImage: CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
+                            ),
+                            title: Text("Kristen Watson", style: AppTextStyles.tileTitleTextStyle,),
+                            trailing: IconButton(
+                                onPressed: (){}, icon: SvgPicture.asset(AppIcons.icMore)),
+                          ),
+                          Text("You're looking absolutely amazing. The apparel looks stunning on you and the combo of you guyz ❤️. Looking forward to see more from you guyz.", style: AppTextStyles.commentTextStyle,),
+                          Row(
+                            spacing: 20,
+                            children: [
+                              PostLikeWidget(reelID: _reelID,iconColor: Colors.black, icon: AppIcons.icLikeOutlined,),
+                              Text("2 days ago", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),),
+                              TextButton(onPressed: (){}, child: Text("Reply", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),))
+                            ],
+                          )
                         ],
-                      )
-                    ],
-                  ),
-                );
-              })),
+                      ),
+                    );
+                  }));
+            }
+            return Expanded(child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 10,
+              children: [
+                Text("No Comments Yet", style: AppTextStyles.headingTextStyle3,),
+                Text("Be the first to comment on the reel", style: AppTextStyles.bodyTextStyle,),
+              ],
+            ));
+          }),
 
           Container(
             decoration: BoxDecoration(
