@@ -227,7 +227,7 @@ class _ReelsPageState extends State<ReelsPage> {
                             ],
                           ),
                           PostLikeWidget(reelID: reel.reelID, iconColor: Colors.white, isReel: true,),
-                          PostCommentWidget(iconColor: Colors.white, isReel: true,),
+                          PostCommentWidget(iconColor: Colors.white, isReel: true, reelID: reel.reelID,),
                           PostShareWidget( iconColor: Colors.white,),
                         ],
                       ),

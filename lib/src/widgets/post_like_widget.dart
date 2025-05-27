@@ -26,55 +26,9 @@ class PostLikeWidget extends StatelessWidget{
         return _buildLikeButton([]);
       }
     );
-   /* return StreamBuilder(
-        stream: PostsService.getPostLikedUsers(postID: post.postID),
-        builder: (ctx, snapshot) {
-          if(snapshot.hasData){
-            List<UserModel> users = snapshot.requireData;
-            return LikeButton(
-              size: 45,
-              mainAxisAlignment: MainAxisAlignment.start,
-              circleSize: 24,
-              isLiked: getIsLiked(users),
-              likeCount: users.length,
-              onTap: (isLiked)async{
-                await PostsService.likePost(post: post, isRemove: isLiked);
-                return !isLiked;
-              },
-              countPostion: isReel ? CountPostion.bottom : CountPostion.right,
-              likeBuilder: (isLiked){
-                return  Icon(
-                  Icons.thumb_up,
-                  color: isLiked
-                      ? primaryColor : iconColor,
-                  size: 25,
-                );
-              },
-              countBuilder: (_, isSelected, text){
-                return text == '0' ? const SizedBox(): IconButton(
-                  onPressed: (){},
-                  icon: isSelected
-                      ? Text(
-                    text,
-                    style: smallTextStyle.copyWith(
-                        fontFamily: giloryFontFamily,
-                        color: primaryColor),
-                  )
-                      : Text(
-                    text,
-                    style: smallTextStyle.copyWith(
-                        fontFamily: giloryFontFamily),
-                  ),
-                );
-              },
-            );
-          }
-
-          return const SizedBox();
-        });*/
   }
 
-  LikeButton _buildLikeButton(List<String> likedUsers) {
+  Widget _buildLikeButton(List<String> likedUsers) {
     bool isLiked = likedUsers.contains(FirebaseAuth.instance.currentUser!.uid);
     return LikeButton(
           size: 35,
@@ -111,8 +65,4 @@ class PostLikeWidget extends StatelessWidget{
         );
   }
 
- /* bool getIsLiked(List<UserModel> favorites) {
-    String userID = FirebaseAuth.instance.currentUser!.uid;
-    return favorites.where((favByUser)=> favByUser.userID == userID).isNotEmpty;
-  }*/
 }

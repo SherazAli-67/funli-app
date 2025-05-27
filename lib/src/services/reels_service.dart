@@ -77,6 +77,15 @@ class ReelsService {
     return likeDocRef.snapshots().map((snapshot)=> snapshot.docs.map((doc)=> doc.id).toList());
   }
 
+  static Stream<int> getReelCommentCount({required String reelID}) {
+    return  FirebaseFirestore.instance
+        .collection(AppConstants.reelsCollection)
+        .doc(reelID)
+        .collection(AppConstants.commentsCollection)
+        .snapshots()
+        .map((snapshot) =>
+    snapshot.docs.length);
+  }
 
   static Future<bool> addLikeToReel({required String reelID, required bool isRemove})async{
     bool isLiked = false;
