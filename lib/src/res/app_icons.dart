@@ -33,6 +33,7 @@ class AppIcons {
   static const icAdd ='assets/icons/ic_add.svg';
   static const icAddUser = 'assets/icons/ic_add_user.svg';
   static const gradientChatIcon = 'assets/icons/gradient_chat_icon.svg';
+  static const icUnfollow = 'assets/icons/ic_unfollow.svg';
 
 
   // Gradients

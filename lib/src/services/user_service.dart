@@ -83,4 +83,38 @@ class UserService {
       'mood' : mood,
     });
   }
+
+  static Future<int> getUserPostsCount({required String userID}) async{
+    final countQuery = await FirebaseFirestore.instance
+        .collection(FirebaseConstants.userCollection)
+        .doc(userID)
+        .collection(FirebaseConstants.reelsCollection)
+        .count()
+        .get();
+
+    final totalCount = countQuery.count ?? 0;
+    return totalCount;
+  }
+  static Future<int> getUserFollowersCount({required String userID}) async{
+    final countQuery = await FirebaseFirestore.instance
+        .collection(FirebaseConstants.userCollection)
+        .doc(userID)
+        .collection(FirebaseConstants.followersCollection)
+        .count()
+        .get();
+
+    final totalCount = countQuery.count ?? 0;
+    return totalCount;
+  }
+  static Future<int> getUserFollowingCount({required String userID}) async{
+    final countQuery = await FirebaseFirestore.instance
+        .collection(FirebaseConstants.userCollection)
+        .doc(userID)
+        .collection(FirebaseConstants.followingCollection)
+        .count()
+        .get();
+
+    final totalCount = countQuery.count ?? 0;
+    return totalCount;
+  }
 }

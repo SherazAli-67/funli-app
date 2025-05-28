@@ -5,6 +5,7 @@ import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/reels_service.dart';
+import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
@@ -54,12 +55,52 @@ class RemoteUserProfile extends StatelessWidget{
                   spacing: 10,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildUserInfoWidget(title: 'Posts', totalCount: 823),
-                    _buildUserInfoWidget(title: 'Followers', totalCount: 370000),
-      
-                    _buildUserInfoWidget(title: 'Following', totalCount: 925),
-                    _buildUserInfoWidget(title: 'Likes', totalCount: 3900000, isLast: true),
-      
+                    FutureBuilder(
+                        future: UserService.getUserPostsCount(userID: _userID!),
+                        builder: (ctx, snapshot){
+                          if(snapshot.hasData){
+                            return _buildUserInfoWidget(title: 'Posts', totalCount: snapshot.requireData);
+                          }else if(snapshot.connectionState == ConnectionState.waiting){
+                            return LoadingWidget();
+                          }
+
+                          return SizedBox();
+                        }),
+                    FutureBuilder(
+                        future: UserService.getUserFollowersCount(userID: _userID),
+                        builder: (ctx, snapshot){
+                          if(snapshot.hasData){
+                            return _buildUserInfoWidget(title: 'Followers', totalCount: snapshot.requireData);
+                          }else if(snapshot.connectionState == ConnectionState.waiting){
+                            return LoadingWidget();
+                          }
+
+                          return SizedBox();
+                        }),
+                    FutureBuilder(
+                        future: UserService.getUserFollowingCount(userID: _userID),
+                        builder: (ctx, snapshot){
+                          if(snapshot.hasData){
+                            return _buildUserInfoWidget(title: 'Following', totalCount: snapshot.requireData);
+                          }else if(snapshot.connectionState == ConnectionState.waiting){
+                            return LoadingWidget();
+                          }
+
+                          return SizedBox();
+                        }),
+
+                    FutureBuilder(
+                        future: UserService.getUserPostsCount(userID: _userID),
+                        builder: (ctx, snapshot){
+                          if(snapshot.hasData){
+                            return _buildUserInfoWidget(title: 'Likes', totalCount: snapshot.requireData, isLast: true);
+                          }else if(snapshot.connectionState == ConnectionState.waiting){
+                            return LoadingWidget();
+                          }
+
+                          return SizedBox();
+                        }),
+
                   ],
                 ),
               ),
@@ -70,7 +111,14 @@ class RemoteUserProfile extends StatelessWidget{
                   child: Row(
                     spacing: 12,
                     children: [
-                      Expanded(child: PrimaryBtn(btnText: "Follow",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient,)),
+                      StreamBuilder(stream: UserService.getIsFollowing(_userID), builder: (ctx, snapshot){
+                        if(snapshot.hasData){
+                          bool isFollowing = snapshot.requireData;
+                          return Expanded(child: Expanded(child: PrimaryBtn(btnText: isFollowing ? "Un-Follow" : "Follow",isPrefix: true, icon: AppIcons.icUnfollow, onTap: (){}, bgGradient: AppIcons.primaryBgGradient, iconColor: Colors.white,)),);
+                        }
+
+                        return Expanded(child: PrimaryBtn(btnText: "",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient,));
+                      }),
                       Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),
                     ],
                   ),
@@ -85,7 +133,7 @@ class RemoteUserProfile extends StatelessWidget{
               SizedBox(
                 height: 200,
                 child: FutureBuilder(future: ReelsService.getUserReels(limit: 10), builder: (ctx, snapshot){
-      
+
                   if(snapshot.hasData){
                     return ListView.builder(
                         itemCount: snapshot.requireData.length,
@@ -99,7 +147,7 @@ class RemoteUserProfile extends StatelessWidget{
                   }else if(snapshot.connectionState == ConnectionState.waiting){
                     return LoadingWidget();
                   }
-      
+
                   return SizedBox();
                 }),
               )

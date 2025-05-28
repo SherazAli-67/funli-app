@@ -9,8 +9,10 @@ import '../res/spacing_constants.dart';
 class PrimaryBtn extends StatelessWidget {
   const PrimaryBtn({
     super.key,
-    required String btnText, required String icon, required VoidCallback onTap, String bgGradient = AppIcons.btnBgGradient, bool isPrefix = false, bool isLoading = false, double borderRadius = SpacingConstants.btnBorderRadius
-  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _isLoading = isLoading, _bgGradient = bgGradient, _borderRadius = borderRadius;
+    required String btnText, required String icon, required VoidCallback onTap, String bgGradient = AppIcons
+        .btnBgGradient, bool isPrefix = false, bool isLoading = false, double borderRadius = SpacingConstants
+        .btnBorderRadius, Color? iconColor
+  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _isLoading = isLoading, _bgGradient = bgGradient, _borderRadius = borderRadius, _iconColor = iconColor;
   final String _text;
   final String _icon;
   final VoidCallback _onTap;
@@ -18,6 +20,7 @@ class PrimaryBtn extends StatelessWidget {
   final bool _isLoading;
   final String _bgGradient;
   final double _borderRadius;
+  final Color? _iconColor;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -53,10 +56,10 @@ class PrimaryBtn extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if(_isPrefix && _icon.isNotEmpty)
-                    SvgPicture.asset(_icon),
+                    SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,),
                   Text(_text, style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),),
                   if(!_isPrefix && _icon.isNotEmpty)
-                    SvgPicture.asset(_icon),
+                    SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,)
                 ],
               ),
             ],
