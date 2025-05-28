@@ -205,25 +205,29 @@ class _ReelsPageState extends State<ReelsPage> {
                                   ),
                                 ),
                               ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                left: 0,
-                                child:
-
-                                Container(
-                                    decoration: BoxDecoration(
-                                        color: AppColors.deepPurpleColor,
-                                        shape: BoxShape.circle
-                                    ),
-                                    child: IconButton(
-                                        padding: EdgeInsets.zero,
-                                        style: const ButtonStyle(
-                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              StreamBuilder(stream: UserService.getIsFollowing(reel.userID), builder: (ctx, snapshot){
+                                if(snapshot.hasData && !snapshot.requireData){
+                                  return Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    left: 0,
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                            color: AppColors.deepPurpleColor,
+                                            shape: BoxShape.circle
                                         ),
-                                        onPressed: ()=> UserService.onFollowTap(remoteUID: reel.userID), icon: SvgPicture.asset(AppIcons.icAdd, height: 20,))
-                                ),
-                              )
+                                        child: IconButton(
+                                            padding: EdgeInsets.zero,
+                                            style: const ButtonStyle(
+                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                            ),
+                                            onPressed: ()=> UserService.onFollowTap(remoteUID: reel.userID), icon: SvgPicture.asset(AppIcons.icAdd, height: 20,))
+                                    ),
+                                  );
+                                }
+
+                                return SizedBox();
+                              })
                             ],
                           ),
                           PostLikeWidget(reelID: reel.reelID, iconColor: Colors.white, isReel: true,),

@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/follow_model.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:funli_app/src/models/user_model.dart';
-import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 
 class UserService {
@@ -61,5 +60,12 @@ class UserService {
 
 
     return result;
+  }
+
+  static Stream<bool> getIsFollowing(String remoteUID) {
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    return _fireStore.collection(
+        FirebaseConstants.userCollection).doc(currentUID).collection(
+        FirebaseConstants.followingCollection).doc(remoteUID).snapshots().map((snapshot)=> snapshot.exists);
   }
 }
