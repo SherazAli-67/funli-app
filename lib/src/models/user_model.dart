@@ -3,6 +3,7 @@ class UserModel {
   final String userName;
   final String email;
   final DateTime? dob;
+  final String? mood;
   final List<String> interests;
 
   UserModel({
@@ -10,6 +11,7 @@ class UserModel {
     required this.userName,
     required this.email,
     this.dob,
+    this.mood,
     List<String>? interests,
   }) : interests = interests ?? [];
 
@@ -20,6 +22,7 @@ class UserModel {
       'email': email,
       'dob': dob?.toIso8601String(),
       'interests': interests,
+      'mood' : mood
     };
   }
 
@@ -28,6 +31,7 @@ class UserModel {
       userID: map['userID'] ?? '',
       userName: map['userName'] ?? '',
       email: map['email'] ?? '',
+      mood: map['mood'],
       dob: map['dob'] != null ? DateTime.tryParse(map['dob']) : null,
       interests: List<String>.from(map['interests'] ?? []),
     );

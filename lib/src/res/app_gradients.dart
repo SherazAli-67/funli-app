@@ -32,7 +32,7 @@ class AppGradients {
       Color.fromRGBO(255, 59, 48, 1),
       Color.fromRGBO(255, 149, 0, 1),
       Color.fromRGBO(255, 204, 0, 1),
-      Color.fromRGBO(255, 204, 0, 1),
+      // Color.fromRGBO(255, 204, 0, 1),
       Color.fromRGBO(52, 199, 89, 1),
       Color.fromRGBO(0, 122, 255, 1),
       Color.fromRGBO(88, 86, 214, 1),

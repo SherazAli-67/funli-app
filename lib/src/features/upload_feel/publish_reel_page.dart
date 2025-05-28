@@ -215,11 +215,10 @@ class _PublishReelPageState extends State<PublishReelPage> {
   }
 
   void _onPublishReelTap() {
-    context.read<RecordUploadProvider>().publishReels();
-   /* ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Uploading your video. You’ll be notified once it’s done.')),
     );
     context.read<RecordUploadProvider>().publishReel(caption: "", visibility: visibility);
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> MainMenuPage()), (val)=> false);*/
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> MainMenuPage()), (val)=> false);
   }
 }

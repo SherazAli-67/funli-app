@@ -113,9 +113,7 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
               );
-              setState(() {
-
-              });
+              setState(() {});
             }
           })
         ],

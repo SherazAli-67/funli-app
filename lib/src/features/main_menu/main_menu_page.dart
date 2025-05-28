@@ -4,7 +4,7 @@ import 'package:funli_app/src/features/main_menu/reels_home_page/reels_item_widg
 import 'package:funli_app/src/features/main_menu/notification_page.dart';
 import 'package:funli_app/src/features/main_menu/reels_home_page/reels_page.dart';
 import 'package:funli_app/src/features/main_menu/search_page.dart';
-import 'package:funli_app/src/features/main_menu/user_profile_page.dart';
+import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:provider/provider.dart';
 import '../../notification_service/notification_service.dart';

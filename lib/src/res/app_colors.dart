@@ -20,4 +20,5 @@ class AppColors {
   static const icCommentGreyColor = Color(0xff616161);
   static const commentTextFieldFillColor = Color(0xffEFECF5);
   static const commentHintTextColor = Color(0xff8C8C8C);
+  static const amberYellowColor = Color(0xffFFCC00);
 }

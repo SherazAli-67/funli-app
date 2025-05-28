@@ -4,9 +4,10 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:funli_app/src/app_data.dart';
+import 'package:funli_app/src/features/main_menu/profile/remote_user_profile.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
-import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/services/user_service.dart';
@@ -31,6 +32,7 @@ class ReelsPage extends StatefulWidget {
 
 class _ReelsPageState extends State<ReelsPage> {
   late ScrollController _scrollController;
+  UserModel? _userModel;
 
   @override
   void initState() {
@@ -148,8 +150,8 @@ class _ReelsPageState extends State<ReelsPage> {
                                               children: [
                                                 FutureBuilder(future: UserService.getUserByID(userID: reel.userID), builder: (ctx, snap){
                                                   if(snap.hasData && snap.requireData != null){
-                                                    UserModel user = snap.requireData!;
-                                                    return Text(user.userName, style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),);
+                                                    _userModel = snap.requireData!;
+                                                    return Text(_userModel!.userName, style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),);
                                                   }else if(snap.connectionState == ConnectionState.waiting){
                                                     return Align(
                                                         alignment: Alignment.topLeft,
@@ -192,7 +194,17 @@ class _ReelsPageState extends State<ReelsPage> {
                           Stack(
                             children: [
                               GestureDetector(
-                                onTap: (){},
+                                onTap: (){
+                                  String? userName = _userModel?.userName;
+                                  String? userID = _userModel?.userID;
+                                  showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      context: context, builder: (ctx){
+                                    return FractionallySizedBox(
+                                        heightFactor: 0.7,
+                                        child: RemoteUserProfile(userName: userName, userID: userID,));
+                                  });
+                                },
                                 child: Container(
                                   margin: EdgeInsets.only(bottom: 20),
                                   decoration: BoxDecoration(
@@ -273,6 +285,7 @@ class _ReelsPageState extends State<ReelsPage> {
                       stream: UserService.getCurrentUserStream(),
                       builder: (context, snapshot,) {
                         if(snapshot.hasData){
+                          String mood = snapshot.requireData.mood ?? 'Happy';
                           return Positioned(
                               top: 45,
                               left: 20,
@@ -298,7 +311,7 @@ class _ReelsPageState extends State<ReelsPage> {
                                       child: Row(
                                         spacing: 20,
                                         children: [
-                                          Text("${AppConstants.happyEmoji} Happy", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w600),),
+                                          Text("${AppData.getEmojiByMood(mood)} $mood", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w600),),
                                           Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white,)
                                         ],
                                       ),

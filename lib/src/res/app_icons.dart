@@ -31,6 +31,8 @@ class AppIcons {
   static const icLikeOutlined = 'assets/icons/ic_like_outlined.svg';
   static const icSendBtn = 'assets/icons/ic_send_btn.svg';
   static const icAdd ='assets/icons/ic_add.svg';
+  static const icAddUser = 'assets/icons/ic_add_user.svg';
+  static const gradientChatIcon = 'assets/icons/gradient_chat_icon.svg';
 
 
   // Gradients

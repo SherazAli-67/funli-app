@@ -201,4 +201,10 @@ class ReelsService {
         .doc(reelID)
         .collection(FirebaseConstants.commentsCollection).snapshots().map((snapshot)=> snapshot.docs.map((doc)=> AddCommentModel.fromMap(doc.data())).toList());
   }
+
+  static Future<List<ReelModel>> getUserReels({required int limit}) async{
+   QuerySnapshot querySnapshot =  await FirebaseFirestore.instance
+        .collection(FirebaseConstants.reelsCollection).limit(limit).get();
+  return querySnapshot.docs.map((doc)=> ReelModel.fromMap(doc.data() as Map<String,dynamic>)).toList();
+  }
 }

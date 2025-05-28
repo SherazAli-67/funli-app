@@ -103,7 +103,7 @@ class RecordUploadProvider extends ChangeNotifier{
     }
   }
 
-  void publishReels() {
+ /* void publishReels() {
     List<ReelModel> reels = AppData.getReels();
     reels.forEach((reel) async {
       bool isUploaded = await PublishReelService.uploadReel(reel: reel);
@@ -114,5 +114,5 @@ class RecordUploadProvider extends ChangeNotifier{
         );
       }
     });
-  }
+  }*/
 }

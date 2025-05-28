@@ -80,7 +80,7 @@ class UserService {
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
     await _fireStore.collection(
         FirebaseConstants.userCollection).doc(currentUID).update({
-      'moodTag' : mood,
+      'mood' : mood,
     });
   }
 }
