@@ -45,7 +45,12 @@ class PostCommentWidget extends StatelessWidget{
             }, icon: SvgPicture.asset(AppIcons.icComment,
               colorFilter:  ColorFilter
                   .mode(
-                  iconColor, BlendMode.srcIn),)),
+                  iconColor, BlendMode.srcIn),),
+            style: IconButton.styleFrom(
+              padding: EdgeInsets.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap
+            ),
+            ),
             Text(totalComments == 0 ? '' : "$totalComments", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),)
           ],
         );

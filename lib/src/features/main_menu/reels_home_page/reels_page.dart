@@ -221,7 +221,7 @@ class _ReelsPageState extends State<ReelsPage> {
                                         style: const ButtonStyle(
                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                         ),
-                                        onPressed: (){}, icon: SvgPicture.asset(AppIcons.icAdd, height: 20,))
+                                        onPressed: ()=> UserService.onFollowTap(remoteUID: reel.userID), icon: SvgPicture.asset(AppIcons.icAdd, height: 20,))
                                 ),
                               )
                             ],

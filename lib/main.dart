@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
           fontFamily: AppConstants.appFontFamily,
           scaffoldBackgroundColor: Colors.white
         ),
-          home: FirebaseAuth.instance.currentUser != null ? MainMenuPage() : WelcomePage()
+          home: WelcomePage()
       ),
     );
   }

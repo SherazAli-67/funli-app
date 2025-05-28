@@ -59,7 +59,7 @@ class AuthCubit extends Cubit<AuthStates>{
                 'userID' : userCredential.user!.uid,
                 'userName' : userCredential.user!.displayName
               };
-              await FirebaseFirestore.instance.collection(userCollection).doc(userCredential.user!.uid).set(userMap);
+              await FirebaseFirestore.instance.collection(FirebaseConstants.userCollection).doc(userCredential.user!.uid).set(userMap);
               emit(SignedUpGoogle(user: userCredential));
             } else {
 

@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/reel_model.dart';
-import 'package:funli_app/src/res/app_constants.dart';
+import 'package:funli_app/src/res/firebase_constants.dart';
 
 class PublishReelService {
 
@@ -39,7 +39,7 @@ class PublishReelService {
     bool uploaded = false;
     try{
       await FirebaseFirestore.instance
-          .collection(AppConstants.reelsCollection)
+          .collection(FirebaseConstants.reelsCollection)
           .doc(reel.reelID)
           .set(reel.toMap());
       uploaded = true;

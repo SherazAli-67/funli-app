@@ -14,7 +14,7 @@ class AuthService {
   // Step 3: Public getter to access the instance
   static AuthService get instance => _instance;
 
-  final CollectionReference _userColRef = FirebaseFirestore.instance.collection(userCollection);
+  final CollectionReference _userColRef = FirebaseFirestore.instance.collection(FirebaseConstants.userCollection);
   // FirebaseAuth instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
