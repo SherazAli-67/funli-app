@@ -68,4 +68,19 @@ class UserService {
         FirebaseConstants.userCollection).doc(currentUID).collection(
         FirebaseConstants.followingCollection).doc(remoteUID).snapshots().map((snapshot)=> snapshot.exists);
   }
+
+  static Stream<UserModel> getCurrentUserStream() {
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    return _fireStore.collection(
+        FirebaseConstants.userCollection).doc(currentUID).snapshots().map((snapshot)=> UserModel.fromMap(snapshot.data()!));
+  }
+
+  static Future<void> updateMoodTo(String mood)async {
+
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    await _fireStore.collection(
+        FirebaseConstants.userCollection).doc(currentUID).update({
+      'moodTag' : mood,
+    });
+  }
 }

@@ -8,6 +8,7 @@ import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
+import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,7 @@ import 'package:whitecodel_reels/whitecodel_reels.dart';
 import '../../../providers/reels_provider.dart';
 import '../../../res/app_icons.dart';
 import '../../../res/app_textstyles.dart';
+import '../../../widgets/mood_selecting_scroll_wheel_widget.dart';
 import '../../../widgets/post_comment_widget.dart';
 import '../../../widgets/post_like_widget.dart';
 import '../../../widgets/post_share_widget.dart';
@@ -55,8 +57,6 @@ class _ReelsPageState extends State<ReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = Provider.of<SizeProvider>(context).size;
-
     return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
@@ -269,6 +269,48 @@ class _ReelsPageState extends State<ReelsPage> {
                         );
                       },
                     ),
+                    StreamBuilder(
+                      stream: UserService.getCurrentUserStream(),
+                      builder: (context, snapshot,) {
+                        if(snapshot.hasData){
+                          return Positioned(
+                              top: 45,
+                              left: 20,
+                              right: 20,
+                              child: GestureDetector(
+                                onTap: (){
+                                  showModalBottomSheet(context: context, builder: (_){
+                                    return MoodSelectingScrollWheelWidget(onMoodChange: (mood){
+                                      UserService.updateMoodTo(mood);
+                                    });
+                                  });
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(AppConstants.appTitle, style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                                    Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          color: Colors.black54,
+                                          borderRadius: BorderRadius.circular(99)
+                                      ),
+                                      child: Row(
+                                        spacing: 20,
+                                        children: [
+                                          Text("${AppConstants.happyEmoji} Happy", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w600),),
+                                          Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white,)
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ));
+                        }
+
+                        return SizedBox();
+                      }
+                    )
                   ],
                 );
               }),
