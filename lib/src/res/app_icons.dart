@@ -36,6 +36,8 @@ class AppIcons {
   static const icUnfollow = 'assets/icons/ic_unfollow.svg';
   static const icBlockUser = 'assets/icons/ic_block_user.svg';
   static const icReportUser = 'assets/icons/ic_report_user.svg';
+  static const icBookMark = 'assets/icons/ic_bookmark.svg';
+  static const icCategory = 'assets/icons/ic_category.svg';
 
 
 
