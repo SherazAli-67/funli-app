@@ -23,7 +23,7 @@ class RemoteUserProfilePage extends StatefulWidget{
 
 class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with TickerProviderStateMixin{
   late TabController _tabController;
-
+  int selectedTabIndex = 0;
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
@@ -31,7 +31,6 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
   }
   @override
   Widget build(BuildContext context) {
-    _tabController = TabController(length: 2, vsync: this);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -90,16 +89,29 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
                     labelColor: Colors.black,
                     labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black),
                     unselectedLabelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.black),
-
-                    tabs: [
-                      Tab(
-                        icon: SvgPicture.asset(AppIcons.icCategory)
+                  indicator: ShapeDecoration(
+                      shape: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.transparent, width: 0, style: BorderStyle.solid)),
+                      gradient: AppGradients.primaryGradient),
+                    onTap: (index){
+                      if(index != selectedTabIndex){
+                        setState(()=> selectedTabIndex = index);
+                      }
+                    },
+                    tabs: <Widget>[
+                      Container(
+                        height: 40,
+                        alignment: Alignment.center,
+                        color: Colors.white,
+                        child: SvgPicture.asset(AppIcons.icCategory),
                       ),
-                      Tab(
-                          icon: SvgPicture.asset(AppIcons.icBookMark)
+                      Container(
+                        height: 40,
+                        alignment: Alignment.center,
+                        color: Colors.white,
+                        child:  SvgPicture.asset(AppIcons.icBookMark),
                       ),
-
-                    ])
+                    ],)
               ],
             ))
           ],
