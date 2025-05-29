@@ -1,11 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
 import 'package:funli_app/src/helpers/formatting_helpers.dart';
 import 'package:funli_app/src/res/app_colors.dart';
+import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
+import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
@@ -150,6 +153,23 @@ class RemoteUserProfile extends StatelessWidget{
 
                   return SizedBox();
                 }),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: TextButton(onPressed: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_)=> RemoteUserProfilePage()));
+                },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GradientTextWidget(
+                          gradient: AppGradients.primaryGradient,
+                          text: "View Complete Profile",
+                          textStyle: AppTextStyles.buttonTextStyle.copyWith(
+                              fontWeight: FontWeight.w700),),
+                        Icon(Icons.navigate_next_rounded, color: AppColors.deepPurpleColor, size: 30,)
+                      ],
+                    )),
               )
             ],
           )
