@@ -201,8 +201,8 @@ class _ReelsPageState extends State<ReelsPage> {
                                       isScrollControlled: true,
                                       context: context, builder: (ctx){
                                     return FractionallySizedBox(
-                                        heightFactor: 0.7,
-                                        child: RemoteUserProfile(userName: userName, userID: userID,));
+                                        heightFactor: 0.75,
+                                        child: SingleChildScrollView(child: RemoteUserProfileInfoWidget(userName: userName, userID: userID!,)));
                                   });
                                 },
                                 child: Container(

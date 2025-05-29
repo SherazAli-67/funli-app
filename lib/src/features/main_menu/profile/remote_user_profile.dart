@@ -13,151 +13,152 @@ import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
 
-class RemoteUserProfile extends StatelessWidget{
-  const RemoteUserProfile({super.key, String? userName, String? userID, String? profilePicture}): _userID = userID, _userName = userName, _profilePicture = profilePicture;
+class RemoteUserProfileInfoWidget extends StatelessWidget{
+  const RemoteUserProfileInfoWidget({super.key, String? userName, required String userID, String? profilePicture, bool isFromProfilePage = false}): _userID = userID, _userName = userName, _profilePicture = profilePicture, _isFromProfilePage = isFromProfilePage;
   final String? _userName;
-  final String? _userID;
+  final String _userID;
   final String? _profilePicture;
+  final bool _isFromProfilePage;
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: IconButton(
-                style: IconButton.styleFrom(
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.topRight,
+          child: IconButton(
+              style: IconButton.styleFrom(
                   backgroundColor: AppColors.lightGreyColor,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(99)
+                      borderRadius: BorderRadius.circular(99)
                   )
-                ),
-                onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close)),
-          ),
-          Column(
-            spacing: 16,
-            children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: AppColors.amberYellowColor,
-                child: CircleAvatar(
-                  backgroundColor: AppColors.amberYellowColor,
-                  radius: 35,
-                  backgroundImage: _profilePicture != null ? CachedNetworkImageProvider(_profilePicture) : CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
-                ),
               ),
-              Column(
-                spacing: 8,
+              onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close)),
+        ),
+        Column(
+          spacing: 16,
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: AppColors.amberYellowColor,
+              child: CircleAvatar(
+                backgroundColor: AppColors.amberYellowColor,
+                radius: 35,
+                backgroundImage: _profilePicture != null ? CachedNetworkImageProvider(_profilePicture) : CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
+              ),
+            ),
+            Column(
+              spacing: 8,
+              children: [
+                Text('@${_userName ?? ''}', style: AppTextStyles.subHeadingTextStyle.copyWith(fontWeight: FontWeight.w900),),
+                Text("Dancer & Singer", style: AppTextStyles.commentTextStyle,)
+              ],
+            ),
+            IntrinsicHeight(
+              child: Row(
+                spacing: 10,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('@${_userName ?? ''}', style: AppTextStyles.subHeadingTextStyle.copyWith(fontWeight: FontWeight.w900),),
-                  Text("Dancer & Singer", style: AppTextStyles.commentTextStyle,)
+                  FutureBuilder(
+                      future: UserService.getUserPostsCount(userID: _userID!),
+                      builder: (ctx, snapshot){
+                        if(snapshot.hasData){
+                          return _buildUserInfoWidget(title: 'Posts', totalCount: snapshot.requireData);
+                        }else if(snapshot.connectionState == ConnectionState.waiting){
+                          return LoadingWidget();
+                        }
+
+                        return SizedBox();
+                      }),
+                  FutureBuilder(
+                      future: UserService.getUserFollowersCount(userID: _userID),
+                      builder: (ctx, snapshot){
+                        if(snapshot.hasData){
+                          return _buildUserInfoWidget(title: 'Followers', totalCount: snapshot.requireData);
+                        }else if(snapshot.connectionState == ConnectionState.waiting){
+                          return LoadingWidget();
+                        }
+
+                        return SizedBox();
+                      }),
+                  FutureBuilder(
+                      future: UserService.getUserFollowingCount(userID: _userID),
+                      builder: (ctx, snapshot){
+                        if(snapshot.hasData){
+                          return _buildUserInfoWidget(title: 'Following', totalCount: snapshot.requireData);
+                        }else if(snapshot.connectionState == ConnectionState.waiting){
+                          return LoadingWidget();
+                        }
+
+                        return SizedBox();
+                      }),
+
+                  FutureBuilder(
+                      future: UserService.getUserPostsCount(userID: _userID),
+                      builder: (ctx, snapshot){
+                        if(snapshot.hasData){
+                          return _buildUserInfoWidget(title: 'Likes', totalCount: snapshot.requireData, isLast: true);
+                        }else if(snapshot.connectionState == ConnectionState.waiting){
+                          return LoadingWidget();
+                        }
+
+                        return SizedBox();
+                      }),
+
                 ],
               ),
-              IntrinsicHeight(
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: SizedBox(
+                height: 45,
                 child: Row(
-                  spacing: 10,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 12,
                   children: [
-                    FutureBuilder(
-                        future: UserService.getUserPostsCount(userID: _userID!),
-                        builder: (ctx, snapshot){
-                          if(snapshot.hasData){
-                            return _buildUserInfoWidget(title: 'Posts', totalCount: snapshot.requireData);
-                          }else if(snapshot.connectionState == ConnectionState.waiting){
-                            return LoadingWidget();
-                          }
+                    StreamBuilder(stream: UserService.getIsFollowing(_userID), builder: (ctx, snapshot){
+                      if(snapshot.hasData){
+                        bool isFollowing = snapshot.requireData;
+                        return Expanded(child: Expanded(child: PrimaryBtn(btnText: isFollowing ? "Un-Follow" : "Follow",isPrefix: true, icon: AppIcons.icUnfollow, onTap: (){}, bgGradient: AppIcons.primaryBgGradient, iconColor: Colors.white,)),);
+                      }
 
-                          return SizedBox();
-                        }),
-                    FutureBuilder(
-                        future: UserService.getUserFollowersCount(userID: _userID),
-                        builder: (ctx, snapshot){
-                          if(snapshot.hasData){
-                            return _buildUserInfoWidget(title: 'Followers', totalCount: snapshot.requireData);
-                          }else if(snapshot.connectionState == ConnectionState.waiting){
-                            return LoadingWidget();
-                          }
-
-                          return SizedBox();
-                        }),
-                    FutureBuilder(
-                        future: UserService.getUserFollowingCount(userID: _userID),
-                        builder: (ctx, snapshot){
-                          if(snapshot.hasData){
-                            return _buildUserInfoWidget(title: 'Following', totalCount: snapshot.requireData);
-                          }else if(snapshot.connectionState == ConnectionState.waiting){
-                            return LoadingWidget();
-                          }
-
-                          return SizedBox();
-                        }),
-
-                    FutureBuilder(
-                        future: UserService.getUserPostsCount(userID: _userID),
-                        builder: (ctx, snapshot){
-                          if(snapshot.hasData){
-                            return _buildUserInfoWidget(title: 'Likes', totalCount: snapshot.requireData, isLast: true);
-                          }else if(snapshot.connectionState == ConnectionState.waiting){
-                            return LoadingWidget();
-                          }
-
-                          return SizedBox();
-                        }),
-
+                      return Expanded(child: PrimaryBtn(btnText: "",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient,));
+                    }),
+                    Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: SizedBox(
-                  height: 45,
-                  child: Row(
-                    spacing: 12,
-                    children: [
-                      StreamBuilder(stream: UserService.getIsFollowing(_userID), builder: (ctx, snapshot){
-                        if(snapshot.hasData){
-                          bool isFollowing = snapshot.requireData;
-                          return Expanded(child: Expanded(child: PrimaryBtn(btnText: isFollowing ? "Un-Follow" : "Follow",isPrefix: true, icon: AppIcons.icUnfollow, onTap: (){}, bgGradient: AppIcons.primaryBgGradient, iconColor: Colors.white,)),);
-                        }
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text("Recent Feels", style: AppTextStyles.headingTextStyle3,)),
+            ),
+            SizedBox(
+              height: 200,
+              child: FutureBuilder(future: ReelsService.getUserReels(limit: 10), builder: (ctx, snapshot){
 
-                        return Expanded(child: PrimaryBtn(btnText: "",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient,));
-                      }),
-                      Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Text("Recent Feels", style: AppTextStyles.headingTextStyle3,)),
-              ),
-              SizedBox(
-                height: 200,
-                child: FutureBuilder(future: ReelsService.getUserReels(limit: 10), builder: (ctx, snapshot){
+                if(snapshot.hasData){
+                  return ListView.builder(
+                      itemCount: snapshot.requireData.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (_, index){
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: CachedNetworkImage(imageUrl: AppIcons.icDummyImgUrl, fit: BoxFit.cover,),
+                        );
+                      });
+                }else if(snapshot.connectionState == ConnectionState.waiting){
+                  return LoadingWidget();
+                }
 
-                  if(snapshot.hasData){
-                    return ListView.builder(
-                        itemCount: snapshot.requireData.length,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (_, index){
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: CachedNetworkImage(imageUrl: AppIcons.icDummyImgUrl, fit: BoxFit.cover,),
-                          );
-                    });
-                  }else if(snapshot.connectionState == ConnectionState.waiting){
-                    return LoadingWidget();
-                  }
-
-                  return SizedBox();
-                }),
-              ),
+                return SizedBox();
+              }),
+            ),
+            if(!_isFromProfilePage)
               Padding(
                 padding: const EdgeInsets.only(bottom: 20.0),
                 child: TextButton(onPressed: () {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_)=> RemoteUserProfilePage()));
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_)=> RemoteUserProfilePage(userID: _userID, userName: _userName, profilePicture: _profilePicture,)));
                 },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -171,10 +172,9 @@ class RemoteUserProfile extends StatelessWidget{
                       ],
                     )),
               )
-            ],
-          )
-        ],
-      ),
+          ],
+        )
+      ],
     );
   }
 
