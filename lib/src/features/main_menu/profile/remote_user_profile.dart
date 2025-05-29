@@ -23,17 +23,18 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Align(
-          alignment: Alignment.topRight,
-          child: IconButton(
-              style: IconButton.styleFrom(
-                  backgroundColor: AppColors.lightGreyColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(99)
-                  )
-              ),
-              onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close)),
-        ),
+       if(!_isFromProfilePage)
+         Align(
+           alignment: Alignment.topRight,
+           child: IconButton(
+               style: IconButton.styleFrom(
+                   backgroundColor: AppColors.lightGreyColor,
+                   shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(99)
+                   )
+               ),
+               onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close)),
+         ),
         Column(
           spacing: 16,
           children: [
@@ -114,14 +115,16 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
                 child: Row(
                   spacing: 12,
                   children: [
-                    StreamBuilder(stream: UserService.getIsFollowing(_userID), builder: (ctx, snapshot){
-                      if(snapshot.hasData){
-                        bool isFollowing = snapshot.requireData;
-                        return Expanded(child: Expanded(child: PrimaryBtn(btnText: isFollowing ? "Un-Follow" : "Follow",isPrefix: true, icon: AppIcons.icUnfollow, onTap: (){}, bgGradient: AppIcons.primaryBgGradient, iconColor: Colors.white,)),);
-                      }
-
-                      return Expanded(child: PrimaryBtn(btnText: "",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient,));
-                    }),
+                    Expanded(
+                      child: StreamBuilder(stream: UserService.getIsFollowing(_userID), builder: (ctx, snapshot){
+                        if(snapshot.hasData){
+                          bool isFollowing = snapshot.requireData;
+                          return PrimaryBtn(btnText: isFollowing ? "Un-Follow" : "Follow",isPrefix: true, icon: AppIcons.icUnfollow, onTap: (){}, bgGradient: AppIcons.primaryBgGradient, iconColor: Colors.white,);
+                        }
+                      
+                        return  PrimaryBtn(btnText: "",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient,);
+                      }),
+                    ),
                     Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),
                   ],
                 ),

@@ -34,6 +34,9 @@ class AppIcons {
   static const icAddUser = 'assets/icons/ic_add_user.svg';
   static const gradientChatIcon = 'assets/icons/gradient_chat_icon.svg';
   static const icUnfollow = 'assets/icons/ic_unfollow.svg';
+  static const icBlockUser = 'assets/icons/ic_block_user.svg';
+  static const icReportUser = 'assets/icons/ic_report_user.svg';
+
 
 
   // Gradients
