@@ -21,6 +21,8 @@ class RecordUploadProvider extends ChangeNotifier{
 
   String? get recordedPath => _recordedPath;
   String get currentMood => _currentMood;
+  bool isCompressingVideo = false;
+
   void toggleRecording(){
     isRecording = !isRecording;
     notifyListeners();
@@ -60,7 +62,9 @@ class RecordUploadProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  void publishReel({required String caption, required String visibility}) async{
+  void publishReel({required String caption, required String visibility, required VoidCallback navigationCallback}) async{
+    isCompressingVideo = true;
+    notifyListeners();
     debugPrint("Video size before compression: ${await File(_recordedPath!).length()}");
     File thumbnailPath = await VideoCompress.getFileThumbnail(_recordedPath!);
 
@@ -73,8 +77,11 @@ class RecordUploadProvider extends ChangeNotifier{
     if (compressedVideo == null || compressedVideo.file == null) {
       throw Exception('Video compression failed');
     }
+    isCompressingVideo = false;
+    notifyListeners();
+    navigationCallback();
     debugPrint("Video size after compression: ${await compressedVideo.file!.length()}");
-     String reelID = DateTime.now().microsecondsSinceEpoch.toString();
+    String reelID = DateTime.now().microsecondsSinceEpoch.toString();
 
     String? thumbnailUrl = await PublishReelService.getThumbnailUrl(reelID: reelID, file: thumbnailPath);
      String? videoUrl = await PublishReelService.getReelUploadedUrl(reelID: reelID, file: compressedVideo.file!);

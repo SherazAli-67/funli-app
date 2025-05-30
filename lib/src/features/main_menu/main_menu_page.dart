@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:funli_app/src/features/main_menu/reels_home_page/reels_item_widget.dart';
 import 'package:funli_app/src/features/main_menu/notification_page.dart';
 import 'package:funli_app/src/features/main_menu/reels_home_page/reels_page.dart';
 import 'package:funli_app/src/features/main_menu/search_page.dart';
@@ -69,7 +68,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         child: IconButton(onPressed: ()async{
                           // Show the wheel selector in a modal bottom sheet
 
-                          Navigator.of(context).push(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()));
+                          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()), (val)=> false);
                         }, icon: Icon(Icons.add, color: Colors.white,)),
                       ),
                     ),

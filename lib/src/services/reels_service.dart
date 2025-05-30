@@ -34,7 +34,8 @@ class ReelsService {
           .map((doc) => doc['userID'] as String)
           .toList();*/
 
-      Query baseQuery = _firestore.collection(FirebaseConstants.reelsCollection);
+      Query baseQuery = _firestore.collection(FirebaseConstants.reelsCollection)
+        .orderBy('createdAt', descending: true);
 
      /* if (followings.isEmpty) {
         baseQuery = baseQuery
@@ -51,7 +52,7 @@ class ReelsService {
         baseQuery = baseQuery.startAfterDocument(lastDoc);
       }*/
 
-      final snapshot = await baseQuery.limit(limit).get();
+      final snapshot = await baseQuery.get();
       if (snapshot.docs.isNotEmpty) {
         onLastDoc(snapshot.docs.last);
         onHasMore(snapshot.docs.length == limit);
