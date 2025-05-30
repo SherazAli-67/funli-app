@@ -64,6 +64,7 @@ class UserService {
 
   static Stream<bool> getIsFollowing(String remoteUID) {
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
+
     return _fireStore.collection(
         FirebaseConstants.userCollection).doc(currentUID).collection(
         FirebaseConstants.followingCollection).doc(remoteUID).snapshots().map((snapshot)=> snapshot.exists);

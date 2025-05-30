@@ -27,7 +27,7 @@ class PostCommentWidget extends StatelessWidget{
   Column _buildCommentWidget(BuildContext context, {required int totalComments}) {
     return Column(
           children: [
-            IconButton(onPressed: (){
+            GestureDetector(onTap: (){
 
               showModalBottomSheet<void>(
                 context: context,
@@ -42,16 +42,14 @@ class PostCommentWidget extends StatelessWidget{
                       ));
                 },
               );
-            }, icon: SvgPicture.asset(AppIcons.icComment,
+            }, child: SvgPicture.asset(AppIcons.icComment,
               colorFilter:  ColorFilter
                   .mode(
                   iconColor, BlendMode.srcIn),),
-            style: IconButton.styleFrom(
-              padding: EdgeInsets.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap
+
             ),
-            ),
-            Text(totalComments == 0 ? '' : "$totalComments", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),)
+            if(totalComments != 0)
+              Text( "$totalComments", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),)
           ],
         );
   }

@@ -85,11 +85,27 @@ class _ReelsPageState extends State<ReelsPage> {
                 StreamController<double>();
 
                 videoPlayerController.addListener(() {
-                  double videoProgress = videoPlayerController
-                      .value.position.inMilliseconds /
-                      videoPlayerController.value.duration.inMilliseconds;
+                  final position = videoPlayerController.value.position;
+                  final duration = videoPlayerController.value.duration;
+
+                  if (duration != null &&
+                      position >= duration &&
+                      pageController.hasClients) {
+                    // Move to the next page
+                    final nextPage = index + 1;
+                    if (nextPage < reels.length) {
+                      pageController.animateToPage(
+                        nextPage,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    }
+                  }
+
+                  double videoProgress = position.inMilliseconds / duration.inMilliseconds;
                   videoProgressController.add(videoProgress);
                 });
+
                 bool isPortrait = videoPlayerController.value.size.height >
                     videoPlayerController.value.size.width;
 
@@ -186,9 +202,10 @@ class _ReelsPageState extends State<ReelsPage> {
                       ),
                     ),
                     Positioned(
-                      bottom: 120,
-                      right: 10,
+                      bottom: 150,
+                      right: 5,
                       child: Column(
+
                         spacing: 10,
                         children: [
                           Stack(
@@ -218,7 +235,7 @@ class _ReelsPageState extends State<ReelsPage> {
                                 ),
                               ),
                               StreamBuilder(stream: UserService.getIsFollowing(reel.userID), builder: (ctx, snapshot){
-                                if(snapshot.hasData && !snapshot.requireData){
+                                if(snapshot.hasData && snapshot.requireData){
                                   return Positioned(
                                     bottom: 0,
                                     right: 0,

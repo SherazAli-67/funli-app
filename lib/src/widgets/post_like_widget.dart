@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/res/app_colors.dart';
+import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/reels_service.dart';
+import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:like_button/like_button.dart';
 
 class PostLikeWidget extends StatelessWidget{
@@ -30,6 +32,24 @@ class PostLikeWidget extends StatelessWidget{
 
   Widget _buildLikeButton(List<String> likedUsers) {
     bool isLiked = likedUsers.contains(FirebaseAuth.instance.currentUser!.uid);
+    /*return GestureDetector(
+        onTap: ()async{
+      await ReelsService.addLikeToReel(reelID: reelID, isRemove: isLiked);
+    }, child: Column(
+      children: [
+        SvgPicture.asset(isLiked ? AppIcons.icLikedIcon : AppIcons.icLike, height: 35,),
+        likedUsers.isEmpty ? const SizedBox(): isLiked
+            ? GradientTextWidget(
+          gradient: AppGradients.primaryGradient,
+          text: likedUsers.length.toString(),
+          textStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
+        )
+            : Text(
+          likedUsers.length.toString(),
+          style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
+        )
+      ],
+    ));*/
     return LikeButton(
           size: 30,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -38,7 +58,7 @@ class PostLikeWidget extends StatelessWidget{
           padding: EdgeInsets.zero,
           likeCount: likedUsers.length,
           onTap: (isLiked)async{
-            await ReelsService.addLikeToReel(reelID: reelID, isRemove: isLiked);
+             ReelsService.addLikeToReel(reelID: reelID, isRemove: isLiked);
             return !isLiked;
           },
           countPostion: isReel ? CountPostion.bottom : CountPostion.right,
@@ -49,17 +69,15 @@ class PostLikeWidget extends StatelessWidget{
             );
           },
           countBuilder: (_, isSelected, text){
-            return text == '0' ? const SizedBox(): IconButton(
-              onPressed: (){},
-              icon: isSelected
-                  ? Text(
-                text,
-                style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
-              )
-                  : Text(
-                text,
-                style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
-              ),
+            return text == '0' ? const SizedBox():  isSelected
+                ? GradientTextWidget(
+              gradient: AppGradients.primaryGradient,
+              text: likedUsers.length.toString(),
+              textStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
+            )
+                : Text(
+              text,
+              style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
             );
           },
         );

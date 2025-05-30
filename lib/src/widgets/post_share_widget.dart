@@ -10,10 +10,10 @@ class PostShareWidget extends StatelessWidget{
   Widget build(BuildContext context) {
     return Column(
       children: [
-        IconButton(onPressed: ()async{
+        GestureDetector(onTap: ()async{
           debugPrint("On share tap");
         },
-            icon: SvgPicture.asset(
+            child: SvgPicture.asset(
               AppIcons.icShare,
               colorFilter:  ColorFilter
                   .mode(iconColor, BlendMode.srcIn),)),
