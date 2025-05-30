@@ -9,6 +9,8 @@ import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 
+import '../../../../services/reels_service.dart';
+
 class RemoteUserReelsWidget extends StatefulWidget {
   const RemoteUserReelsWidget({
     super.key,
@@ -157,7 +159,15 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
                         backgroundColor: Colors.white,
                         child: Center(child: Icon(Icons.play_arrow_rounded, ),),
                       ),
-                      Expanded(child: Text(FormatingHelpers.formatNumber(8375000), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),))
+                      Expanded(child: Expanded(
+                          child: FutureBuilder(future: ReelsService.getReelLikesCount(reelID: reel.reelID),
+                              builder: (ctx, snapshot) {
+                            if(snapshot.hasData && snapshot.requireData > 0){
+                              return _buildReelsLikeCountWidget(count: snapshot.requireData);
+                            }
+
+                            return _buildReelsLikeCountWidget();
+                              }))),
                     ],
                   ))
             ],
@@ -171,5 +181,13 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Widget _buildReelsLikeCountWidget({int? count}) {
+    return Text( count != null ?
+      FormatingHelpers.formatNumber(count) : '',
+      style: TextStyle(fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: Colors.white),);
   }
 }

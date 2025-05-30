@@ -78,6 +78,19 @@ class ReelsService {
     return likeDocRef.snapshots().map((snapshot)=> snapshot.docs.map((doc)=> doc.id).toList());
   }
 
+  static Future<int> getReelLikesCount({required String reelID}) async{
+
+    final countQuery = await FirebaseFirestore.instance
+        .collection(FirebaseConstants.reelsCollection)
+        .doc(reelID)
+        .collection(FirebaseConstants.likesCollection).count().get();
+
+    final totalCount = countQuery.count ?? 0;
+    return totalCount;
+
+    // return likeDocRef.snapshots().map((snapshot)=> snapshot.docs.map((doc)=> doc.id).toList());
+  }
+
   static Stream<List<String>> getCommentLikes({required String reelID, required String commentID}) {
     final likeDocRef = FirebaseFirestore.instance
         .collection(FirebaseConstants.reelsCollection)

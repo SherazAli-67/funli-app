@@ -39,7 +39,7 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
-        leading: IconButton(onPressed: (){}, icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black,)),
+        leading: IconButton(onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black,)),
         title: Text(widget._userName ?? '', style: AppTextStyles.headingTextStyle3,),
         centerTitle: false,
         actions: [
