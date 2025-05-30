@@ -1,7 +1,12 @@
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/helpers/formatting_helpers.dart';
+import 'package:funli_app/src/models/reel_model.dart';
+import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
+import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 
 class RemoteUserReelsWidget extends StatefulWidget {
@@ -9,12 +14,15 @@ class RemoteUserReelsWidget extends StatefulWidget {
     super.key,
     required String userID,
     String? userName,
-  })  : _userID = userID,
-        _userName = userName;
+    String? profilePicture
+  })
+      : _userID = userID,
+        _userName = userName,
+        _profilePicture = profilePicture;
 
   final String _userID;
   final String? _userName;
-
+  final String? _profilePicture;
   @override
   State<RemoteUserReelsWidget> createState() => _RemoteUserReelsWidgetState();
 }
@@ -97,8 +105,8 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final reelData = _reels[index].data() as Map<String, dynamic>;
-        final thumbnailUrl = reelData['thumbnailUrl'] ?? AppIcons.icDummyImgUrl;
+        ReelModel reel = ReelModel.fromMap( _reels[index].data() as Map<String, dynamic>);
+        final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
 
         return GestureDetector(
           onTap: () {
@@ -116,7 +124,42 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
                   color: Colors.grey[200],
                 ),
               ),
+              Positioned(
+                  top: 10,
+                  left: 5,
+                  right: 5,
+                  child: Row(
+                    spacing: 5,
+                    children: [
 
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: AppColors.purpleColor,
+                        backgroundImage: CachedNetworkImageProvider(widget._profilePicture ?? AppIcons.icDummyImgUrl),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          radius: 19,
+                        ),
+                      ),
+                      Expanded(child: Text(widget._userName ?? '', style: AppTextStyles.smallTextStyle,))
+                    ],
+                  )),
+              Positioned(
+                  bottom: 10,
+                  left: 10,
+                  right: 0,
+                  child: Row(
+                    spacing: 5,
+                    children: [
+
+                      CircleAvatar(
+                        radius: 12,
+                        backgroundColor: Colors.white,
+                        child: Center(child: Icon(Icons.play_arrow_rounded, ),),
+                      ),
+                      Expanded(child: Text(FormatingHelpers.formatNumber(8375000), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),))
+                    ],
+                  ))
             ],
           ),
         );
