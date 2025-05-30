@@ -37,7 +37,10 @@ class AppIcons {
   static const icBlockUser = 'assets/icons/ic_block_user.svg';
   static const icReportUser = 'assets/icons/ic_report_user.svg';
   static const icBookMark = 'assets/icons/ic_bookmark.svg';
+  static const icSelectedBookMark = 'assets/icons/ic_selected_bookmark.svg';
   static const icCategory = 'assets/icons/ic_category.svg';
+  static const icSelectedCategory = 'assets/icons/ic_selected_category.svg';
+
 
 
 

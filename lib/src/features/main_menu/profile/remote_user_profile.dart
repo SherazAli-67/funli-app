@@ -130,33 +130,40 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text("Recent Feels", style: AppTextStyles.headingTextStyle3,)),
-            ),
-            SizedBox(
-              height: 200,
-              child: FutureBuilder(future: ReelsService.getUserReels(limit: 10), builder: (ctx, snapshot){
+            if(!_isFromProfilePage)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Text("Recent Feels", style: AppTextStyles.headingTextStyle3,)),
+                ),
+                SizedBox(
+                  height: 200,
+                  child: FutureBuilder(future: ReelsService.getUserReels(limit: 10), builder: (ctx, snapshot){
 
-                if(snapshot.hasData){
-                  return ListView.builder(
-                      itemCount: snapshot.requireData.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (_, index){
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: CachedNetworkImage(imageUrl: AppIcons.icDummyImgUrl, fit: BoxFit.cover,),
-                        );
-                      });
-                }else if(snapshot.connectionState == ConnectionState.waiting){
-                  return LoadingWidget();
-                }
+                    if(snapshot.hasData){
+                      return ListView.builder(
+                          itemCount: snapshot.requireData.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (_, index){
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: CachedNetworkImage(imageUrl: AppIcons.icDummyImgUrl, fit: BoxFit.cover,),
+                            );
+                          });
+                    }else if(snapshot.connectionState == ConnectionState.waiting){
+                      return LoadingWidget();
+                    }
 
-                return SizedBox();
-              }),
+                    return SizedBox();
+                  }),
+                ),
+              ],
             ),
+
             if(!_isFromProfilePage)
               Padding(
                 padding: const EdgeInsets.only(bottom: 20.0),

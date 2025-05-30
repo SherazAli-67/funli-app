@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile.dart';
+import 'package:funli_app/src/features/main_menu/profile/widgets/remote_user_bookmark_widget.dart';
+import 'package:funli_app/src/features/main_menu/profile/widgets/remote_user_reels_widget.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
@@ -31,6 +33,7 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
   }
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -71,51 +74,70 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            RemoteUserProfileInfoWidget(userID: widget._userID, userName: widget._userName, profilePicture: widget._profilePicture, isFromProfilePage: true,),
-            Expanded(child: Column(
+        child: SingleChildScrollView(
+          child: SizedBox(
+            height: size.height * 0.9,
+            child: Column(
+              spacing: 20,
               children: [
+                // User profile info
+                RemoteUserProfileInfoWidget(
+                  userID: widget._userID,
+                  userName: widget._userName,
+                  profilePicture: widget._profilePicture,
+                  isFromProfilePage: true,
+                ),
+          
                 TabBar(
-                    controller: _tabController,
-                    dividerColor: Colors.transparent,
-                    dividerHeight: 0,
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    indicatorPadding: EdgeInsets.all(0.0),
-                    indicatorWeight: 4.0,
-                    labelPadding: EdgeInsets.only(left: 0.0, right: 0.0),
-                    unselectedLabelColor: Colors.black,
-                    padding: EdgeInsets.all(3),
-                    labelColor: Colors.black,
-                    labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black),
-                    unselectedLabelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.black),
+                  controller: _tabController,
+                  dividerHeight: 1,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicatorWeight: 4.0,
+                  labelPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+                  unselectedLabelColor: Colors.black,
+                  labelColor: Colors.black,
+                  labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  unselectedLabelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
                   indicator: ShapeDecoration(
-                      shape: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.transparent, width: 0, style: BorderStyle.solid)),
-                      gradient: AppGradients.primaryGradient),
-                    onTap: (index){
-                      if(index != selectedTabIndex){
-                        setState(()=> selectedTabIndex = index);
-                      }
-                    },
-                    tabs: <Widget>[
-                      Container(
-                        height: 40,
-                        alignment: Alignment.center,
-                        color: Colors.white,
-                        child: SvgPicture.asset(AppIcons.icCategory),
-                      ),
-                      Container(
-                        height: 40,
-                        alignment: Alignment.center,
-                        color: Colors.white,
-                        child:  SvgPicture.asset(AppIcons.icBookMark),
-                      ),
-                    ],)
+                    shape: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.transparent, width: 0),
+                    ),
+                    gradient: AppGradients.primaryGradient,
+                  ),
+                  onTap: (index) {
+                    if (index != selectedTabIndex) {
+                      setState(() => selectedTabIndex = index);
+                    }
+                  },
+                  tabs: [
+                    Container(
+                      height: 40,
+                      alignment: Alignment.center,
+                      color: Colors.white,
+                      child: SvgPicture.asset(selectedTabIndex == 0 ? AppIcons.icSelectedCategory : AppIcons.icCategory),
+                    ),
+                    Container(
+                      height: 40,
+                      alignment: Alignment.center,
+                      color: Colors.white,
+                      child: SvgPicture.asset(selectedTabIndex == 1 ? AppIcons.icSelectedBookMark : AppIcons.icBookMark),
+                    ),
+                  ],
+                ),
+                // Tabs and TabView
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      RemoteUserReelsWidget(userID: widget._userID, userName: widget._userName,),
+                      RemoteUserBookmarkWidget()
+                    ],
+                  ),
+                )
               ],
-            ))
-          ],
-        ),
+            ),
+          ),
+        )
       )
     );
   }
