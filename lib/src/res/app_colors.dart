@@ -21,4 +21,5 @@ class AppColors {
   static const commentTextFieldFillColor = Color(0xffEFECF5);
   static const commentHintTextColor = Color(0xff8C8C8C);
   static const amberYellowColor = Color(0xffFFCC00);
+  static const containerFillGreyColor = Color(0xffF3F3F3);
 }

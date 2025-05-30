@@ -7,6 +7,7 @@ import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
+import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/mood_selecting_scroll_wheel_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
@@ -55,6 +56,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: AppBackButton(),
         ),
+        centerTitle: false,
         leadingWidth: 45,
         title: Text("Create a Feel", style: AppTextStyles.headingTextStyle3,),
           actions: [
@@ -85,82 +87,105 @@ class _PublishReelPageState extends State<PublishReelPage> {
       ),
       body: SafeArea(child: SingleChildScrollView(
         padding: EdgeInsets.only(bottom: 40),
-        child: Column(
-          spacing: 14,
-          children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                _controller.value.isInitialized ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: AspectRatio(
-                      aspectRatio: _controller.value.aspectRatio,
-                      child: VideoPlayer(_controller),
-                    ),
-                  ),
-                ) : LoadingWidget(),
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: AppGradients.primaryGradient
-                  ),
-                  child: IconButton(onPressed: (){
-                    bool isPlaying = _controller.value.isPlaying;
-                    if(isPlaying){
-                      _controller.pause();
-                    }else{
-                      _controller.play();
-                    }
-                  }, icon: Icon(_controller.value.isPlaying ? Icons.pause : Icons.play_arrow_rounded, color: Colors.white,)),
-                )
-              ],
-            ),
-            Padding(padding: EdgeInsets.symmetric(horizontal: 22), child: Column(
-              spacing: 40,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                EnhancedSocialTextField(
-                  hintText: "Write a caption here, to use hashtags type #hashtag",
-                  maxLines: 5,
-                  minLines: 3,
-                  hashtagStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.pinkColor),
-                  mentionStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontWeight: FontWeight.w600),
-                  onChanged: (text) {
-                    debugPrint("Text found: $text");
-                  },
-                ),
-                _feelingWidget((){
-                  showModalBottomSheet(context: context, builder: (_){
-                    return MoodSelectingScrollWheelWidget(onMoodChange: (mood){
-                      provider.setCurrentMood(mood);
-                    });
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16.0),
+          child: Column(
+            spacing: 14,
+            children: [
+              _feelingWidget((){
+                showModalBottomSheet(context: context, builder: (_){
+                  return MoodSelectingScrollWheelWidget(onMoodChange: (mood){
+                    provider.setCurrentMood(mood);
                   });
-                }, provider.currentMood),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    spacing: 16,
+                });
+              }, provider.currentMood),
+              
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child:  EnhancedSocialTextField(
+                    hintText: "Write a caption here, to use hashtags type #hashtag",
+                    maxLines: 5,
+                    minLines: 3,
+                    hashtagStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.pinkColor),
+                    mentionStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontWeight: FontWeight.w600),
+                    onChanged: (text) {
+                      debugPrint("Text found: $text");
+                    },
+                  ),),
+                  Expanded(child: Stack(
+                    alignment: Alignment.center,
                     children: [
-                      Expanded(child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          side: BorderSide(color: AppColors.textFieldBorderColor),
-                          elevation: 0,
-                          padding: EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      _controller.value.isInitialized ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: AspectRatio(
+                            aspectRatio: _controller.value.aspectRatio,
+                            child: VideoPlayer(_controller),
+                          ),
                         ),
-                          onPressed: (){}, child: Text("Save as draft", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.black),))),
-
-                      Expanded(child: PrimaryBtn(btnText: "Publish", icon: "", onTap: _onPublishReelTap, bgGradient: AppIcons.primaryBgGradient, borderRadius: 16,))
+                      ) : LoadingWidget(),
+                      Container(
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: AppGradients.primaryGradient
+                        ),
+                        child: IconButton(onPressed: (){
+                          bool isPlaying = _controller.value.isPlaying;
+                          if(isPlaying){
+                            _controller.pause();
+                          }else{
+                            _controller.play();
+                          }
+                        }, icon: Icon(_controller.value.isPlaying ? Icons.pause : Icons.play_arrow_rounded, color: Colors.white,)),
+                      )
                     ],
-                  ),
-                )
-              ],
-            ),)
-          ],
+                  ),)
+                ],
+              ),
+              Image.asset(AppIcons.icComingSoonSpeaker),
+              /*Container(
+                decoration: BoxDecoration(
+                    color: AppColors.containerFillGreyColor
+                ),
+                child: Row(
+                  children: [
+                    Image.asset(AppIcons.icComingSoonSpeaker), 
+                    Expanded(child: Column(children: [
+                      Row(
+                        children: [
+                          Expanded(child: GradientTextWidget(gradient: AppGradients.primaryGradient, text: "Great things ", textStyle: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700),)),
+                          Expanded(
+                              flex: 2,
+                              child: Text('are on their way', style: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700),))
+                        ],
+                      )
+                    ],))
+                  ],
+                ),
+              ),*/
+
+              Row(
+                spacing: 16,
+                children: [
+                  Expanded(child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: BorderSide(color: AppColors.textFieldBorderColor),
+                        elevation: 0,
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                      onPressed: (){}, child: Text("Save as draft", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.black),))),
+
+                  Expanded(child: PrimaryBtn(btnText: "Publish", icon: "", onTap: _onPublishReelTap, bgGradient: AppIcons.primaryBgGradient, borderRadius: 16,))
+                ],
+              )
+            ],
+          ),
         ),
       )),
     );

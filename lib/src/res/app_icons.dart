@@ -40,6 +40,7 @@ class AppIcons {
   static const icSelectedBookMark = 'assets/icons/ic_selected_bookmark.svg';
   static const icCategory = 'assets/icons/ic_category.svg';
   static const icSelectedCategory = 'assets/icons/ic_selected_category.svg';
+  static const icComingSoonSpeaker = 'assets/icons/coming_soon_speaker.png';
 
 
 

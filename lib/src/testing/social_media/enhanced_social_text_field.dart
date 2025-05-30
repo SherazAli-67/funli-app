@@ -382,9 +382,9 @@ class _EnhancedSocialTextFieldState extends State<EnhancedSocialTextField> {
           // onTapOutside: (_)=> FocusManager.instance.primaryFocus?.unfocus(),
           decoration: InputDecoration(
             hintText: widget.hintText,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
             contentPadding: EdgeInsets.all(12),
           ),
           onChanged: (text) {
