@@ -189,6 +189,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
               height: size.height*0.9,
               width: double.infinity,
               color: Colors.black54,
+              child: LoadingWidget(),
             )
         ],
       ),

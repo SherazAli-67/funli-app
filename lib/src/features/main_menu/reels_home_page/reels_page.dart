@@ -60,7 +60,9 @@ class _ReelsPageState extends State<ReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ReelProvider>(
+    return Center(child: Text("Reels page"),);
+
+    /*return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
 
@@ -350,6 +352,6 @@ class _ReelsPageState extends State<ReelsPage> {
         );
 
       },
-    );
+    );*/
   }
 }

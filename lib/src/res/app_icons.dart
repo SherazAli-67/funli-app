@@ -41,6 +41,10 @@ class AppIcons {
   static const icCategory = 'assets/icons/ic_category.svg';
   static const icSelectedCategory = 'assets/icons/ic_selected_category.svg';
   static const icComingSoonSpeaker = 'assets/icons/coming_soon_speaker.png';
+  static const icAnalytics = 'assets/icons/ic_analytics.svg';
+  static const icSettings = 'assets/icons/ic_settings.svg';
+  static const icHeartFilledUnSelected = 'assets/icons/ic_heart_filled_unselected.svg';
+
 
 
 

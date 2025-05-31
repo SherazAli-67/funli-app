@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
-import 'package:funli_app/src/helpers/formatting_helpers.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -11,10 +10,17 @@ import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
+import 'package:funli_app/src/widgets/profile_info_widget.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
 
 class RemoteUserProfileInfoWidget extends StatelessWidget{
-  const RemoteUserProfileInfoWidget({super.key, String? userName, required String userID, String? profilePicture, bool isFromProfilePage = false}): _userID = userID, _userName = userName, _profilePicture = profilePicture, _isFromProfilePage = isFromProfilePage;
+  const RemoteUserProfileInfoWidget(
+      {super.key, String? userName, required String userID, String? profilePicture, bool isFromProfilePage = false,})
+      : _userID = userID,
+        _userName = userName,
+        _profilePicture = profilePicture,
+        _isFromProfilePage = isFromProfilePage;
+
   final String? _userName;
   final String _userID;
   final String? _profilePicture;
@@ -38,98 +44,30 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
         Column(
           spacing: 16,
           children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundColor: AppColors.amberYellowColor,
-              child: CircleAvatar(
-                backgroundColor: AppColors.amberYellowColor,
-                radius: 35,
-                backgroundImage: _profilePicture != null ? CachedNetworkImageProvider(_profilePicture) : CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
-              ),
-            ),
-            Column(
-              spacing: 8,
-              children: [
-                Text('@${_userName ?? ''}', style: AppTextStyles.subHeadingTextStyle.copyWith(fontWeight: FontWeight.w900),),
-                Text("Dancer & Singer", style: AppTextStyles.commentTextStyle,)
-              ],
-            ),
-            IntrinsicHeight(
-              child: Row(
-                spacing: 10,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  FutureBuilder(
-                      future: UserService.getUserPostsCount(userID: _userID!),
-                      builder: (ctx, snapshot){
-                        if(snapshot.hasData){
-                          return _buildUserInfoWidget(title: 'Posts', totalCount: snapshot.requireData);
-                        }else if(snapshot.connectionState == ConnectionState.waiting){
-                          return LoadingWidget();
-                        }
+            ProfileInfoWidget(userID: _userID),
+            if(!_isFromProfilePage)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: SizedBox(
+                  height: 45,
+                  child: Row(
+                    spacing: 12,
+                    children: [
+                      Expanded(
+                        child: StreamBuilder(stream: UserService.getIsFollowing(_userID), builder: (ctx, snapshot){
+                          if(snapshot.hasData){
+                            bool isFollowing = snapshot.requireData;
+                            return PrimaryBtn(btnText: isFollowing ? "Following" : "Follow",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient, iconColor: Colors.white,);
+                          }
 
-                        return SizedBox();
-                      }),
-                  FutureBuilder(
-                      future: UserService.getUserFollowersCount(userID: _userID),
-                      builder: (ctx, snapshot){
-                        if(snapshot.hasData){
-                          return _buildUserInfoWidget(title: 'Followers', totalCount: snapshot.requireData);
-                        }else if(snapshot.connectionState == ConnectionState.waiting){
-                          return LoadingWidget();
-                        }
-
-                        return SizedBox();
-                      }),
-                  FutureBuilder(
-                      future: UserService.getUserFollowingCount(userID: _userID),
-                      builder: (ctx, snapshot){
-                        if(snapshot.hasData){
-                          return _buildUserInfoWidget(title: 'Following', totalCount: snapshot.requireData);
-                        }else if(snapshot.connectionState == ConnectionState.waiting){
-                          return LoadingWidget();
-                        }
-
-                        return SizedBox();
-                      }),
-
-                  FutureBuilder(
-                      future: UserService.getUserPostsCount(userID: _userID),
-                      builder: (ctx, snapshot){
-                        if(snapshot.hasData){
-                          return _buildUserInfoWidget(title: 'Likes', totalCount: snapshot.requireData, isLast: true);
-                        }else if(snapshot.connectionState == ConnectionState.waiting){
-                          return LoadingWidget();
-                        }
-
-                        return SizedBox();
-                      }),
-
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: SizedBox(
-                height: 45,
-                child: Row(
-                  spacing: 12,
-                  children: [
-                    Expanded(
-                      child: StreamBuilder(stream: UserService.getIsFollowing(_userID), builder: (ctx, snapshot){
-                        if(snapshot.hasData){
-                          bool isFollowing = snapshot.requireData;
-                          return PrimaryBtn(btnText: isFollowing ? "Following" : "Follow",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient, iconColor: Colors.white,);
-                        }
-                      
-                        return  PrimaryBtn(btnText: "",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient,);
-                      }),
-                    ),
-                    Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),
-                  ],
+                          return  PrimaryBtn(btnText: "",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient,);
+                        }),
+                      ),
+                      Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),
+                    ],
+                  ),
                 ),
               ),
-            ),
             if(!_isFromProfilePage)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,7 +102,7 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
               ],
             ),
 
-            if(!_isFromProfilePage)
+            // if(!_isFromProfilePage || !_isCurrentUser)
               Padding(
                 padding: const EdgeInsets.only(bottom: 20.0),
                 child: TextButton(onPressed: () {
@@ -188,23 +126,6 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
     );
   }
 
-  Widget _buildUserInfoWidget({required int totalCount, required String title, bool isLast = false}) {
-    return Row(
-      children: [
-        Column(
-          spacing: 4,
-          children: [
-            Text(FormatingHelpers.formatNumber(totalCount), style: AppTextStyles.headingTextStyle3,),
-            Text(title, style: AppTextStyles.commentTextStyle,)
-          ],
-        ),
-        if(!isLast)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0),
-            child: VerticalDivider(),
-          )
-      ],
-    );
-  }
+
 
 }
