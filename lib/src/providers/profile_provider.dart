@@ -6,9 +6,11 @@ import 'package:funli_app/src/services/user_service.dart';
 class ProfileProvider extends ChangeNotifier{
   final String _currentUID = FirebaseAuth.instance.currentUser!.uid;
   UserModel? _currentUser;
+  int _selectedTab = 0;
 
   UserModel? get currentUser => _currentUser;
   String get currentUID => _currentUID;
+  int get selectedTab => _selectedTab;
   ProfileProvider(){
     _initUserProfile();
   }
@@ -19,4 +21,8 @@ class ProfileProvider extends ChangeNotifier{
     notifyListeners();
   }
 
+  void onTabChange(int index){
+    _selectedTab = index;
+    notifyListeners();
+  }
 }

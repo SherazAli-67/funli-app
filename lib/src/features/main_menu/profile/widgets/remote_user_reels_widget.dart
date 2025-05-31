@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -137,13 +136,13 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
                       CircleAvatar(
                         radius: 20,
                         backgroundColor: AppColors.purpleColor,
-                        backgroundImage: CachedNetworkImageProvider(widget._profilePicture ?? AppIcons.icDummyImgUrl),
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
                           radius: 19,
+                          backgroundImage: CachedNetworkImageProvider(widget._profilePicture ?? AppIcons.icDummyImgUrl),
                         ),
                       ),
-                      Expanded(child: Text(widget._userName ?? '', style: AppTextStyles.smallTextStyle,))
+                      Expanded(child: Text(widget._userName ?? '', style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
                     ],
                   )),
               Positioned(
