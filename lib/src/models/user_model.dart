@@ -7,7 +7,7 @@ class UserModel {
   final List<String> interests;
   final String? bio;
   final String? profilePicture;
-
+  final String? gender;
   UserModel({
     required this.userID,
     required this.userName,
@@ -16,6 +16,7 @@ class UserModel {
     this.mood,
     this.bio,
     this.profilePicture,
+    this.gender,
     List<String>? interests,
   }) : interests = interests ?? [];
 
@@ -28,7 +29,8 @@ class UserModel {
       'interests': interests,
       'mood' : mood,
       'bio' : bio,
-      'profilePicture' : profilePicture
+      'profilePicture' : profilePicture,
+      'gender' : gender
     };
   }
 
@@ -42,6 +44,7 @@ class UserModel {
       mood: map['mood'],
       dob: map['dob'] != null ? DateTime.tryParse(map['dob']) : null,
       interests: List<String>.from(map['interests'] ?? []),
+      gender: map['gender']
     );
   }
 }
