@@ -21,6 +21,12 @@ class MainMenuPage extends StatefulWidget{
 
 class _MainMenuPageState extends State<MainMenuPage> {
 
+  final List<Widget> _pages = [
+    const ReelsPage(),
+    const SearchPage(),
+    const NotificationPage(),
+    const UserProfilePage(),
+  ];
   @override
   void initState() {
     _initNotificationService();
@@ -34,7 +40,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
         body: Stack(
           alignment: Alignment.bottomCenter,
           children: [
-            SizedBox.expand(child: _buildPage(provider.currentIndex)),
+            IndexedStack(
+              index: provider.currentIndex,
+              children: _pages,
+            ),
             Positioned(
                 bottom: 0,
                 right: 0,
@@ -68,7 +77,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                             child: IconButton(onPressed: ()async{
                               // Show the wheel selector in a modal bottom sheet
 
-                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()), (val)=> false);
+                              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()), );
                             }, icon: Icon(Icons.add, color: Colors.white,)),
                           ),
                         ),

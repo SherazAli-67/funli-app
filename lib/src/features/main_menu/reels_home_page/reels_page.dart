@@ -13,6 +13,7 @@ import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:whitecodel_reels/models/video_model.dart';
 import 'package:whitecodel_reels/whitecodel_reels.dart';
 
 import '../../../providers/reels_provider.dart';
@@ -74,14 +75,18 @@ class _ReelsPageState extends State<ReelsPage> {
         return SizedBox.expand(
           child: WhiteCodelReels(
               context: context,
-              loader: Expanded(child: Text("Loading", style: AppTextStyles.headingTextStyle3.copyWith(color: AppColors.purpleColor),)),
+              loader: const Center(
+                child: CircularProgressIndicator(),
+              ),
+              // loader: Expanded(child: Text("Loading", style: AppTextStyles.headingTextStyle3.copyWith(color: AppColors.purpleColor),)),
               isCaching: true,
               videoList:
-              List.generate(reels.length, (index) => reels[index].videoUrl),
+              List.generate(reels.length, (index) => VideoModel(url: reels[index].videoUrl)),
               builder: (context, index, child, videoPlayerController, pageController) {
+                bool isReadMore = false;
                 ReelModel reel = reels[index];
-                StreamController<double> videoProgressController =
-                StreamController<double>();
+
+                StreamController<double> videoProgressController = StreamController<double>();
 
                 videoPlayerController.addListener(() {
                   final position = videoPlayerController.value.position;
@@ -107,7 +112,6 @@ class _ReelsPageState extends State<ReelsPage> {
 
                 bool isPortrait = videoPlayerController.value.size.height >
                     videoPlayerController.value.size.width;
-
                 return Stack(
                   children: [
                     Center(
@@ -134,7 +138,7 @@ class _ReelsPageState extends State<ReelsPage> {
                             builder: (context, setState) {
                               return GestureDetector(
                                 onTap: () {
-                                  // setState(() => isReadMore = !isReadMore);
+                                  setState(() => isReadMore = !isReadMore);
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -177,8 +181,8 @@ class _ReelsPageState extends State<ReelsPage> {
                                                 }),
                                                 Text(
                                                   reel.caption,
-                                                  // maxLines:
-                                                  // isReadMore ? 100 : 2,
+                                                  maxLines:
+                                                  isReadMore ? 100 : 2,
                                                   overflow:
                                                   TextOverflow.ellipsis,
                                                   style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),
