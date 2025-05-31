@@ -73,10 +73,9 @@ class _ReelsPageState extends State<ReelsPage> {
 
         return SizedBox.expand(
           child: WhiteCodelReels(
-              key: UniqueKey(),
               context: context,
               loader: Expanded(child: Text("Loading", style: AppTextStyles.headingTextStyle3.copyWith(color: AppColors.purpleColor),)),
-              isCaching: false,
+              isCaching: true,
               videoList:
               List.generate(reels.length, (index) => reels[index].videoUrl),
               builder: (context, index, child, videoPlayerController, pageController) {
@@ -299,47 +298,47 @@ class _ReelsPageState extends State<ReelsPage> {
                       },
                     ),
                     StreamBuilder(
-                      stream: UserService.getCurrentUserStream(),
-                      builder: (context, snapshot,) {
-                        if(snapshot.hasData){
-                          String mood = snapshot.requireData.mood ?? 'Happy';
-                          return Positioned(
-                              top: 45,
-                              left: 20,
-                              right: 20,
-                              child: GestureDetector(
-                                onTap: (){
-                                  showModalBottomSheet(context: context, builder: (_){
-                                    return MoodSelectingScrollWheelWidget(onMoodChange: (mood){
-                                      UserService.updateMoodTo(mood);
+                        stream: UserService.getCurrentUserStream(),
+                        builder: (context, snapshot,) {
+                          if(snapshot.hasData){
+                            String mood = snapshot.requireData.mood ?? 'Happy';
+                            return Positioned(
+                                top: 45,
+                                left: 20,
+                                right: 20,
+                                child: GestureDetector(
+                                  onTap: (){
+                                    showModalBottomSheet(context: context, builder: (_){
+                                      return MoodSelectingScrollWheelWidget(onMoodChange: (mood){
+                                        UserService.updateMoodTo(mood);
+                                      });
                                     });
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(AppConstants.appTitle, style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
-                                    Container(
-                                      padding: EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                          color: Colors.black54,
-                                          borderRadius: BorderRadius.circular(99)
-                                      ),
-                                      child: Row(
-                                        spacing: 20,
-                                        children: [
-                                          Text("${AppData.getEmojiByMood(mood)} $mood", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w600),),
-                                          Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white,)
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ));
-                        }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(AppConstants.appTitle, style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                                      Container(
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                            color: Colors.black54,
+                                            borderRadius: BorderRadius.circular(99)
+                                        ),
+                                        child: Row(
+                                          spacing: 20,
+                                          children: [
+                                            Text("${AppData.getEmojiByMood(mood)} $mood", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w600),),
+                                            Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white,)
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ));
+                          }
 
-                        return SizedBox();
-                      }
+                          return SizedBox();
+                        }
                     )
                   ],
                 );

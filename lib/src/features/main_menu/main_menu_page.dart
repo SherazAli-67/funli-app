@@ -34,53 +34,53 @@ class _MainMenuPageState extends State<MainMenuPage> {
         body: Stack(
           alignment: Alignment.bottomCenter,
           children: [
-           SizedBox.expand(child: _buildPage(provider.currentIndex)),
+            SizedBox.expand(child: _buildPage(provider.currentIndex)),
             Positioned(
                 bottom: 0,
                 right: 0,
                 left: 0,
                 child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-                gradient: AppGradients.primaryGradient
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10.0, bottom: 25,top: 10, right: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                   _buildBottomNavigationItemWidget(icon: AppIcons.icHome, isSelected: provider.currentIndex == 0, onTap: ()=> _onNavigationItemTap(0, provider)),
-                    _buildBottomNavigationItemWidget(icon: AppIcons.icSearch, isSelected: provider.currentIndex == 1, onTap: ()=> _onNavigationItemTap(1, provider)),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
+                      gradient: AppGradients.primaryGradient
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10.0, bottom: 25,top: 10, right: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildBottomNavigationItemWidget(icon: AppIcons.icHome, isSelected: provider.currentIndex == 0, onTap: ()=> _onNavigationItemTap(0, provider)),
+                        _buildBottomNavigationItemWidget(icon: AppIcons.icSearch, isSelected: provider.currentIndex == 1, onTap: ()=> _onNavigationItemTap(1, provider)),
 
-                    Container(
-                      width: 50,
-                      height: 65,
-                      padding: EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        gradient: AppGradients.uploadBtnGradient,
-                        borderRadius: BorderRadius.circular(35)
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                            borderRadius: BorderRadius.circular(35)
+                        Container(
+                          width: 50,
+                          height: 65,
+                          padding: EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                              gradient: AppGradients.uploadBtnGradient,
+                              borderRadius: BorderRadius.circular(35)
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(35)
+                            ),
+                            child: IconButton(onPressed: ()async{
+                              // Show the wheel selector in a modal bottom sheet
+
+                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()), (val)=> false);
+                            }, icon: Icon(Icons.add, color: Colors.white,)),
+                          ),
                         ),
-                        child: IconButton(onPressed: ()async{
-                          // Show the wheel selector in a modal bottom sheet
 
-                          Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()), (val)=> false);
-                        }, icon: Icon(Icons.add, color: Colors.white,)),
-                      ),
+
+                        _buildBottomNavigationItemWidget(icon: AppIcons.icNotification, isSelected: provider.currentIndex == 2, onTap: ()=> _onNavigationItemTap(2, provider)),
+                        _buildBottomNavigationItemWidget(icon: AppIcons.icUserProfile, isSelected: provider.currentIndex == 3, onTap: ()=> _onNavigationItemTap(3, provider)),
+
+                      ],
                     ),
-
-
-                    _buildBottomNavigationItemWidget(icon: AppIcons.icNotification, isSelected: provider.currentIndex == 2, onTap: ()=> _onNavigationItemTap(2, provider)),
-                    _buildBottomNavigationItemWidget(icon: AppIcons.icUserProfile, isSelected: provider.currentIndex == 3, onTap: ()=> _onNavigationItemTap(3, provider)),
-
-                  ],
-                ),
-              ),
-            )),
+                  ),
+                )),
           ],
         ),
       );

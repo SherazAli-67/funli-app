@@ -13,6 +13,9 @@ import 'package:funli_app/src/providers/tab_change_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:provider/provider.dart';
 
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -40,6 +43,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: AppConstants.appTitle,
+          navigatorObservers: [routeObserver],
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           fontFamily: AppConstants.appFontFamily,
