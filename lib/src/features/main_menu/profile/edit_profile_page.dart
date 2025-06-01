@@ -7,12 +7,13 @@ import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
-import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_btn.dart';
+import 'package:funli_app/src/widgets/select_gender_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../../../res/app_gradients.dart';
 import '../../../res/app_textstyles.dart';
+import '../../personalization/age_gender_page.dart';
 
 class EditProfilePage extends StatefulWidget{
   const EditProfilePage({super.key});
@@ -96,7 +97,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   children: [
                     AppTextField(textController: _nameController, prefixIcon: AppIcons.icUser, hintText: 'John Doe', titleText: 'Full name'),
                     AppTextField(textController: _emailController, prefixIcon: AppIcons.icLoginEmail, hintText: 'email address', titleText: 'Email address', textInputType: TextInputType.emailAddress,),
-                    AppTextField(textController: _genderController, prefixIcon: _getGenderIcon(provider.currentUser!.gender), hintText: 'Gender', titleText: 'Gender', isReadOnly: true, suffixIcon: Icon(Icons.keyboard_arrow_down_rounded),),
+                    AppTextField(textController: _genderController,
+                      prefixIcon: _getGenderIcon(provider.currentUser!.gender),
+                      hintText: 'Gender',
+                      titleText: 'Gender',
+                      isReadOnly: true,
+                      suffixIcon: Icon(Icons.keyboard_arrow_down_rounded),
+                      onTap: (){
+                      _onGenderTap(selectedGender: provider.currentUser!.gender ?? 'Male', onSelectGender: (gender){});
+                      },
+                    ),
                     AppTextField(textController: _dobController, prefixIcon: AppIcons.icCalendar, hintText: 'Age', titleText: 'Age', isReadOnly: true, suffixIcon: Icon(Icons.keyboard_arrow_down_rounded)),
                   ],
                 ),
@@ -143,5 +153,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
       default:
         return AppIcons.icMale;
     }
+  }
+
+
+  void _onGenderTap({required String selectedGender, required Function(String) onSelectGender}){
+    showModalBottomSheet(
+        backgroundColor: Colors.white,
+        context: context, builder: (ctx){
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 20),
+        child: SelectGenderWidget(title: 'Edit your gender', selectedGender: selectedGender, onSelectGender: onSelectGender, isEdit: true,),
+      );
+    });
   }
 }

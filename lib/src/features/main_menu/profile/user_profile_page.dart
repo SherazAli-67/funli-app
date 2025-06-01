@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/main_menu/profile/settings/profile_settings_page.dart';
+import 'package:funli_app/src/features/personalization/age_gender_page.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -143,6 +144,5 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
       ),
     );
   }
-
 
 }
