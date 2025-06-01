@@ -27,14 +27,28 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
   late TabController _tabController;
   String userID = FirebaseAuth.instance.currentUser!.uid;
   String? userName;
+  String? profilePicture;
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      final provider =Provider.of<ProfileProvider>(context, listen: false);
+
+      _tabController.addListener(() {
+        provider.onTabChange(_tabController.index);
+      });
+    });
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
     Size size  = Provider.of<SizeProvider>(context).size;
+    final provider  = Provider.of<ProfileProvider>(context);
+    userName = provider.userName;
+    if(provider.currentUser != null){
+      profilePicture = provider.currentUser!.profilePicture;
+    }
+    // profilePicture = provider.
     return SafeArea(
       child: SingleChildScrollView(
         child: SizedBox(
@@ -42,97 +56,91 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Consumer<ProfileProvider>(builder: (ctx, provider, _){
-                if(provider.currentUser != null){
-                  userName = provider.currentUser!.userName;
-                }
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                          flex: 2,
-                          child: SingleChildScrollView(
-                            child: Row(
-                              spacing: 20,
-                              children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                        flex: 2,
+                        child: SingleChildScrollView(
+                          child: Row(
+                            spacing: 20,
+                            children: [
 
-                                AppBackButton(color: Colors.black,),
-                                Text(provider.currentUser != null ? provider
-                                    .currentUser!.userName : "User not found",
-                                  style: AppTextStyles.headingTextStyle3,),
+                              AppBackButton(color: Colors.black,),
+                              Text(provider.currentUser != null ? provider.currentUser!.userName : "User not found",
+                                style: AppTextStyles.headingTextStyle3,),
 
-                              ],),
-                          )),
-                      Expanded(child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(onPressed: () {},
-                              icon: SvgPicture.asset(AppIcons.icAnalytics)),
-                          IconButton(onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> ProfileSettingsPage(currentUser: provider.currentUser!,)));
-                          },
-                              icon: SvgPicture.asset(AppIcons.icSettings)),
-                        ],))
+                            ],),
+                        )),
+                    Expanded(child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(onPressed: () {},
+                            icon: SvgPicture.asset(AppIcons.icAnalytics)),
+                        IconButton(onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> ProfileSettingsPage(currentUser: provider.currentUser!,)));
+                        },
+                            icon: SvgPicture.asset(AppIcons.icSettings)),
+                      ],))
 
 
-                    ],
-                  ),
-                );
-              }),
-              const SizedBox(height: 20,),
-             ProfileInfoWidget(userID: userID),
-               Consumer<ProfileProvider>(builder: (ctx, provider, _){
-                return TabBar(
-                  controller: _tabController,
-                  dividerHeight: 1,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicatorWeight: 4.0,
-                  labelPadding: EdgeInsets.only(left: 0.0, right: 0.0),
-                  unselectedLabelColor: Colors.black,
-                  labelColor: Colors.black,
-                  labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                  unselectedLabelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
-                  indicator: ShapeDecoration(
-                    shape: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent, width: 0),
-                    ),
-                    gradient: AppGradients.primaryGradient,
-                  ),
-                  onTap: (index) {
-                    if (index != provider.selectedTab) {
-                      provider.onTabChange(index);
-                    }
-                  },
-                  tabs: [
-                    Container(
-                      height: 40,
-                      alignment: Alignment.center,
-                      color: Colors.white,
-                      child: SvgPicture.asset(provider.selectedTab == 0 ? AppIcons.icSelectedCategory : AppIcons.icCategory),
-                    ),
-                    Container(
-                      height: 40,
-                      alignment: Alignment.center,
-                      color: Colors.white,
-                      child: SvgPicture.asset(provider.selectedTab == 1 ? AppIcons.icSelectedBookMark : AppIcons.icBookMark),
-                    ),
-                    Container(
-                      height: 40,
-                      alignment: Alignment.center,
-                      color: Colors.white,
-                      child: SvgPicture.asset(provider.selectedTab == 1 ? AppIcons.icLikedIcon : AppIcons.icHeartFilledUnSelected),
-                    ),
                   ],
-                );
-              }),
+                ),
+              ),
+              const SizedBox(height: 20,),
+               ProfileInfoWidget(userID: userID),
+              TabBar(
+                controller: _tabController,
+                dividerHeight: 1,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicatorWeight: 4.0,
+                labelPadding: EdgeInsets.only(left: 0.0, right: 0.0),
+                unselectedLabelColor: Colors.black,
+                labelColor: Colors.black,
+                labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                unselectedLabelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+                indicator: ShapeDecoration(
+                  shape: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.transparent, width: 0),
+                  ),
+                  gradient: AppGradients.primaryGradient,
+                ),
+                onTap: (index) {
+                  if (index != provider.selectedTab) {
+                    provider.onTabChange(index);
+                  }
+                },
+                tabs: [
+                  Container(
+                    height: 40,
+                    alignment: Alignment.center,
+                    color: Colors.white,
+                    child: SvgPicture.asset(provider.selectedTab == 0
+                        ? AppIcons.icSelectedCategory
+                        : AppIcons.icCategory),
+                  ),
+                  Container(
+                    height: 40,
+                    alignment: Alignment.center,
+                    color: Colors.white,
+                    child: SvgPicture.asset(provider.selectedTab == 1 ? AppIcons.icSelectedBookMark : AppIcons.icBookMark),
+                  ),
+                  Container(
+                    height: 40,
+                    alignment: Alignment.center,
+                    color: Colors.white,
+                    child: SvgPicture.asset(provider.selectedTab == 2 ? AppIcons.icLikedIcon : AppIcons.icHeartFilledUnSelected),
+                  ),
+                ],
+              ),
               // Tabs and TabView
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    RemoteUserReelsWidget(userID: userID, userName: userName),
+                    RemoteUserReelsWidget(userID: userID, userName: userName, profilePicture: profilePicture),
                     RemoteUserBookmarkWidget(),
                     SizedBox()
                   ],

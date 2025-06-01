@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/user_model.dart';
@@ -55,7 +53,6 @@ class ProfileProvider extends ChangeNotifier{
       _selectedDay = currentUser!.dob != null ? currentUser!.dob!.day: 1;
       _selectedMonth =  currentUser!.dob != null ? currentUser!.dob!.month: 1;
       _selectedYear =  currentUser!.dob != null ? currentUser!.dob!.year: 2025;
-
     }
     _isProfileLoading = false;
     notifyListeners();

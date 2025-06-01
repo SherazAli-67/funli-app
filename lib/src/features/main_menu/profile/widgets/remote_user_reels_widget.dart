@@ -158,15 +158,15 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
                         backgroundColor: Colors.white,
                         child: Center(child: Icon(Icons.play_arrow_rounded, ),),
                       ),
-                      Expanded(child: Expanded(
+                      Expanded(
                           child: FutureBuilder(future: ReelsService.getReelLikesCount(reelID: reel.reelID),
                               builder: (ctx, snapshot) {
-                            if(snapshot.hasData && snapshot.requireData > 0){
-                              return _buildReelsLikeCountWidget(count: snapshot.requireData);
-                            }
+                                if(snapshot.hasData && snapshot.requireData > 0){
+                                  return _buildReelsLikeCountWidget(count: snapshot.requireData);
+                                }
 
-                            return _buildReelsLikeCountWidget();
-                              }))),
+                                return _buildReelsLikeCountWidget();
+                              }))
                     ],
                   ))
             ],

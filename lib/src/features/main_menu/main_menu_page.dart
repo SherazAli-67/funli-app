@@ -104,25 +104,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
   Widget _buildBottomNavigationItemWidget({required String icon, required bool isSelected, required VoidCallback onTap}) =>
       IconButton(onPressed: onTap, icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(isSelected ? Colors.black : Colors.white, BlendMode.srcIn),));
 
-  Widget _buildPage(int currentIndex) {
-    switch(currentIndex){
-      case 0:
-        return ReelsPage();
-
-      case 1:
-        return SearchPage();
-
-      case 2:
-        return NotificationPage();
-
-      case 3:
-        return UserProfilePage();
-
-      default:
-        return ReelsPage();
-    }
-  }
-
   void _initNotificationService()async{
     //Get notification permission then
     await NotificationService.requestPermissions().then((value) {});

@@ -17,13 +17,14 @@ class ProfileInfoWidget extends StatelessWidget{
     return Column(
       spacing: 12,
       children: [
-        ProfilePictureWidget(profilePicture: _profilePicture),
+
         FutureBuilder(future: UserService.getUserByID(userID: _userID), builder: (ctx, snapshot){
           if(snapshot.hasData){
             UserModel user = snapshot.requireData!;
             return Column(
               spacing: 16,
               children: [
+                ProfilePictureWidget(profilePicture: user.profilePicture),
                 Column(
                   spacing: 8,
                   children: [

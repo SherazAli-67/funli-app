@@ -127,6 +127,7 @@ class UserService {
     String userID = FirebaseAuth.instance.currentUser!.uid;
     String? imageUrl;
     try{
+      //'reels/$userID/$reelID/video.mp4'
       final profilePictureRef = FirebaseStorage.instance.ref().child('profiles/$userID/profilePicture.jpg');
       TaskSnapshot uploadTask = await profilePictureRef.putFile(imageFile);
       imageUrl =  await uploadTask.ref.getDownloadURL();
