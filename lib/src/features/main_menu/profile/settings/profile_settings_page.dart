@@ -1,6 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/models/user_model.dart';
+import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
@@ -19,8 +20,11 @@ class ProfileSettingsPage extends StatelessWidget{
         centerTitle: false,
       ),
       body: SafeArea(child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 30,
         children: [
           ListTile(
+            contentPadding: EdgeInsets.zero,
             leading: ProfilePictureWidget(profilePicture: _currentUser.profilePicture),
             title: Text(_currentUser.userName, style: AppTextStyles.tileTitleTextStyle,),
             subtitle: Text("${getAgeByDOB(_currentUser.dob!)}, ${_currentUser.gender}"),
@@ -33,6 +37,23 @@ class ProfileSettingsPage extends StatelessWidget{
                 ),
                 child: Icon(Icons.edit, color: Colors.white,)
             )),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("App Settings", style: AppTextStyles.subHeadingTextStyle,),
+                SettingsItemWidget(icon: Icons.visibility_outlined, title: 'Dark Mode',  isSwitch: true,),
+                SettingsItemWidget(icon: Icons.verified_user_outlined, title: 'Security & Privacy',),
+                SettingsItemWidget(icon: Icons.switch_camera_rounded, title: 'Content Preferences',),
+                SettingsItemWidget(icon: Icons.edit, title: 'Report a Problem', ),
+                SettingsItemWidget(icon: Icons.help_center, title: 'Dark Mode',),
+                SettingsItemWidget(icon: Icons.visibility_outlined, title: 'Help Center',),
+                SettingsItemWidget(icon: Icons.pages, title: 'Terms & Service', ),
+
+              ],
+            ),
           )
         ],
       )),
@@ -44,5 +65,32 @@ class ProfileSettingsPage extends StatelessWidget{
     int dobYear = dob.year;
     debugPrint("DOB year: ${dob.toIso8601String()}");
     return currentYear - dobYear;
+  }
+}
+
+class SettingsItemWidget extends StatelessWidget {
+  const SettingsItemWidget({
+    super.key,
+    required String title,
+    required IconData icon,
+    VoidCallback? onTap,
+    bool isSwitch = false,
+  }): _icon = icon, _title = title, _onTap = onTap,  _isSwitch = isSwitch;
+  final IconData _icon;
+  final String _title;
+  final bool _isSwitch;
+  final VoidCallback? _onTap;
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.symmetric(vertical: 5),
+      onTap: _onTap,
+      leading: Icon(_icon),
+      title: Text(_title, style: AppTextStyles.buttonTextStyle,),
+      trailing: _isSwitch ?  CupertinoSwitch(
+          inactiveTrackColor:  AppColors.switchTrackColor,
+          activeTrackColor: AppColors.purpleColor,
+          value: true, onChanged: (val){}) : Icon(Icons.navigate_next_outlined)
+    );
   }
 }
