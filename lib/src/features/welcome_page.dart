@@ -16,7 +16,6 @@ import 'package:funli_app/src/res/spacing_constants.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
-
 import '../widgets/primary_btn.dart';
 
 class WelcomePage extends StatelessWidget {

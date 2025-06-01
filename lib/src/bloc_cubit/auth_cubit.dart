@@ -23,9 +23,9 @@ class AuthCubit extends Cubit<AuthStates>{
 
         );
         try {
-          await auth.signInWithPopup(authProvider);
+         UserCredential userCredential = await auth.signInWithPopup(authProvider);
 
-          emit(SignedInGoogle());
+          emit(SignedInGoogle(user: userCredential.user!));
         } catch (e) {
           String errorMessage = e.toString();
           if(e is PlatformException){
@@ -63,7 +63,7 @@ class AuthCubit extends Cubit<AuthStates>{
               emit(SignedUpGoogle(user: userCredential));
             } else {
 
-              emit(SignedInGoogle());
+              emit(SignedInGoogle(user: userCredential.user!));
             }
           } on FirebaseAuthException catch (e) {
             debugPrint("Google sign in error: ${e.toString()}");

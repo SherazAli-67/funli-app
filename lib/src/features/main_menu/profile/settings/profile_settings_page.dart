@@ -2,12 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
+import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:funli_app/src/models/user_model.dart';
+import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
+import 'package:provider/provider.dart';
 
 class ProfileSettingsPage extends StatelessWidget{
   const ProfileSettingsPage({super.key, required UserModel currentUser}) : _currentUser = currentUser;
@@ -62,6 +65,11 @@ class ProfileSettingsPage extends StatelessWidget{
 
               ],
             ),
+          ),
+          const Spacer(),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: SettingsItemWidget(title: "Logout", icon: AppIcons.icLogout, isLogout: true, onTap: ()=> _onLogoutTap(context),),
           )
         ],
       )),
@@ -74,6 +82,12 @@ class ProfileSettingsPage extends StatelessWidget{
     debugPrint("DOB year: ${dob.toIso8601String()}");
     return currentYear - dobYear;
   }
+  void _onLogoutTap(BuildContext context){
+    //Clear all cache and logout - reset from everywhere
+    final provider = Provider.of<ProfileProvider>(context, listen: false);
+    provider.clear();
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> WelcomePage()), (val)=> false);
+  }
 }
 
 class SettingsItemWidget extends StatelessWidget {
@@ -83,25 +97,27 @@ class SettingsItemWidget extends StatelessWidget {
     required String icon,
     VoidCallback? onTap,
     bool isSwitch = false,
-  }): _icon = icon, _title = title, _onTap = onTap,  _isSwitch = isSwitch;
+    bool isLogout = false
+  }): _icon = icon, _title = title, _onTap = onTap,  _isSwitch = isSwitch, _isLogout = isLogout;
   final String _icon;
   final String _title;
   final bool _isSwitch;
   final VoidCallback? _onTap;
+  final bool _isLogout;
   @override
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(vertical: 5),
       onTap: _onTap,
-      leading: SvgPicture.asset(_icon),
-      title: Text(_title, style: AppTextStyles.buttonTextStyle,),
+      leading: SvgPicture.asset(_icon,),
+      title: Text(_title, style: _isLogout ? AppTextStyles.buttonTextStyle.copyWith(color: AppColors.logoutRedColor) : AppTextStyles.buttonTextStyle,),
       trailing: _isSwitch ?  CupertinoSwitch(
           inactiveTrackColor:  AppColors.switchTrackColor,
           activeTrackColor: AppColors.purpleColor,
-          value: true, onChanged: (val){}) : Padding(
+          value: true, onChanged: (val){}) : !_isLogout ? Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: Icon(Icons.navigate_next_outlined),
-          )
+          ) : null
     );
   }
 }

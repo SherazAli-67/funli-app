@@ -29,7 +29,10 @@ class SignedUpGoogle extends AuthStates{
   SignedUpGoogle({required this.user});
 }
 
-class SignedInGoogle extends AuthStates{}
+class SignedInGoogle extends AuthStates{
+  final User user;
+  SignedInGoogle({required this.user});
+}
 
 class CompletingUserSignupInfo extends AuthStates{}
 class CompletedUserSignupInfo extends AuthStates{}

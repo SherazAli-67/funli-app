@@ -23,4 +23,5 @@ class AppColors {
   static const amberYellowColor = Color(0xffFFCC00);
   static const containerFillGreyColor = Color(0xffF3F3F3);
   static const switchTrackColor = Color(0xffEEEEEE);
+  static const logoutRedColor = Color(0xffF75555);
 }

@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 
 class ProfileProvider extends ChangeNotifier{
   final String _currentUID = FirebaseAuth.instance.currentUser!.uid;
-
   bool _isProfileLoading = false;
   bool _isSavingChanges = false;
   String _bio = '';
@@ -129,5 +128,19 @@ class ProfileProvider extends ChangeNotifier{
     notifyListeners();
 
     onChangesDone();
+  }
+
+  void clear() async{
+    _currentUser = null;
+    _bio = '';
+    _emailAddress = '';
+    _userName = '';
+    _gender = '';
+    _selectedDay = 0;
+    _selectedMonth = 0;
+    _selectedYear = 0;
+    _selectedImage = null;
+    await FirebaseAuth.instance.signOut();
+    notifyListeners();
   }
 }

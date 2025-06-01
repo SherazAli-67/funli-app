@@ -53,8 +53,7 @@ class AppIcons {
   static const icTermsPrivacy = 'assets/icons/ic_terms_privacy.svg';
   static const icSecurity = 'assets/icons/ic_security.svg';
   static const icHelpCenter = 'assets/icons/ic_help_center.svg';
-
-
+  static const icLogout = 'assets/icons/ic_logout.svg';
 
 
 

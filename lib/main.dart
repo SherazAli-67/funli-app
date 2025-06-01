@@ -29,7 +29,6 @@ void main() async{
         ChangeNotifierProvider(create: (_)=> ReelProvider()),
         ChangeNotifierProvider(create: (_)=> SizeProvider()),
         ChangeNotifierProvider(create: (_)=> ProfileProvider()),
-
       ],
       child: const MyApp()));
 }
@@ -52,7 +51,13 @@ class MyApp extends StatelessWidget {
           fontFamily: AppConstants.appFontFamily,
           scaffoldBackgroundColor: Colors.white
         ),
-          home: FirebaseAuth.instance.currentUser != null ? MainMenuPage() : WelcomePage()
+          home: StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(), builder: (ctx, snapshot){
+            if(snapshot.hasData){
+              return snapshot.requireData != null ? MainMenuPage() : WelcomePage();
+            }
+
+            return SizedBox();
+          })
       ),
     );
   }
