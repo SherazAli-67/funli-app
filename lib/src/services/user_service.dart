@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/follow_model.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
@@ -118,5 +121,19 @@ class UserService {
 
     final totalCount = countQuery.count ?? 0;
     return totalCount;
+  }
+
+  static Future<String?> uploadImage(File imageFile) async{
+    String userID = FirebaseAuth.instance.currentUser!.uid;
+    String? imageUrl;
+    try{
+      final profilePictureRef = FirebaseStorage.instance.ref().child('profiles/$userID/profilePicture.jpg');
+      TaskSnapshot uploadTask = await profilePictureRef.putFile(imageFile);
+      imageUrl =  await uploadTask.ref.getDownloadURL();
+    }catch(e){
+      debugPrint("Error while uploading profile picture: ${e.toString()}");
+    }
+
+    return imageUrl;
   }
 }

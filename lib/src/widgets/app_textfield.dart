@@ -15,7 +15,8 @@ class AppTextField extends StatefulWidget {
     TextStyle hintTextStyle = AppTextStyles.hintTextStyle,
     Widget? suffixIcon,
     VoidCallback? onTap,
-
+    InputBorder? enabledBorder,
+    InputBorder? focusedBorder,
     int maxLines = 1,
   })
       : _textController = textController,
@@ -26,7 +27,10 @@ class AppTextField extends StatefulWidget {
         _hintTextStyle = hintTextStyle,
         _maxLines = maxLines,
         _suffixIcon = suffixIcon,
-        _onTap = onTap;
+        _onTap = onTap,
+  _enabledBorder = enabledBorder,
+  _focusedBorder = focusedBorder
+  ;
 
   final TextEditingController _textController;
   final String _prefixIcon;
@@ -39,6 +43,9 @@ class AppTextField extends StatefulWidget {
   final int _maxLines;
   final Widget? _suffixIcon;
   final VoidCallback? _onTap;
+  final InputBorder? _enabledBorder;
+  final InputBorder? _focusedBorder;
+
   @override
   State<AppTextField> createState() => _AppTextFieldState();
 }
@@ -71,11 +78,11 @@ class _AppTextFieldState extends State<AppTextField> {
             maxLines: widget._maxLines,
             decoration: InputDecoration(
               alignLabelWithHint: true,
-              enabledBorder: OutlineInputBorder(
+              enabledBorder: widget._enabledBorder ?? OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: AppColors.borderColor)
               ),
-              focusedBorder: OutlineInputBorder(
+              focusedBorder:widget._focusedBorder ?? OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: AppColors.colorBlack)
               ),
