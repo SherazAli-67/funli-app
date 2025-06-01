@@ -13,6 +13,7 @@ class UserService {
   static Future<UserModel?> getUserByID({required String userID})async{
     DocumentSnapshot docSnap = await _fireStore.collection(FirebaseConstants.userCollection).doc(userID).get();
     if(docSnap.exists){
+      // debugPrint("Doc Snap: ${docSnap.data()}");
       UserModel user = UserModel.fromMap(docSnap.data() as Map<String, dynamic>);
       return user;
     }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -27,19 +28,23 @@ class ProfileSettingsPage extends StatelessWidget{
         spacing: 30,
         children: [
           ListTile(
+            onTap: (){
+              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> EditProfilePage()));
+            },
             contentPadding: EdgeInsets.zero,
             leading: ProfilePictureWidget(profilePicture: _currentUser.profilePicture),
             title: Text(_currentUser.userName, style: AppTextStyles.tileTitleTextStyle,),
             subtitle: Text("${getAgeByDOB(_currentUser.dob!)}, ${_currentUser.gender}"),
-            trailing: IconButton(onPressed: (){}, icon: Container(
+            trailing: Container(
                 padding: EdgeInsets.all(5),
+                margin: EdgeInsets.only(right: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   gradient: AppGradients.primaryGradient,
 
                 ),
                 child: Icon(Icons.edit, color: Colors.white,)
-            )),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),

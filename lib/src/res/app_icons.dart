@@ -44,6 +44,7 @@ class AppIcons {
   static const icAnalytics = 'assets/icons/ic_analytics.svg';
   static const icSettings = 'assets/icons/ic_settings.svg';
   static const icHeartFilledUnSelected = 'assets/icons/ic_heart_filled_unselected.svg';
+  static const icCalendar = 'assets/icons/ic_calendar.svg';
 
   //Settings icon
   static const icEdit = 'assets/icons/ic_edit.svg';

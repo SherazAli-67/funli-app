@@ -13,6 +13,9 @@ class AppTextField extends StatefulWidget {
     this.isReadOnly = false,
     TextInputType textInputType = TextInputType.text,
     TextStyle hintTextStyle = AppTextStyles.hintTextStyle,
+    Widget? suffixIcon,
+    VoidCallback? onTap,
+
     int maxLines = 1,
   })
       : _textController = textController,
@@ -21,7 +24,9 @@ class AppTextField extends StatefulWidget {
         _titleText = titleText,
         _textInputType = textInputType,
         _hintTextStyle = hintTextStyle,
-        _maxLines = maxLines;
+        _maxLines = maxLines,
+        _suffixIcon = suffixIcon,
+        _onTap = onTap;
 
   final TextEditingController _textController;
   final String _prefixIcon;
@@ -32,6 +37,8 @@ class AppTextField extends StatefulWidget {
   final TextInputType _textInputType;
   final TextStyle _hintTextStyle;
   final int _maxLines;
+  final Widget? _suffixIcon;
+  final VoidCallback? _onTap;
   @override
   State<AppTextField> createState() => _AppTextFieldState();
 }
@@ -58,6 +65,7 @@ class _AppTextFieldState extends State<AppTextField> {
             style: AppTextStyles.bodyTextStyle,
             keyboardType: widget._textInputType,
             readOnly: widget.isReadOnly,
+            onTap: widget._onTap,
             obscureText: widget.isPassword && hidePassword,
             cursorColor: Colors.grey,
             maxLines: widget._maxLines,
@@ -75,7 +83,11 @@ class _AppTextFieldState extends State<AppTextField> {
               hintStyle: widget._hintTextStyle,
               prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 20),
               prefixIcon: widget._prefixIcon.isNotEmpty ? SvgPicture.asset(widget._prefixIcon) : null,
-              suffixIcon: widget.isPassword ? IconButton(onPressed: ()=> setState(() => hidePassword = !hidePassword), icon: hidePassword ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off)) : null,
+              suffixIcon: widget.isPassword ? IconButton(
+                  onPressed: () => setState(() => hidePassword = !hidePassword),
+                  icon: hidePassword
+                      ? const Icon(Icons.visibility)
+                      : const Icon(Icons.visibility_off)) : widget._suffixIcon,
 
             ),
           ),

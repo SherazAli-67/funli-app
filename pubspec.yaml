@@ -62,6 +62,7 @@ dependencies:
   cached_network_image: ^3.4.1
   like_button: ^2.1.0
   whitecodel_reels: ^0.0.9+4
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

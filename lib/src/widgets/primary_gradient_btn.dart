@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
-import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import '../res/app_textstyles.dart';
 import '../res/spacing_constants.dart';
@@ -9,13 +8,14 @@ import '../res/spacing_constants.dart';
 class PrimaryGradientBtn extends StatelessWidget {
   const PrimaryGradientBtn({
     super.key,
-    required String btnText, required String icon, required VoidCallback onTap, bool isPrefix = false, bool isLoading = false
-  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _isLoading = isLoading;
+    required String btnText, required String icon, required VoidCallback onTap, bool isPrefix = false, bool isLoading = false, double borderRadius = SpacingConstants.btnBorderRadius
+  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _isLoading = isLoading, _borderRadius = borderRadius;
   final String _text;
   final String _icon;
   final VoidCallback _onTap;
   final bool _isPrefix;
   final bool _isLoading;
+  final double _borderRadius;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -30,14 +30,14 @@ class PrimaryGradientBtn extends StatelessWidget {
                 offset: Offset(0, 6)
             )
           ],
-          borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
+          borderRadius: BorderRadius.circular(_borderRadius),
         ),
         // padding: EdgeInsets.all(2),
         child: Container(
           width: double.infinity,
           height: SpacingConstants.buttonHeight,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
+            borderRadius: BorderRadius.circular(_borderRadius),
             gradient: AppGradients.primaryGradient,
             boxShadow: [
                 BoxShadow(

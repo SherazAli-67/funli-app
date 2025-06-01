@@ -1,3 +1,6 @@
+import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
+
 class FormatingHelpers {
   static String formatNumber(num value) {
     String format(num n, String suffix) {
@@ -14,5 +17,16 @@ class FormatingHelpers {
     } else {
       return value.toString();
     }
+  }
+
+  static String getFormattedDOBWithYearsOld(DateTime dob){
+    String formattedDOB = '';
+    int currentYear = DateTime.now().year;
+    int dobYear = dob.year;
+    int yearsOld = currentYear - dobYear;
+    debugPrint("Dob Year: ${dobYear}");
+    DateFormat dateFormat = DateFormat('dd/MM/yyyy');
+    formattedDOB = '${dateFormat.format(dob)} - $yearsOld years old';
+    return formattedDOB;
   }
 }
