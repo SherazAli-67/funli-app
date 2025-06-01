@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
+import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 
@@ -17,6 +19,7 @@ class ProfileSettingsPage extends StatelessWidget{
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text('Make Some Changes', style: AppTextStyles.headingTextStyle3,),
+        leadingWidth: 30,
         centerTitle: false,
       ),
       body: SafeArea(child: Column(
@@ -44,13 +47,13 @@ class ProfileSettingsPage extends StatelessWidget{
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("App Settings", style: AppTextStyles.subHeadingTextStyle,),
-                SettingsItemWidget(icon: Icons.visibility_outlined, title: 'Dark Mode',  isSwitch: true,),
-                SettingsItemWidget(icon: Icons.verified_user_outlined, title: 'Security & Privacy',),
-                SettingsItemWidget(icon: Icons.switch_camera_rounded, title: 'Content Preferences',),
-                SettingsItemWidget(icon: Icons.edit, title: 'Report a Problem', ),
-                SettingsItemWidget(icon: Icons.help_center, title: 'Dark Mode',),
-                SettingsItemWidget(icon: Icons.visibility_outlined, title: 'Help Center',),
-                SettingsItemWidget(icon: Icons.pages, title: 'Terms & Service', ),
+                SettingsItemWidget(icon: AppIcons.icVisibility, title: 'Dark Mode',  isSwitch: true,),
+                SettingsItemWidget(icon: AppIcons.icSecurity, title: 'Security & Privacy',),
+                SettingsItemWidget(icon: AppIcons.icVideo, title: 'Content Preferences',),
+                SettingsItemWidget(icon: AppIcons.icEdit, title: 'Report a Problem', ),
+                SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Dark Mode',),
+                SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Help Center',),
+                SettingsItemWidget(icon: AppIcons.icTermsPrivacy, title: 'Terms & Service', ),
 
               ],
             ),
@@ -72,11 +75,11 @@ class SettingsItemWidget extends StatelessWidget {
   const SettingsItemWidget({
     super.key,
     required String title,
-    required IconData icon,
+    required String icon,
     VoidCallback? onTap,
     bool isSwitch = false,
   }): _icon = icon, _title = title, _onTap = onTap,  _isSwitch = isSwitch;
-  final IconData _icon;
+  final String _icon;
   final String _title;
   final bool _isSwitch;
   final VoidCallback? _onTap;
@@ -85,12 +88,15 @@ class SettingsItemWidget extends StatelessWidget {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(vertical: 5),
       onTap: _onTap,
-      leading: Icon(_icon),
+      leading: SvgPicture.asset(_icon),
       title: Text(_title, style: AppTextStyles.buttonTextStyle,),
       trailing: _isSwitch ?  CupertinoSwitch(
           inactiveTrackColor:  AppColors.switchTrackColor,
           activeTrackColor: AppColors.purpleColor,
-          value: true, onChanged: (val){}) : Icon(Icons.navigate_next_outlined)
+          value: true, onChanged: (val){}) : Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Icon(Icons.navigate_next_outlined),
+          )
     );
   }
 }

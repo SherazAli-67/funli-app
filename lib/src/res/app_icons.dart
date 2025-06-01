@@ -45,6 +45,14 @@ class AppIcons {
   static const icSettings = 'assets/icons/ic_settings.svg';
   static const icHeartFilledUnSelected = 'assets/icons/ic_heart_filled_unselected.svg';
 
+  //Settings icon
+  static const icEdit = 'assets/icons/ic_edit.svg';
+  static const icVisibility = 'assets/icons/ic_visibility.svg';
+  static const icVideo = 'assets/icons/ic_video.svg';
+  static const icTermsPrivacy = 'assets/icons/ic_terms_privacy.svg';
+  static const icSecurity = 'assets/icons/ic_security.svg';
+  static const icHelpCenter = 'assets/icons/ic_help_center.svg';
+
 
 
 

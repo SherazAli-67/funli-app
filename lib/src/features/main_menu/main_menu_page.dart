@@ -22,10 +22,10 @@ class MainMenuPage extends StatefulWidget{
 class _MainMenuPageState extends State<MainMenuPage> {
 
   final List<Widget> _pages = [
-    const ReelsPage(),
-    const SearchPage(),
-    const NotificationPage(),
-    const UserProfilePage(),
+    SizedBox.expand(child: const ReelsPage()),
+  SizedBox.expand(child: const SearchPage()),
+    SizedBox.expand(child: const NotificationPage()),
+    SizedBox.expand(child: const UserProfilePage()),
   ];
   @override
   void initState() {
