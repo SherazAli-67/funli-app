@@ -7,12 +7,14 @@ import '../res/spacing_constants.dart';
 class SecondaryBtn extends StatelessWidget {
   const SecondaryBtn({
     super.key,
-    required String btnText, required String icon, required VoidCallback onTap, bool isPrefix = false
-  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix;
+    required String btnText, required String icon, required VoidCallback onTap, bool isPrefix = false,
+    double borderRadius = SpacingConstants.btnBorderRadius
+  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _borderRadius = borderRadius;
   final String _text;
   final String _icon;
   final VoidCallback _onTap;
   final bool _isPrefix;
+  final double _borderRadius;
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -22,7 +24,7 @@ class SecondaryBtn extends StatelessWidget {
             backgroundColor: Colors.white,
             elevation: 0,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
+                borderRadius: BorderRadius.circular(_borderRadius),
                 side: BorderSide(color: AppColors.borderColor)
             ),
           ),

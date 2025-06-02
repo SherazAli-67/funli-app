@@ -60,9 +60,8 @@ class _ReelsPageState extends State<ReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text("Reels page"),);
 
-    /*return Consumer<ReelProvider>(
+    return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
 
@@ -210,7 +209,6 @@ class _ReelsPageState extends State<ReelsPage> {
                       bottom: 150,
                       right: 5,
                       child: Column(
-
                         spacing: 10,
                         children: [
                           Stack(
@@ -241,6 +239,7 @@ class _ReelsPageState extends State<ReelsPage> {
                               ),
                               StreamBuilder(stream: UserService.getIsFollowing(reel.userID), builder: (ctx, snapshot){
                                 if(snapshot.hasData && snapshot.requireData){
+                                  debugPrint("isFollowing: ${snapshot.requireData}");
                                   return Positioned(
                                     bottom: 0,
                                     right: 0,
@@ -259,7 +258,6 @@ class _ReelsPageState extends State<ReelsPage> {
                                     ),
                                   );
                                 }
-
                                 return SizedBox();
                               })
                             ],
@@ -352,6 +350,6 @@ class _ReelsPageState extends State<ReelsPage> {
         );
 
       },
-    );*/
+    );
   }
 }

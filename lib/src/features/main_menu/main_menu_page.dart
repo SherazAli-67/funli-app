@@ -23,7 +23,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   final List<Widget> _pages = [
     SizedBox.expand(child: const ReelsPage()),
-  SizedBox.expand(child: const SearchPage()),
+    SizedBox.expand(child: const SearchPage()),
     SizedBox.expand(child: const NotificationPage()),
     SizedBox.expand(child: const UserProfilePage()),
   ];

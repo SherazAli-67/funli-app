@@ -85,7 +85,14 @@ class WelcomePage extends StatelessWidget {
                   spacing: 14,
                   children: [
                     PrimaryBtn(btnText: "Continue with Email",icon: AppIcons.icMail, onTap: ()=> _onEmailTap(context), isPrefix: true,),
-                    SecondaryBtn(btnText: "Continue with Google", icon: AppIcons.icGoogle, onTap: ()=> _onSignInWithGoogleTap(context), isPrefix: true,)
+                    Row(
+                      spacing: 20,
+                      children: [
+                        Expanded(child: SecondaryBtn(btnText: "Google", icon: AppIcons.icGoogle, onTap: ()=> _onSignInWithGoogleTap(context), isPrefix: true,borderRadius: 16,),),
+                        Expanded(child: SecondaryBtn(btnText: "Apple", icon: AppIcons.icApple, onTap: (){}, isPrefix: true, borderRadius: 16,))
+
+                      ],
+                    )
                   ],
                 ),
               ),

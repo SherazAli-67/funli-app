@@ -1,6 +1,7 @@
 class AppIcons {
   static const String icMail = 'assets/icons/ic_mail.svg';
   static const String icGoogle = 'assets/icons/ic_google.svg';
+  static const String icApple = 'assets/icons/ic_apple.svg';
   static const String icArrowBack = 'assets/icons/ic_arrow_back.svg';
   static const String icArrowNext = 'assets/icons/ic_arrow_next.svg';
 

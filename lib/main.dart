@@ -54,11 +54,11 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white
         ),
           home: StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(), builder: (ctx, snapshot){
-            /*if(snapshot.hasData){
+            if(snapshot.hasData){
               return snapshot.requireData != null ? MainMenuPage() : WelcomePage();
-            }*/
+            }
 
-            return MoodDetectionSetup();
+            /*return MoodDetectionSetup();*/
             return SizedBox();
           })
       ),
