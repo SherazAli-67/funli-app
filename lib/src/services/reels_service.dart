@@ -221,4 +221,12 @@ class ReelsService {
         .collection(FirebaseConstants.reelsCollection).limit(limit).get();
   return querySnapshot.docs.map((doc)=> ReelModel.fromMap(doc.data() as Map<String,dynamic>)).toList();
   }
+
+  static Future<int> getHashtagReelsCount({required String hashtag}) async{
+    final countQuery = await FirebaseFirestore.instance
+        .collection(FirebaseConstants.hashtagsCollections).doc(hashtag).collection(FirebaseConstants.reelsCollection).count().get();
+
+    final totalCount = countQuery.count ?? 0;
+    return totalCount;
+  }
 }

@@ -1,112 +1,105 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:funli_app/src/models/reel_model.dart';
-import 'package:funli_app/src/res/app_colors.dart';
-import 'package:funli_app/src/res/app_icons.dart';
-import 'package:funli_app/src/res/app_textstyles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
+import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/reel_likes_count.dart';
 
-import '../../../../services/reels_service.dart';
+import '../../models/reel_model.dart';
+import '../../res/app_colors.dart';
+import '../../res/app_icons.dart';
+import '../../res/app_textstyles.dart';
+import '../../services/reels_service.dart';
 
-class RemoteUserReelsWidget extends StatefulWidget {
-  const RemoteUserReelsWidget({
-    super.key,
-    required String userID,
-    String? userName,
-    String? profilePicture
-  })
-      : _userID = userID,
-        _userName = userName,
-        _profilePicture = profilePicture;
+class HashtagReelsGrid extends StatefulWidget {
+  final String hashtag;
+  const HashtagReelsGrid({super.key, required this.hashtag});
 
-  final String _userID;
-  final String? _userName;
-  final String? _profilePicture;
   @override
-  State<RemoteUserReelsWidget> createState() => _RemoteUserReelsWidgetState();
+  State<HashtagReelsGrid> createState() => _HashtagReelsGridState();
 }
 
-class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
-  final List<DocumentSnapshot> _reels = [];
+class _HashtagReelsGridState extends State<HashtagReelsGrid> {
+  final List<Map<String, dynamic>> _reels = [];
   final ScrollController _scrollController = ScrollController();
+
   bool _isLoading = false;
   bool _hasMore = true;
-  int _limit = 4;
-  DocumentSnapshot? _lastDocument;
+  DocumentSnapshot? _lastDoc;
 
   @override
   void initState() {
     super.initState();
-    _fetchReels(isFirstTime: true);
-    _scrollController.addListener(_scrollListener);
-  }
-
-  void _scrollListener() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 300 && !_isLoading && _hasMore) {
-      _fetchReels();
-    }
-  }
-
-  Future<void> _fetchReels({bool isFirstTime = false}) async {
-    if (_isLoading) return;
-    setState(() {
-      _isLoading = true;
-    });
-
-    Query query = FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection)
-        .where("userID", isEqualTo: widget._userID)
-        // .orderBy("createdAt", descending: true)
-        .limit(_limit);
-
-    if (_lastDocument != null && !isFirstTime) {
-      query = query.startAfterDocument(_lastDocument!);
-    }
-
-    final querySnapshot = await query.get();
-    final docs = querySnapshot.docs;
-
-    if (docs.isNotEmpty) {
-      _lastDocument = docs.last;
-      _reels.addAll(docs);
-    }
-
-    setState(() {
-      _isLoading = false;
-      if (docs.length < _limit) {
-        _hasMore = false;
+    _fetchHashtaggedReels();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 300 &&
+          !_isLoading &&
+          _hasMore) {
+        _fetchHashtaggedReels();
       }
     });
   }
 
+  Future<void> _fetchHashtaggedReels() async {
+    if (_isLoading || !_hasMore) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final query = FirebaseFirestore.instance
+          .collection(FirebaseConstants.hashtagsCollections)
+          .doc(widget.hashtag)
+          .collection(FirebaseConstants.reelsCollection)
+          // .orderBy("createdAt", descending: true)
+          .limit(10);
+
+      final snapshot = _lastDoc == null
+          ? await query.get()
+          : await query.startAfterDocument(_lastDoc!).get();
+
+      if (snapshot.docs.isEmpty) {
+        setState(() => _hasMore = false);
+      } else {
+        _lastDoc = snapshot.docs.last;
+        for (var doc in snapshot.docs) {
+          final reelID = doc.id;
+          final reelSnap = await FirebaseFirestore.instance
+              .collection(FirebaseConstants.reelsCollection)
+              .doc(reelID)
+              .get();
+
+          if (reelSnap.exists) {
+            _reels.add(reelSnap.data()!..["id"] = reelSnap.id);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("Error fetching reels: $e");
+    }
+
+    setState(() => _isLoading = false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_reels.isEmpty && _isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_reels.isEmpty) {
-      return const Center(child: Text("No reels found."));
-    }
-
-    return GridView.builder(
+    return _reels.isEmpty && _isLoading
+        ? LoadingWidget()
+        : GridView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8),
+      itemCount: _reels.length + (_hasMore ? 1 : 0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
-        mainAxisSpacing: 4.0,
-        crossAxisSpacing: 4.0,
+        crossAxisSpacing: 6,
+        mainAxisSpacing: 6,
         childAspectRatio: 9 / 16,
       ),
-      itemCount: _reels.length + (_hasMore ? 1 : 0),
       itemBuilder: (context, index) {
-        if (index == _reels.length) {
-          return const Center(child: CircularProgressIndicator());
+        if (index >= _reels.length) {
+          return LoadingWidget();
         }
-
-        ReelModel reel = ReelModel.fromMap( _reels[index].data() as Map<String, dynamic>);
+        ReelModel reel = ReelModel.fromMap( _reels[index]);
         final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
 
         return GestureDetector(
@@ -139,10 +132,10 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
                           radius: 19,
-                          backgroundImage: CachedNetworkImageProvider(widget._profilePicture ?? AppIcons.icDummyImgUrl),
+                          backgroundImage: CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
                         ),
                       ),
-                      Expanded(child: Text(widget._userName ?? '', style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
+                      Expanded(child: Text('User name', style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
                     ],
                   )),
               Positioned(
@@ -181,6 +174,4 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
     _scrollController.dispose();
     super.dispose();
   }
-
-
 }

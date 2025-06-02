@@ -27,7 +27,7 @@ class AppTextWidget extends StatelessWidget {
               style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontFamily: AppConstants.appFontFamily),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> HashtagReelsPage(hashtag: word)));
+                Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> HashtagReelsPage(hashtag: word.substring(1, word.length))));
                 },
             );
           } else {
