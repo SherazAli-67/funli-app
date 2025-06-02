@@ -11,6 +11,7 @@ import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/services/user_service.dart';
+import 'package:funli_app/src/widgets/app_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:whitecodel_reels/models/video_model.dart';
@@ -180,14 +181,15 @@ class _ReelsPageState extends State<ReelsPage> {
 
                                                   return const SizedBox();
                                                 }),
-                                                Text(
+                                                AppTextWidget(text: reel.caption),
+                                                /*Text(
                                                   reel.caption,
                                                   maxLines:
                                                   isReadMore ? 100 : 2,
                                                   overflow:
                                                   TextOverflow.ellipsis,
                                                   style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),
-                                                )
+                                                )*/
                                               ],
                                             ),
                                           ),
@@ -237,14 +239,14 @@ class _ReelsPageState extends State<ReelsPage> {
                                   ),
                                 ),
                               ),
-                              StreamBuilder(stream: UserService.getIsFollowing(reel.userID), builder: (ctx, snapshot){
-                                if(snapshot.hasData && snapshot.requireData){
-                                  debugPrint("isFollowing: ${snapshot.requireData}");
-                                  return Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    left: 0,
-                                    child: Container(
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                left: 0,
+                                child: FutureBuilder(future: UserService.getIsFollowing(reel.userID), builder: (ctx, snapshot){
+
+                                  if(snapshot.hasData && !snapshot.requireData){
+                                  return Container(
                                         decoration: BoxDecoration(
                                             color: AppColors.deepPurpleColor,
                                             shape: BoxShape.circle
@@ -252,14 +254,18 @@ class _ReelsPageState extends State<ReelsPage> {
                                         child: IconButton(
                                             padding: EdgeInsets.zero,
                                             style: const ButtonStyle(
-                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                              tapTargetSize: MaterialTapTargetSize
+                                                  .shrinkWrap,
                                             ),
-                                            onPressed: ()=> UserService.onFollowTap(remoteUID: reel.userID), icon: SvgPicture.asset(AppIcons.icAdd, height: 20,))
-                                    ),
-                                  );
-                                }
-                                return SizedBox();
-                              })
+                                            onPressed: () => UserService.onFollowTap(remoteUID: reel.userID),
+                                            icon: SvgPicture.asset(
+                                              AppIcons.icAdd, height: 20,))
+                                    );
+                                  }
+
+                                  return SizedBox();
+                                })
+                              ),
                             ],
                           ),
                           PostLikeWidget(reelID: reel.reelID, iconColor: Colors.white, isReel: true,),

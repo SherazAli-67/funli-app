@@ -54,7 +54,7 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
                     spacing: 12,
                     children: [
                       Expanded(
-                        child: StreamBuilder(stream: UserService.getIsFollowing(_userID), builder: (ctx, snapshot){
+                        child: FutureBuilder(future: UserService.getIsFollowing(_userID), builder: (ctx, snapshot){
                           if(snapshot.hasData){
                             bool isFollowing = snapshot.requireData;
                             return PrimaryBtn(btnText: isFollowing ? "Following" : "Follow",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient, iconColor: Colors.white,);

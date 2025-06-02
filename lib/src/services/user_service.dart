@@ -66,12 +66,21 @@ class UserService {
     return result;
   }
 
-  static Stream<bool> getIsFollowing(String remoteUID) {
+  static Stream<bool> getIsFollowingStream(String remoteUID) {
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
 
     return _fireStore.collection(
         FirebaseConstants.userCollection).doc(currentUID).collection(
         FirebaseConstants.followingCollection).doc(remoteUID).snapshots().map((snapshot)=> snapshot.exists);
+  }
+
+  static Future<bool> getIsFollowing(String remoteUID) async{
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+
+    DocumentSnapshot documentSnapshot = await  _fireStore.collection(
+        FirebaseConstants.userCollection).doc(currentUID).collection(
+        FirebaseConstants.followingCollection).doc(remoteUID).get();
+    return documentSnapshot.exists;
   }
 
   static Stream<UserModel> getCurrentUserStream() {

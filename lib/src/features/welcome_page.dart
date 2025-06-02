@@ -35,8 +35,8 @@ class WelcomePage extends StatelessWidget {
                 child: CarouselSlider(
                     items: [
                       OnboardingModel(image: AppIcons.onboarding1, title: "Express Your Mood, Your Way! ", subTitle: "Discover a world where your mood shapes your feed. 🌈 "),
-                      OnboardingModel(image: AppIcons.onboarding1, title: "Your Mood, Your Feed!", subTitle: "Watch content that truly resonates with how you feel. ❤️"),
-                      OnboardingModel(image: AppIcons.onboarding1, title: "Share Your Feels! ", subTitle: "Let your emotions take center stage! 🎬 "),
+                      OnboardingModel(image: AppIcons.onboarding2, title: "Your Mood, Your Feed!", subTitle: "Watch content that truly resonates with how you feel. ❤️"),
+                      OnboardingModel(image: AppIcons.onboarding3, title: "Share Your Feels! ", subTitle: "Let your emotions take center stage! 🎬 "),
 
                     ].map((item){
                       return Column(

@@ -53,14 +53,24 @@ class MyApp extends StatelessWidget {
           fontFamily: AppConstants.appFontFamily,
           scaffoldBackgroundColor: Colors.white
         ),
-          home: StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(), builder: (ctx, snapshot){
-            if(snapshot.hasData){
-              return snapshot.requireData != null ? MainMenuPage() : WelcomePage();
-            }
+          home: StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-            /*return MoodDetectionSetup();*/
-            return SizedBox();
-          })
+              if (snapshot.hasData) {
+                debugPrint("HasData: ${snapshot.requireData!.uid}");
+                return MainMenuPage();
+              } else {
+                debugPrint("Do not has Data");
+                return WelcomePage();
+              }
+
+              return WelcomePage();
+            },
+          )
       ),
     );
   }
