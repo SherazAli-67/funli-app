@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/features/mood_detection_setup/camera_emotion_detection_setup.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
@@ -50,7 +51,9 @@ class MoodDetectionSetupState extends State<MoodDetectionSetup> with SingleTicke
           ),
         ),
         Expanded(
-          child: Stack(
+          child:
+
+          Stack(
             children: [
               GestureDetector(
                   onTap:(){
@@ -150,51 +153,7 @@ class MoodDetectionSetupState extends State<MoodDetectionSetup> with SingleTicke
 
   Widget _builCameraWidget() {
     bool isSelected = _cardState == CardState.camera;
-    return Container(
-                decoration: BoxDecoration(
-                    color: AppColors.lightPurple,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(32), topRight: Radius.circular(32))
-                ),
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-              width: double.infinity,
-              child: Column(
-                spacing: 6,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Camera", style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w900, color: Colors.white),),
-                            Text("Let’s capture your vibe! 😎", style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400, color: Colors.white),),
-                          ],
-                        ),
-                      ),
-                      if(!isSelected)
-                        CircleAvatar(
-                          radius: 15,
-                          backgroundColor: Colors.white,
-                          child: Icon(Icons.done, color: Colors.black, size: 20,),
-                        )
-                    ],
-                  ),
-                  const SizedBox(height: 20,),
-                  Align(
-                    alignment: Alignment.center,
-                    child: CircleAvatar(
-                      radius: 150,
-                      backgroundColor: Colors.black,
-                      child: Center(child: Text("Camera Goes here", style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400, color: Colors.white),),),
-                    ),
-                  ),
-                  const SizedBox(height: 12,),
-                  PrimaryBtn(btnText: "Done", icon: AppIcons.icArrowNext, onTap: (){})
-                ],
-              ),
-            );
+    return CameraEmotionDetection(isSelected: isSelected);
   }
 
   Widget _buildYourVoiceWidget() {

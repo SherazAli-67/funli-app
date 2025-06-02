@@ -63,6 +63,9 @@ dependencies:
   like_button: ^2.1.0
   whitecodel_reels: ^0.0.9+4
   intl: ^0.20.2
+  google_mlkit_face_detection: ^0.13.1
+  permission_handler: ^12.0.0+1
+  google_mlkit_commons: ^0.11.0
 
 dev_dependencies:
   flutter_test:

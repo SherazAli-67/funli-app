@@ -62,45 +62,6 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
     });
   }
 
-  Future<void> _toggleCamera() async {
-    if (_cameras.length < 2) return;
-    int newIndex = (_selectedCameraIndex + 1) % _cameras.length;
-    await _controller.dispose();
-    await _initCamera(newIndex);
-  }
-
-  Future<void> _startRecording() async {
-    if (!_controller.value.isInitialized || _isRecording) return;
-
-    final directory = await getTemporaryDirectory();
-    join(directory.path, '${DateTime.now().millisecondsSinceEpoch}.mp4');
-
-    await _controller.startVideoRecording();
-    setState(()=>  _isRecording = true);
-    debugPrint("Recording started");
-  }
-
-  Future<void> _stopRecording({required BuildContext context}) async {
-    if (!_controller.value.isRecordingVideo) return;
-
-    final file = await _controller.stopVideoRecording();
-    setState(()=> _isRecording = false);
-
-    _recordUploadProvider.setRecordingPath(file.path);
-    Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> EditUploadedFeelPage(videoPath: file.path,)));
-  }
-
-  void _onScaleStart(ScaleStartDetails details) {
-    _baseZoom = _currentZoom;
-  }
-
-  void _onScaleUpdate(ScaleUpdateDetails details) async {
-    if ( !_controller.value.isInitialized) return;
-
-    double newZoom = (_baseZoom * details.scale).clamp(_minZoom, _maxZoom);
-    await _controller.setZoomLevel(newZoom);
-    setState(()=>  _currentZoom = newZoom);
-  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -285,6 +246,46 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
     }
 
     return null;
+  }
+
+  Future<void> _toggleCamera() async {
+    if (_cameras.length < 2) return;
+    int newIndex = (_selectedCameraIndex + 1) % _cameras.length;
+    await _controller.dispose();
+    await _initCamera(newIndex);
+  }
+
+  Future<void> _startRecording() async {
+    if (!_controller.value.isInitialized || _isRecording) return;
+
+    final directory = await getTemporaryDirectory();
+    join(directory.path, '${DateTime.now().millisecondsSinceEpoch}.mp4');
+
+    await _controller.startVideoRecording();
+    setState(()=>  _isRecording = true);
+    debugPrint("Recording started");
+  }
+
+  Future<void> _stopRecording({required BuildContext context}) async {
+    if (!_controller.value.isRecordingVideo) return;
+
+    final file = await _controller.stopVideoRecording();
+    setState(()=> _isRecording = false);
+
+    _recordUploadProvider.setRecordingPath(file.path);
+    Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> EditUploadedFeelPage(videoPath: file.path,)));
+  }
+
+  void _onScaleStart(ScaleStartDetails details) {
+    _baseZoom = _currentZoom;
+  }
+
+  void _onScaleUpdate(ScaleUpdateDetails details) async {
+    if ( !_controller.value.isInitialized) return;
+
+    double newZoom = (_baseZoom * details.scale).clamp(_minZoom, _maxZoom);
+    await _controller.setZoomLevel(newZoom);
+    setState(()=>  _currentZoom = newZoom);
   }
 
 }

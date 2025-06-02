@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
+import 'package:funli_app/src/features/mood_detection_setup/camera_emotion_detection.dart';
+import 'package:funli_app/src/features/personalization/mood_detection_setup.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:funli_app/src/providers/personal_info_provider.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
@@ -52,10 +54,11 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white
         ),
           home: StreamBuilder(stream: FirebaseAuth.instance.authStateChanges(), builder: (ctx, snapshot){
-            if(snapshot.hasData){
+            /*if(snapshot.hasData){
               return snapshot.requireData != null ? MainMenuPage() : WelcomePage();
-            }
+            }*/
 
+            return FaceDetectorView();
             return SizedBox();
           })
       ),
