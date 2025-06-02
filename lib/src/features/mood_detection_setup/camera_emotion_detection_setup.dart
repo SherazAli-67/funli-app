@@ -129,7 +129,7 @@ class _CameraEmotionDetectionState extends State<CameraEmotionDetection> {
 
   Future<void> _initCameras()async{
     _cameras = await availableCameras();
-    _selectedCameraIndex = _cameras.indexWhere((camera)=> camera.lensDirection == CameraLensDirection.front);
+    _selectedCameraIndex = _cameras.indexWhere((camera)=> camera.lensDirection == CameraLensDirection.back);
 
     if(_selectedCameraIndex == -1){
       _selectedCameraIndex = 0;

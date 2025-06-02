@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
               return snapshot.requireData != null ? MainMenuPage() : WelcomePage();
             }*/
 
-            return FaceDetectorView();
+            return MoodDetectionSetup();
             return SizedBox();
           })
       ),

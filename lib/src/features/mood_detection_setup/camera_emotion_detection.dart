@@ -8,6 +8,10 @@ import 'package:flutter/services.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../../res/app_colors.dart';
+import '../../res/app_constants.dart';
+import '../../res/app_textstyles.dart';
 class FaceDetectorView extends StatefulWidget {
   const FaceDetectorView({super.key});
 
@@ -96,6 +100,7 @@ class FaceDetectorPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+
     final Paint paint1 = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0
@@ -199,6 +204,7 @@ class FaceDetectorPainter extends CustomPainter {
       for (final type in FaceLandmarkType.values) {
         paintLandmark(type);
       }
+
     }
   }
 
