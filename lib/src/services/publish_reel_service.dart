@@ -42,12 +42,48 @@ class PublishReelService {
           .collection(FirebaseConstants.reelsCollection)
           .doc(reel.reelID)
           .set(reel.toMap());
+
       uploaded = true;
+
     }catch(e){
       debugPrint("Failed to upload reel: ${e.toString()}");
     }
 
 
     return uploaded;
+  }
+
+  static Future<void> addReelToHashtag({
+    required String hashtag,
+    required String reelID,
+  }) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    final DocumentReference reelDocRef = firestore
+        .collection(FirebaseConstants.hashtagsCollections)
+        .doc(hashtag)
+        .collection(FirebaseConstants.reelsCollection)
+        .doc(reelID);
+
+    try {
+      final DocumentSnapshot snapshot = await reelDocRef.get();
+
+      if (!snapshot.exists) {
+        // If the document doesn't exist, create it with a basic map (you can expand this)
+        await reelDocRef.set({
+          "reelID": reelID,
+          "timestamp": FieldValue.serverTimestamp(),
+        });
+      } else {
+        // Optional: Update timestamp or other metadata if needed
+        await reelDocRef.update({
+          "timestamp": FieldValue.serverTimestamp(),
+        });
+      }
+
+      print("Reel successfully added to hashtag: $hashtag");
+    } catch (e) {
+      print("Error adding reel to hashtag: $e");
+    }
   }
 }

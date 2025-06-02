@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/main_menu/profile/widgets/remote_user_reels_widget.dart';
 import 'package:funli_app/src/res/app_colors.dart';

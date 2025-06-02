@@ -9,6 +9,9 @@ import 'package:funli_app/src/notification_service/notification_service.dart';
 import 'package:funli_app/src/services/publish_reel_service.dart';
 import 'package:video_compress/video_compress.dart';
 
+import '../helpers/hashtag_helper.dart';
+import '../res/firebase_constants.dart';
+
 class RecordUploadProvider extends ChangeNotifier{
   bool isRecording = false;
   bool isRecorded = false;
@@ -101,12 +104,18 @@ class RecordUploadProvider extends ChangeNotifier{
         visibility: visibility,
         createdAt: createdAt);
 
+
     bool isUploaded = await PublishReelService.uploadReel(reel: reel);
     if(isUploaded){
       NotificationService.show(
         title: "Upload Completed",
         body: 'Your reel has been uploaded successfully.',
       );
+    }
+
+    List<String> hashtags = HashtagHelper.extractHashtags(reel.caption);
+    for (var hashtag in hashtags) {
+      PublishReelService.addReelToHashtag(hashtag: hashtag, reelID: reelID);
     }
   }
 
