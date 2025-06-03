@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.dart';
+import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_widget.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -72,14 +75,20 @@ class SearchPage extends StatelessWidget{
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Row(
                       children: [
-                        Expanded(
-                          child: RichText(text: TextSpan(
-                              children: [
-                                TextSpan(text: "#happinessinpak  ", style: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700, fontFamily: AppConstants.appFontFamily, color: Colors.black),),
-                                TextSpan(text: "20k feels ", style: AppTextStyles.smallTextStyle.copyWith(fontFamily: AppConstants.appFontFamily, color: AppColors.hashtagCountGreyColor),),
-                              ]
-                          )),
-                        ),
+                         Expanded(
+                            child: GestureDetector(
+                              onTap: (){
+                                Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> HashtagReelsPage(hashtag: 'happy')));
+                              },
+                              child: RichText(text: TextSpan(
+                                  children: [
+                                    TextSpan(text: "#happy  ", style: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700, fontFamily: AppConstants.appFontFamily, color: Colors.black),),
+                                    TextSpan(text: "20k feels ", style: AppTextStyles.smallTextStyle.copyWith(fontFamily: AppConstants.appFontFamily, color: AppColors.hashtagCountGreyColor),),
+                                  ],
+
+                              )),
+                            ),
+                          ),
                         SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 40,)
                       ],
                     ),
