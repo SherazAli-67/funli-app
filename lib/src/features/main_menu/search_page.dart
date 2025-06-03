@@ -1,9 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
+import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
+import 'package:funli_app/src/widgets/gradient_icon.dart';
+import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
 
 class SearchPage extends StatelessWidget{
@@ -36,7 +40,7 @@ class SearchPage extends StatelessWidget{
           ))
         ],
       ),
-      body: SafeArea(child: Padding(
+      body: SafeArea(child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +86,61 @@ class SearchPage extends StatelessWidget{
                   );
                 })
               ],
-            )
+            ),
+            Text("Trending Feels", style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),),
+            ...List.generate(4, (index){
+              return  Card(
+                margin: EdgeInsets.zero,
+                elevation: 1,
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)
+                ),
+                child: Column(
+                  spacing: 10,
+                  children: [
+                    ListTile(
+                      leading: Container(
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.yellowAccentColor
+                        ),
+                        padding: EdgeInsets.all(5),
+                        child: Text(AppConstants.happyEmoji, style: TextStyle(fontSize: 30),),
+                      ),
+                      title: Text("Happy", style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w700),),
+                      subtitle: Text('205k feels', style: AppTextStyles.captionTextStyle.copyWith(fontWeight: FontWeight.w300, color: AppColors.hintTextColor),),
+                      trailing: SizedBox(
+                          width: 100,
+                          child: Row(
+                            children: [
+                              GradientTextWidget(gradient: AppGradients.primaryGradient, text: "SEE ALL", textStyle: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),),
+                              GradientIcon(icon: Icons.navigate_next_sharp, size: 30, gradient: AppGradients.primaryGradient),
+                            ],
+                          )
+                      ),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                    ),
+                    SizedBox(
+                      height: 200,
+                      width: double.infinity,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                          itemCount: 10,
+                          itemBuilder: (ctx, index){
+                            return Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: CachedNetworkImage(imageUrl: AppIcons.icDummyImgUrl, height: 150,),
+                              ),
+                            );
+                      }),
+                    )
+                  ],
+                ),
+              );
+            })
           ],
         ),
       )),
