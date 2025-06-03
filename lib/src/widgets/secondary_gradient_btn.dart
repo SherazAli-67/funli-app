@@ -9,16 +9,17 @@ import '../res/spacing_constants.dart';
 class SecondaryGradientBtn extends StatelessWidget {
   const SecondaryGradientBtn({
     super.key,
-    required String btnText, required String icon, required VoidCallback onTap, bool isPrefix = false
-  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix;
+    required String btnText, required String icon, required VoidCallback onTap, bool isPrefix = false, double buttonHeight = SpacingConstants.buttonHeight
+  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _buttonHeight = buttonHeight;
   final String _text;
   final String _icon;
   final VoidCallback _onTap;
   final bool _isPrefix;
+  final double _buttonHeight;
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: SpacingConstants.buttonHeight,
+      height: _buttonHeight,
       child: UnicornOutlineButton(
         strokeWidth: 2,
         radius: 24,
@@ -28,10 +29,13 @@ class SecondaryGradientBtn extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 10,
           children: [
-            if(_isPrefix)
+            if(_isPrefix && _icon.isNotEmpty)
               SvgPicture.asset(_icon),
-            GradientTextWidget(gradient: AppGradients.primaryGradient, text: _text,),
-            if(!_isPrefix)
+            Padding(
+              padding: _icon.isEmpty ? EdgeInsets.symmetric(horizontal: 20): EdgeInsets.zero,
+              child: GradientTextWidget(gradient: AppGradients.primaryGradient, text: _text,),
+            ),
+            if(!_isPrefix && _icon.isNotEmpty)
               SvgPicture.asset(_icon),
           ],
         ),

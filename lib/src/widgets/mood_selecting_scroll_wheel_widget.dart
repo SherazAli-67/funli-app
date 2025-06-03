@@ -57,7 +57,7 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
               alignment: Alignment.center,
               children: [
                 CircleAvatar(
-                  backgroundColor: AppColors.tealColor,
+                  backgroundColor: AppColors.yellowAccentColor,
                   radius: 45,
                 ),
                 circle_wheel.CircleListScrollView(

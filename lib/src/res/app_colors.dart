@@ -25,4 +25,6 @@ class AppColors {
   static const switchTrackColor = Color(0xffEEEEEE);
   static const logoutRedColor = Color(0xffF75555);
   static const hashtagCountGreyColor = Color(0xff919191);
+  static const greyFillColor = Color(0xffE9E9E9);
+  static const searchFillColor  = Color(0xffF7F5FE);
 }

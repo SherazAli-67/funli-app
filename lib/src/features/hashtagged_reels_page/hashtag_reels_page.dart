@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_widget.dart';
-import 'package:funli_app/src/features/main_menu/profile/widgets/remote_user_reels_widget.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';

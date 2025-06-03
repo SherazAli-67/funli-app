@@ -61,8 +61,9 @@ class _ReelsPageState extends State<ReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    return Consumer<ReelProvider>(
+    //Commented because to work on the rest pages and stop reloading reels again and again
+    return Center(child: Text("Reels Page"),);
+    /*return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
 
@@ -182,14 +183,14 @@ class _ReelsPageState extends State<ReelsPage> {
                                                   return const SizedBox();
                                                 }),
                                                 AppTextWidget(text: reel.caption),
-                                                /*Text(
+                                                *//*Text(
                                                   reel.caption,
                                                   maxLines:
                                                   isReadMore ? 100 : 2,
                                                   overflow:
                                                   TextOverflow.ellipsis,
                                                   style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),
-                                                )*/
+                                                )*//*
                                               ],
                                             ),
                                           ),
@@ -356,6 +357,6 @@ class _ReelsPageState extends State<ReelsPage> {
         );
 
       },
-    );
+    );*/
   }
 }
