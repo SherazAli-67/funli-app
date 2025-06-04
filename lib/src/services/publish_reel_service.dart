@@ -48,10 +48,9 @@ class PublishReelService {
     }catch(e){
       debugPrint("Failed to upload reel: ${e.toString()}");
     }
-
-
     return uploaded;
   }
+
   static Future<void> addReelToHashtag({
     required String hashtag,
     required String reelID,
@@ -93,9 +92,54 @@ class PublishReelService {
         });
       }
 
-      print(" Reel successfully added to hashtag: $hashtag");
+      debugPrint(" Reel successfully added to hashtag: $hashtag");
     } catch (e) {
-      print("Error adding reel to hashtag: $e");
+      debugPrint("Error adding reel to hashtag: $e");
+    }
+  }
+
+  static Future<void> addReelToMood({required String mood, required String reelID, required String userID}) async{
+
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    final DocumentReference moodDocRef = firestore
+        .collection(FirebaseConstants.moodsCollection)
+        .doc(mood);
+
+    final DocumentReference reelDocRef = moodDocRef
+        .collection(FirebaseConstants.reelsCollection)
+        .doc(reelID);
+
+    try {
+      // Step 1: Check and create hashtag document if it doesn't exist
+      final DocumentSnapshot hashtagSnapshot = await moodDocRef.get();
+
+      if (!hashtagSnapshot.exists) {
+        await moodDocRef.set({
+          "mood": mood,
+          "createdAt": FieldValue.serverTimestamp(),
+          "reelsCount": 0,
+        });
+      }
+
+      // Step 2: Check if reel already exists in the subcollection
+      final DocumentSnapshot reelSnapshot = await reelDocRef.get();
+
+      if (!reelSnapshot.exists) {
+        await reelDocRef.set({
+          "reelID": reelID,
+          "createdAt": FieldValue.serverTimestamp(),
+        });
+      } else {
+        // Optional: update existing reel metadata
+        await reelDocRef.update({
+          "createdAt": FieldValue.serverTimestamp(),
+        });
+      }
+
+      debugPrint(" Reel successfully added to mood: $mood");
+    } catch (e) {
+      debugPrint("Error adding reel to mood: $e");
     }
   }
 }

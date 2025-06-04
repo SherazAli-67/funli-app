@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/follow_model.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
+import 'package:funli_app/src/models/mood_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 
 class HashtagService {
@@ -43,4 +44,13 @@ class HashtagService {
     return querySnapshot.docs.map((doc)=>  HashtagModel.fromMap(doc.data())).toList();
   }
 
+  static Future<List<MoodModel>> getTrendingMoods({int limit = 4}) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection(FirebaseConstants.moodsCollection)
+        .orderBy('reelsCount', descending: true)
+        .limit(limit)
+        .get();
+
+    return querySnapshot.docs.map((doc)=>  MoodModel.fromMap(doc.data())).toList();
+  }
 }

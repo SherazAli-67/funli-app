@@ -87,9 +87,9 @@ class RecordUploadProvider extends ChangeNotifier{
     String reelID = DateTime.now().microsecondsSinceEpoch.toString();
 
     String? thumbnailUrl = await PublishReelService.getThumbnailUrl(reelID: reelID, file: thumbnailPath);
-     String? videoUrl = await PublishReelService.getReelUploadedUrl(reelID: reelID, file: compressedVideo.file!);
+    String? videoUrl = await PublishReelService.getReelUploadedUrl(reelID: reelID, file: compressedVideo.file!);
 
-     String userID = FirebaseAuth.instance.currentUser!.uid;
+    String userID = FirebaseAuth.instance.currentUser!.uid;
     DateTime createdAt = DateTime.now();
     ReelModel reel = ReelModel(reelID: reelID,
         userID: userID,
@@ -117,6 +117,13 @@ class RecordUploadProvider extends ChangeNotifier{
     for (var hashtag in hashtags) {
       PublishReelService.addReelToHashtag(hashtag: hashtag, reelID: reelID);
     }
+
+    // Add to mood
+    PublishReelService.addReelToMood(
+      mood: reel.moodTag,
+      reelID: reel.reelID,
+      userID: reel.userID,
+    );
   }
 
  /* void publishReels() {

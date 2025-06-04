@@ -62,8 +62,8 @@ class _ReelsPageState extends State<ReelsPage> {
   @override
   Widget build(BuildContext context) {
     //Commented because to work on the rest pages and stop reloading reels again and again
-    return Center(child: Text("Reels Page"),);
-    /*return Consumer<ReelProvider>(
+
+    return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
 
@@ -95,7 +95,7 @@ class _ReelsPageState extends State<ReelsPage> {
                   final position = videoPlayerController.value.position;
                   final duration = videoPlayerController.value.duration;
 
-                  if (duration != null &&
+                  if (
                       position >= duration &&
                       pageController.hasClients) {
                     // Move to the next page
@@ -183,14 +183,6 @@ class _ReelsPageState extends State<ReelsPage> {
                                                   return const SizedBox();
                                                 }),
                                                 AppTextWidget(text: reel.caption),
-                                                *//*Text(
-                                                  reel.caption,
-                                                  maxLines:
-                                                  isReadMore ? 100 : 2,
-                                                  overflow:
-                                                  TextOverflow.ellipsis,
-                                                  style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),
-                                                )*//*
                                               ],
                                             ),
                                           ),
@@ -357,6 +349,6 @@ class _ReelsPageState extends State<ReelsPage> {
         );
 
       },
-    );*/
+    );
   }
 }
