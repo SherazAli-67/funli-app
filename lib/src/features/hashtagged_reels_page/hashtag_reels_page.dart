@@ -37,7 +37,7 @@ class HashtagReelsPage extends StatelessWidget{
                height: 45,
                child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient,)),
          ),
-          Expanded(child: HashtagReelsGrid(hashtag: _hashtag))
+          Expanded(child: HashtagReelsGrid(tag: _hashtag))
         ],
       )),
     );

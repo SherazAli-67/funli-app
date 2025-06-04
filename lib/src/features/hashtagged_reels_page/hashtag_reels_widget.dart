@@ -12,8 +12,9 @@ import '../../res/app_textstyles.dart';
 import '../../services/reels_service.dart';
 
 class HashtagReelsGrid extends StatefulWidget {
-  final String hashtag;
-  const HashtagReelsGrid({super.key, required this.hashtag});
+  final String tag;
+  final bool isComingFromMood;
+  const HashtagReelsGrid({super.key, required this.tag, this.isComingFromMood = false});
 
   @override
   State<HashtagReelsGrid> createState() => _HashtagReelsGridState();
@@ -39,46 +40,6 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
         _fetchHashtaggedReels();
       }
     });
-  }
-
-  Future<void> _fetchHashtaggedReels() async {
-    if (_isLoading || !_hasMore) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      final query = FirebaseFirestore.instance
-          .collection(FirebaseConstants.hashtagsCollections)
-          .doc(widget.hashtag)
-          .collection(FirebaseConstants.reelsCollection)
-          // .orderBy("createdAt", descending: true)
-          .limit(10);
-
-      final snapshot = _lastDoc == null
-          ? await query.get()
-          : await query.startAfterDocument(_lastDoc!).get();
-
-      if (snapshot.docs.isEmpty) {
-        setState(() => _hasMore = false);
-      } else {
-        _lastDoc = snapshot.docs.last;
-        for (var doc in snapshot.docs) {
-          final reelID = doc.id;
-          final reelSnap = await FirebaseFirestore.instance
-              .collection(FirebaseConstants.reelsCollection)
-              .doc(reelID)
-              .get();
-
-          if (reelSnap.exists) {
-            _reels.add(reelSnap.data()!..["id"] = reelSnap.id);
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint("Error fetching reels: $e");
-    }
-
-    setState(() => _isLoading = false);
   }
 
   @override
@@ -173,5 +134,54 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+
+  Future<void> _fetchHashtaggedReels() async {
+    if (_isLoading || !_hasMore) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      Query query =  FirebaseFirestore.instance
+          .collection(FirebaseConstants.hashtagsCollections)
+          .doc(widget.tag)
+          .collection(FirebaseConstants.reelsCollection)
+      // .orderBy("createdAt", descending: true)
+          .limit(10);
+
+      if(widget.isComingFromMood){
+        query =  FirebaseFirestore.instance
+            .collection(FirebaseConstants.moodsCollection)
+            .doc(widget.tag)
+            .collection(FirebaseConstants.reelsCollection)
+        // .orderBy("createdAt", descending: true)
+            .limit(10);
+      }
+      final snapshot = _lastDoc == null
+          ? await query.get()
+          : await query.startAfterDocument(_lastDoc!).get();
+
+      if (snapshot.docs.isEmpty) {
+        setState(() => _hasMore = false);
+      } else {
+        _lastDoc = snapshot.docs.last;
+        for (var doc in snapshot.docs) {
+          final reelID = doc.id;
+          final reelSnap = await FirebaseFirestore.instance
+              .collection(FirebaseConstants.reelsCollection)
+              .doc(reelID)
+              .get();
+
+          if (reelSnap.exists) {
+            _reels.add(reelSnap.data()!..["id"] = reelSnap.id);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("Error fetching reels: $e");
+    }
+
+    setState(() => _isLoading = false);
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.dart';
+import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
 import 'package:funli_app/src/helpers/formatting_helpers.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
 import 'package:funli_app/src/models/mood_model.dart';
@@ -159,14 +160,19 @@ class SearchPage extends StatelessWidget{
                             ),
                             title: Text(mood.mood, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w700),),
                             subtitle: Text('${mood.reelsCount} feels', style: AppTextStyles.captionTextStyle.copyWith(fontWeight: FontWeight.w300, color: AppColors.hintTextColor),),
-                            trailing: SizedBox(
-                                width: 100,
-                                child: Row(
-                                  children: [
-                                    GradientTextWidget(gradient: AppGradients.primaryGradient, text: "SEE ALL", textStyle: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),),
-                                    GradientIcon(icon: Icons.navigate_next_sharp, size: 30, gradient: AppGradients.primaryGradient),
-                                  ],
-                                )
+                            trailing: GestureDetector(
+                              onTap: (){
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_)=> MoodReelsPage(mood: mood.mood)));
+                              },
+                              child: SizedBox(
+                                  width: 100,
+                                  child: Row(
+                                    children: [
+                                      GradientTextWidget(gradient: AppGradients.primaryGradient, text: "SEE ALL", textStyle: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),),
+                                      GradientIcon(icon: Icons.navigate_next_sharp, size: 30, gradient: AppGradients.primaryGradient),
+                                    ],
+                                  )
+                              ),
                             ),
                             contentPadding: EdgeInsets.symmetric(horizontal: 10),
                           ),
