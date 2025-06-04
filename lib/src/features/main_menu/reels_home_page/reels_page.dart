@@ -10,6 +10,7 @@ import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
+import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/app_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
@@ -61,8 +62,6 @@ class _ReelsPageState extends State<ReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    //Commented because to work on the rest pages and stop reloading reels again and again
-
     return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
@@ -88,16 +87,12 @@ class _ReelsPageState extends State<ReelsPage> {
               builder: (context, index, child, videoPlayerController, pageController) {
                 bool isReadMore = false;
                 ReelModel reel = reels[index];
-
                 StreamController<double> videoProgressController = StreamController<double>();
-
                 videoPlayerController.addListener(() {
                   final position = videoPlayerController.value.position;
                   final duration = videoPlayerController.value.duration;
 
-                  if (
-                      position >= duration &&
-                      pageController.hasClients) {
+                  if (position >= duration && pageController.hasClients) {
                     // Move to the next page
                     final nextPage = index + 1;
                     if (nextPage < reels.length) {
@@ -113,8 +108,12 @@ class _ReelsPageState extends State<ReelsPage> {
                   videoProgressController.add(videoProgress);
                 });
 
-                bool isPortrait = videoPlayerController.value.size.height >
-                    videoPlayerController.value.size.width;
+                if(!provider.isReelViewed(reel.reelID)){
+                  ReelsService.addViewToReel(context: context, reelID: reel.reelID);
+                }
+
+                bool isPortrait = videoPlayerController.value.size.height > videoPlayerController.value.size.width;
+
                 return Stack(
                   children: [
                     Center(

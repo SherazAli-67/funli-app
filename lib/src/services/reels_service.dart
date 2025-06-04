@@ -3,13 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/comment_model.dart';
 import 'package:funli_app/src/models/like_model.dart';
-import 'package:funli_app/src/res/app_constants.dart';
+import 'package:funli_app/src/providers/reels_provider.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
+import 'package:provider/provider.dart';
 
 import '../models/reel_model.dart';
 
 class ReelsService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final _reelsColRef = FirebaseFirestore.instance
+      .collection(FirebaseConstants.reelsCollection);
 
   Future<List<ReelModel>> fetchReels({
     required String userId,
@@ -22,35 +24,7 @@ class ReelsService {
     List<ReelModel> fetchedReels = [];
 
     try {
-      // Get followings from subcollection
-     /* final followingSnap = await _firestore
-          .collection(userCollection)
-          .doc(userId)
-          .collection('following')
-          .limit(10)
-          .get();
-
-      final followings = followingSnap.docs
-          .map((doc) => doc['userID'] as String)
-          .toList();*/
-
-      Query baseQuery = _firestore.collection(FirebaseConstants.reelsCollection)
-        .orderBy('createdAt', descending: true);
-
-     /* if (followings.isEmpty) {
-        baseQuery = baseQuery
-            .where('moodTag', isEqualTo: selectedMood)
-            .orderBy('likes', descending: true)
-            .orderBy('createdAt', descending: true);
-      } else {
-        baseQuery = baseQuery
-            .where('creatorId', whereIn: followings)
-            .orderBy('createdAt', descending: true);
-      }
-
-      if (lastDoc != null) {
-        baseQuery = baseQuery.startAfterDocument(lastDoc);
-      }*/
+      Query baseQuery = _reelsColRef.orderBy('createdAt', descending: true);
 
       final snapshot = await baseQuery.get();
       if (snapshot.docs.isNotEmpty) {
@@ -70,9 +44,7 @@ class ReelsService {
   }
 
   static Stream<List<String>> getReelLikes({required String reelID}) {
-
-    final likeDocRef = FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection)
+    final likeDocRef = _reelsColRef
         .doc(reelID)
         .collection(FirebaseConstants.likesCollection);
 
@@ -81,8 +53,7 @@ class ReelsService {
 
   static Future<int> getReelLikesCount({required String reelID}) async{
 
-    final countQuery = await FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection)
+    final countQuery = await _reelsColRef
         .doc(reelID)
         .collection(FirebaseConstants.likesCollection).count().get();
 
@@ -93,8 +64,7 @@ class ReelsService {
   }
 
   static Stream<List<String>> getCommentLikes({required String reelID, required String commentID}) {
-    final likeDocRef = FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection)
+    final likeDocRef = _reelsColRef
         .doc(reelID)
         .collection(FirebaseConstants.commentsCollection).doc(commentID).collection(
         FirebaseConstants.likesCollection);
@@ -103,8 +73,7 @@ class ReelsService {
   }
 
   static Stream<int> getReelCommentCount({required String reelID}) {
-    return  FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection)
+    return  _reelsColRef
         .doc(reelID)
         .collection(FirebaseConstants.commentsCollection)
         .snapshots()
@@ -126,8 +95,7 @@ class ReelsService {
           .collection(FirebaseConstants.likesCollection)
           .doc(reelID);
 
-      final postLikeRef = firebaseFirestore
-          .collection(FirebaseConstants.reelsCollection)
+      final postLikeRef = _reelsColRef
           .doc(reelID)
           .collection(FirebaseConstants.likesCollection)
           .doc(currentUID);
@@ -168,8 +136,7 @@ class ReelsService {
     try {
       String currentUID = FirebaseAuth.instance.currentUser!.uid;
 
-      final commentLikeRef = FirebaseFirestore.instance
-          .collection(FirebaseConstants.reelsCollection)
+      final commentLikeRef = _reelsColRef
           .doc(reelID)
           .collection(FirebaseConstants.commentsCollection).doc(commentID).collection(
           FirebaseConstants.likesCollection).doc(currentUID);
@@ -201,8 +168,7 @@ class ReelsService {
         commentBy: currentUID,
         dateTime: DateTime.now(),
         comment: commentText);
-    await FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection)
+    await _reelsColRef
         .doc(reelID)
         .collection(FirebaseConstants.commentsCollection)
         .doc(commentID).set(comment.toMap());
@@ -210,15 +176,16 @@ class ReelsService {
   }
 
   static Stream<List<AddCommentModel>> getReelsComment({required String reelID}) {
-    return FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection)
+    return _reelsColRef
         .doc(reelID)
-        .collection(FirebaseConstants.commentsCollection).snapshots().map((snapshot)=> snapshot.docs.map((doc)=> AddCommentModel.fromMap(doc.data())).toList());
+        .collection(FirebaseConstants.commentsCollection).snapshots().map((
+        snapshot) =>
+        snapshot.docs.map((doc) => AddCommentModel.fromMap(doc.data()))
+            .toList());
   }
 
   static Future<List<ReelModel>> getUserReels({required int limit}) async{
-   QuerySnapshot querySnapshot =  await FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection).limit(limit).get();
+   QuerySnapshot querySnapshot =  await _reelsColRef.limit(limit).get();
   return querySnapshot.docs.map((doc)=> ReelModel.fromMap(doc.data() as Map<String,dynamic>)).toList();
   }
 
@@ -230,5 +197,20 @@ class ReelsService {
 
     final totalCount = countQuery.count ?? 0;
     return totalCount;
+  }
+
+  static Future<void> addViewToReel({required BuildContext context,  required String reelID}) async{
+    final provider = Provider.of<ReelProvider>(context);
+    provider.addReelToView(reelID);
+
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    await _reelsColRef
+        .doc(reelID)
+        .collection('views')
+        .doc(currentUID)
+        .set({
+      'userID' : currentUID,
+      'viewedAt': FieldValue.serverTimestamp(),
+    });
   }
 }

@@ -21,6 +21,7 @@ class MoodService {
         reels.add(ReelModel.fromMap(docSnap.data() as Map<String, dynamic>));
       }
     }
+
     return reels;
   }
 }

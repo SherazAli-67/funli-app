@@ -150,6 +150,7 @@ class SearchPage extends StatelessWidget{
                         spacing: 10,
                         children: [
                           ListTile(
+                            onTap: ()=> _onMoodTap(context, mood.mood),
                             leading: Container(
                               decoration: BoxDecoration(
                                   shape: BoxShape.circle,
@@ -161,9 +162,7 @@ class SearchPage extends StatelessWidget{
                             title: Text(mood.mood, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w700),),
                             subtitle: Text('${mood.reelsCount} feels', style: AppTextStyles.captionTextStyle.copyWith(fontWeight: FontWeight.w300, color: AppColors.hintTextColor),),
                             trailing: GestureDetector(
-                              onTap: (){
-                                Navigator.of(context).push(MaterialPageRoute(builder: (_)=> MoodReelsPage(mood: mood.mood)));
-                              },
+                              onTap: ()=> _onMoodTap(context, mood.mood),
                               child: SizedBox(
                                   width: 100,
                                   child: Row(
@@ -218,6 +217,10 @@ class SearchPage extends StatelessWidget{
         ),
       )),
     );
+  }
+
+  void _onMoodTap(BuildContext context, String mood) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> MoodReelsPage(mood: mood)));
   }
 
 }
