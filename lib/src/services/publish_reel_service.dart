@@ -52,36 +52,48 @@ class PublishReelService {
 
     return uploaded;
   }
-
   static Future<void> addReelToHashtag({
     required String hashtag,
     required String reelID,
   }) async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    final DocumentReference reelDocRef = firestore
+    final DocumentReference hashtagDocRef = firestore
         .collection(FirebaseConstants.hashtagsCollections)
-        .doc(hashtag)
+        .doc(hashtag);
+
+    final DocumentReference reelDocRef = hashtagDocRef
         .collection(FirebaseConstants.reelsCollection)
         .doc(reelID);
 
     try {
-      final DocumentSnapshot snapshot = await reelDocRef.get();
+      // Step 1: Check and create hashtag document if it doesn't exist
+      final DocumentSnapshot hashtagSnapshot = await hashtagDocRef.get();
 
-      if (!snapshot.exists) {
-        // If the document doesn't exist, create it with a basic map (you can expand this)
-        await reelDocRef.set({
-          "reelID": reelID,
-          "timestamp": FieldValue.serverTimestamp(),
-        });
-      } else {
-        // Optional: Update timestamp or other metadata if needed
-        await reelDocRef.update({
-          "timestamp": FieldValue.serverTimestamp(),
+      if (!hashtagSnapshot.exists) {
+        await hashtagDocRef.set({
+          "tag": hashtag,
+          "createdAt": FieldValue.serverTimestamp(),
+          "reelsCount": 0, // Optional: You can leave this out if you're using the cloud function to update
         });
       }
 
-      print("Reel successfully added to hashtag: $hashtag");
+      // Step 2: Check if reel already exists in the subcollection
+      final DocumentSnapshot reelSnapshot = await reelDocRef.get();
+
+      if (!reelSnapshot.exists) {
+        await reelDocRef.set({
+          "reelID": reelID,
+          "createdAt": FieldValue.serverTimestamp(),
+        });
+      } else {
+        // Optional: update existing reel metadata
+        await reelDocRef.update({
+          "createdAt": FieldValue.serverTimestamp(),
+        });
+      }
+
+      print(" Reel successfully added to hashtag: $hashtag");
     } catch (e) {
       print("Error adding reel to hashtag: $e");
     }

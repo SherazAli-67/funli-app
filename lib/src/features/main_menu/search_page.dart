@@ -1,16 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.dart';
-import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_widget.dart';
+import 'package:funli_app/src/helpers/formatting_helpers.dart';
+import 'package:funli_app/src/models/hashtag_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
+import 'package:funli_app/src/services/hashtag_service.dart';
 import 'package:funli_app/src/widgets/gradient_icon.dart';
 import 'package:funli_app/src/widgets/gradient_text_widget.dart';
+import 'package:funli_app/src/widgets/loading_widget.dart';
+import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
 
 class SearchPage extends StatelessWidget{
@@ -70,30 +73,57 @@ class SearchPage extends StatelessWidget{
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Trending Hashtags", style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),),
-                ...List.generate(4, (index){
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Row(
-                      children: [
-                         Expanded(
-                            child: GestureDetector(
-                              onTap: (){
-                                Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> HashtagReelsPage(hashtag: 'happy')));
-                              },
-                              child: RichText(text: TextSpan(
-                                  children: [
-                                    TextSpan(text: "#happy  ", style: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700, fontFamily: AppConstants.appFontFamily, color: Colors.black),),
-                                    TextSpan(text: "20k feels ", style: AppTextStyles.smallTextStyle.copyWith(fontFamily: AppConstants.appFontFamily, color: AppColors.hashtagCountGreyColor),),
-                                  ],
+                FutureBuilder(future: HashtagService.getTrendingHashtags(), builder: (ctx, snapshot){
 
-                              )),
-                            ),
+                  if(snapshot.hasData){
+                    List<HashtagModel> trendingHashtags = snapshot.requireData;
+                    return Column(
+                      children: trendingHashtags.map((hashtag){
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: (){
+                                    Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> HashtagReelsPage(hashtag: 'happy')));
+                                  },
+                                  child: RichText(text: TextSpan(
+                                    children: [
+                                      TextSpan(text: "#${hashtag.tag}  ", style: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700, fontFamily: AppConstants.appFontFamily, color: Colors.black),),
+                                      TextSpan(text: "${FormatingHelpers.formatNumber(hashtag.reelsCount)} feels ", style: AppTextStyles.smallTextStyle.copyWith(fontFamily: AppConstants.appFontFamily, color: AppColors.hashtagCountGreyColor),),
+                                    ],
+
+                                  )),
+                                ),
+                              ),
+                              StreamBuilder(stream: HashtagService.getIsFollowing(hashtag: hashtag.tag), builder: (ctx, snapshot){
+                                if(snapshot.hasData){
+                                  bool isFollowing = snapshot.requireData;
+                                  return isFollowing
+                                      ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> HashtagService.oddToFollow(hashtag: hashtag.tag, isUnfollowRequest: true), buttonHeight: 40,)
+                                      : SizedBox(
+                                      height: 40,
+                                      width: 100,
+                                      child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.oddToFollow(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
+                                }
+
+                                return SizedBox();
+                              })
+                            ],
                           ),
-                        SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 40,)
-                      ],
-                    ),
-                  );
+                        );
+                      }).toList(),
+                    );
+                  }
+                  else if(snapshot.connectionState == ConnectionState.waiting){
+                    return LoadingWidget(color: AppColors.purpleColor,);
+                  }
+
+                  return SizedBox();
                 })
+
               ],
             ),
             Text("Trending Feels", style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),),

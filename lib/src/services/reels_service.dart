@@ -224,7 +224,9 @@ class ReelsService {
 
   static Future<int> getHashtagReelsCount({required String hashtag}) async{
     final countQuery = await FirebaseFirestore.instance
-        .collection(FirebaseConstants.hashtagsCollections).doc(hashtag).collection(FirebaseConstants.reelsCollection).count().get();
+        .collection(FirebaseConstants.hashtagsCollections).doc(hashtag)
+        .collection(FirebaseConstants.reelsCollection).count()
+        .get();
 
     final totalCount = countQuery.count ?? 0;
     return totalCount;
