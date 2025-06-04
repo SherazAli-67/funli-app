@@ -109,7 +109,9 @@ class _ReelsPageState extends State<ReelsPage> {
                 });
 
                 if(!provider.isReelViewed(reel.reelID)){
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
                   ReelsService.addViewToReel(context: context, reelID: reel.reelID);
+                });
                 }
 
                 bool isPortrait = videoPlayerController.value.size.height > videoPlayerController.value.size.width;

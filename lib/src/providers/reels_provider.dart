@@ -56,9 +56,10 @@ class ReelProvider with ChangeNotifier {
 
 
   void _initCachedViewedReels() async{
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
     final sharedPreferences = await SharedPreferences.getInstance();
     //Either get all from firebase
-    final String? storedData =sharedPreferences.getString(LocalStorageConstants.cachedViewReelsKey);
+    final String? storedData =sharedPreferences.getString('${LocalStorageConstants.cachedViewReelsKey}_$currentUID');
     if (storedData != null) {
       final List<dynamic> decodedData = json.decode(storedData);
       _cachedReels = decodedData.map((item) => item.toString()).toList();
@@ -70,8 +71,9 @@ class ReelProvider with ChangeNotifier {
     _cachedReels.add(reelID);
     notifyListeners();
 
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(LocalStorageConstants.cachedViewReelsKey, json.encode(_cachedReels));
+    await prefs.setString('${LocalStorageConstants.cachedViewReelsKey}_$currentUID', json.encode(_cachedReels));
   }
 
   bool isReelViewed(String reelID) {

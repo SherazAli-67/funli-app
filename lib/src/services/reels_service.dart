@@ -200,17 +200,27 @@ class ReelsService {
   }
 
   static Future<void> addViewToReel({required BuildContext context,  required String reelID}) async{
-    final provider = Provider.of<ReelProvider>(context);
+    final provider = Provider.of<ReelProvider>(context, listen: false);
     provider.addReelToView(reelID);
 
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
-    await _reelsColRef
+    final docRef = FirebaseFirestore.instance
+        .collection('reels')
         .doc(reelID)
         .collection('views')
-        .doc(currentUID)
-        .set({
-      'userID' : currentUID,
-      'viewedAt': FieldValue.serverTimestamp(),
-    });
+        .doc(currentUID);
+
+    final docSnapshot = await docRef.get();
+    if (!docSnapshot.exists) {
+      debugPrint("Adding view to $reelID");
+      await docRef.set(
+          {
+            'userID' : currentUID,
+            'viewedAt': FieldValue.serverTimestamp(),
+          }
+      );
+    }else{
+      debugPrint("Already viewed $reelID");
+    }
   }
 }
