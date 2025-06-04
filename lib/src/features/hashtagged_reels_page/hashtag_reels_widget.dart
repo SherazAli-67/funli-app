@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
+import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/reel_likes_count.dart';
 
@@ -83,22 +85,29 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
                   top: 10,
                   left: 5,
                   right: 5,
-                  child: Row(
-                    spacing: 5,
-                    children: [
+                  child: FutureBuilder(future: UserService.getUserByID(userID: reel.userID), builder: (ctx, snapshot){
+                    if(snapshot.hasData && snapshot.requireData != null){
+                      UserModel user = snapshot.requireData!;
+                      return Row(
+                        spacing: 5,
+                        children: [
 
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: AppColors.purpleColor,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 19,
-                          backgroundImage: CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
-                        ),
-                      ),
-                      Expanded(child: Text('User name', style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
-                    ],
-                  )),
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: AppColors.purpleColor,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white,
+                              radius: 19,
+                              backgroundImage: CachedNetworkImageProvider(user.profilePicture ?? AppIcons.icDummyImgUrl),
+                            ),
+                          ),
+                          Expanded(child: Text(user.userName, style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
+                        ],
+                      );
+                    }
+
+                    return SizedBox();
+                  })),
               Positioned(
                   bottom: 10,
                   left: 10,
