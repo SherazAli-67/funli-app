@@ -5,6 +5,7 @@ import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/services/search_service.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
+import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
 import '../models/user_model.dart';
 import '../res/app_colors.dart';
@@ -111,7 +112,30 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildUsersSearchWidget() {
-    return Center(child: Text("Users search widget"),);
+    return FutureBuilder(future: SearchService.getUsers(query), builder: (ctx,snapshot){
+      if(snapshot.hasData){
+        List<UserModel> users = snapshot.requireData;
+        return ListView.builder(
+          padding: const EdgeInsets.all(8),
+          itemCount: users.length,
+         
+          itemBuilder: (context, index) {
+            if (index >= users.length) {
+              return LoadingWidget();
+            }
+            UserModel user = users[index];
+            return ListTile(
+              leading: ProfilePictureWidget(profilePicture: user.profilePicture),
+              title: Text(user.userName, style: AppTextStyles.buttonTextStyle,),
+            );
+          },
+        );
+      }else if(snapshot.connectionState == ConnectionState.waiting){
+        return LoadingWidget();
+      }
+
+      return SizedBox();
+    });
   }
 
   Widget _buildFeelsSearchWidget() {
