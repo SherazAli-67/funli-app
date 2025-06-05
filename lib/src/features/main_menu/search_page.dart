@@ -15,10 +15,13 @@ import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/hashtag_service.dart';
 import 'package:funli_app/src/services/mood_service.dart';
+import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/gradient_icon.dart';
 import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
+import 'package:funli_app/src/widgets/post_comment_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
+import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
 
 class SearchPage extends StatelessWidget{
@@ -227,72 +230,146 @@ class SearchPage extends StatelessWidget{
 
 
   void _onFilterTap(BuildContext context, ){
-    showModalBottomSheet(
-      backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.horizontal(left: Radius.circular(32), right: Radius.circular(32))
-        ),
-        context: context, builder: (ctx){
+    final TextEditingController locationTextEditingController = TextEditingController();
+    final TextEditingController languageTextEditingController = TextEditingController();
+    
 
-      List<String> selectedMoods = [];
-      return StatefulBuilder(
-        builder: (context, innerState) {
+    showModalBottomSheet(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.horizontal(left: Radius.circular(32), right: Radius.circular(32))
+        ),
+        isScrollControlled: true,
+        context: context,
+        builder: (ctx) {
+          List<String> selectedMoods = [];
+          String selectedPopularityLevel = '';
+
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 25),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Filters", style: AppTextStyles.headingTextStyle3,),
-                    IconButton(
-                        style: IconButton.styleFrom(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))
-                        ),
-                        onPressed: (){
-                        }, icon: Icon(Icons.close))
-                  ],
-                ),
-                SizedBox(
-                  height: 40,
-                  child: ListView.builder(
-                      itemCount: AppData.getMoods.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (ctx, index){
-                        String mood = AppData.getMoods[index];
-                        bool isSelected = selectedMoods.contains(mood);
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: isSelected ? SizedBox(
-                            width: 100,
-                            child: PrimaryBtn(
-                              bgGradient: AppIcons.primaryBgGradient,
-                                btnText: mood, icon: '', onTap: () {
-                              if (isSelected) {
-                                selectedMoods.remove(mood);
-                              } else {
-                                selectedMoods.add(mood);
-                              }
-                              innerState(() {});
-                            }),
-                          ) : SecondaryGradientBtn(
-                            btnText: mood, icon: '', onTap: () {
-                              debugPrint("On tap");
-                            if (isSelected) {
-                              selectedMoods.remove(mood);
-                            } else {
-                              selectedMoods.add(mood);
-                            }
-                            innerState(() {});
-                          },),
-                        );
-                  }),
-                )
-              ],
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: FractionallySizedBox(
+              heightFactor: 0.65,
+              child: StatefulBuilder(
+                  builder: (context, innerState) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 25),
+                      child: Column(
+                        spacing: 16,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Filters", style: AppTextStyles.headingTextStyle3,),
+                              IconButton(
+                                  style: IconButton.styleFrom(
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))
+                                  ),
+                                  onPressed: (){
+                                  }, icon: Icon(Icons.close))
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 7,
+                            children: [
+                              Text("Mood", style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400),),
+                              SizedBox(
+                                height: 38,
+                                child: ListView.builder(
+                                    itemCount: AppData.getMoods.length,
+                                    scrollDirection: Axis.horizontal,
+                                    itemBuilder: (ctx, index){
+                                      String mood = AppData.getMoods[index];
+                                      bool isSelected = selectedMoods.contains(mood);
+                                      return Padding(
+                                        padding: const EdgeInsets.only(right: 8.0),
+                                        child: isSelected ? SizedBox(
+                                          width: 100,
+                                          child: PrimaryBtn(
+                                              bgGradient: AppIcons.primaryBgGradient,
+                                              btnText: mood, icon: '', onTap: () {
+                                            if (isSelected) {
+                                              selectedMoods.remove(mood);
+                                            } else {
+                                              selectedMoods.add(mood);
+                                            }
+                                            innerState(() {});
+                                          }),
+                                        ) : SecondaryGradientBtn(
+                                          btnText: mood, icon: '', onTap: () {
+                                          debugPrint("On tap");
+                                          if (isSelected) {
+                                            selectedMoods.remove(mood);
+                                          } else {
+                                            selectedMoods.add(mood);
+                                          }
+                                          innerState(() {});
+                                        },),
+                                      );
+                                    }),
+                              )
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 7,
+                            children: [
+                              Text("Popularity", style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400),),
+                              SizedBox(
+                                height: 38,
+                                child: ListView(
+                                  scrollDirection: Axis.horizontal,
+                                  children: [
+                                    'Top Feels', 'Newest Feels', 'Most Viewed'
+                                  ].map((feel){
+                                    bool isSelected = selectedPopularityLevel == feel;
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 8.0),
+                                      child: isSelected ? SizedBox(
+                                        width: 150,
+                                        child: PrimaryBtn(
+                                            bgGradient: AppIcons.primaryBgGradient,
+                                            btnText: feel, icon: '', onTap: () {
+                                          if (!isSelected) {
+                                            selectedPopularityLevel = feel;
+                                            innerState(() {});
+                                          }
+
+                                        }),
+                                      ) : SecondaryGradientBtn(
+                                        btnText: feel, icon: '', onTap: () {
+                                        debugPrint("On tap");
+                                        if (!isSelected) {
+                                          selectedPopularityLevel = feel;
+                                          innerState(() {});
+                                        }
+
+                                      },),
+                                    );
+                                  }).toList(),
+                                ),
+                              )
+                            ],
+                          ),
+
+                          AppTextField(textController: locationTextEditingController, prefixIcon: AppIcons.icLocation, hintText: 'Abu Dahbi, UAE', titleText: 'Location'),
+                          AppTextField(textController: languageTextEditingController, prefixIcon: AppIcons.icLanguage, hintText: 'Urdu', titleText: 'Language'),
+                          const SizedBox(height: 20,),
+                          Row(
+                            spacing: 20,
+                            children: [
+                              Expanded(child: SecondaryBtn(btnText: "Cancel", icon: '', onTap: (){})),
+                              Expanded(child: PrimaryBtn(btnText: "Apply", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient,)),
+
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  }
+              ),
             ),
           );
-        }
-      );
-    });
+        });
   }
 }
