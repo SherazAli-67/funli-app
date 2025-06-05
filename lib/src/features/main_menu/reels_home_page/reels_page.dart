@@ -62,7 +62,8 @@ class _ReelsPageState extends State<ReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ReelProvider>(
+    return _buildCommentWidget();
+   /* return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
 
@@ -346,7 +347,7 @@ class _ReelsPageState extends State<ReelsPage> {
         );
 
       },
-    );
+    );*/
   }
 
   Center _buildCommentWidget() => Center(child: Text("Reels page is set to comment due to development of other pages and to avoid re-built", style: AppTextStyles.bodyTextStyle, textAlign: TextAlign.center,),);

@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.dart';
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
+import 'package:funli_app/src/features/search_page.dart';
 import 'package:funli_app/src/helpers/formatting_helpers.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
 import 'package:funli_app/src/models/mood_model.dart';
@@ -23,8 +24,8 @@ import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
 
-class SearchPage extends StatelessWidget{
-  const SearchPage({super.key});
+class DiscoverPage extends StatelessWidget{
+  const DiscoverPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +61,10 @@ class SearchPage extends StatelessWidget{
           spacing: 20,
           children: [
             TextField(
+              readOnly: true,
+              onTap: (){
+                Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> SearchPage()));
+              },
               decoration: InputDecoration(
                 filled: true,
                 fillColor: AppColors.searchFillColor,
@@ -73,7 +78,7 @@ class SearchPage extends StatelessWidget{
                 ),
                 hintText: 'Search users, feels, trends, hashtags',
                 hintStyle: AppTextStyles.hintTextStyle,
-                prefixIcon: Icon(Icons.search, color: AppColors.greyTextColor,)
+                prefixIcon: Icon(Icons.search, color: AppColors.greyTextColor,),
               ),
             ),
             Column(

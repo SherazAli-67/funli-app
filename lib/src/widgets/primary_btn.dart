@@ -11,8 +11,19 @@ class PrimaryBtn extends StatelessWidget {
     super.key,
     required String btnText, required String icon, required VoidCallback onTap, String bgGradient = AppIcons
         .btnBgGradient, bool isPrefix = false, bool isLoading = false, double borderRadius = SpacingConstants
-        .btnBorderRadius, Color? iconColor
-  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _isLoading = isLoading, _bgGradient = bgGradient, _borderRadius = borderRadius, _iconColor = iconColor;
+        .btnBorderRadius, Color? iconColor,
+    TextStyle textStyle = AppTextStyles.buttonTextStyle
+  })
+      : _text = btnText,
+        _icon = icon,
+        _onTap = onTap,
+        _isPrefix = isPrefix,
+        _isLoading = isLoading,
+        _bgGradient = bgGradient,
+        _borderRadius = borderRadius,
+        _iconColor = iconColor,
+  _textStyle = textStyle
+  ;
   final String _text;
   final String _icon;
   final VoidCallback _onTap;
@@ -21,6 +32,7 @@ class PrimaryBtn extends StatelessWidget {
   final String _bgGradient;
   final double _borderRadius;
   final Color? _iconColor;
+  final TextStyle _textStyle;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -52,12 +64,12 @@ class PrimaryBtn extends StatelessWidget {
                 child: Image.asset(_bgGradient, fit: BoxFit.cover, width: double.infinity, height: SpacingConstants.buttonHeight,),
               ),
               _isLoading ? LoadingWidget() : Row(
-                spacing: 10,
+                spacing: _icon.isNotEmpty ? 10 : 0,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if(_isPrefix && _icon.isNotEmpty)
                     SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,),
-                  Text(_text, style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),),
+                  Text(_text, style: _textStyle.copyWith(color: Colors.white),),
                   if(!_isPrefix && _icon.isNotEmpty)
                     SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,)
                 ],

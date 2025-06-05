@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/features/main_menu/notification_page.dart';
 import 'package:funli_app/src/features/main_menu/reels_home_page/reels_page.dart';
-import 'package:funli_app/src/features/main_menu/search_page.dart';
+import 'package:funli_app/src/features/main_menu/discover_page/discover_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +23,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   final List<Widget> _pages = [
     SizedBox.expand(child: const ReelsPage()),
-    SizedBox.expand(child: const SearchPage()),
+    SizedBox.expand(child: const DiscoverPage()),
     SizedBox.expand(child: const NotificationPage()),
     SizedBox.expand(child: const UserProfilePage()),
   ];

@@ -8,13 +8,15 @@ class SecondaryBtn extends StatelessWidget {
   const SecondaryBtn({
     super.key,
     required String btnText, required String icon, required VoidCallback onTap, bool isPrefix = false,
-    double borderRadius = SpacingConstants.btnBorderRadius
-  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _borderRadius = borderRadius;
+    double borderRadius = SpacingConstants.btnBorderRadius,
+    TextStyle textStyle = AppTextStyles.buttonTextStyle,
+  }): _text = btnText, _icon = icon, _onTap = onTap, _isPrefix = isPrefix, _borderRadius = borderRadius, _textStyle = textStyle;
   final String _text;
   final String _icon;
   final VoidCallback _onTap;
   final bool _isPrefix;
   final double _borderRadius;
+  final TextStyle _textStyle;
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -30,11 +32,12 @@ class SecondaryBtn extends StatelessWidget {
           ),
           onPressed: _onTap, child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        spacing: 10,
+
+        spacing: _icon.isNotEmpty ? 10 : 0,
         children: [
           if(_isPrefix && _icon.isNotEmpty)
             SvgPicture.asset(_icon),
-          Text(_text, style: AppTextStyles.buttonTextStyle.copyWith(color: AppColors.colorBlack),),
+          Text(_text, style: _textStyle.copyWith(color: AppColors.colorBlack),),
           if(!_isPrefix  && _icon.isNotEmpty)
             SvgPicture.asset(_icon),
         ],
