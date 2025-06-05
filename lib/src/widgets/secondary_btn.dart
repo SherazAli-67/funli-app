@@ -32,10 +32,10 @@ class SecondaryBtn extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 10,
         children: [
-          if(_isPrefix)
+          if(_isPrefix && _icon.isNotEmpty)
             SvgPicture.asset(_icon),
           Text(_text, style: AppTextStyles.buttonTextStyle.copyWith(color: AppColors.colorBlack),),
-          if(!_isPrefix)
+          if(!_isPrefix  && _icon.isNotEmpty)
             SvgPicture.asset(_icon),
         ],
       )),

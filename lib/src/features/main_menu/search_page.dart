@@ -19,7 +19,6 @@ import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/gradient_icon.dart';
 import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
-import 'package:funli_app/src/widgets/post_comment_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
@@ -54,9 +53,7 @@ class SearchPage extends StatelessWidget{
           ))
         ],
       ),
-      body: Center(child: Text("Set to comment due to development of other features", style: AppTextStyles.bodyTextStyle, textAlign: TextAlign.center,),)
-      
-     /* SafeArea(child: SingleChildScrollView(
+      body: SafeArea(child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,9 +217,11 @@ class SearchPage extends StatelessWidget{
             }),
           ],
         ),
-      )),*/
+      )),
     );
   }
+
+  Center _buildFeaturesCommenttedWidget() => Center(child: Text("Set to comment due to development of other features", style: AppTextStyles.bodyTextStyle, textAlign: TextAlign.center,),);
 
   void _onMoodTap(BuildContext context, String mood) {
     Navigator.of(context).push(MaterialPageRoute(builder: (_)=> MoodReelsPage(mood: mood)));
