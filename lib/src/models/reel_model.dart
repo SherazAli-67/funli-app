@@ -16,6 +16,7 @@ class ReelModel {
   final DateTime createdAt;
   final Map<String, dynamic>? location; // e.g., {'lat': 0.0, 'lng': 0.0}
 
+
   ReelModel({
     required this.reelID,
     required this.userID,
@@ -49,6 +50,7 @@ class ReelModel {
       visibility: map['visibility'] ?? 'public',
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       location: map['location'] != null ? Map<String, dynamic>.from(map['location']) : null,
+
     );
   }
 

@@ -49,13 +49,14 @@ class ReelsService {
     return likeDocRef.snapshots().map((snapshot)=> snapshot.docs.map((doc)=> doc.id).toList());
   }
 
-  static Future<int> getReelLikesCount({required String reelID}) async{
+  static Future<int>  getReelViewsCount({required String reelID}) async{
 
     final countQuery = await _reelsColRef
         .doc(reelID)
-        .collection(FirebaseConstants.likesCollection).count().get();
+        .collection(FirebaseConstants.viewsCollections).count().get();
 
     final totalCount = countQuery.count ?? 0;
+
     return totalCount;
 
     // return likeDocRef.snapshots().map((snapshot)=> snapshot.docs.map((doc)=> doc.id).toList());
@@ -203,9 +204,9 @@ class ReelsService {
 
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
     final docRef = FirebaseFirestore.instance
-        .collection('reels')
+        .collection(FirebaseConstants.reelsCollection)
         .doc(reelID)
-        .collection('views')
+        .collection(FirebaseConstants.viewsCollections)
         .doc(currentUID);
 
     final docSnapshot = await docRef.get();

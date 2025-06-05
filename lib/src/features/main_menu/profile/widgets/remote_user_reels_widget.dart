@@ -159,7 +159,7 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
                         child: Center(child: Icon(Icons.play_arrow_rounded, ),),
                       ),
                       Expanded(
-                          child: FutureBuilder(future: ReelsService.getReelLikesCount(reelID: reel.reelID),
+                          child: FutureBuilder(future: ReelsService.getReelViewsCount(reelID: reel.reelID),
                               builder: (ctx, snapshot) {
                                 if(snapshot.hasData && snapshot.requireData > 0){
                                   return ReelLikesCountWidget(count: snapshot.requireData);
