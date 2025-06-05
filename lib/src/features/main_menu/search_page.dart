@@ -42,7 +42,7 @@ class SearchPage extends StatelessWidget{
                 padding: EdgeInsets.symmetric(horizontal: 15),
                 elevation: 0
               ),
-              onPressed: (){}, child: Row(
+              onPressed: ()=> _onFilterTap(context), child: Row(
             spacing: 10,
             children: [
               SvgPicture.asset(AppIcons.icFilter),
@@ -51,7 +51,9 @@ class SearchPage extends StatelessWidget{
           ))
         ],
       ),
-      body: SafeArea(child: SingleChildScrollView(
+      body: Center(child: Text("Set to comment due to development of other features", style: AppTextStyles.bodyTextStyle, textAlign: TextAlign.center,),)
+      
+     /* SafeArea(child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,7 +217,7 @@ class SearchPage extends StatelessWidget{
             }),
           ],
         ),
-      )),
+      )),*/
     );
   }
 
@@ -223,4 +225,74 @@ class SearchPage extends StatelessWidget{
     Navigator.of(context).push(MaterialPageRoute(builder: (_)=> MoodReelsPage(mood: mood)));
   }
 
+
+  void _onFilterTap(BuildContext context, ){
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.horizontal(left: Radius.circular(32), right: Radius.circular(32))
+        ),
+        context: context, builder: (ctx){
+
+      List<String> selectedMoods = [];
+      return StatefulBuilder(
+        builder: (context, innerState) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 25),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Filters", style: AppTextStyles.headingTextStyle3,),
+                    IconButton(
+                        style: IconButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))
+                        ),
+                        onPressed: (){
+                        }, icon: Icon(Icons.close))
+                  ],
+                ),
+                SizedBox(
+                  height: 40,
+                  child: ListView.builder(
+                      itemCount: AppData.getMoods.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (ctx, index){
+                        String mood = AppData.getMoods[index];
+                        bool isSelected = selectedMoods.contains(mood);
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: isSelected ? SizedBox(
+                            width: 100,
+                            child: PrimaryBtn(
+                              bgGradient: AppIcons.primaryBgGradient,
+                                btnText: mood, icon: '', onTap: () {
+                              if (isSelected) {
+                                selectedMoods.remove(mood);
+                              } else {
+                                selectedMoods.add(mood);
+                              }
+                              innerState(() {});
+                            }),
+                          ) : SecondaryGradientBtn(
+                            btnText: mood, icon: '', onTap: () {
+                              debugPrint("On tap");
+                            if (isSelected) {
+                              selectedMoods.remove(mood);
+                            } else {
+                              selectedMoods.add(mood);
+                            }
+                            innerState(() {});
+                          },),
+                        );
+                  }),
+                )
+              ],
+            ),
+          );
+        }
+      );
+    });
+  }
 }

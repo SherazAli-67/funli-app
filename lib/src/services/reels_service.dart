@@ -3,9 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/comment_model.dart';
 import 'package:funli_app/src/models/like_model.dart';
-import 'package:funli_app/src/providers/reels_provider.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
-import 'package:provider/provider.dart';
 
 import '../models/reel_model.dart';
 
@@ -199,9 +197,9 @@ class ReelsService {
     return totalCount;
   }
 
-  static Future<void> addViewToReel({required BuildContext context,  required String reelID}) async{
-    final provider = Provider.of<ReelProvider>(context, listen: false);
-    provider.addReelToView(reelID);
+  static Future<void> addViewToReel({ required String reelID}) async{
+    // final provider = Provider.of<ReelProvider>(context, listen: false);
+
 
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
     final docRef = FirebaseFirestore.instance

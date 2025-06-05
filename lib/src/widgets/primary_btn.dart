@@ -28,13 +28,13 @@ class PrimaryBtn extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           gradient: AppGradients.btnOuterGradient,
-            boxShadow: [
+           /* boxShadow: [
               BoxShadow(
                   color: Color(0xffC9BAFF),
                   blurRadius: 17.6,
                   offset: Offset(0, 6)
               )
-            ],
+            ],*/
           borderRadius: BorderRadius.circular(_borderRadius),
         ),
         // padding: EdgeInsets.all(2),

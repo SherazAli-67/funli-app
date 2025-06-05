@@ -121,4 +121,8 @@ class AppData {
           createdAt: DateTime.now());
     });
   }
+
+  static List<String> get getMoods => [
+    'Happy', 'Sad', 'Angry', 'Anxious', 'Curious', 'Surprised', 'Exhausted'
+  ];
 }

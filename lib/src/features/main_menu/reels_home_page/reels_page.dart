@@ -62,7 +62,8 @@ class _ReelsPageState extends State<ReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ReelProvider>(
+    return Center(child: Text("Reels page is set to comment due to development of other pages and to avoid re-built", style: AppTextStyles.bodyTextStyle, textAlign: TextAlign.center,),);
+    /*return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
 
@@ -108,12 +109,8 @@ class _ReelsPageState extends State<ReelsPage> {
                   videoProgressController.add(videoProgress);
                 });
 
-                if(!provider.isReelViewed(reel.reelID)){
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                  ReelsService.addViewToReel(context: context, reelID: reel.reelID);
-                });
-                }
 
+                ReelsService.addViewToReel(reelID: reel.reelID);
                 bool isPortrait = videoPlayerController.value.size.height > videoPlayerController.value.size.width;
 
                 return Stack(
@@ -350,6 +347,6 @@ class _ReelsPageState extends State<ReelsPage> {
         );
 
       },
-    );
+    );*/
   }
 }
