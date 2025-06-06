@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/models/hashtag_model.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/services/search_service.dart';
@@ -7,11 +8,15 @@ import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
+import '../helpers/formatting_helpers.dart';
 import '../models/user_model.dart';
 import '../res/app_colors.dart';
+import '../res/app_constants.dart';
 import '../res/app_textstyles.dart';
+import '../services/hashtag_service.dart';
 import '../services/user_service.dart';
 import '../widgets/loading_widget.dart';
+import 'hashtagged_reels_page/hashtag_reels_page.dart';
 
 class SearchPage extends StatefulWidget{
   const SearchPage({super.key});
@@ -103,7 +108,7 @@ class _SearchPageState extends State<SearchPage> {
             Expanded(child: _buildUsersSearchWidget()),
 
           if(selectedIndex == 2)
-            Expanded(child: _buildHashtagSearchWidget())
+            Expanded(child:   _buildHashtagSearchWidget() )
         ],
       )),
     );
@@ -130,21 +135,25 @@ class _SearchPageState extends State<SearchPage> {
               contentPadding: EdgeInsets.zero,
               leading: ProfilePictureWidget(profilePicture: user.profilePicture),
               title: Text(user.userName, style: AppTextStyles.buttonTextStyle,),
-              trailing: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
-                if(snapshot.hasData){
-                  return snapshot.requireData
-                      ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 38,)
-                      : SizedBox(
-                    height: 38,
-                    width: 75,
-                    child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient,),
-                  );
-                }else if(snapshot.connectionState == ConnectionState.waiting){
-                  return LoadingWidget();
-                }
+              trailing: SizedBox(
 
-                return const SizedBox();
-              }),
+                width: 100,
+                child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
+                  if(snapshot.hasData){
+                    return snapshot.requireData
+                        ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 38,)
+                        : SizedBox(
+                      height: 38,
+                      width: 75,
+                      child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient,),
+                    );
+                  }else if(snapshot.connectionState == ConnectionState.waiting){
+                    return LoadingWidget();
+                  }
+
+                  return LoadingWidget();
+                }),
+              ),
             );
           },
         );
@@ -157,7 +166,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildFeelsSearchWidget() {
-    return FutureBuilder(future: SearchService.getReels(query), builder: (ctx,snapshot){
+    return StreamBuilder(stream: SearchService.getReelsStream(query), builder: (ctx,snapshot){
       if(snapshot.hasData){
         List<ReelModel> reels = snapshot.requireData;
         debugPrint("Reels found ${reels.length} for $query");
@@ -259,6 +268,61 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildHashtagSearchWidget() {
-    return Center(child: Text("Hashtag search widget"),);
+    return StreamBuilder(stream: SearchService.getTags(query), builder: (ctx,snapshot){
+      if(snapshot.hasData){
+        List<HashtagModel> tags = snapshot.requireData;
+        debugPrint("Tags found ${tags.length} for $query");
+        return ListView.builder(
+          padding: const EdgeInsets.all(8),
+          itemCount: tags.length,
+          itemBuilder: (context, index) {
+            if (index >= tags.length) {
+              return LoadingWidget();
+            }
+            HashtagModel hashtag = tags[index];
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> HashtagReelsPage(hashtag: hashtag.tag)));
+                      },
+                      child: RichText(text: TextSpan(
+                        children: [
+                          TextSpan(text: "#${hashtag.tag}  ", style: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700, fontFamily: AppConstants.appFontFamily, color: Colors.black),),
+                          TextSpan(text: "${FormatingHelpers.formatNumber(hashtag.reelsCount)} feels ", style: AppTextStyles.smallTextStyle.copyWith(fontFamily: AppConstants.appFontFamily, color: AppColors.hashtagCountGreyColor),),
+                        ],
+
+                      )),
+                    ),
+                  ),
+                  StreamBuilder(stream: HashtagService.getIsFollowing(hashtag: hashtag.tag), builder: (ctx, snapshot){
+                    if(snapshot.hasData){
+                      bool isFollowing = snapshot.requireData;
+                      return isFollowing
+                          ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> HashtagService.oddToFollow(hashtag: hashtag.tag, isUnfollowRequest: true), buttonHeight: 40,)
+                          : SizedBox(
+                          height: 40,
+                          width: 100,
+                          child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.oddToFollow(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
+                    }
+
+                    return SizedBox();
+                  })
+                ],
+              ),
+            );
+          },
+        );
+      }else if(snapshot.connectionState == ConnectionState.waiting){
+        return LoadingWidget();
+      }
+
+      return SizedBox();
+    });
   }
 }

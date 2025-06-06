@@ -99,7 +99,7 @@ class DiscoverPage extends StatelessWidget{
                               Expanded(
                                 child: GestureDetector(
                                   onTap: (){
-                                    Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> HashtagReelsPage(hashtag: 'happy')));
+                                    Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> HashtagReelsPage(hashtag: hashtag.tag)));
                                   },
                                   child: RichText(text: TextSpan(
                                     children: [
