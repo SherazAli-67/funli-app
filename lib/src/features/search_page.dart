@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_widget.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/services/search_service.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
+import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
 import '../models/user_model.dart';
 import '../res/app_colors.dart';
 import '../res/app_textstyles.dart';
@@ -23,7 +23,7 @@ class SearchPage extends StatefulWidget{
 class _SearchPageState extends State<SearchPage> {
 
   int selectedIndex = 0;
-  List<ReelModel> _reels = [];
+  // List<ReelModel> _reels = [];
   String query = '';
   @override
   Widget build(BuildContext context) {
@@ -127,8 +127,24 @@ class _SearchPageState extends State<SearchPage> {
             }
             UserModel user = users[index];
             return ListTile(
+              contentPadding: EdgeInsets.zero,
               leading: ProfilePictureWidget(profilePicture: user.profilePicture),
               title: Text(user.userName, style: AppTextStyles.buttonTextStyle,),
+              trailing: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
+                if(snapshot.hasData){
+                  return snapshot.requireData
+                      ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 38,)
+                      : SizedBox(
+                    height: 38,
+                    width: 75,
+                    child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient,),
+                  );
+                }else if(snapshot.connectionState == ConnectionState.waiting){
+                  return LoadingWidget();
+                }
+
+                return const SizedBox();
+              }),
             );
           },
         );

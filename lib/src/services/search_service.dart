@@ -35,9 +35,9 @@ class SearchService {
       return []; // return empty if query is empty
     }
     try {
-      final lowercaseQuery = query.toLowerCase().replaceAll(RegExp(r'\s+'), '');
       final querySnapshot = await _usersColRef
-          .where('userName_keywords', arrayContains: lowercaseQuery)
+        .where('userName', isGreaterThanOrEqualTo: query)
+        .where('userName', isLessThan: '${query}z')
           .get();
 
       debugPrint("User found for query: $query are ${querySnapshot.size}");
