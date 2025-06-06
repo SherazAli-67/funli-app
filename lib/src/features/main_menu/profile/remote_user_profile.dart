@@ -102,7 +102,7 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
               ],
             ),
 
-            // if(!_isFromProfilePage || !_isCurrentUser)
+            if(!_isFromProfilePage)
               Padding(
                 padding: const EdgeInsets.only(bottom: 20.0),
                 child: TextButton(onPressed: () {

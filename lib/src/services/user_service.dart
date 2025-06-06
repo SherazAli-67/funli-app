@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/follow_model.dart';
+import 'package:funli_app/src/models/hashtag_model.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
@@ -146,4 +147,18 @@ class UserService {
 
     return imageUrl;
   }
+
+ /* static Future<UserModel> getUserFollowers() async {
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    CollectionReference followersColRef = FirebaseFirestore.instance
+        .collection(FirebaseConstants.userCollection)
+        .doc(currentUID)
+        .collection(FirebaseConstants.followersCollection);
+
+    QuerySnapshot querySnapshot = await followersColRef.get();
+    List<FollowModel> tags = querySnapshot.docs.map((doc) =>
+        FollowModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
+
+
+  }*/
 }

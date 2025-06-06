@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -33,6 +34,13 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Search Results", style: AppTextStyles.headingTextStyle3,),
+        centerTitle: false,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
       body: SafeArea(child: Column(
         children: [
           Padding(
@@ -132,6 +140,9 @@ class _SearchPageState extends State<SearchPage> {
             }
             UserModel user = users[index];
             return ListTile(
+              onTap: (){
+                Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> RemoteUserProfilePage(userID: user.userID, userName: user.userName, profilePicture: user.profilePicture,)));
+              },
               contentPadding: EdgeInsets.zero,
               leading: ProfilePictureWidget(profilePicture: user.profilePicture),
               title: Text(user.userName, style: AppTextStyles.buttonTextStyle,),
@@ -271,7 +282,6 @@ class _SearchPageState extends State<SearchPage> {
     return StreamBuilder(stream: SearchService.getTags(query), builder: (ctx,snapshot){
       if(snapshot.hasData){
         List<HashtagModel> tags = snapshot.requireData;
-        debugPrint("Tags found ${tags.length} for $query");
         return ListView.builder(
           padding: const EdgeInsets.all(8),
           itemCount: tags.length,

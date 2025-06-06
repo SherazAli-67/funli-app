@@ -36,6 +36,7 @@ class ProfileProvider extends ChangeNotifier{
   bool get isSavingChanges => _isSavingChanges;
 
   int get selectedTab => _selectedTab;
+
   ProfileProvider(){
     initUserProfile();
   }
