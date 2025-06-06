@@ -13,8 +13,12 @@ class SearchService {
       return []; // return empty if query is empty
     }
     try {
+
+
+
       final  querySnapshot = await _reelsColRef
-          .where('moodTag', isEqualTo: query)
+          .where('moodTag', isGreaterThanOrEqualTo: query)
+          .where('moodTag', isLessThan: '${query}z')
           .get();
 
       return querySnapshot.docs

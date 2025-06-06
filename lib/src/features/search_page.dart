@@ -46,6 +46,8 @@ class _SearchPageState extends State<SearchPage> {
                       query = val;
                       setState(() {});
                     },
+                    textCapitalization: TextCapitalization.words,
+                    onTapOutside: (val)=> FocusManager.instance.primaryFocus!.unfocus(),
                     decoration: InputDecoration(
                         filled: true,
                         fillColor: AppColors.searchFillColor,
@@ -142,6 +144,7 @@ class _SearchPageState extends State<SearchPage> {
     return FutureBuilder(future: SearchService.getReels(query), builder: (ctx,snapshot){
       if(snapshot.hasData){
         List<ReelModel> reels = snapshot.requireData;
+        debugPrint("Reels found ${reels.length} for $query");
         return GridView.builder(
           padding: const EdgeInsets.all(8),
           itemCount: reels.length,
