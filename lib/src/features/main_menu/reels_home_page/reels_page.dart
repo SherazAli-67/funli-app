@@ -62,8 +62,7 @@ class _ReelsPageState extends State<ReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildCommentWidget();
-   /* return Consumer<ReelProvider>(
+    return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
 
@@ -259,8 +258,8 @@ class _ReelsPageState extends State<ReelsPage> {
                               ),
                             ],
                           ),
-                          PostLikeWidget(reelID: reel.reelID, iconColor: Colors.white, isReel: true,),
-                          PostCommentWidget(iconColor: Colors.white, isReel: true, reelID: reel.reelID,),
+                          PostLikeWidget(reel: reel, iconColor: Colors.white, isReel: true,),
+                          PostCommentWidget(iconColor: Colors.white, isReel: true, reel: reel,),
                           PostShareWidget( iconColor: Colors.white,),
                         ],
                       ),
@@ -347,7 +346,7 @@ class _ReelsPageState extends State<ReelsPage> {
         );
 
       },
-    );*/
+    );
   }
 
   Center _buildCommentWidget() => Center(child: Text("Reels page is set to comment due to development of other pages and to avoid re-built", style: AppTextStyles.bodyTextStyle, textAlign: TextAlign.center,),);

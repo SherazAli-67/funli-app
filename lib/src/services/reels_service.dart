@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/comment_model.dart';
 import 'package:funli_app/src/models/like_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
+import 'package:funli_app/src/services/notifications_service.dart';
 
 import '../models/reel_model.dart';
 
@@ -114,11 +115,10 @@ class ReelsService {
           'dateTime': dateTime
         });
 
-
-
         LikeModel like = LikeModel(likedBy: userID, dateTime: dateTime);
         await postLikeRef.set(like.toMap());
         isLiked = true;
+
       }
     } catch (e) {
       debugPrint("Exception while adding author to Favorites: ${e.toString()}");

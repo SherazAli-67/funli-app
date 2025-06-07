@@ -17,4 +17,6 @@ class AppConstants {
   static const cryingEmoji = '😥';
   static const laughingEmoji = '🤣';
   static const annoyedEmoji = '😒';
+
+  //Notifications
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/features/main_menu/reels_home_page/comments_page.dart';
+import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/reels_service.dart';
@@ -8,13 +9,13 @@ import 'package:funli_app/src/services/reels_service.dart';
 class PostCommentWidget extends StatelessWidget{
   final Color iconColor;
   final bool isReel;
-  final String reelID;
-  const PostCommentWidget({super.key, required this.reelID,  this.iconColor = Colors.grey, this.isReel = false});
+  final ReelModel reel;
+  const PostCommentWidget({super.key, required this.reel,  this.iconColor = Colors.grey, this.isReel = false});
   @override
   Widget build(BuildContext context) {
 
     return StreamBuilder(
-      stream: ReelsService.getReelCommentCount(reelID: reelID),
+      stream: ReelsService.getReelCommentCount(reelID: reel.reelID),
       builder: (context, snapshot) {
         if(snapshot.hasData){
           return _buildCommentWidget(context, totalComments: snapshot.requireData);
@@ -38,7 +39,7 @@ class PostCommentWidget extends StatelessWidget{
                       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                       child: FractionallySizedBox(
                         heightFactor: 0.8,
-                        child: CommentsPage(reelID: reelID,),
+                        child: CommentsPage(reel: reel,),
                       ));
                 },
               );

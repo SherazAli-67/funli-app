@@ -6,9 +6,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/follow_model.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
+import 'package:funli_app/src/models/notification_model.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
+import 'package:funli_app/src/services/notifications_service.dart';
 
 class UserService {
   // final _auth = FirebaseAuth.instance;
@@ -38,10 +40,7 @@ class UserService {
           FirebaseConstants.followersCollection);
       QuerySnapshot querySnapshot = await currentUserFollowingColRef.where('userID', isEqualTo: remoteUID).get();
       if(querySnapshot.size > 0){
-        debugPrint("Found");
         await currentUserFollowingColRef.doc(remoteUID).delete();
-
-        debugPrint("Removed from remote user");
         await remoteUserFollowerColRef.doc(currentUID).delete();
         //remove from following
         result = true;
@@ -57,6 +56,8 @@ class UserService {
         FollowModel currentUserFollowerModel = FollowModel(userID: currentUID, dateTime: DateTime.now());
         remoteUserFollowerColRef.doc(currentUID).set(currentUserFollowerModel.toMap());
         debugPrint("added to follower list");
+
+        NotificationsService.sendNotificationToUser(receiverID: remoteUID, description: 'Started following you', notificationType: NotificationType.follow);
         result = true;
       }
     }catch(e){
