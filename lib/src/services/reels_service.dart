@@ -203,8 +203,7 @@ class ReelsService {
 
 
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
-    final docRef = FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection)
+    final docRef = _reelsColRef
         .doc(reelID)
         .collection(FirebaseConstants.viewsCollections)
         .doc(currentUID);
@@ -221,5 +220,18 @@ class ReelsService {
     }else{
       debugPrint("Already viewed $reelID");
     }
+  }
+
+  static Future<ReelModel?> getReelByID(String reelID) async{
+    try{
+     DocumentSnapshot docSnap =  await _reelsColRef.doc(reelID).get();
+     if(docSnap.exists){
+       return ReelModel.fromMap(docSnap.data() as Map<String, dynamic>);
+     }
+    }catch(e){
+      debugPrint("Failed to get reel by ID: ${e.toString()}");
+    }
+
+    return null;
   }
 }

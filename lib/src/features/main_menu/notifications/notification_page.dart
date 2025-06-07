@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/features/main_menu/notifications/notification_item_widge.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 import '../../../models/notification_model.dart';
@@ -86,7 +87,7 @@ class _NotificationPageState extends State<NotificationPage> {
             itemCount: _notifications.length + (_isLoading ? 1 : 0),
             itemBuilder: (context, index) {
               if (index < _notifications.length) {
-                return _buildNotificationItem(_notifications[index]);
+                return NotificationItemWidget(notification: _notifications[index]);
               } else {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
