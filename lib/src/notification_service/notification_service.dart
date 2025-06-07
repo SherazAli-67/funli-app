@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:funli_app/src/services/auth_service.dart';
 
-class NotificationService {
+class FirebaseNotificationsService {
   static final notification = FlutterLocalNotificationsPlugin();
   static const String channelId = 'funli-notification';
   static const String channelDesc = 'FUNLI Notifications';
@@ -54,7 +54,7 @@ class NotificationService {
     await Firebase.initializeApp();
 
     if (message.notification != null) {
-      NotificationService.show(
+      FirebaseNotificationsService.show(
         title: message.notification!.title,
         body: message.notification!.body,
       );
@@ -143,7 +143,7 @@ class NotificationService {
   static Future<void> _notificationClickHandler(RemoteMessage message) async {
     bool hasCurrentUser = FirebaseAuth.instance.currentUser != null;
     if (hasCurrentUser) {
-      NotificationService.notificationClickAction(message: message);
+      FirebaseNotificationsService.notificationClickAction(message: message);
     }
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/models/user_model.dart';
-import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 

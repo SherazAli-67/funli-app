@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:funli_app/src/features/main_menu/notification_page.dart';
+import 'package:funli_app/src/features/main_menu/notifications/notification_page.dart';
 import 'package:funli_app/src/features/main_menu/reels_home_page/reels_page.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/discover_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart';
@@ -106,13 +106,13 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   void _initNotificationService()async{
     //Get notification permission then
-    await NotificationService.requestPermissions().then((value) {});
+    await FirebaseNotificationsService.requestPermissions().then((value) {});
     try{
-      await NotificationService.initializeLocalNotifications();
-      await NotificationService.initializeFirebaseMessaging().then((value) {
-        NotificationService.startNotificationListeners();
+      await FirebaseNotificationsService.initializeLocalNotifications();
+      await FirebaseNotificationsService.initializeFirebaseMessaging().then((value) {
+        FirebaseNotificationsService.startNotificationListeners();
       });
-      NotificationService.startNotificationClickListeners();
+      FirebaseNotificationsService.startNotificationClickListeners();
     }catch(e){
       debugPrint("Exception while notification configuration: ${e.toString()}");
     }

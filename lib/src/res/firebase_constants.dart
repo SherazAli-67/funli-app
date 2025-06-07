@@ -7,6 +7,7 @@ class FirebaseConstants {
   static const followingCollection = 'following';
   static const hashtagsCollections = 'hashtags';
   static const followingHashtagCollections = 'followingHashtags';
+  static const notificationsCollections = 'notifications';
 
   static const viewsCollections = 'views';
 

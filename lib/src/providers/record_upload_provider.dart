@@ -107,7 +107,7 @@ class RecordUploadProvider extends ChangeNotifier{
 
     bool isUploaded = await PublishReelService.uploadReel(reel: reel);
     if(isUploaded){
-      NotificationService.show(
+      FirebaseNotificationsService.show(
         title: "Upload Completed",
         body: 'Your reel has been uploaded successfully.',
       );
