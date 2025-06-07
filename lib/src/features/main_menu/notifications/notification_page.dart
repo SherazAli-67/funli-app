@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/main_menu/notifications/notification_item_widge.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
+import 'package:funli_app/src/widgets/loading_widget.dart';
 import '../../../models/notification_model.dart';
 
 class NotificationPage extends StatefulWidget{
@@ -70,6 +71,8 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final grouped = groupNotificationsByDate(_notifications);
+
     return SafeArea(
       child: Column(
         children: [
@@ -81,8 +84,29 @@ class _NotificationPageState extends State<NotificationPage> {
               const SizedBox(width: 5,),
             ],
           ),
-          Expanded(child:
-          ListView.builder(
+          Expanded(child: _isLoading ? LoadingWidget() : ListView(
+              controller: _scrollController,
+              children: grouped.entries.map((entry) {
+                final sectionTitle = entry.key;
+                final notifications = entry.value;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Text(
+                        sectionTitle,
+                        style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    ...notifications.map((notification) => NotificationItemWidget(notification: notification)),
+                  ],
+                );
+              }).toList()
+    )
+
+         /* ListView.builder(
             controller: _scrollController,
             itemCount: _notifications.length + (_isLoading ? 1 : 0),
             itemBuilder: (context, index) {
@@ -95,22 +119,34 @@ class _NotificationPageState extends State<NotificationPage> {
                 );
               }
             },
-          ),)
+          ),*/
+
+          )
         ],
       ),
     );
   }
 
-  Widget _buildNotificationItem(NotificationModel notification) {
-    return ListTile(
-      leading: Icon(Icons.notifications, color: Colors.blueAccent),
-      title: Text("Notification Title"),
-      subtitle: Text(notification.notificationDescription),
-      /*trailing: Text(
-        _formatTimestamp(notification.timestamp),
-        style: TextStyle(fontSize: 12, color: Colors.grey),
-      ),*/
-    );
+
+  Map<String, List<NotificationModel>> groupNotificationsByDate(List<NotificationModel> notifications) {
+    final Map<String, List<NotificationModel>> grouped = {};
+
+    for (var notif in notifications) {
+      final label = getDateLabel(notif.timestamp.toDate());
+      grouped.putIfAbsent(label, () => []).add(notif);
+    }
+
+    return grouped;
   }
 
+  String getDateLabel(DateTime timestamp) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final date = DateTime(timestamp.year, timestamp.month, timestamp.day);
+
+    if (date == today) return "Today";
+    if (date == today.subtract(Duration(days: 1))) return "Yesterday";
+    if (now.difference(date).inDays <= 7) return "This Week";
+    return "Earlier";
+  }
 }
