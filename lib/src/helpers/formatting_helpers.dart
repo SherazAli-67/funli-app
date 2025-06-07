@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
@@ -28,5 +29,11 @@ class FormatingHelpers {
     DateFormat dateFormat = DateFormat('dd/MM/yyyy');
     formattedDOB = '${dateFormat.format(dob)} - $yearsOld years old';
     return formattedDOB;
+  }
+
+  static String formatTimestamp(Timestamp timestamp){
+    final dt = timestamp.toDate();
+    return "${dt.hour}:${dt.minute} ${dt.day}/${dt.month}/${dt.year}";
+
   }
 }
