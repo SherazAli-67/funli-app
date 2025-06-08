@@ -208,4 +208,18 @@ class AuthCubit extends Cubit<AuthStates>{
         return 'Something went wrong. Please try again.';
     }
   }
+
+  Future<void> onForgetPassTap({required String email}) async {
+    emit(SendingForgetPassLink());
+    try {
+      await auth.sendPasswordResetEmail(email: email);
+      emit(SentForgetPassLink());
+    } on FirebaseAuthException catch (err) {
+      emit(SendingForgetPassLinkFailed(errorMessage: err.message.toString()));
+      throw Exception(err.message.toString());
+    } catch (err) {
+      emit(SendingForgetPassLinkFailed(errorMessage: err.toString()));
+      throw Exception(err.toString());
+    }
+  }
 }

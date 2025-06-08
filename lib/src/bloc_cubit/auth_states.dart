@@ -40,3 +40,10 @@ class CompletedUserSignupInfoFailed extends AuthStates{
   final String errorMessage;
   CompletedUserSignupInfoFailed({required this.errorMessage});
 }
+
+class SendingForgetPassLink  extends AuthStates{}
+class SentForgetPassLink extends AuthStates{}
+class SendingForgetPassLinkFailed extends AuthStates{
+  final String errorMessage;
+  SendingForgetPassLinkFailed({required this.errorMessage});
+}

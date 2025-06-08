@@ -19,4 +19,6 @@ class AppConstants {
   static const annoyedEmoji = '😒';
 
   //Notifications
+
+  static const resetEmailSentDescription = 'Your account security is our priority!. We\'ve Sent You a Secure Link To Safely Change your password and Keep your account protected';
 }

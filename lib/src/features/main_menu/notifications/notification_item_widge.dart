@@ -76,7 +76,7 @@ class _NotificationItemWidgetState extends State<NotificationItemWidget> {
           width: 120,
           height: 38,
           child: PrimaryBtn(btnText: "Follow Back", icon: '', onTap: (){
-
+            UserService.onFollowTap(remoteUID: widget._notification.userID);
           }, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallTextStyle,),
         );
       }
