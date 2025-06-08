@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/models/notification_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
@@ -8,6 +7,7 @@ import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
+import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 
 class NotificationItemWidget extends StatefulWidget{
@@ -37,7 +37,12 @@ class _NotificationItemWidgetState extends State<NotificationItemWidget> {
               ? AppIcons.icDummyImgUrl : user!.profilePicture),
       title: Text((_isLoadingUser || user == null) ?  '' : user!.userName, style: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700),),
       subtitle: Text(widget._notification.notificationDescription, style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.icCommentGreyColor),),
-      trailing: widget._notification.notificationType == NotificationType.like || widget._notification.notificationType == NotificationType.comment ? _buildThumbnailWidget() : _buildFollowFollowingWidget(),
+      trailing: widget._notification.notificationType ==
+          NotificationType.like || widget._notification.notificationType == NotificationType.comment
+          ? _buildThumbnailWidget()
+          : widget._notification.notificationType == NotificationType.follow
+          ? _buildFollowFollowingWidget()
+          : const SizedBox(),
     );
   }
 
@@ -65,6 +70,18 @@ class _NotificationItemWidgetState extends State<NotificationItemWidget> {
   }
 
   Widget _buildFollowFollowingWidget() {
-    return SizedBox();
+    return StreamBuilder(stream: UserService.getIsFollowingStream(widget._notification.userID), builder: (ctx, snapshot){
+      if(snapshot.hasData && !snapshot.requireData){
+        return SizedBox(
+          width: 120,
+          height: 38,
+          child: PrimaryBtn(btnText: "Follow Back", icon: '', onTap: (){
+
+          }, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallTextStyle,),
+        );
+      }
+
+      return SizedBox();
+    });
   }
 }
