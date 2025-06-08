@@ -218,7 +218,7 @@ class ReelsService {
           }
       );
     }else{
-      debugPrint("Already viewed $reelID");
+      // debugPrint("Already viewed $reelID");
     }
   }
 
