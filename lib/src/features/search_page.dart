@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
+import 'package:funli_app/src/models/filter_model.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -20,8 +21,8 @@ import '../widgets/loading_widget.dart';
 import 'hashtagged_reels_page/hashtag_reels_page.dart';
 
 class SearchPage extends StatefulWidget{
-  const SearchPage({super.key});
-
+  const SearchPage({super.key, this.reelFilter});
+  final ReelFilter? reelFilter;
   @override
   State<SearchPage> createState() => _SearchPageState();
 }

@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/filter_bottomsheet.dart';
+import 'package:funli_app/src/features/main_menu/discover_page/filtered_reels_page.dart';
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
 import 'package:funli_app/src/features/search_page.dart';
 import 'package:funli_app/src/helpers/formatting_helpers.dart';
@@ -74,10 +75,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
               onPressed: () async {
                 final newFilter = await showFilterBottomSheet(
                     context, currentFilter);
-                if (newFilter != null) {
-                  setState(() => currentFilter = newFilter);
-                  // _fetchReelsWithFilter();
-                }
+                Navigator.of(context).push(MaterialPageRoute(builder: (_)=> FilteredReelsPage(filter: newFilter!)));
               }, child: Row(
             spacing: 10,
             children: [
