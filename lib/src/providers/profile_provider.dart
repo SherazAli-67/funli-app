@@ -38,6 +38,7 @@ class ProfileProvider extends ChangeNotifier{
   int get selectedTab => _selectedTab;
 
   ProfileProvider(){
+
     initUserProfile();
   }
 

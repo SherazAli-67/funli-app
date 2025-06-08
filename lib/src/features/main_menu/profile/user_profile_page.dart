@@ -32,10 +32,13 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
     _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<ProfileProvider>(context, listen: false);
-
+      if(provider.currentUser != null && provider.userName.isNotEmpty){
+        provider.initUserProfile();
+      }
       _tabController.addListener(() {
         provider.onTabChange(_tabController.index);
       });
+
     });
     super.initState();
   }

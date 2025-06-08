@@ -1,9 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/main_menu/notifications/notification_item_widge.dart';
+import 'package:funli_app/src/res/app_colors.dart';
+import 'package:funli_app/src/res/app_gradients.dart';
+import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
+import 'package:funli_app/src/widgets/gradient_icon.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import '../../../models/notification_model.dart';
 
@@ -84,7 +89,11 @@ class _NotificationPageState extends State<NotificationPage> {
               const SizedBox(width: 5,),
             ],
           ),
-          Expanded(child: _isLoading ? LoadingWidget() : ListView(
+          Expanded(child: _isLoading
+              ? LoadingWidget()
+              : _notifications.isEmpty
+              ? _buildEmptyNotesPage()
+              : ListView(
               controller: _scrollController,
               children: grouped.entries.map((entry) {
                 final sectionTitle = entry.key;
@@ -106,21 +115,6 @@ class _NotificationPageState extends State<NotificationPage> {
               }).toList()
     )
 
-         /* ListView.builder(
-            controller: _scrollController,
-            itemCount: _notifications.length + (_isLoading ? 1 : 0),
-            itemBuilder: (context, index) {
-              if (index < _notifications.length) {
-                return NotificationItemWidget(notification: _notifications[index]);
-              } else {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-            },
-          ),*/
-
           )
         ],
       ),
@@ -131,9 +125,9 @@ class _NotificationPageState extends State<NotificationPage> {
   Map<String, List<NotificationModel>> groupNotificationsByDate(List<NotificationModel> notifications) {
     final Map<String, List<NotificationModel>> grouped = {};
 
-    for (var notif in notifications) {
-      final label = getDateLabel(notif.timestamp.toDate());
-      grouped.putIfAbsent(label, () => []).add(notif);
+    for (var notification in notifications) {
+      final label = getDateLabel(notification.timestamp.toDate());
+      grouped.putIfAbsent(label, () => []).add(notification);
     }
 
     return grouped;
@@ -148,5 +142,17 @@ class _NotificationPageState extends State<NotificationPage> {
     if (date == today.subtract(Duration(days: 1))) return "Yesterday";
     if (now.difference(date).inDays <= 7) return "This Week";
     return "Earlier";
+  }
+
+  _buildEmptyNotesPage() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      spacing: 10,
+      children: [
+        GradientIcon(icon: Icons.notifications_none_rounded, size: 55, gradient: AppGradients.primaryGradient),
+        Text("No Notifications Right Now!", style: AppTextStyles.tileTitleTextStyle, textAlign: TextAlign.center,),
+        Text("You're up to date", style: AppTextStyles.bodyTextStyle,)
+      ],
+    );
   }
 }

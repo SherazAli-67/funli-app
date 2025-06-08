@@ -233,7 +233,7 @@ class _ReelsPageState extends State<ReelsPage> {
                                 bottom: 0,
                                 right: 0,
                                 left: 0,
-                                child: FutureBuilder(future: UserService.getIsFollowing(reel.userID), builder: (ctx, snapshot){
+                                child: StreamBuilder(stream: UserService.getIsFollowingStream(reel.userID), builder: (ctx, snapshot){
 
                                   if(snapshot.hasData && !snapshot.requireData){
                                   return Container(

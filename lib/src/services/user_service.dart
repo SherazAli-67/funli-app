@@ -1,13 +1,10 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/follow_model.dart';
-import 'package:funli_app/src/models/hashtag_model.dart';
 import 'package:funli_app/src/models/notification_model.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/services/notifications_service.dart';
@@ -57,7 +54,11 @@ class UserService {
         remoteUserFollowerColRef.doc(currentUID).set(currentUserFollowerModel.toMap());
         debugPrint("added to follower list");
 
-        NotificationsService.sendNotificationToUser(receiverID: remoteUID, description: 'Started following you', notificationType: NotificationType.follow);
+        NotificationsService.sendNotificationToUser(
+            receiverID: remoteUID,
+            description: 'Started following you',
+            notificationType: NotificationType.follow);
+        debugPrint("Follow notification sent");
         result = true;
       }
     }catch(e){
