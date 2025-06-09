@@ -7,6 +7,7 @@ import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
+import 'package:funli_app/src/services/comment_service.dart';
 import 'package:funli_app/src/services/notifications_service.dart';
 import 'package:funli_app/src/services/reels_service.dart';
 
@@ -95,7 +96,6 @@ class _CommentsPageState extends State<CommentsPage> {
                     Expanded(
                       child: Row(
                         children: [
-                          IconButton(onPressed: (){}, icon: Icon(Icons.emoji_emotions_outlined)),
                           Expanded(child: TextField(
                             controller: _commentController,
                             focusNode: _focusNode,
@@ -130,7 +130,7 @@ class _CommentsPageState extends State<CommentsPage> {
 
   Future<void> _addReply()async{
     String replyText = _commentController.text.trim();
-    await ReelsService.addReplyToComment(
+    await CommentService.addReplyToComment(
         reelID: widget._reel.reelID,
         commentID: _commentID!,
         replyText: replyText);
@@ -151,7 +151,7 @@ class _CommentsPageState extends State<CommentsPage> {
 
   Future<void> _addComment()async{
     String commentText = _commentController.text.trim();
-    await ReelsService.addCommentToReel(reelID: widget._reel.reelID, commentText: commentText);
+    await CommentService.addCommentToReel(reelID: widget._reel.reelID, commentText: commentText);
     NotificationsService.sendNotificationToUser(
         receiverID: widget._reel.userID,
         reelID: widget._reel.reelID,
