@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +37,9 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
   double _baseZoom = 1.0;
 
   late RecordUploadProvider _recordUploadProvider;
+
+  Timer? _timer;
+  int _elapsedSeconds = 0;
   @override
   void initState() {
     super.initState();
@@ -129,31 +134,67 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                           const SizedBox(
                             width: 40,
                           ),
-                          CircleAvatar(
-                            backgroundColor: Colors.white,
-                            radius: 40,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: AppGradients.primaryGradient
-                              ),
-                              margin: EdgeInsets.all(5),
-                              padding: EdgeInsets.all(10),
-
-                              child: IconButton(onPressed: (){
-                                if(_isRecording){
-                                  _stopRecording(context: context);
-                                }else{
-                                  _startRecording();
-                                }
+                          if(_isRecording)
+                            GestureDetector(
+                              onTap: () {
+                                _stopRecording(context: context);
                               },
-                                  icon: SvgPicture.asset(_isRecording
-                                      ? AppIcons.icStopRecording
-                                      : AppIcons.icRecordVideo,
-                                    colorFilter: ColorFilter.mode(
-                                        Colors.white, BlendMode.srcIn),)),
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                    TweenAnimationBuilder<double>(
+                                      tween: Tween(begin: 0.0, end: 1.0),
+                                      duration: Duration(seconds: _getSelectedDurationInSeconds()),
+                                      onEnd: () {
+                                        if (_isRecording) {
+                                          _stopRecording(context: context);
+                                        }
+                                      },
+                                      builder: (context, value, child) {
+                                        return CustomPaint(
+                                          painter: CircularProgressPainter(progress: value),
+                                          size: Size(80, 80),
+                                        );
+                                      },
+                                    ),
+                                    Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        gradient: AppGradients.primaryGradient,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: -40,
+                                      child: Text(
+                                        _recordingDurationText(),
+                                        style: TextStyle(color: Colors.white, fontSize: 16),
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
+
+                          if(!_isRecording)
+                            CircleAvatar(
+                              backgroundColor: Colors.white,
+                              radius: 40,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: AppGradients.primaryGradient
+                                ),
+                                margin: EdgeInsets.all(5),
+                                padding: EdgeInsets.all(10),
+
+                                child: IconButton(onPressed: (){
+                                  _startRecording();
+                                },
+                                    icon: SvgPicture.asset( AppIcons.icRecordVideo,
+                                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),)),
+                              ),
+                            ),
                           IconButton(onPressed: ()async{
                             String? selectedVideoPath = await _onSelectVideoFromGalleryTap();
                             if(selectedVideoPath != null){
@@ -167,48 +208,47 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                 }
               ),
             ),
-            Positioned(
-              top: 65 ,
-              left: 30,
-              right: 30,
-              child: Consumer<RecordUploadProvider>(
-                  builder: (ctx, provider, _) {
-                    return Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        spacing: 16,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              AppBackButton(color: Colors.white,),
-                              Text("Record a video", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
-                              const SizedBox(width: 40,),
-                            ],
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 11),
-                            decoration: BoxDecoration(
-                              color: AppColors.yellowAccentColor,
-                              borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius)
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: 10,
-                              children: [
-                                Text("You seem 😄 Happy", style: AppTextStyles.buttonTextStyle,),
-                                Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black,)
-                              ],
-                            ),
-                          )
-                        ],
+                      Positioned(
+                        top: 65 ,
+                        left: 30,
+                        right: 30,
+                        child: Consumer<RecordUploadProvider>(
+                            builder: (ctx, provider, _) {
+                              return Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  spacing: 16,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        AppBackButton(color: Colors.white,),
+                                        Text("Record a video", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                                        const SizedBox(width: 40,),
+                                      ],
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 11),
+                                      decoration: BoxDecoration(
+                                          color: AppColors.yellowAccentColor,
+                                          borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius)
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        spacing: 10,
+                                        children: [
+                                          Text("You seem 😄 Happy", style: AppTextStyles.buttonTextStyle,),
+                                          Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black,)
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }
+                        ),
                       ),
-                    );
-                  }
-              ),
-            ),
-
                     ],
                   ),
           )
@@ -232,11 +272,23 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
     );
   }
 
+  int _getSelectedDurationInSeconds() {
+    final durationStr = _recordUploadProvider.videoRecordingDuration;
+    if (durationStr.contains("1m")) return 60;
+    if (durationStr.contains("30s")) return 30;
+    return 15;
+  }
+  String _recordingDurationText() {
+    final minutes = _elapsedSeconds ~/ 60;
+    final seconds = _elapsedSeconds % 60;
+    return "$minutes:${seconds.toString().padLeft(2, '0')}";
+  }
+
   Future<String?> _onSelectVideoFromGalleryTap() async{
     FilePicker filePicker = FilePicker.platform;
     FilePickerResult? result = await filePicker.pickFiles(
-      type: FileType.video,
-      allowMultiple: false
+        type: FileType.video,
+        allowMultiple: false
     );
 
     if(result != null){
@@ -262,7 +314,18 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
     join(directory.path, '${DateTime.now().millisecondsSinceEpoch}.mp4');
 
     await _controller.startVideoRecording();
-    setState(()=>  _isRecording = true);
+    setState(() {
+      _isRecording = true;
+      _elapsedSeconds = 0;
+    });
+
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSeconds++;
+      });
+    });
+
+
     debugPrint("Recording started");
   }
 
@@ -273,6 +336,9 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
     setState(()=> _isRecording = false);
 
     _recordUploadProvider.setRecordingPath(file.path);
+
+    _timer?.cancel();
+    _timer = null;
     Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> EditUploadedFeelPage(videoPath: file.path,)));
   }
 
@@ -288,4 +354,57 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
     setState(()=>  _currentZoom = newZoom);
   }
 
+}
+
+class CircularProgressPainter extends CustomPainter {
+  final double progress;
+
+  CircularProgressPainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final strokeWidth = 6.0;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width - strokeWidth) / 2;
+
+    final backgroundPaint = Paint()
+      ..color = Colors.grey.withOpacity(0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    final gradient = SweepGradient(
+      colors: [
+        Colors.yellow,
+        Colors.orange,
+        Colors.red,
+        Colors.purple,
+        Colors.blue,
+        Colors.green,
+        Colors.yellow,
+      ],
+      stops: [0.0, 0.16, 0.33, 0.5, 0.66, 0.83, 1.0],
+    );
+
+    final foregroundPaint = Paint()
+      ..shader = gradient.createShader(
+        Rect.fromCircle(center: center, radius: radius),
+      )
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawCircle(center, radius, backgroundPaint);
+
+    final sweepAngle = 2 * 3.141592653589793 * progress;
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -3.14 / 2,
+      sweepAngle,
+      false,
+      foregroundPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

@@ -27,36 +27,6 @@ class AppData {
 
   ];
 
-
-
-/*  static String getEmojiByMood(String mood){
-    switch(mood){
-      case 'Happy':
-        return AppConstants.happyEmoji;
-
-      case 'Excitement':
-        return AppConstants.happyEmoji;
-
-      case 'Sad':
-        return AppConstants.sadEmoji;
-
-      case 'Angry':
-        return AppConstants.angryEmoji;
-
-      case 'Laughing':
-        return AppConstants.laughingEmoji;
-
-      case 'Crying':
-        return AppConstants.cryingEmoji;
-
-      case 'Annoyed':
-        return AppConstants.annoyedEmoji;
-
-      default:
-        return AppConstants.happyEmoji;
-    }
-  }*/
-
   static List<ReelModel> getReels(){
     String userID = 'RurOyejb8iQERN1R9OqJ81eokg02';
     String reelID = DateTime.now().microsecondsSinceEpoch.toString();
