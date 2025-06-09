@@ -74,7 +74,7 @@ class _ReelsPageState extends State<ReelsPage> {
           return const Center(child: Text("No reels available."));
         }
 
-        return _buildCommentWidget();
+        return buildReelsWidget(context, reels);
 
       },
     );

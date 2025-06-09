@@ -20,6 +20,11 @@ class CommentsPage extends StatefulWidget{
 
 class _CommentsPageState extends State<CommentsPage> {
   final TextEditingController _commentController = TextEditingController();
+  bool _isReplying = false;
+  String? _replyingToUserName;
+  String? _commentID;
+  final _focusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -56,7 +61,7 @@ class _CommentsPageState extends State<CommentsPage> {
                     AddCommentModel comment = snapshot.requireData[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 24.0),
-                      child: CommentItemWidget(comment: comment, reelID:  widget._reel.reelID)
+                      child: CommentItemWidget(comment: comment, reelID:  widget._reel.reelID, onReplyTap:  _onReplyTap,)
                     );
                   }));
             }
@@ -70,49 +75,90 @@ class _CommentsPageState extends State<CommentsPage> {
             ));
           }),
 
-          Container(
-
-            decoration: BoxDecoration(
-              color: AppColors.commentTextFieldFillColor,
-              borderRadius: BorderRadius.circular(13),
-              border: Border.all(color: AppColors.borderColor)
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      IconButton(onPressed: (){}, icon: Icon(Icons.emoji_emotions_outlined)),
-                      Expanded(child: TextField(
-                        controller: _commentController,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          hintText: "Say something nice...",
-                          hintStyle: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.commentHintTextColor)
-                        ),
-                      ))
-                    ],
-                  ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start ,
+            children: [
+              if(_isReplying )
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("Replying to $_replyingToUserName"),
                 ),
-                IconButton(onPressed: ()async{
-                  String commentText = _commentController.text.trim();
-                  await ReelsService.addCommentToReel(reelID: widget._reel.reelID, commentText: commentText);
-                  NotificationsService.sendNotificationToUser(
-                      receiverID: widget._reel.userID,
-                      reelID: widget._reel.reelID,
-                      description: "Leave a comment on your video",
-                      notificationType: NotificationType.comment);
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  _commentController.clear();
-                }, icon: SvgPicture.asset(AppIcons.icSendBtn))
-              ],
-            ),
+              Container(
+
+                decoration: BoxDecoration(
+                  color: AppColors.commentTextFieldFillColor,
+                  borderRadius: BorderRadius.circular(13),
+                  border: Border.all(color: AppColors.borderColor)
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          IconButton(onPressed: (){}, icon: Icon(Icons.emoji_emotions_outlined)),
+                          Expanded(child: TextField(
+                            controller: _commentController,
+                            focusNode: _focusNode,
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                hintText: "Say something nice...",
+                                hintStyle: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.commentHintTextColor)
+                            ),
+                          ))
+                        ],
+                      ),
+                    ),
+                    IconButton(onPressed: _isReplying ? _addReply : _addComment, icon: SvgPicture.asset(AppIcons.icSendBtn))
+                  ],
+                ),
+              ),
+            ],
           )
         ],
       ),
     );
+  }
+
+  void _onReplyTap(String userName, String commentID){
+    setState(()=>  _isReplying = true);
+    _replyingToUserName = userName;
+    _commentID = commentID;
+    _focusNode.requestFocus();
+  }
+
+  Future<void> _addReply()async{
+    String replyText = _commentController.text.trim();
+    await ReelsService.addReplyToComment(
+        reelID: widget._reel.reelID,
+        commentID: _commentID!,
+        replyText: replyText);
+
+    NotificationsService.sendNotificationToUser(
+        receiverID: widget._reel.userID,
+        reelID: widget._reel.reelID,
+        description: "Wrote a reply on your video" ,
+        notificationType: NotificationType.reply);
+    _isReplying = false;
+    _commentID = null;
+    _replyingToUserName = null;
+    _focusNode.unfocus();
+    _commentController.clear();
+
+    setState(() {});
+  }
+
+  Future<void> _addComment()async{
+    String commentText = _commentController.text.trim();
+    await ReelsService.addCommentToReel(reelID: widget._reel.reelID, commentText: commentText);
+    NotificationsService.sendNotificationToUser(
+        receiverID: widget._reel.userID,
+        reelID: widget._reel.reelID,
+        description:  "Leave a comment on your video",
+        notificationType: NotificationType.comment);
+    _focusNode.unfocus();
+    _commentController.clear();
   }
 }
 

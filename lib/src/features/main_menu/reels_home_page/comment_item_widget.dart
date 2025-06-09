@@ -14,12 +14,16 @@ class CommentItemWidget extends StatelessWidget {
   const CommentItemWidget({
     super.key,
     required AddCommentModel comment,
-    required String reelID
-  }) : _comment = comment, _reelID = reelID;
+    required String reelID,
+    required Function(String userName, String commentID) onReplyTap
+  }) : _comment = comment, _reelID = reelID, _onReplyTap = onReplyTap;
   final AddCommentModel _comment;
   final String _reelID;
+
+  final Function(String userName, String commentID) _onReplyTap;
   @override
   Widget build(BuildContext context) {
+    String userName = '';
     return Column(
       spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,12 +31,13 @@ class CommentItemWidget extends StatelessWidget {
         FutureBuilder(future: UserService.getUserByID(userID: _comment.commentBy), builder: (ctx,snapshot){
           if(snapshot.hasData && snapshot.requireData != null){
             UserModel user = snapshot.requireData!;
+            userName = user.userName;
             return ListTile(
               contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
                 backgroundImage: CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
               ),
-              title: Text(user.userName, style: AppTextStyles.tileTitleTextStyle,),
+              title: Text(userName, style: AppTextStyles.tileTitleTextStyle,),
               trailing: IconButton(
                   onPressed: (){}, icon: SvgPicture.asset(AppIcons.icMore)),
             );
@@ -53,7 +58,7 @@ class CommentItemWidget extends StatelessWidget {
           children: [
             CommentLikeWidget(reelID: _reelID, commentID: _comment.commentID),
             Text(DateTimeHelper.timeAgo(_comment.dateTime), style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),),
-            TextButton(onPressed: (){}, child: Text("Reply", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),))
+            TextButton(onPressed: ()=> _onReplyTap(userName, _comment.commentID), child: Text("Reply", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),))
           ],
         )
       ],
