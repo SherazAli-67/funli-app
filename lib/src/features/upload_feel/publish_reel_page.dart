@@ -11,6 +11,8 @@ import 'package:funli_app/src/widgets/app_back_button.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/mood_selecting_scroll_wheel_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
+import 'package:funli_app/src/widgets/secondary_btn.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import '../../providers/record_upload_provider.dart';
@@ -251,9 +253,33 @@ class _PublishReelPageState extends State<PublishReelPage> {
   }
 
   void navigationCallback(){
-    ScaffoldMessenger.of(context).showSnackBar(
+    showModalBottomSheet(
+        backgroundColor: Colors.white,
+        context: context, builder: (ctx){
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 10,
+          children: [
+            Lottie.asset(AppIcons.icSuccessAnim, height: 150, repeat: false,),
+            Text("Awesome! You have expressed your feelings☺", textAlign: TextAlign.center, style: AppTextStyles.headingTextStyle3,),
+
+            const SizedBox(height: 20,),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: SecondaryBtn(btnText: "Go to 🏠 Home", icon: '', onTap: (){
+                Navigator.of(context).pop();
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);
+              }),
+            )
+          ],
+        ),
+      );
+    });
+  /*  ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Uploading your video. You’ll be notified once it’s done.')),
     );
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);*/
   }
 }

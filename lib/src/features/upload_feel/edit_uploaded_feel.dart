@@ -37,7 +37,6 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
       startValue: _startValue,
       endValue: _endValue,
       onSave: (outputPath) {
-        debugPrint('OUTPUT PATH: $outputPath');
         final provider = Provider.of<RecordUploadProvider>(context, listen: false);
         provider.setRecordingPath(outputPath!);
       },
@@ -47,7 +46,11 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
   @override
   void initState() {
     super.initState();
-    _loadVideo();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      final provider = Provider.of<RecordUploadProvider>(context, listen: false);
+      provider.setRecordingPath(widget.videoPath);
+      _loadVideo();
+    });
   }
 
   @override

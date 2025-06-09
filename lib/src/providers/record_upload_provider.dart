@@ -65,7 +65,7 @@ class RecordUploadProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  void publishReel({required String caption, required String visibility, required VoidCallback navigationCallback}) async{
+  Future<void> publishReel({required String caption, required String visibility, required VoidCallback navigationCallback}) async{
     isCompressingVideo = true;
     notifyListeners();
     debugPrint("Video size before compression: ${await File(_recordedPath!).length()}");
@@ -103,7 +103,6 @@ class RecordUploadProvider extends ChangeNotifier{
         moodTag: currentMood,
         visibility: visibility,
         createdAt: createdAt);
-
 
     bool isUploaded = await PublishReelService.uploadReel(reel: reel);
     if(isUploaded){

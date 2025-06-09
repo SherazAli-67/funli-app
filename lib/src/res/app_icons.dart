@@ -73,6 +73,7 @@ class AppIcons {
   static const String onboarding3 = 'assets/icons/onboarding_img3.png';
   static const emojiHappyMoodDetected = 'assets/icons/ic_mood_happy_detected.png';
 
+
   static const icDummyImgUrl = 'https://plus.unsplash.com/premium_photo-1684783848102-7946d8930369?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
   //Lottie Anim
