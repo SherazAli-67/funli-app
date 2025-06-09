@@ -1,6 +1,5 @@
 
 import 'package:funli_app/src/models/reel_model.dart';
-import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/testing/social_media/social_api_service.dart';
 
 class AppData {
@@ -29,9 +28,13 @@ class AppData {
   ];
 
 
-  static String getEmojiByMood(String mood){
+
+/*  static String getEmojiByMood(String mood){
     switch(mood){
       case 'Happy':
+        return AppConstants.happyEmoji;
+
+      case 'Excitement':
         return AppConstants.happyEmoji;
 
       case 'Sad':
@@ -52,7 +55,7 @@ class AppData {
       default:
         return AppConstants.happyEmoji;
     }
-  }
+  }*/
 
   static List<ReelModel> getReels(){
     String userID = 'RurOyejb8iQERN1R9OqJ81eokg02';
@@ -122,7 +125,34 @@ class AppData {
     });
   }
 
-  static List<String> get getMoods => [
-    'Happy', 'Sad', 'Angry', 'Anxious', 'Curious', 'Surprised', 'Exhausted'
+  static List<Map<String, String>> get getMoods => [
+    {'label': 'Happy', 'emoji': '😊'},
+    {'label': 'Excitement', 'emoji': '🤩'},
+    {'label': 'Love', 'emoji': '❤️'},
+    {'label': 'Confident', 'emoji': '😎'},
+    {'label': 'Pride', 'emoji': '🏅'},
+    {'label': 'Care', 'emoji': '🤗'},
+    {'label': 'Curious', 'emoji': '🤔'},
+    {'label': 'Neutral', 'emoji': '😐'},
+    {'label': 'Confused', 'emoji': '😕'},
+    {'label': 'Bored', 'emoji': '😒'},
+    {'label': 'Sad', 'emoji': '😢'},
+    {'label': 'Crying', 'emoji': '😭'},
+    {'label': 'Fear', 'emoji': '😨'},
+    {'label': 'Angry', 'emoji': '😠'},
+    {'label': 'Disgust', 'emoji': '🤢'},
+    {'label': 'Anxiety', 'emoji': '😰'},
+    {'label': 'Contempt', 'emoji': '😤'},
+    {'label': 'Embarrassment', 'emoji': '😳'},
+    {'label': 'Surprise', 'emoji': '😮'},
   ];
+
+  static String getEmojiByMood(String mood) {
+    List<Map<String, String>> map = AppData.getMoods.where((moodData)=> moodData['label']!.toLowerCase() == mood.toLowerCase()).toList();
+    if(map.isNotEmpty){
+      return map.first['emoji'] ?? '😊';
+    }
+
+    return 'Failed';
+  }
 }

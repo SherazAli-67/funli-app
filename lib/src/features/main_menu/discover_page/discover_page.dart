@@ -41,17 +41,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
 
   final TextEditingController locationTextEditingController = TextEditingController();
   final TextEditingController languageTextEditingController = TextEditingController();
-
-/*  void _openFilterSheet() async {
-
-  }
-
-  void _fetchReelsWithFilter() async {
-    final reels = await fetchFilteredReels(currentFilter);
-    setState(() {
-      _reels = reels;
-    });
-  }*/
+  
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +65,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
               onPressed: () async {
                 final newFilter = await showFilterBottomSheet(
                     context, currentFilter);
-                Navigator.of(context).push(MaterialPageRoute(builder: (_)=> FilteredReelsPage(filter: newFilter!)));
+               if(newFilter != null){
+                 Navigator.of(context).push(MaterialPageRoute(builder: (_)=> FilteredReelsPage(filter: newFilter)));
+               }
               }, child: Row(
             spacing: 10,
             children: [
@@ -85,7 +77,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
           ))
         ],
       ),
-      body: SafeArea(child: _buildFeaturesCommenttedWidget()),
+      body: SafeArea(child: _buildDiscoverWidget(context)),
     );
   }
 
@@ -243,8 +235,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                       color: AppColors.yellowAccentColor
                                   ),
                                   padding: EdgeInsets.all(5),
-                                  child: Text(
-                                    AppData.getEmojiByMood(mood.mood),
+                                  child: Text(AppData.getEmojiByMood(mood.mood),
                                     style: TextStyle(fontSize: 30),),
                                 ),
                                 title: Text(mood.mood,

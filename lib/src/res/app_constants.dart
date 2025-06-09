@@ -11,13 +11,18 @@ class AppConstants {
   static const accountSetupSuccessTitle = 'Welcome to the FUNLI Vibe Zone!';
   static const accountSetupSuccessMessage = 'Ready to roll? Your journey starts now!';
 
-  static const happyEmoji = '😄';
+/*  static const happyEmoji = '😊';
+  static const excitedEmoji  = '🤩';
   static const sadEmoji = '😔';
   static const angryEmoji = '😡';
   static const cryingEmoji = '😥';
   static const laughingEmoji = '🤣';
-  static const annoyedEmoji = '😒';
+  static const annoyedEmoji = '😒';*/
 
+  /*
+  * "Happy", "Sad", "Disgust", "Neutral", "Fear", "Angry", "Surprise", "Confused", "Bored", Contempt, Excitement, Embarrassment, Love, Confident, Pride, Anxiety, Care, Curious
+
+  * */
   //Notifications
 
   static const resetEmailSentDescription = 'Your account security is our priority!. We\'ve Sent You a Secure Link To Safely Change your password and Keep your account protected';

@@ -1,5 +1,6 @@
 import 'package:circle_wheel_scroll/circle_wheel_scroll_view.dart' as circle_wheel;
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 
@@ -11,14 +12,7 @@ class MoodSelectingScrollWheelWidget extends StatefulWidget{
 }
 
 class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWheelWidget> {
-  final List<Map<String, String>> moods = [
-    {'emoji': AppConstants.sadEmoji, 'label': 'Sad'},
-    {'emoji': AppConstants.cryingEmoji, 'label': 'Crying'},
-    {'emoji': AppConstants.happyEmoji, 'label': 'Happy'},
-    {'emoji': AppConstants.annoyedEmoji, 'label': 'Annoyed'},
-    {'emoji': AppConstants.laughingEmoji, 'label': 'Laughing'},
-    {'emoji': AppConstants.angryEmoji, 'label': 'Angry'},
-  ];
+  final List<Map<String, String>> moods = AppData.getMoods;
 
   int currentIndex = 2;
   late circle_wheel.FixedExtentScrollController _controller;
