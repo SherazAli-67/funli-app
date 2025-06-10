@@ -105,6 +105,7 @@ class RecordUploadProvider extends ChangeNotifier{
         createdAt: createdAt);
 
     bool isUploaded = await PublishReelService.uploadReel(reel: reel);
+    _resetData();
     if(isUploaded){
       FirebaseNotificationsService.show(
         title: "Upload Completed",
@@ -125,6 +126,58 @@ class RecordUploadProvider extends ChangeNotifier{
     );
   }
 
+  Future<void> saveToDrafts({required String caption, required String visibility})async{
+    notifyListeners();
+    debugPrint("Video size before compression: ${await File(_recordedPath!).length()}");
+    File thumbnailPath = await VideoCompress.getFileThumbnail(_recordedPath!);
+
+    final MediaInfo? compressedVideo = await VideoCompress.compressVideo(
+      _recordedPath!,
+      quality: VideoQuality.MediumQuality,
+      deleteOrigin: false, // Set true to delete original file
+    );
+
+    if (compressedVideo == null || compressedVideo.file == null) {
+      throw Exception('Video compression failed');
+    }
+    debugPrint("Video size after compression: ${await compressedVideo.file!.length()}");
+    String reelID = DateTime.now().microsecondsSinceEpoch.toString();
+
+    String? thumbnailUrl = await PublishReelService.getThumbnailUrl(reelID: reelID, file: thumbnailPath);
+    String? videoUrl = await PublishReelService.getReelUploadedUrl(reelID: reelID, file: compressedVideo.file!);
+
+    String userID = FirebaseAuth.instance.currentUser!.uid;
+    DateTime createdAt = DateTime.now();
+    ReelModel reel = ReelModel(reelID: reelID,
+        userID: userID,
+        videoUrl: videoUrl!,
+        thumbnailUrl: thumbnailUrl!,
+        caption: caption,
+        hashtags: [],
+        mentions: [],
+        commentsCount: 0,
+        shareCount: 0,
+        moodTag: currentMood,
+        visibility: visibility,
+        createdAt: createdAt);
+
+    bool isUploaded = await PublishReelService.saveToDrafts(reel: reel);
+    _resetData();
+    if(isUploaded){
+      FirebaseNotificationsService.show(
+        title: "Upload Completed",
+        body: 'Your reel has been added to drafts.',
+      );
+    }
+  }
+
+  void _resetData(){
+    _currentMood = 'Happy';
+    isMuted = false;
+    _recordedPath = null;
+    playbackSpeed = 1;
+    notifyListeners();
+  }
  /* void publishReels() {
     List<ReelModel> reels = AppData.getReels();
     reels.forEach((reel) async {

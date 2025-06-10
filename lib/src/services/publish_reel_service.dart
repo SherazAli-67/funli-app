@@ -51,6 +51,22 @@ class PublishReelService {
     return uploaded;
   }
 
+  static Future<bool> saveToDrafts({required ReelModel reel})async{
+    bool uploaded = false;
+    String userID = FirebaseAuth.instance.currentUser!.uid;
+    try{
+      await FirebaseFirestore.instance
+          .collection(FirebaseConstants.userCollection)
+          .doc(userID).collection(FirebaseConstants.draftsCollection).doc(reel.reelID)
+          .set(reel.toMap());
+
+      uploaded = true;
+
+    }catch(e){
+      debugPrint("Failed to upload reel: ${e.toString()}");
+    }
+    return uploaded;
+  }
   static Future<void> addReelToHashtag({
     required String hashtag,
     required String reelID,

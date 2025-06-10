@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
@@ -8,6 +9,7 @@ import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
+import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/mood_selecting_scroll_wheel_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
@@ -178,7 +180,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
                               padding: EdgeInsets.symmetric(vertical: 15),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             ),
-                            onPressed: (){}, child: Text("Save as draft", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.black),)),
+                            onPressed: _onSaveAsDraft, child: Text("Save as draft", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.black),)),
                       ),
                     ],
                   )
@@ -277,9 +279,46 @@ class _PublishReelPageState extends State<PublishReelPage> {
         ),
       );
     });
-  /*  ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Uploading your video. You’ll be notified once it’s done.')),
-    );
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);*/
+  }
+
+  void _onSaveAsDraft(){
+    //Show draft dialog
+    showDialog(
+        context: context, builder: (ctx){
+      return CupertinoAlertDialog(
+        content: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 10,
+            children: [
+              Text("Save as draft?", textAlign: TextAlign.center, style: AppTextStyles.headingTextStyle3,),
+              Text("Drafts let you save your edits, so you can come back later", style: AppTextStyles.bodyTextStyle,),
+
+            ],
+          ),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: (){
+              String caption = captionController.text;
+              context.read<RecordUploadProvider>().saveToDrafts(caption: caption, visibility: visibility,);
+              Navigator.of(context).pop();
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);
+            },
+            child: GradientTextWidget(gradient: AppGradients.primaryGradient, text: "Save Draft", textStyle: AppTextStyles.buttonTextStyle,),
+          ),
+          CupertinoDialogAction(
+            onPressed: (){
+              Navigator.of(context).pop();
+            },
+            child: Text("Discard", style: AppTextStyles.buttonTextStyle,),
+          )
+        ],
+      );
+    });
+
+
   }
 }
