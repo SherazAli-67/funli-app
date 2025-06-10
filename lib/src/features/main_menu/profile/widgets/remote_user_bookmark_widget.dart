@@ -2,10 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/models/reel_model.dart';
+import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
+import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/reel_likes_count.dart';
 
 import '../../../../services/reels_service.dart';
@@ -14,22 +16,15 @@ class BookmarkWidget extends StatefulWidget {
   const BookmarkWidget({
     super.key,
     required String userID,
-    String? userName,
-    String? profilePicture
-  })
-      : _userID = userID,
-        _userName = userName,
-        _profilePicture = profilePicture;
+  }) : _userID = userID;
 
   final String _userID;
-  final String? _userName;
-  final String? _profilePicture;
   @override
   State<BookmarkWidget> createState() => _BookmarkWidgetState();
 }
 
 class _BookmarkWidgetState extends State<BookmarkWidget> {
-  final List<DocumentSnapshot> _reels = [];
+  final List<Map<String, dynamic>> _reels = [];
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
   bool _hasMore = true;
@@ -56,8 +51,10 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
     });
 
     Query query = FirebaseFirestore.instance
-        .collection(FirebaseConstants.userCollection).doc(widget._userID).collection(FirebaseConstants.draftsCollection)
-        .orderBy("createdAt", descending: true)
+        .collection(FirebaseConstants.userCollection)
+        .doc(widget._userID)
+        .collection(FirebaseConstants.bookmarksCollection)
+        .orderBy("timestamp", descending: true)
         .limit(_limit);
 
     if (_lastDocument != null && !isFirstTime) {
@@ -67,9 +64,22 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
     final querySnapshot = await query.get();
     final docs = querySnapshot.docs;
 
+
     if (docs.isNotEmpty) {
-      _lastDocument = docs.last;
-      _reels.addAll(docs);
+      _lastDocument = querySnapshot.docs.last;
+      for (var doc in querySnapshot.docs) {
+        final reelID = doc.id;
+        final reelSnap = await FirebaseFirestore.instance
+            .collection(FirebaseConstants.reelsCollection)
+            .doc(reelID)
+            .get();
+
+        if (reelSnap.exists) {
+          _reels.add(reelSnap.data()!..["id"] = reelSnap.id);
+        }
+      }
+      /*_lastDocument = docs.last;
+      _reels.addAll(docs);*/
     }
 
     setState(() {
@@ -105,7 +115,7 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        ReelModel reel = ReelModel.fromMap( _reels[index].data() as Map<String, dynamic>);
+        ReelModel reel = ReelModel.fromMap( _reels[index]);
         final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
 
         return GestureDetector(
@@ -128,22 +138,28 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
                   top: 10,
                   left: 5,
                   right: 5,
-                  child: Row(
-                    spacing: 5,
-                    children: [
+                  child: FutureBuilder(future: UserService.getUserByID(userID: reel.userID), builder: (ctx, snapshot){
+                    if(snapshot.hasData && snapshot.requireData != null){
+                      UserModel user = snapshot.requireData!;
+                      return Row(
+                        spacing: 5,
+                        children: [
 
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundColor: AppColors.purpleColor,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 19,
-                          backgroundImage: CachedNetworkImageProvider(widget._profilePicture ?? AppIcons.icDummyImgUrl),
-                        ),
-                      ),
-                      Expanded(child: Text(widget._userName ?? '', style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
-                    ],
-                  )),
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: AppColors.purpleColor,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white,
+                              radius: 19,
+                              backgroundImage: CachedNetworkImageProvider(user.profilePicture ?? AppIcons.icDummyImgUrl),
+                            ),
+                          ),
+                          Expanded(child: Text(user.userName, style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
+                        ],
+                      );
+                    }
+                    return SizedBox();
+                  })),
               Positioned(
                   bottom: 10,
                   left: 10,

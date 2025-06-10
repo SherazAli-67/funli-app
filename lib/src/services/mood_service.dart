@@ -12,7 +12,10 @@ class MoodService {
 
   static Future<List<ReelModel>> getReelsbyMood({required String mood})async{
     List<ReelModel> reels = [];
-    QuerySnapshot querySnapshot = await _moodCollectionRef.doc(mood).collection(FirebaseConstants.reelsCollection).get();
+    QuerySnapshot querySnapshot = await _moodCollectionRef
+        .doc(mood)
+        .collection(FirebaseConstants.reelsCollection)
+        .get();
     List<String> reelIDs = querySnapshot.docs.map((doc)=> doc.id).toList();
 
     for (var reelID in reelIDs) {

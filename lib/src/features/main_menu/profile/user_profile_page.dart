@@ -143,7 +143,7 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
                   controller: _tabController,
                   children: [
                     RemoteUserReelsWidget(userID: userID, userName: userName, profilePicture: profilePicture),
-                    BookmarkWidget(userID: userID, userName: userName, profilePicture: profilePicture),
+                    BookmarkWidget(userID: userID,),
                     SizedBox()
                   ],
                 ),

@@ -18,12 +18,10 @@ import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/hashtag_service.dart';
 import 'package:funli_app/src/services/mood_service.dart';
-import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/gradient_icon.dart';
 import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
-import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
 
 import '../../../models/filter_model.dart';
