@@ -14,6 +14,7 @@ import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/app_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
+import 'package:funli_app/src/widgets/post_bookmark_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:whitecodel_reels/models/video_model.dart';
 import 'package:whitecodel_reels/whitecodel_reels.dart';
@@ -267,6 +268,7 @@ class _ReelsPageState extends State<ReelsPage> {
                         ),
                         PostLikeWidget(reel: reel, iconColor: Colors.white, isReel: true,),
                         PostCommentWidget(iconColor: Colors.white, isReel: true, reel: reel,),
+                        PostBookmarkWidget(reelID: reel.reelID,),
                         PostShareWidget( iconColor: Colors.white,),
                       ],
                     ),

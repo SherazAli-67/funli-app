@@ -217,4 +217,31 @@ class ReelsService {
 
     return null;
   }
+
+  static Stream<bool> getIsBookmarked({required String reelID}) {
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    return FirebaseFirestore.instance.collection(
+        FirebaseConstants.userCollection)
+        .doc(currentUID).collection(
+        FirebaseConstants.bookmarksCollection)
+        .doc(reelID).snapshots().map((snapshot) => snapshot.exists);
+  }
+
+  static Future<void> toggleBookmark({required String reelID, required bool isRemoval}) async {
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    DocumentReference docRef =  FirebaseFirestore.instance.collection(
+        FirebaseConstants.userCollection)
+        .doc(currentUID).collection(
+        FirebaseConstants.bookmarksCollection)
+        .doc(reelID);
+
+    if(isRemoval){
+     await docRef.delete();
+    }else{
+     await  docRef.set({
+        'reelID' : reelID,
+        'timestamp': Timestamp.now()
+      });
+    }
+  }
 }
