@@ -130,7 +130,7 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
                     controller: _tabController,
                     children: [
                       RemoteUserReelsWidget(userID: widget._userID, userName: widget._userName,),
-                      RemoteUserBookmarkWidget()
+                      BookmarkWidget(userID: widget._userID,)
                     ],
                   ),
                 )
