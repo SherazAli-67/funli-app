@@ -28,7 +28,7 @@ void main() async{
         ChangeNotifierProvider(create: (_)=> RecordUploadProvider()),
         ChangeNotifierProvider(create: (_)=> ReelProvider()),
         ChangeNotifierProvider(create: (_)=> SizeProvider()),
-        ChangeNotifierProvider(create: (_)=> ProfileProvider()),
+        ChangeNotifierProvider(create: (_)=> ProfileProvider()..initUserProfile()),
       ],
       child: const MyApp()));
 }

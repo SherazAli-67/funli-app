@@ -24,7 +24,7 @@ class AuthService {
     if (userCredential.user != null) {
       Map<String, dynamic> userMap = {
         'userID': userCredential.user!.uid,
-        'name': userName,
+        'userName': userName,
         'email': email
       };
       await _userColRef.doc(userCredential.user!.uid).set(userMap);

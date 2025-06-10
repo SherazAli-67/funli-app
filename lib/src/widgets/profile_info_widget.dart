@@ -40,7 +40,7 @@ class ProfileInfoWidget extends StatelessWidget{
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       FutureBuilder(
-                          future: UserService.getUserPostsCount(userID: _userID),
+                          future: UserService.getUserReelsCount(userID: _userID),
                           builder: (ctx, snapshot){
                             if(snapshot.hasData){
                               return _buildUserInfoWidget(title: 'Posts', totalCount: snapshot.requireData);
@@ -77,7 +77,7 @@ class ProfileInfoWidget extends StatelessWidget{
                           }),
 
                       FutureBuilder(
-                          future: UserService.getUserPostsCount(userID: _userID),
+                          future: UserService.getUserReelsCount(userID: _userID),
                           builder: (ctx, snapshot){
                             if(snapshot.hasData){
                               return _buildUserInfoWidget(title: 'Likes', totalCount: snapshot.requireData, isLast: true);

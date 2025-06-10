@@ -101,16 +101,16 @@ class UserService {
     });
   }
 
-  static Future<int> getUserPostsCount({required String userID}) async{
-    final countQuery = await FirebaseFirestore.instance
+  static Future<int> getUserReelsCount({required String userID}) async{
+    final userDocSnap = await FirebaseFirestore.instance
         .collection(FirebaseConstants.userCollection)
-        .doc(userID)
-        .collection(FirebaseConstants.reelsCollection)
-        .count()
-        .get();
+        .doc(userID).get();
 
-    final totalCount = countQuery.count ?? 0;
-    return totalCount;
+    if(userDocSnap.exists){
+      return userDocSnap.data()!['reelsPosted'] ?? 0;
+    }
+
+    return 0;
   }
   static Future<int> getUserFollowersCount({required String userID}) async{
     final countQuery = await FirebaseFirestore.instance

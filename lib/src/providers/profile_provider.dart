@@ -37,12 +37,13 @@ class ProfileProvider extends ChangeNotifier{
 
   int get selectedTab => _selectedTab;
 
-  ProfileProvider(){
+ /* ProfileProvider(){
 
     initUserProfile();
-  }
+  }*/
 
   void initUserProfile() async{
+    debugPrint("Method invoked");
     _isProfileLoading = true;
     notifyListeners();
     _currentUser = await UserService.getUserByID(userID: _currentUID);

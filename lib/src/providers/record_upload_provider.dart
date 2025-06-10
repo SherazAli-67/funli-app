@@ -113,6 +113,8 @@ class RecordUploadProvider extends ChangeNotifier{
       );
     }
 
+    //Add reel to user collection
+    PublishReelService.addReelToUser(reelID: reel.reelID);
     List<String> hashtags = HashtagHelper.extractHashtags(reel.caption);
     for (var hashtag in hashtags) {
       PublishReelService.addReelToHashtag(hashtag: hashtag, reelID: reelID);

@@ -158,4 +158,12 @@ class PublishReelService {
       debugPrint("Error adding reel to mood: $e");
     }
   }
+
+  static Future<void> addReelToUser({required String reelID})async {
+    String userID = FirebaseAuth.instance.currentUser!.uid;
+    await FirebaseFirestore.instance.collection(FirebaseConstants.userCollection).doc(userID).collection(FirebaseConstants.reelsCollection).doc(reelID).set({
+      "reelID" : reelID,
+      "timestamp" : Timestamp.now()
+    });
+  }
 }
