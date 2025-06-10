@@ -233,7 +233,7 @@ class _ReelsPageState extends State<ReelsPage> {
                                 ),
                                 child: CircleAvatar(
                                   radius: 30,
-                                  backgroundImage: CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
+                                  backgroundImage: CachedNetworkImageProvider( _userModel != null ? _userModel!.profilePicture ?? AppIcons.icDummyImgUrl: AppIcons.icDummyImgUrl),
                                 ),
                               ),
                             ),

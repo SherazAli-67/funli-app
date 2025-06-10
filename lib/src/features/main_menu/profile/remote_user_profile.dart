@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
+import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -70,6 +71,7 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
               ),
             if(!_isFromProfilePage)
             Column(
+              spacing: 10,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
@@ -87,9 +89,12 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
                           itemCount: snapshot.requireData.length,
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (_, index){
+                            ReelModel reel = snapshot.requireData[index];
                             return Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: CachedNetworkImage(imageUrl: AppIcons.icDummyImgUrl, fit: BoxFit.cover,),
+                              padding: const EdgeInsets.only(left: 16.0),
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: CachedNetworkImage(imageUrl: reel.thumbnailUrl ?? AppIcons.icDummyImgUrl, fit: BoxFit.cover,)),
                             );
                           });
                     }else if(snapshot.connectionState == ConnectionState.waiting){
