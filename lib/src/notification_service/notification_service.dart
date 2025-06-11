@@ -118,7 +118,7 @@ class FirebaseNotificationsService {
           android: AndroidNotificationDetails(
             channelId,
             channelDesc,
-            icon: 'pickle_ball',
+            icon: 'ic_launcher',
             importance: Importance.high,
             priority: Priority.high,
           ),

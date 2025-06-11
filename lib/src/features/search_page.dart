@@ -79,33 +79,36 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                 ),
-                Row(
-                  spacing: 5,
-                  children: [
-                    SizedBox(
-                      height: 35,
-                      width: 100,
-                      child: selectedIndex == 0
-                          ?  PrimaryBtn(btnText: "Feels", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
-                          : SecondaryBtn(btnText: "Feels", icon: '', onTap: ()=> _onSelectFilterTypeTap(0), textStyle: AppTextStyles.bodyTextStyle,),
-                    ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    spacing: 5,
+                    children: [
+                      SizedBox(
+                        height: 35,
+                        width: 100,
+                        child: selectedIndex == 0
+                            ?  PrimaryBtn(btnText: "Feels", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
+                            : SecondaryBtn(btnText: "Feels", icon: '', onTap: ()=> _onSelectFilterTypeTap(0), textStyle: AppTextStyles.bodyTextStyle,),
+                      ),
 
-                    SizedBox(
-                      height: 35,
-                      width: 100,
-                      child: selectedIndex == 1
-                          ?  PrimaryBtn(btnText: "Users", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
-                          : SecondaryBtn(btnText: "Users", icon: '', onTap: ()=> _onSelectFilterTypeTap(1), textStyle: AppTextStyles.bodyTextStyle,),
-                    ),
+                      SizedBox(
+                        height: 35,
+                        width: 100,
+                        child: selectedIndex == 1
+                            ?  PrimaryBtn(btnText: "Users", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
+                            : SecondaryBtn(btnText: "Users", icon: '', onTap: ()=> _onSelectFilterTypeTap(1), textStyle: AppTextStyles.bodyTextStyle,),
+                      ),
 
-                    SizedBox(
-                      height: 35,
-                      width: 127,
-                      child: selectedIndex == 2
-                          ?  PrimaryBtn(btnText: "Hashtags", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
-                          : SecondaryBtn(btnText: "Hashtags", icon: '', onTap: ()=> _onSelectFilterTypeTap(2), textStyle: AppTextStyles.bodyTextStyle,),
-                    ),
-                  ],
+                      SizedBox(
+                        height: 35,
+                        width: 127,
+                        child: selectedIndex == 2
+                            ?  PrimaryBtn(btnText: "Hashtags", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
+                            : SecondaryBtn(btnText: "Hashtags", icon: '', onTap: ()=> _onSelectFilterTypeTap(2), textStyle: AppTextStyles.bodyTextStyle,),
+                      ),
+                    ],
+                  ),
                 )
               ],
             ),

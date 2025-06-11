@@ -13,7 +13,8 @@ class SearchService {
 
   static Stream<List<ReelModel>> getReelsStream(String query)  {
     return _reelsColRef.where('userName', isGreaterThanOrEqualTo: query)
-        .where('userName', isLessThan: '${query}z').snapshots().map((
+        .where('userName', isLessThan: '${query}z')
+        .snapshots().map((
         snapshot) =>
         snapshot.docs.map((doc) => ReelModel.fromMap(doc.data())).toList());
   }

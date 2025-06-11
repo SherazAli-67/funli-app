@@ -26,52 +26,53 @@ class ProfileSettingsPage extends StatelessWidget{
         leadingWidth: 30,
         centerTitle: false,
       ),
-      body: SafeArea(child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 30,
-        children: [
-          ListTile(
-            onTap: (){
-              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> EditProfilePage()));
-            },
-            contentPadding: EdgeInsets.zero,
-            leading: ProfilePictureWidget(profilePicture: _currentUser.profilePicture),
-            title: Text(_currentUser.userName, style: AppTextStyles.tileTitleTextStyle,),
-            subtitle: Text("${getAgeByDOB(_currentUser.dob!)}, ${_currentUser.gender}"),
-            trailing: Container(
-                padding: EdgeInsets.all(5),
-                margin: EdgeInsets.only(right: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: AppGradients.primaryGradient,
-
-                ),
-                child: Icon(Icons.edit, color: Colors.white,)
+      body: SafeArea(child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 30,
+          children: [
+            ListTile(
+              onTap: (){
+                Navigator.of(context).push(MaterialPageRoute(builder: (_)=> EditProfilePage()));
+              },
+              contentPadding: EdgeInsets.zero,
+              leading: ProfilePictureWidget(profilePicture: _currentUser.profilePicture),
+              title: Text(_currentUser.userName, style: AppTextStyles.tileTitleTextStyle,),
+              subtitle: Text("${getAgeByDOB(_currentUser.dob!)}, ${_currentUser.gender}"),
+              trailing: Container(
+                  padding: EdgeInsets.all(5),
+                  margin: EdgeInsets.only(right: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: AppGradients.primaryGradient,
+        
+                  ),
+                  child: Icon(Icons.edit, color: Colors.white,)
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("App Settings", style: AppTextStyles.subHeadingTextStyle,),
-                SettingsItemWidget(icon: AppIcons.icVisibility, title: 'Dark Mode',  isSwitch: true,),
-                SettingsItemWidget(icon: AppIcons.icSecurity, title: 'Security & Privacy',),
-                SettingsItemWidget(icon: AppIcons.icVideo, title: 'Content Preferences',),
-                SettingsItemWidget(icon: AppIcons.icEdit, title: 'Report a Problem', ),
-                SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Dark Mode',),
-                SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Help Center',),
-                SettingsItemWidget(icon: AppIcons.icTermsPrivacy, title: 'Terms & Service', ),
-
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("App Settings", style: AppTextStyles.subHeadingTextStyle,),
+                  SettingsItemWidget(icon: AppIcons.icVisibility, title: 'Dark Mode',  isSwitch: true,),
+                  SettingsItemWidget(icon: AppIcons.icSecurity, title: 'Security & Privacy',),
+                  SettingsItemWidget(icon: AppIcons.icVideo, title: 'Content Preferences',),
+                  SettingsItemWidget(icon: AppIcons.icEdit, title: 'Report a Problem', ),
+                  SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Dark Mode',),
+                  SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Help Center',),
+                  SettingsItemWidget(icon: AppIcons.icTermsPrivacy, title: 'Terms & Service', ),
+        
+                ],
+              ),
             ),
-          ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: SettingsItemWidget(title: "Logout", icon: AppIcons.icLogout, isLogout: true, onTap: ()=> _onLogoutTap(context),),
-          )
-        ],
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: SettingsItemWidget(title: "Logout", icon: AppIcons.icLogout, isLogout: true, onTap: ()=> _onLogoutTap(context),),
+            )
+          ],
+        ),
       )),
     );
   }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile.dart';
+import 'package:funli_app/src/loading_shimmers/reels_shimmer_widget.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
@@ -89,9 +90,7 @@ class _ReelsPageState extends State<ReelsPage> {
     return SizedBox.expand(
         child: WhiteCodelReels(
             context: context,
-            loader: const Center(
-              child: CircularProgressIndicator(),
-            ),
+            loader: ReelsShimmerWidget(),
             // loader: Expanded(child: Text("Loading", style: AppTextStyles.headingTextStyle3.copyWith(color: AppColors.purpleColor),)),
             isCaching: true,
             videoList:

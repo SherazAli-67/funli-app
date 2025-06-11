@@ -79,12 +79,10 @@ class _DiscoverPageState extends State<DiscoverPage> {
     );
   }
 
-  SingleChildScrollView _buildDiscoverWidget(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 20,
+  Widget _buildDiscoverWidget(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 18.0, right: 18, top: 8, bottom: 100),
+      child: ListView(
         children: [
           TextField(
             readOnly: true,
@@ -108,6 +106,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
               prefixIcon: Icon(Icons.search, color: AppColors.greyTextColor,),
             ),
           ),
+          const SizedBox(height: 20,),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -205,10 +204,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
 
             ],
           ),
+          const SizedBox(height: 20,),
           Text("Trending Feels",
             style: AppTextStyles.buttonTextStyle.copyWith(
                 fontWeight: FontWeight.w700),),
-
+          const SizedBox(height: 20,),
           FutureBuilder(future: HashtagService.getTrendingMoods(),
               builder: (ctx, snapshot) {
                 if (snapshot.hasData) {
