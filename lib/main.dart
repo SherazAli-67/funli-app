@@ -44,8 +44,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_)=> AuthCubit())
       ],
       child: MaterialApp(
-        title: AppConstants.appTitle,
-          navigatorObservers: [routeObserver],
+        title: AppConstants.appTitle, navigatorObservers: [routeObserver],
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           fontFamily: AppConstants.appFontFamily,

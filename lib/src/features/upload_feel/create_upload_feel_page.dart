@@ -198,7 +198,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                           IconButton(onPressed: ()async{
                             String? selectedVideoPath = await _onSelectVideoFromGalleryTap();
                             if(selectedVideoPath != null){
-                              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> EditUploadedFeelPage(videoPath: selectedVideoPath)));
+                              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_)=> EditUploadedFeelPage(videoPath: selectedVideoPath)));
                             }
                           }, icon: SvgPicture.asset(AppIcons.icUpload))
                         ],

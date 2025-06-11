@@ -1,6 +1,5 @@
 // screens/reels_screen.dart
 import 'dart:async';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -18,7 +17,6 @@ import 'package:funli_app/src/widgets/post_bookmark_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:whitecodel_reels/models/video_model.dart';
 import 'package:whitecodel_reels/whitecodel_reels.dart';
-
 import '../../../providers/reels_provider.dart';
 import '../../../res/app_icons.dart';
 import '../../../res/app_textstyles.dart';
@@ -62,6 +60,12 @@ class _ReelsPageState extends State<ReelsPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<ReelProvider>(
       builder: (context, provider, _) {
@@ -75,13 +79,13 @@ class _ReelsPageState extends State<ReelsPage> {
           return const Center(child: Text("No reels available."));
         }
 
-        return buildReelsWidget(context, reels);
+        return buildReelsWidget(context, reels,);
 
       },
     );
   }
 
-  SizedBox buildReelsWidget(BuildContext context, List<ReelModel> reels) {
+  SizedBox buildReelsWidget(BuildContext context, List<ReelModel> reels,) {
     return SizedBox.expand(
         child: WhiteCodelReels(
             context: context,
@@ -115,7 +119,6 @@ class _ReelsPageState extends State<ReelsPage> {
                 double videoProgress = position.inMilliseconds / duration.inMilliseconds;
                 videoProgressController.add(videoProgress);
               });
-
 
               ReelsService.addViewToReel(reelID: reel.reelID);
               bool isPortrait = videoPlayerController.value.size.height > videoPlayerController.value.size.width;

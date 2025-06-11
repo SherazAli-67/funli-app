@@ -57,6 +57,7 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
   Widget build(BuildContext context) {
     _provider = Provider.of<RecordUploadProvider>(context);
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
           Stack(

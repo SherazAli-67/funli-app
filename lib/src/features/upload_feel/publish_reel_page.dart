@@ -254,8 +254,8 @@ class _PublishReelPageState extends State<PublishReelPage> {
 
   }
 
-  void navigationCallback(){
-    showModalBottomSheet(
+  void navigationCallback()async{
+   final result = await showModalBottomSheet(
         backgroundColor: Colors.white,
         context: context, builder: (ctx){
       return Padding(
@@ -279,6 +279,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
         ),
       );
     });
+   debugPrint("Came below");
   }
 
   void _onSaveAsDraft(){

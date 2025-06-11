@@ -50,8 +50,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
         elevation: 0,
         title: Text("Discover", style: AppTextStyles.headingTextStyle3,),
         centerTitle: false,
-        leading: IconButton(
-            onPressed: () {}, icon: Icon(Icons.arrow_back_ios_new_rounded)),
+       /* leading: IconButton(
+            onPressed: () {}, icon: Icon(Icons.arrow_back_ios_new_rounded)),*/
         leadingWidth: 30,
         actions: [
           ElevatedButton(
@@ -337,6 +337,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
   Future<ReelFilter?> showFilterBottomSheet(BuildContext context, ReelFilter currentFilter) {
     return showModalBottomSheet<ReelFilter>(
       context: context,
+      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       isScrollControlled: true,

@@ -38,7 +38,7 @@ class PostCommentWidget extends StatelessWidget{
                   return Padding(
                       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                       child: FractionallySizedBox(
-                        heightFactor: 0.8,
+                        heightFactor: 0.7,
                         child: CommentsPage(reel: reel,),
                       ));
                 },

@@ -99,11 +99,13 @@ class _CommentsPageState extends State<CommentsPage> {
                           Expanded(child: TextField(
                             controller: _commentController,
                             focusNode: _focusNode,
+
                             decoration: InputDecoration(
                                 border: InputBorder.none,
                                 enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
                                 hintText: "Say something nice...",
+                                prefixIcon: IconButton(onPressed: (){}, icon: Icon(Icons.emoji_emotions_outlined)),
                                 hintStyle: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.commentHintTextColor)
                             ),
                           ))

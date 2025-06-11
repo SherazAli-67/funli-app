@@ -1,4 +1,4 @@
-package com.example.funli_app
+package com.funtech.funli
 
 import io.flutter.embedding.android.FlutterActivity
 

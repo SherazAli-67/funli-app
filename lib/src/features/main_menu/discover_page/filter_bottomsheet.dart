@@ -3,7 +3,6 @@ import 'package:funli_app/src/models/filter_model.dart';
 
 import '../../../res/app_icons.dart';
 import '../../../res/app_textstyles.dart';
-import '../../../widgets/app_textfield.dart';
 import '../../../widgets/primary_btn.dart';
 import '../../../widgets/secondary_btn.dart';
 import '../../../widgets/secondary_gradient_btn.dart';

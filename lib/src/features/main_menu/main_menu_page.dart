@@ -6,6 +6,7 @@ import 'package:funli_app/src/features/main_menu/discover_page/discover_page.dar
 import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:provider/provider.dart';
+import '../../../main.dart';
 import '../../notification_service/notification_service.dart';
 import '../../providers/size_provider.dart';
 import '../../providers/tab_change_provider.dart';
@@ -19,7 +20,7 @@ class MainMenuPage extends StatefulWidget{
   State<MainMenuPage> createState() => _MainMenuPageState();
 }
 
-class _MainMenuPageState extends State<MainMenuPage> {
+class _MainMenuPageState extends State<MainMenuPage> with RouteAware{
 
   final List<Widget> _pages = [
     SizedBox.expand(child: const ReelsPage()),
@@ -27,11 +28,24 @@ class _MainMenuPageState extends State<MainMenuPage> {
     SizedBox.expand(child: const NotificationPage()),
     SizedBox.expand(child: const UserProfilePage()),
   ];
+
   @override
   void initState() {
+
     _initNotificationService();
     _initSize();
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    routeObserver.subscribe(this, ModalRoute.of(context)! as PageRoute);
+    super.didChangeDependencies();
+  }
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
   }
   @override
   Widget build(BuildContext context) {

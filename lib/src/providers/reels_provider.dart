@@ -16,6 +16,8 @@ class ReelProvider with ChangeNotifier {
   ReelProvider(){
     _initCachedViewedReels();
   }
+
+
   final ReelsService _service = ReelsService();
   String?_currentUserID;
   String? _selectedMood;

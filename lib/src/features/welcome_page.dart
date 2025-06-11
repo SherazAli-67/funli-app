@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,7 +91,8 @@ class WelcomePage extends StatelessWidget {
                       spacing: 20,
                       children: [
                         Expanded(child: SecondaryBtn(btnText: "Google", icon: AppIcons.icGoogle, onTap: ()=> _onSignInWithGoogleTap(context), isPrefix: true,borderRadius: 16,),),
-                        Expanded(child: SecondaryBtn(btnText: "Apple", icon: AppIcons.icApple, onTap: (){}, isPrefix: true, borderRadius: 16,))
+                        if(Platform.isIOS)
+                          Expanded(child: SecondaryBtn(btnText: "Apple", icon: AppIcons.icApple, onTap: (){}, isPrefix: true, borderRadius: 16,))
 
                       ],
                     )

@@ -21,9 +21,11 @@ class ReelsService {
     required void Function(bool) onHasMore,
   }) async {
     List<ReelModel> fetchedReels = [];
-
+    debugPrint("Selected mood: $selectedMood");
     try {
-      Query baseQuery = _reelsColRef.orderBy('createdAt', descending: true);
+      Query baseQuery = _reelsColRef
+          // .where("moodTag", isEqualTo: selectedMood)
+          .orderBy('createdAt', descending: true);
 
       final snapshot = await baseQuery.get();
       if (snapshot.docs.isNotEmpty) {
