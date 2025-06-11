@@ -68,7 +68,8 @@ class _ReelsPageState extends State<ReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ReelProvider>(
+    return _buildCommentWidget();
+    /*return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
 
@@ -83,7 +84,7 @@ class _ReelsPageState extends State<ReelsPage> {
         return buildReelsWidget(context, reels,);
 
       },
-    );
+    );*/
   }
 
   SizedBox buildReelsWidget(BuildContext context, List<ReelModel> reels,) {

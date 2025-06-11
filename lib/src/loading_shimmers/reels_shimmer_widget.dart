@@ -6,8 +6,9 @@ class ReelsShimmerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    Size size = MediaQuery.of(context).size;
+    // final screenHeight = MediaQuery.of(context).size.height;
+    // final screenWidth = MediaQuery.of(context).size.width;
 
     Color baseColor = Colors.grey[300]!;
     Color highlightColor = Colors.grey[100]!;
@@ -18,8 +19,8 @@ class ReelsShimmerWidget extends StatelessWidget {
     return Stack(
       children: [
         Shimmer.fromColors(baseColor: Colors.black, highlightColor:  highlightColor, child: Container(
-          height: screenHeight,
-          width: screenWidth,
+          height: size.height,
+          width: size.width,
           color: Colors.grey,
         )),
 
@@ -68,7 +69,7 @@ class ReelsShimmerWidget extends StatelessWidget {
                     ),
                     Container(
                       height: 20,
-                      width: screenWidth*0.45,
+                      width: size.width*0.45,
                       margin: EdgeInsets.only(top: 10,left: 10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),

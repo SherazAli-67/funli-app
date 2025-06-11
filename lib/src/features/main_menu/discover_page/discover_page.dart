@@ -23,7 +23,9 @@ import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
+import 'package:shimmer/shimmer.dart';
 
+import '../../../loading_shimmers/trending_hashtag_shimmer.dart';
 import '../../../models/filter_model.dart';
 
 class DiscoverPage extends StatefulWidget{
@@ -113,11 +115,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
               Text("Trending Hashtags",
                 style: AppTextStyles.buttonTextStyle.copyWith(
                     fontWeight: FontWeight.w700),),
+
               FutureBuilder(future: HashtagService.getTrendingHashtags(),
                   builder: (ctx, snapshot) {
                     if (snapshot.hasData) {
-                      List<HashtagModel> trendingHashtags = snapshot
-                          .requireData;
+                      List<HashtagModel> trendingHashtags = snapshot.requireData;
                       return Column(
                         children: trendingHashtags.map((hashtag) {
                           return Padding(
@@ -129,10 +131,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(builder: (ctx) =>
-                                              HashtagReelsPage(
-                                                  hashtag: hashtag.tag)));
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => HashtagReelsPage(hashtag: hashtag.tag)));
                                     },
                                     child: RichText(text: TextSpan(
                                       children: [
@@ -140,18 +139,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                           style: AppTextStyles.smallTextStyle
                                               .copyWith(
                                               fontWeight: FontWeight.w700,
-                                              fontFamily: AppConstants
-                                                  .appFontFamily,
-                                              color: Colors.black),),
+                                              fontFamily: AppConstants.appFontFamily, color: Colors.black),),
                                         TextSpan(text: "${FormatingHelpers
                                             .formatNumber(
                                             hashtag.reelsCount)} feels ",
-                                          style: AppTextStyles.smallTextStyle
-                                              .copyWith(
-                                              fontFamily: AppConstants
-                                                  .appFontFamily,
-                                              color: AppColors
-                                                  .hashtagCountGreyColor),),
+                                          style: AppTextStyles.smallTextStyle.copyWith(fontFamily: AppConstants.appFontFamily, color: AppColors.hashtagCountGreyColor),),
                                       ],
 
                                     )),
@@ -196,7 +188,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
                     }
                     else
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return LoadingWidget(color: AppColors.purpleColor,);
+                      return Column(
+                        children: List.generate(4, (index){
+                          return TrendingHashtagShimmerWidget();
+                        }),
+                      );
                     }
 
                     return SizedBox();
@@ -206,9 +202,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
           ),
           const SizedBox(height: 20,),
           Text("Trending Feels",
-            style: AppTextStyles.buttonTextStyle.copyWith(
-                fontWeight: FontWeight.w700),),
+            style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),),
           const SizedBox(height: 20,),
+
           FutureBuilder(future: HashtagService.getTrendingMoods(),
               builder: (ctx, snapshot) {
                 if (snapshot.hasData) {
@@ -347,4 +343,3 @@ class _DiscoverPageState extends State<DiscoverPage> {
     );
   }
 }
-

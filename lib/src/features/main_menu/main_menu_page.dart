@@ -115,9 +115,10 @@ class _MainMenuPageState extends State<MainMenuPage> with RouteAware{
     provider.onTabChange(index);
   }
 
+
+
   Widget _buildBottomNavigationItemWidget({required String icon, required bool isSelected, required VoidCallback onTap}) =>
       IconButton(onPressed: onTap, icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(isSelected ? Colors.black : Colors.white, BlendMode.srcIn),));
-
   void _initNotificationService()async{
     //Get notification permission then
     await FirebaseNotificationsService.requestPermissions().then((value) {});
