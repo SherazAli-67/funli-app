@@ -14,8 +14,8 @@ import '../../res/app_icons.dart';
 import '../upload_feel/create_upload_feel_page.dart';
 
 class MainMenuPage extends StatefulWidget{
-  const MainMenuPage({super.key});
-
+  const MainMenuPage({super.key, this.comingFromNotification = false});
+  final bool comingFromNotification;
   @override
   State<MainMenuPage> createState() => _MainMenuPageState();
 }
@@ -31,7 +31,12 @@ class _MainMenuPageState extends State<MainMenuPage> with RouteAware{
 
   @override
   void initState() {
-
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      if(widget.comingFromNotification){
+        final provider = Provider.of<MainMenuTabChangeProvider>(context, listen: false);
+        provider.onTabChange(2);
+      }
+    });
     _initNotificationService();
     _initSize();
     super.initState();

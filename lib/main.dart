@@ -15,6 +15,7 @@ import 'package:funli_app/src/res/app_constants.dart';
 import 'package:provider/provider.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 
 void main() async{

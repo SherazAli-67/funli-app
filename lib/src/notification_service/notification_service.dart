@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:funli_app/src/services/auth_service.dart';
 
+import '../../main.dart';
+import '../features/main_menu/main_menu_page.dart';
+
 class FirebaseNotificationsService {
   static final notification = FlutterLocalNotificationsPlugin();
   static const String channelId = 'funli-notification';
@@ -73,7 +76,7 @@ class FirebaseNotificationsService {
   }
   static Future<String?> notificationClickAction({required RemoteMessage message,}) async {
     try {
-      // navigatorKey.currentState?.push(MaterialPageRoute(builder: (ctx)=> const MainMenuPage(comingFromNotification: true,)));
+      navigatorKey.currentState?.push(MaterialPageRoute(builder: (ctx)=> const MainMenuPage(comingFromNotification: true,)));
       return null;
     } catch (e) {
       return e.toString();
@@ -146,42 +149,4 @@ class FirebaseNotificationsService {
       FirebaseNotificationsService.notificationClickAction(message: message);
     }
   }
-
-/*static Future<void> sendNotification({required UserModel receiver, required UserModel sender, bool isAcceptHitch = false})async{
-
-    String notificationTitle = 'Hitch Play Request';
-    String notificationBody = 'You have received a new Hitch request from ${sender.userName}';
-    if(isAcceptHitch){
-      notificationTitle = 'Hitch Play Request Accepted';
-      notificationBody = '${sender.userName} accepted your Hitch request';
-    }
-    String serverKey = await FirebaseServerKeyProvider.getServerKey();
-    var dataUpdated = {
-      "message":{
-        "token": receiver.token,
-        "notification":{
-          "body": notificationBody,
-          "title": notificationTitle
-        }
-      }
-    };
-
-    final String firebaseProjectAppID = dotenv.env['FIREBASE_PROJECT_ID']!;
-    await http.post(Uri.parse('https://fcm.googleapis.com/v1/projects/$firebaseProjectAppID/messages:send'),
-        body: jsonEncode(dataUpdated) ,
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization' : 'Bearer $serverKey'
-        }
-    ).then((value){
-
-      if (kDebugMode) {
-        print("Notification sent response: ${value.body}");
-      }
-    }).onError((error, stackTrace){
-      if (kDebugMode) {
-        print(error);
-      }
-    });
-  }*/
 }
