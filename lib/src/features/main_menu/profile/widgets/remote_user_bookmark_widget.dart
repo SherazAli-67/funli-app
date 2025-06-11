@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
@@ -93,7 +94,7 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
   @override
   Widget build(BuildContext context) {
     if (_reels.isEmpty && _isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return ReelsGridShimmer();
     }
 
     if (_reels.isEmpty) {

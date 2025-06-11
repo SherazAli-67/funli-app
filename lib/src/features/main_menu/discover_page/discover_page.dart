@@ -24,8 +24,7 @@ import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
-import 'package:shimmer/shimmer.dart';
-
+import '../../../loading_shimmers/reel_thumbnail_shimmer_item.dart';
 import '../../../loading_shimmers/trending_hashtag_shimmer.dart';
 import '../../../models/filter_model.dart';
 
@@ -346,15 +345,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                 child: ClipRRect(
                                                   borderRadius: BorderRadius.circular(10),
                                                   child: CachedNetworkImage(
-                                                    placeholder: (context, url) =>
-                                                        Shimmer.fromColors(baseColor: Colors.grey[300]!, highlightColor:  Colors.grey[100]!, child: Container(
-                                                          height: 150,
-                                                          width: 100,
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(5),
-                                                            color: Colors.grey,
-                                                          ),
-                                                        )),
+                                                    placeholder: (context, url) => ReelThumbnailShimmerItem(),
                                                     imageUrl: reel.thumbnailUrl ?? AppIcons.icDummyImgUrl,
                                                     height: 150,),
                                                 ),
@@ -408,4 +399,3 @@ class _DiscoverPageState extends State<DiscoverPage> {
     );
   }
 }
-

@@ -1,22 +1,11 @@
 // providers/reel_provider.dart
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/services/reels_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/reel_model.dart';
-import '../res/local_storage_constants.dart';
 
 class ReelProvider with ChangeNotifier {
-  List<String> _cachedReels  = [];
-  List<String> get cachedReels => _cachedReels;
-
-  ReelProvider(){
-    _initCachedViewedReels();
-  }
-
 
   final ReelsService _service = ReelsService();
   String?_currentUserID;
@@ -57,28 +46,4 @@ class ReelProvider with ChangeNotifier {
   }
 
 
-  void _initCachedViewedReels() async{
-    String currentUID = FirebaseAuth.instance.currentUser!.uid;
-    final sharedPreferences = await SharedPreferences.getInstance();
-    //Either get all from firebase
-    final String? storedData =sharedPreferences.getString('${LocalStorageConstants.cachedViewReelsKey}_$currentUID');
-    if (storedData != null) {
-      final List<dynamic> decodedData = json.decode(storedData);
-      _cachedReels = decodedData.map((item) => item.toString()).toList();
-      notifyListeners();
-    }
-  }
-
-  Future<void> addReelToView(String reelID)async{
-    _cachedReels.add(reelID);
-    notifyListeners();
-
-    String currentUID = FirebaseAuth.instance.currentUser!.uid;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('${LocalStorageConstants.cachedViewReelsKey}_$currentUID', json.encode(_cachedReels));
-  }
-
-  bool isReelViewed(String reelID) {
-    return _cachedReels.contains(reelID);
-  }
 }

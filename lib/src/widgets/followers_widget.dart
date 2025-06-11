@@ -142,7 +142,7 @@ class _FollowingAndFollowersBottomSheetState extends State<FollowingAndFollowers
                         onTap: (){
                           Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> RemoteUserProfilePage(userID: user.userID, userName: user.userName, profilePicture: user.profilePicture,)));
                         },
-                        contentPadding: EdgeInsets.zero,
+                        contentPadding: EdgeInsets.symmetric(vertical: 10),
                         leading: ProfilePictureWidget(profilePicture: user.profilePicture),
                         title: Text(user.userName, style: AppTextStyles.buttonTextStyle,),
                         trailing: SizedBox(

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/services/user_service.dart';
@@ -47,7 +48,7 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
   @override
   Widget build(BuildContext context) {
     return _reels.isEmpty && _isLoading
-        ? LoadingWidget()
+        ? ReelsGridShimmer()
         : GridView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.all(8),
@@ -157,7 +158,7 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
           .collection(FirebaseConstants.hashtagsCollections)
           .doc(widget.tag)
           .collection(FirebaseConstants.reelsCollection)
-      // .orderBy("createdAt", descending: true)
+          .orderBy("createdAt", descending: true)
           .limit(10);
 
       if(widget.isComingFromMood){
@@ -165,7 +166,7 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
             .collection(FirebaseConstants.moodsCollection)
             .doc(widget.tag)
             .collection(FirebaseConstants.reelsCollection)
-        // .orderBy("createdAt", descending: true)
+            .orderBy("createdAt", descending: true)
             .limit(10);
       }
       final snapshot = _lastDoc == null
