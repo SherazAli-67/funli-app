@@ -8,6 +8,7 @@ import 'package:funli_app/src/features/main_menu/discover_page/filtered_reels_pa
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
 import 'package:funli_app/src/features/search_page.dart';
 import 'package:funli_app/src/helpers/formatting_helpers.dart';
+import 'package:funli_app/src/loading_shimmers/trending_feels_widget.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
 import 'package:funli_app/src/models/mood_model.dart';
 import 'package:funli_app/src/models/reel_model.dart';
@@ -205,6 +206,69 @@ class _DiscoverPageState extends State<DiscoverPage> {
             style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),),
           const SizedBox(height: 20,),
 
+         /*Column(
+           children: List.generate(4, (index){
+             Color baseColor = Colors.grey[300]!;
+             Color highlightColor = Colors.grey[100]!;
+             return Column(
+               children: [
+                 Card(
+                   margin: EdgeInsets.only(bottom: 10),
+                   elevation: 1,
+                   color: Colors.white,
+                   shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(16)
+                   ),
+                   child: Padding(
+                     padding: const EdgeInsets.all(8.0),
+                     child: Column(
+                       children: [
+                         Row(
+                           spacing: 20,
+                           children: [
+                             Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
+                               height: 50,
+                               width: 50,
+                               decoration: BoxDecoration(
+                                 shape: BoxShape.circle,
+                                 color: Colors.grey,
+                               ),
+                             )),
+                             Column(
+                               crossAxisAlignment: CrossAxisAlignment.start,
+                               spacing: 10,
+                               children: [
+                                 Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
+                                   height: 20,
+                                   width: 50,
+                                   color: Colors.grey,
+                                 )),
+                                 Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
+                                   height: 10,
+                                   width: 100,
+                                   color: Colors.grey,
+                                 )),
+                               ],
+                             ),
+                             const Spacer(),
+                             Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
+                               height: 25,
+                               width: 100,
+                               decoration: BoxDecoration(
+                                 borderRadius: BorderRadius.circular(5),
+                                 color: Colors.grey,
+                               ),
+                             )),
+                           ],
+                         )
+                       ],
+                     ),
+                   ),
+                 )
+               ],
+             );
+           }).toList(),
+         )*/
           FutureBuilder(future: HashtagService.getTrendingMoods(),
               builder: (ctx, snapshot) {
                 if (snapshot.hasData) {
@@ -269,28 +333,29 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                 height: 200,
                                 width: double.infinity,
                                 child: FutureBuilder(
-                                    future: MoodService.getReelsbyMood(
-                                        mood: mood.mood),
+                                    future: MoodService.getReelsbyMood(mood: mood.mood),
                                     builder: (ctx, snapshot) {
                                       if (snapshot.hasData) {
                                         return ListView.builder(
                                             scrollDirection: Axis.horizontal,
-                                            itemCount: snapshot.requireData
-                                                .length,
+                                            itemCount: snapshot.requireData.length,
                                             itemBuilder: (ctx, index) {
-                                              ReelModel reel = snapshot
-                                                  .requireData[index];
+                                              ReelModel reel = snapshot.requireData[index];
                                               return Padding(
-                                                padding: const EdgeInsets.all(
-                                                    5),
+                                                padding: const EdgeInsets.all(5),
                                                 child: ClipRRect(
-                                                  borderRadius: BorderRadius
-                                                      .circular(10),
+                                                  borderRadius: BorderRadius.circular(10),
                                                   child: CachedNetworkImage(
-                                                    imageUrl: reel
-                                                        .thumbnailUrl ??
-                                                        AppIcons
-                                                            .icDummyImgUrl,
+                                                    placeholder: (context, url) =>
+                                                        Shimmer.fromColors(baseColor: Colors.grey[300]!, highlightColor:  Colors.grey[100]!, child: Container(
+                                                          height: 150,
+                                                          width: 100,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(5),
+                                                            color: Colors.grey,
+                                                          ),
+                                                        )),
+                                                    imageUrl: reel.thumbnailUrl ?? AppIcons.icDummyImgUrl,
                                                     height: 150,),
                                                 ),
                                               );
@@ -311,7 +376,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 }
                 else
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return LoadingWidget(color: AppColors.purpleColor,);
+                  return TrendingFeelsWidget();
                 }
 
                 return SizedBox();
@@ -343,3 +408,4 @@ class _DiscoverPageState extends State<DiscoverPage> {
     );
   }
 }
+
