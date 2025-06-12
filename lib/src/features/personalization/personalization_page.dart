@@ -5,7 +5,6 @@ import 'package:funli_app/src/bloc_cubit/auth_states.dart';
 import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
 import 'package:funli_app/src/features/personalization/age_gender_page.dart';
 import 'package:funli_app/src/features/personalization/interest_page.dart';
-import 'package:funli_app/src/features/personalization/mood_detection_setup.dart';
 import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/providers/personal_info_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';

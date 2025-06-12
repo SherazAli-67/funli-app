@@ -64,4 +64,21 @@ class SettingsService {
       'rememberMe' : rememberMe
     });
   }
+
+  static Stream<bool> getShowAdultContent(){
+    String userID = FirebaseAuth.instance.currentUser!.uid;
+    return _userColRef.doc(userID).snapshots().map((snapshot){
+      final map = snapshot.data() as Map<String, dynamic>;
+      bool rememberMe = map['showAdultContent'] ?? false;
+      return rememberMe;
+    });
+  }
+
+  static Future<void> setShowAdultContent({required bool showAdultContent}) async {
+    String userID = FirebaseAuth.instance.currentUser!.uid;
+
+    await _userColRef.doc(userID).update({
+      'showAdultContent' : showAdultContent
+    });
+  }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
+import 'package:funli_app/src/features/settings/content_preferences_page.dart';
 import 'package:funli_app/src/features/settings/privacy_security.dart';
 import 'package:funli_app/src/features/settings/widgets/settings_item_widget.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
@@ -60,7 +61,7 @@ class ProfileSettingsPage extends StatelessWidget{
                   Text("App Settings", style: AppTextStyles.subHeadingTextStyle,),
                   SettingsItemWidget(icon: AppIcons.icVisibility, title: 'Dark Mode',  isSwitch: true,),
                   SettingsItemWidget(icon: AppIcons.icSecurity, title: 'Security & Privacy', onTap: ()=> _onSecurityPrivacyTap(context),),
-                  SettingsItemWidget(icon: AppIcons.icVideo, title: 'Content Preferences',),
+                  SettingsItemWidget(icon: AppIcons.icVideo, title: 'Content Preferences', onTap: ()=> _onContentPreferencesTap(context),),
                   SettingsItemWidget(icon: AppIcons.icEdit, title: 'Report a Problem', ),
                   SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Dark Mode',),
                   SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Help Center',),
@@ -93,7 +94,10 @@ class ProfileSettingsPage extends StatelessWidget{
   }
   
   void _onSecurityPrivacyTap(BuildContext context){
-    debugPrint("On tap");
     Navigator.of(context).push(MaterialPageRoute(builder: (_)=> PrivacySecurity()));
+  }
+
+  void _onContentPreferencesTap(BuildContext context){
+    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> ContentPreferencesPage()));
   }
 }
