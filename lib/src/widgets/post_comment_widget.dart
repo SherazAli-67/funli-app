@@ -28,7 +28,7 @@ class PostCommentWidget extends StatelessWidget{
   Column _buildCommentWidget(BuildContext context, {required int totalComments}) {
     return Column(
           children: [
-            GestureDetector(onTap: (){
+            IconButton(onPressed: (){
 
               showModalBottomSheet<void>(
                 context: context,
@@ -43,7 +43,7 @@ class PostCommentWidget extends StatelessWidget{
                       ));
                 },
               );
-            }, child: SvgPicture.asset(AppIcons.icComment,
+            }, icon: SvgPicture.asset(AppIcons.icComment,
               colorFilter:  ColorFilter
                   .mode(
                   iconColor, BlendMode.srcIn),),

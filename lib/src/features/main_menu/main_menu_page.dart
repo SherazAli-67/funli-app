@@ -35,6 +35,7 @@ class _MainMenuPageState extends State<MainMenuPage> with RouteAware{
       if(widget.comingFromNotification){
         final provider = Provider.of<MainMenuTabChangeProvider>(context, listen: false);
         provider.onTabChange(2);
+
       }
     });
     _initNotificationService();

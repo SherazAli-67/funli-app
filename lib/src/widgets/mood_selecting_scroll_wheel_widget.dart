@@ -2,11 +2,11 @@ import 'package:circle_wheel_scroll/circle_wheel_scroll_view.dart' as circle_whe
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/res/app_colors.dart';
-import 'package:funli_app/src/res/app_constants.dart';
 
 class MoodSelectingScrollWheelWidget extends StatefulWidget{
-  const MoodSelectingScrollWheelWidget({super.key, required this.onMoodChange});
+  const MoodSelectingScrollWheelWidget({super.key, required this.onMoodChange, required this.selectedMood});
   final Function(String mood) onMoodChange;
+  final String selectedMood;
   @override
   State<MoodSelectingScrollWheelWidget> createState() => _MoodSelectingScrollWheelWidgetState();
 }
@@ -19,6 +19,8 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
 
   @override
   void initState() {
+    int index = moods.indexWhere((mood)=> mood['label'] == widget.selectedMood);
+    currentIndex = index;
     _controller = circle_wheel.FixedExtentScrollController(initialItem: currentIndex);
     super.initState();
   }
@@ -40,7 +42,7 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
            children: [
              Text("Change your mood!",
                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-             IconButton(onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close))
+             IconButton(onPressed: ()=> Navigator.of(context).pop(moods[currentIndex]['label']), icon: Icon(Icons.close))
            ],
          ),
           const SizedBox(height: 24),
@@ -63,7 +65,7 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
                   onSelectedItemChanged: (val){
                     currentIndex = val;
                     setState(() {});
-                    widget.onMoodChange(moods[currentIndex]['label'].toString());
+                    ;
                   },
                   children: List.generate(moods.length, (index){
                     bool isSelected = currentIndex == index;

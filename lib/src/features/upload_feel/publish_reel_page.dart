@@ -105,7 +105,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
                     showModalBottomSheet(context: context, builder: (_){
                       return MoodSelectingScrollWheelWidget(onMoodChange: (mood){
                         provider.setCurrentMood(mood);
-                      });
+                      }, selectedMood: provider.currentMood,);
                     });
                   }, provider.currentMood),
 

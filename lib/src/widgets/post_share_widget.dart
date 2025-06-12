@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/res/app_icons.dart';
-import 'package:funli_app/src/res/app_textstyles.dart';
 
 class PostShareWidget extends StatelessWidget{
   final Color iconColor;
@@ -11,14 +11,14 @@ class PostShareWidget extends StatelessWidget{
     return Column(
       children: [
         GestureDetector(onTap: ()async{
-          debugPrint("On share tap");
+          Fluttertoast.showToast(msg: "The share feature is in progress");
         },
             child: SvgPicture.asset(
               AppIcons.icShare,
               colorFilter:  ColorFilter
                   .mode(iconColor, BlendMode.srcIn),)),
         // if(snapshot.requireData > 0)
-          Text("132k", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),),
+        //   Text("132k", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),),
       ],
     );
     /*return StreamBuilder(

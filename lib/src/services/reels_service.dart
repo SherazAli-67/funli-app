@@ -23,8 +23,9 @@ class ReelsService {
     List<ReelModel> fetchedReels = [];
     debugPrint("Selected mood: $selectedMood");
     try {
+      String mood = selectedMood == 'Sad' ? 'Happy' : selectedMood;
       Query baseQuery = _reelsColRef
-          // .where("moodTag", isEqualTo: selectedMood)
+          .where("moodTag", isEqualTo: mood)
           .orderBy('createdAt', descending: true);
 
       final snapshot = await baseQuery.get();

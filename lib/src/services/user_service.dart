@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/models/follow_model.dart';
 import 'package:funli_app/src/models/notification_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
@@ -24,7 +25,7 @@ class UserService {
     return null;
   }
 
-   static Future<bool> onFollowTap({required String remoteUID})async{
+   static Future<bool> onFollowTap({required String remoteUID, required String userName})async{
     bool result = false;
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
     try{
@@ -60,6 +61,8 @@ class UserService {
             notificationType: NotificationType.follow);
         debugPrint("Follow notification sent");
         result = true;
+
+        Fluttertoast.showToast(msg: "You're now following $userName");
       }
     }catch(e){
       debugPrint("Error while adding to followers list: ${e.toString()}");

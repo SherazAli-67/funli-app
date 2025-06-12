@@ -77,16 +77,13 @@ class _NotificationPageState extends State<NotificationPage> {
 
     return SafeArea(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              IconButton(onPressed: (){}, icon: Icon(Icons.arrow_back_ios_new_rounded)),
-              Text("Notifications", style: AppTextStyles.headingTextStyle3,),
-              const SizedBox(width: 5,),
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text("Notifications", style: AppTextStyles.headingTextStyle3,),
           ),
-          Expanded(child: _isLoading
+          Expanded(child: _isLoading && grouped.entries.isEmpty
               ? LoadingWidget()
               : _notifications.isEmpty
               ? _buildEmptyNotesPage()

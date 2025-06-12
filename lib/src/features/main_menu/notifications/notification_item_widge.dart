@@ -10,6 +10,8 @@ import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 
+import '../profile/remote_user_profile.dart';
+
 class NotificationItemWidget extends StatefulWidget{
   final NotificationModel _notification;
 
@@ -31,6 +33,20 @@ class _NotificationItemWidgetState extends State<NotificationItemWidget> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: (){
+        String? userName = user?.userName;
+        String? userID = user?.userID;
+        showModalBottomSheet(
+            isScrollControlled: true,
+            context: context, builder: (ctx){
+          return FractionallySizedBox(
+              heightFactor: 0.75,
+              child: SingleChildScrollView(child: RemoteUserProfileInfoWidget(userName: userName, userID: userID!,)));
+        });
+        /*if(widget._notification.notificationType == NotificationType.follow){
+
+        }*/
+      },
       contentPadding: EdgeInsets.only(right: 10),
       leading: ProfilePictureWidget(
           profilePicture: (_isLoadingUser || user == null) 
@@ -76,7 +92,7 @@ class _NotificationItemWidgetState extends State<NotificationItemWidget> {
           width: 120,
           height: 38,
           child: PrimaryBtn(btnText: "Follow Back", icon: '', onTap: (){
-            UserService.onFollowTap(remoteUID: widget._notification.userID);
+            UserService.onFollowTap(remoteUID: widget._notification.userID, userName: user != null ? user!.userName : '');
           }, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallTextStyle,),
         );
       }
