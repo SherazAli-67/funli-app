@@ -23,11 +23,11 @@
 		<key>CFBundleSignature</key>
 		<string>????</string>
 		<key>NSCameraUsageDescription</key>
-        <string>FUNLI required Camera Permission to record feels</string>
-        <key>NSMicrophoneUsageDescription</key>
-        <string>FUNLI required Camera Permission to record feels</string>
-        <key>NSPhotoLibraryUsageDescription</key>
-        <string>FUNLI required Gallery Permission to upload feels</string>
+		<string>FUNLI required Camera Permission to record feels</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>FUNLI required Camera Permission to record feels</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>FUNLI required Gallery Permission to upload feels</string>
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>
