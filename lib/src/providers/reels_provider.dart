@@ -2,7 +2,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/res/local_storage_constants.dart';
 import 'package:funli_app/src/services/reels_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/reel_model.dart';
 
 class ReelProvider with ChangeNotifier {
@@ -31,9 +33,12 @@ class ReelProvider with ChangeNotifier {
     notifyListeners();
 
     debugPrint("Fetching reels for: $_selectedMood");
+    if(_selectedMood == null){
+     await _initCurrentMood();
+    }
     final newReels = await _service.fetchReels(
       userId: currentUserID,
-      selectedMood: _selectedMood ?? 'Happy',
+      selectedMood: _selectedMood!,
       lastDoc: _lastDoc,
       limit: _limit,
       onLastDoc: (doc) => _lastDoc = doc,
@@ -48,7 +53,7 @@ class ReelProvider with ChangeNotifier {
   }
 
 
-  void setCurrentMood(String mood){
+  Future<void> setCurrentMood(String mood) async {
     if(mood != _selectedMood){
       _selectedMood = mood;
       _lastDoc = null;
@@ -56,7 +61,16 @@ class ReelProvider with ChangeNotifier {
       _reels.clear();
       fetchReels();
       notifyListeners();
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(LocalStorageConstants.currentMoodKey, mood);
     }
   }
 
+  Future<void> _initCurrentMood() async{
+    final prefs = await SharedPreferences.getInstance();
+    _selectedMood = prefs.getString(LocalStorageConstants.currentMoodKey) ?? 'Happy';
+    debugPrint("Mood found: $_selectedMood");
+    notifyListeners();
+  }
 }
