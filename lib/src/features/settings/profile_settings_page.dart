@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
+import 'package:funli_app/src/features/settings/privacy_security.dart';
+import 'package:funli_app/src/features/settings/widgets/settings_item_widget.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
@@ -57,7 +59,7 @@ class ProfileSettingsPage extends StatelessWidget{
                 children: [
                   Text("App Settings", style: AppTextStyles.subHeadingTextStyle,),
                   SettingsItemWidget(icon: AppIcons.icVisibility, title: 'Dark Mode',  isSwitch: true,),
-                  SettingsItemWidget(icon: AppIcons.icSecurity, title: 'Security & Privacy',),
+                  SettingsItemWidget(icon: AppIcons.icSecurity, title: 'Security & Privacy', onTap: ()=> _onSecurityPrivacyTap(context),),
                   SettingsItemWidget(icon: AppIcons.icVideo, title: 'Content Preferences',),
                   SettingsItemWidget(icon: AppIcons.icEdit, title: 'Report a Problem', ),
                   SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Dark Mode',),
@@ -89,36 +91,9 @@ class ProfileSettingsPage extends StatelessWidget{
     provider.clear();
     Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> WelcomePage()), (val)=> false);
   }
-}
-
-class SettingsItemWidget extends StatelessWidget {
-  const SettingsItemWidget({
-    super.key,
-    required String title,
-    required String icon,
-    VoidCallback? onTap,
-    bool isSwitch = false,
-    bool isLogout = false
-  }): _icon = icon, _title = title, _onTap = onTap,  _isSwitch = isSwitch, _isLogout = isLogout;
-  final String _icon;
-  final String _title;
-  final bool _isSwitch;
-  final VoidCallback? _onTap;
-  final bool _isLogout;
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.symmetric(vertical: 5),
-      onTap: _onTap,
-      leading: SvgPicture.asset(_icon,),
-      title: Text(_title, style: _isLogout ? AppTextStyles.buttonTextStyle.copyWith(color: AppColors.logoutRedColor) : AppTextStyles.buttonTextStyle,),
-      trailing: _isSwitch ?  CupertinoSwitch(
-          inactiveTrackColor:  AppColors.switchTrackColor,
-          activeTrackColor: AppColors.purpleColor,
-          value: true, onChanged: (val){}) : !_isLogout ? Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Icon(Icons.navigate_next_outlined),
-          ) : null
-    );
+  
+  void _onSecurityPrivacyTap(BuildContext context){
+    debugPrint("On tap");
+    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> PrivacySecurity()));
   }
 }

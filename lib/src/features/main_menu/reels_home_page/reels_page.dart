@@ -68,6 +68,7 @@ class _ReelsPageState extends State<ReelsPage> {
 
   @override
   Widget build(BuildContext context) {
+    return _buildCommentWidget();
     return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
