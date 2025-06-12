@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 
 class SettingsService {
@@ -7,16 +9,25 @@ class SettingsService {
   static Stream<bool> isPrivateAccount(String userID){
    return _userColRef.doc(userID).snapshots().map((snapshot){
       final map = snapshot.data() as Map<String, dynamic>;
-      bool isPrivateAccount = map['isPrivate'] ?? false;
-      return isPrivateAccount;
+      UserModel user = UserModel.fromMap(map);
+      return user.visibility.value == 'followersOnly';
     });
   }
 
-  static Future<void> setAccountVisibility({required bool isPrivate}) async {
+  static Stream<ProfileVisibility> getProfileVisibility(){
+    String userID = FirebaseAuth.instance.currentUser!.uid;
+    return _userColRef.doc(userID).snapshots().map((snapshot){
+      final map = snapshot.data() as Map<String, dynamic>;
+      UserModel user = UserModel.fromMap(map);
+      return user.visibility;
+    });
+  }
+
+  static Future<void> setAccountVisibility({required ProfileVisibility visibility}) async {
     String userID = FirebaseAuth.instance.currentUser!.uid;
 
    await _userColRef.doc(userID).update({
-      'isPrivate' : isPrivate
+      'visibility' : visibility.value
     });
   }
 

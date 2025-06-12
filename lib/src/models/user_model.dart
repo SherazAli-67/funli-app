@@ -1,3 +1,34 @@
+enum ProfileVisibility {
+  public,
+  followersOfFollowers,
+  followersOnly,
+}
+
+extension ProfileVisibilityExtension on ProfileVisibility {
+  String get value {
+    switch (this) {
+      case ProfileVisibility.public:
+        return 'public';
+      case ProfileVisibility.followersOfFollowers:
+        return 'followersOfFollowers';
+      case ProfileVisibility.followersOnly:
+        return 'followersOnly';
+    }
+  }
+
+  static ProfileVisibility fromString(String value) {
+    switch (value) {
+      case 'followersOfFollowers':
+        return ProfileVisibility.followersOfFollowers;
+      case 'followersOnly':
+        return ProfileVisibility.followersOnly;
+      case 'public':
+      default:
+        return ProfileVisibility.public;
+    }
+  }
+}
+
 class UserModel {
   final String userID;
   final String userName;
@@ -8,6 +39,8 @@ class UserModel {
   final String? bio;
   final String? profilePicture;
   final String? gender;
+  final ProfileVisibility visibility;
+
   UserModel({
     required this.userID,
     required this.userName,
@@ -17,20 +50,22 @@ class UserModel {
     this.bio,
     this.profilePicture,
     this.gender,
+    this.visibility = ProfileVisibility.public,
     List<String>? interests,
   }) : interests = interests ?? [];
 
   Map<String, dynamic> toMap() {
     return {
-      "userID" : userID,
-      'userName': userName,
-      'email': email,
-      'dob': dob?.toIso8601String(),
-      'interests': interests,
-      'mood' : mood,
-      'bio' : bio,
-      'profilePicture' : profilePicture,
-      'gender' : gender
+      "userID": userID,
+      "userName": userName,
+      "email": email,
+      "dob": dob?.toIso8601String(),
+      "interests": interests,
+      "mood": mood,
+      "bio": bio,
+      "profilePicture": profilePicture,
+      "gender": gender,
+      "visibility": visibility.value,
     };
   }
 
@@ -44,7 +79,8 @@ class UserModel {
       mood: map['mood'],
       dob: map['dob'] != null ? DateTime.tryParse(map['dob']) : null,
       interests: List<String>.from(map['interests'] ?? []),
-      gender: map['gender']
+      gender: map['gender'],
+      visibility: ProfileVisibilityExtension.fromString(map['visibility'] ?? 'public'),
     );
   }
 }

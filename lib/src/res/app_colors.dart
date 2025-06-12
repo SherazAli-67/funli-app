@@ -28,4 +28,5 @@ class AppColors {
   static const greyFillColor = Color(0xffE9E9E9);
   static const searchFillColor  = Color(0xffF7F5FE);
   static const redColor = Color(0xffFF1B1B);
+  static const darkGreyColor = Color(0xff424242);
 }
