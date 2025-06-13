@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/models/user_model.dart';
+import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 
@@ -30,7 +31,9 @@ class ProfileInfoWidget extends StatelessWidget{
                     Text('@${user.userName}',
                       style: AppTextStyles.subHeadingTextStyle.copyWith(
                           fontWeight: FontWeight.w900),),
-                    Text("Dancer & Singer", style: AppTextStyles.commentTextStyle,),
+                    user.bio != null
+                        ? Text(user.bio!, style: AppTextStyles.commentTextStyle,)
+                        : Text('Write something about yourself', style: AppTextStyles.commentTextStyle.copyWith(color: AppColors.greyTextColor),)
                   ],
                 ),
 

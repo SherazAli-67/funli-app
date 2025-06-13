@@ -101,12 +101,16 @@ class _PublishReelPageState extends State<PublishReelPage> {
               child: Column(
                 spacing: 14,
                 children: [
-                  _feelingWidget((){
-                    showModalBottomSheet(context: context, builder: (_){
-                      return MoodSelectingScrollWheelWidget(onMoodChange: (mood){
-                        provider.setCurrentMood(mood);
-                      }, selectedMood: provider.currentMood,);
+                  _feelingWidget(() async {
+                    final result = await showModalBottomSheet(
+                        isDismissible: false,
+                        context: context, builder: (_){
+                      return MoodSelectingScrollWheelWidget(selectedMood: provider.currentMood,);
                     });
+
+                    if(result != null){
+                      provider.setCurrentMood(result);
+                    }
                   }, provider.currentMood),
 
                   Row(

@@ -4,8 +4,8 @@ import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 
 class MoodSelectingScrollWheelWidget extends StatefulWidget{
-  const MoodSelectingScrollWheelWidget({super.key, required this.onMoodChange, required this.selectedMood});
-  final Function(String mood) onMoodChange;
+  const MoodSelectingScrollWheelWidget({super.key, required this.selectedMood});
+  // final Function(String mood) onMoodChange;
   final String selectedMood;
   @override
   State<MoodSelectingScrollWheelWidget> createState() => _MoodSelectingScrollWheelWidgetState();
@@ -42,13 +42,13 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
            children: [
              Text("Change your mood!",
                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-             IconButton(onPressed: ()=> Navigator.of(context).pop(moods[currentIndex]['label']), icon: Icon(Icons.close))
+             IconButton(onPressed: _onMoodSelected, icon: Icon(Icons.close))
            ],
          ),
           const SizedBox(height: 24),
 
           SizedBox(
-            height: size.height*0.19,
+            height: size.height * 0.19,
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -56,30 +56,44 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
                   backgroundColor: AppColors.yellowAccentColor,
                   radius: 45,
                 ),
+
+                // Emoji wheel
                 circle_wheel.CircleListScrollView(
                   physics: circle_wheel.CircleFixedExtentScrollPhysics(),
                   axis: Axis.horizontal,
                   itemExtent: 80,
-                  radius: size.width*0.5,
+                  radius: size.width * 0.5,
                   controller: _controller,
-                  onSelectedItemChanged: (val){
+                  onSelectedItemChanged: (val) {
                     currentIndex = val;
                     setState(() {});
-                    ;
                   },
-                  children: List.generate(moods.length, (index){
+                  children: List.generate(moods.length, (index) {
                     bool isSelected = currentIndex == index;
-
                     return Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Text(moods[index]['emoji']!, textAlign: TextAlign.center, style: TextStyle(fontSize: isSelected ? 60 : 55),),
-                        )
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          moods[index]['emoji']!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: isSelected ? 60 : 55),
+                        ),
+                      ),
                     );
                   }),
                 ),
 
+                // 🔹 Invisible tappable area over the center item
+                GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: _onMoodSelected,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.transparent, // make sure it's tappable
+                  ),
+                ),
               ],
             ),
           ),
@@ -125,6 +139,10 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
         style: TextStyle(fontSize: isSelected ? 100 * scale : 60*scale),
       ),
     );
+  }
+
+  void _onMoodSelected() {
+    Navigator.of(context).pop(moods[currentIndex]['label']);
   }
 }
 

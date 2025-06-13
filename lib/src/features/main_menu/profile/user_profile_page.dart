@@ -82,7 +82,7 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
                         IconButton(onPressed: () {},
                             icon: SvgPicture.asset(AppIcons.icAnalytics)),
                         IconButton(onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> ProfileSettingsPage(currentUser: provider.currentUser!,)));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> ProfileSettingsPage()));
                         },
                             icon: SvgPicture.asset(AppIcons.icSettings)),
                       ],))

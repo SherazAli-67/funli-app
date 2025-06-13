@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/features/upload_feel/edit_uploaded_feel.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
@@ -12,6 +13,7 @@ import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
+import 'package:funli_app/src/widgets/mood_selecting_scroll_wheel_widget.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -121,6 +123,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                     children: [
                       Row(
                         spacing: 12,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _buildVideoDurationWidget(duration: '1m', provider: provider),
                           _buildVideoDurationWidget(duration: '30s',provider: provider),
@@ -131,9 +134,9 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          const SizedBox(
-                            width: 40,
-                          ),
+                          IconButton(onPressed: ()async{
+                            _toggleCamera();
+                          }, icon: Icon(Icons.change_circle_rounded, color: Colors.white, size: 35,)),
                           if(_isRecording)
                             GestureDetector(
                               onTap: () {
@@ -228,19 +231,32 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                                         const SizedBox(width: 40,),
                                       ],
                                     ),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 11),
-                                      decoration: BoxDecoration(
-                                          color: AppColors.yellowAccentColor,
-                                          borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius)
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        spacing: 10,
-                                        children: [
-                                          Text("You seem 😄 Happy", style: AppTextStyles.buttonTextStyle,),
-                                          Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black,)
-                                        ],
+                                    GestureDetector(
+                                      onTap: () async {
+                                        final result = await showModalBottomSheet(
+                                            isDismissible: false,
+                                            context: context, builder: (_){
+                                          return MoodSelectingScrollWheelWidget(selectedMood: provider.currentMood,);
+                                        });
+
+                                        if(result != null){
+                                          provider.setCurrentMood(result);
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 11),
+                                        decoration: BoxDecoration(
+                                            color: AppColors.yellowAccentColor,
+                                            borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius)
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          spacing: 10,
+                                          children: [
+                                            Text("You seem ${AppData.getEmojiByMood(provider.currentMood)} ${provider.currentMood}", style: AppTextStyles.buttonTextStyle,),
+                                            Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black,)
+                                          ],
+                                        ),
                                       ),
                                     )
                                   ],

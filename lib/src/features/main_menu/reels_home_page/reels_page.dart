@@ -95,9 +95,7 @@ class _ReelsPageState extends State<ReelsPage> {
                               final result = await showModalBottomSheet(
                                   isDismissible: false,
                                   context: context, builder: (_){
-                                return MoodSelectingScrollWheelWidget(onMoodChange: (mood){
-
-                                }, selectedMood: provider.selectedMood,);
+                                return MoodSelectingScrollWheelWidget(selectedMood: provider.selectedMood,);
                               });
 
                               if(result != null){

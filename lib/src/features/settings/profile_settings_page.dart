@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
 import 'package:funli_app/src/features/settings/content_preferences_page.dart';
 import 'package:funli_app/src/features/settings/privacy_security.dart';
@@ -8,7 +6,6 @@ import 'package:funli_app/src/features/settings/widgets/settings_item_widget.dar
 import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
-import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
@@ -16,8 +13,7 @@ import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 import 'package:provider/provider.dart';
 
 class ProfileSettingsPage extends StatelessWidget{
-  const ProfileSettingsPage({super.key, required UserModel currentUser}) : _currentUser = currentUser;
-  final UserModel _currentUser;
+  const ProfileSettingsPage({super.key, });
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,24 +30,28 @@ class ProfileSettingsPage extends StatelessWidget{
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 30,
           children: [
-            ListTile(
-              onTap: (){
-                Navigator.of(context).push(MaterialPageRoute(builder: (_)=> EditProfilePage()));
-              },
-              contentPadding: EdgeInsets.zero,
-              leading: ProfilePictureWidget(profilePicture: _currentUser.profilePicture),
-              title: Text(_currentUser.userName, style: AppTextStyles.tileTitleTextStyle,),
-              subtitle: Text("${getAgeByDOB(_currentUser.dob!)}, ${_currentUser.gender}"),
-              trailing: Container(
-                  padding: EdgeInsets.all(5),
-                  margin: EdgeInsets.only(right: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: AppGradients.primaryGradient,
-        
+            Consumer<ProfileProvider>(
+              builder: (context, provider, _) {
+                return ListTile(
+                  onTap: (){
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> EditProfilePage()));
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  leading: ProfilePictureWidget(profilePicture: provider.currentUser!.profilePicture),
+                  title: Text(provider.userName, style: AppTextStyles.tileTitleTextStyle,),
+                  subtitle: Text("${getAgeByDOB(provider.currentUser!.dob!)}, ${provider.gender}"),
+                  trailing: Container(
+                      padding: EdgeInsets.all(5),
+                      margin: EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: AppGradients.primaryGradient,
+
+                      ),
+                      child: Icon(Icons.edit, color: Colors.white,)
                   ),
-                  child: Icon(Icons.edit, color: Colors.white,)
-              ),
+                );
+              }
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
