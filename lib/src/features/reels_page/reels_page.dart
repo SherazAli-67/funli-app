@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:funli_app/src/res/app_constants.dart';
 import 'package:video_player/video_player.dart';
 import 'package:whitecodel_reels/models/video_model.dart';
 import 'package:whitecodel_reels/whitecodel_reels.dart';
@@ -47,7 +46,7 @@ class _ReelsPageState extends State<ReelsPage> {
   DocumentSnapshot? _lastDocument;
   bool isFetchingMore = false;
   UserModel? _userModel;
-  int _limit = 4;
+  final int _limit = 4;
 
   bool _hasMore = false;
   @override
@@ -136,9 +135,9 @@ class _ReelsPageState extends State<ReelsPage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.0),
-                    Colors.black.withOpacity(0.2),
-                    Colors.black.withOpacity(0.5),
+                    Colors.black.withValues(alpha: 0.0),
+                    Colors.black.withValues(alpha: 0.2),
+                    Colors.black.withValues(alpha: 0.5),
                   ],
                 ),
               ),

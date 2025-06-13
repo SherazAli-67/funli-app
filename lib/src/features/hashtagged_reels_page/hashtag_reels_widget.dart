@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:funli_app/src/features/reels_page/reels_page.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/user_model.dart';
+import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
@@ -69,10 +70,17 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
 
         return GestureDetector(
           onTap: () {
-           /* Navigator.of(context).push(MaterialPageRoute(builder: (_) =>
-                ReelsPage(initialReels: _reels,
-                    selectedIndex: selectedIndex,
-                    comingFrom: comingFrom)))*/
+            final reels = _reels.map((map)=> ReelModel.fromMap( _reels[index])).toList();
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) =>
+                ReelsPage(initialReels: reels,
+                    selectedIndex: index,
+                    mood: widget.isComingFromMood ? widget.tag : null,
+                    tag: !widget.isComingFromMood ? widget.tag : null,
+                    comingFrom: widget.isComingFromMood
+                        ? AppConstants.comingFromMood
+                        : AppConstants.comingFromHashtag,
+                  lastDocument: _lastDoc,
+                )));
           },
           child: Stack(
             children: [
