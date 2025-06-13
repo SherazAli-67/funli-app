@@ -70,7 +70,7 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
 
         return GestureDetector(
           onTap: () {
-            final reels = _reels.map((map)=> ReelModel.fromMap( _reels[index])).toList();
+            final reels = _reels.map((map)=> ReelModel.fromMap(map)).toList();
             Navigator.of(context).push(MaterialPageRoute(builder: (_) =>
                 ReelsPage(initialReels: reels,
                     selectedIndex: index,
