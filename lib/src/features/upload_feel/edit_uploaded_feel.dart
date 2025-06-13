@@ -91,7 +91,7 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
                             AppBackButton(color: Colors.white,),
                             Text("Create a Feel", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
                             TextButton(onPressed: (){
-                              Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> PublishReelPage()));
+                              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (ctx)=> PublishReelPage()));
                             }, child: Text("Next", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),))
                           ],
                         ),

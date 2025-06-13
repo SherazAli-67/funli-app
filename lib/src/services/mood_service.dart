@@ -14,7 +14,10 @@ class MoodService {
     List<String> reelIDs = querySnapshot.docs.map((doc)=> doc.id).toList();
 
     for (var reelID in reelIDs) {
-      DocumentSnapshot docSnap = await FirebaseFirestore.instance.collection(FirebaseConstants.reelsCollection).doc(reelID).get();
+      DocumentSnapshot docSnap = await FirebaseFirestore.instance
+          .collection(FirebaseConstants.reelsCollection)
+          .doc(reelID)
+          .get();
       if(docSnap.exists){
         reels.add(ReelModel.fromMap(docSnap.data() as Map<String, dynamic>));
       }

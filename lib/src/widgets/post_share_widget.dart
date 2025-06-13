@@ -10,10 +10,10 @@ class PostShareWidget extends StatelessWidget{
   Widget build(BuildContext context) {
     return Column(
       children: [
-        GestureDetector(onTap: ()async{
+        IconButton(onPressed: ()async{
           Fluttertoast.showToast(msg: "The share feature is in progress");
         },
-            child: SvgPicture.asset(
+            icon: SvgPicture.asset(
               AppIcons.icShare,
               colorFilter:  ColorFilter
                   .mode(iconColor, BlendMode.srcIn),)),

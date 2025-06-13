@@ -12,7 +12,6 @@ import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
-import 'package:funli_app/src/widgets/app_back_button.dart';
 import 'package:funli_app/src/widgets/mood_selecting_scroll_wheel_widget.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -107,11 +106,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                     alignment: Alignment.bottomCenter,
                     children: [
             // Image.network(AppIcons.icDummyImgUrl,fit: BoxFit.cover, height: size.height,),
-            Transform.scale(
-              scale: scale,
-              alignment: Alignment.topCenter,
-              child: CameraPreview(_controller),
-            ),
+                      CameraPreview(_controller),
             Positioned(
               bottom: 0,
               left: 30,
@@ -226,7 +221,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        AppBackButton(color: Colors.white,),
+                                        IconButton(onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white,)),
                                         Text("Record a video", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
                                         const SizedBox(width: 40,),
                                       ],
@@ -355,7 +350,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
 
     _timer?.cancel();
     _timer = null;
-    Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> EditUploadedFeelPage(videoPath: file.path,)));
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (ctx)=> EditUploadedFeelPage(videoPath: file.path,)));
   }
 
   void _onScaleStart(ScaleStartDetails details) {

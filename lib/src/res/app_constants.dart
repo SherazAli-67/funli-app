@@ -14,4 +14,10 @@ class AppConstants {
   //Notifications
 
   static const resetEmailSentDescription = 'Your account security is our priority!. We\'ve Sent You a Secure Link To Safely Change your password and Keep your account protected';
+
+  //comingFrom
+  static const comingFromUserProfile = 'userProfile';
+  static const comingFromHashtag = 'hashtag';
+  static const comingFromMood = 'mood';
+
 }

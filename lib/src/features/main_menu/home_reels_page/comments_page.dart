@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:funli_app/src/features/main_menu/reels_home_page/comment_item_widget.dart';
+import 'package:funli_app/src/features/main_menu/home_reels_page/comment_item_widget.dart';
 import 'package:funli_app/src/models/comment_model.dart';
 import 'package:funli_app/src/models/notification_model.dart';
 import 'package:funli_app/src/models/reel_model.dart';

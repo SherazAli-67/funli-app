@@ -1,11 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/features/reels_page/reels_page.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
+import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
-import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/widgets/reel_likes_count.dart';
 
 import '../../../../services/reels_service.dart';
@@ -29,17 +31,17 @@ class RemoteUserReelsWidget extends StatefulWidget {
 }
 
 class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
-  final List<DocumentSnapshot> _reels = [];
+  final List<ReelModel> _reels = [];
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
   bool _hasMore = true;
-  int _limit = 4;
+  final int _limit = 4;
   DocumentSnapshot? _lastDocument;
 
   @override
   void initState() {
     super.initState();
-    _fetchReels(isFirstTime: true);
+    fetchReels();
     _scrollController.addListener(_scrollListener);
   }
 
@@ -49,37 +51,27 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
     }
   }
 
-  Future<void> _fetchReels({bool isFirstTime = false}) async {
-    if (_isLoading) return;
-    setState(() {
-      _isLoading = true;
-    });
+  Future<void> fetchReels() async {
+    if (_isLoading || !_hasMore) return;
 
-    Query query = FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection)
-        .where("userID", isEqualTo: widget._userID)
-        // .orderBy("createdAt", descending: true)
-        .limit(_limit);
+    setState(()=> _isLoading = true);
 
-    if (_lastDocument != null && !isFirstTime) {
-      query = query.startAfterDocument(_lastDocument!);
-    }
 
-    final querySnapshot = await query.get();
-    final docs = querySnapshot.docs;
+    final newReels = await ReelsService.fetchUserReels(
+      userId: widget._userID,
+      lastDoc: _lastDocument,
+      limit: _limit,
+      onLastDoc: (doc) => _lastDocument = doc,
+      onHasMore: (has) => _hasMore = has,
+    );
 
-    if (docs.isNotEmpty) {
-      _lastDocument = docs.last;
-      _reels.addAll(docs);
-    }
+    _reels.addAll(newReels);
 
-    setState(() {
-      _isLoading = false;
-      if (docs.length < _limit) {
-        _hasMore = false;
-      }
-    });
+    _isLoading = false;
+    setState(()=> _isLoading = true);
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -106,12 +98,18 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        ReelModel reel = ReelModel.fromMap( _reels[index].data() as Map<String, dynamic>);
+        ReelModel reel = _reels[index];
         final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
 
         return GestureDetector(
           onTap: () {
-            // open reel detail page if needed
+            Navigator.of(context).push(MaterialPageRoute(builder: (ctx) =>
+                ReelsPage(
+                  initialReels: _reels,
+                  selectedIndex: index,
+                  lastDocument: _lastDocument,
+                  comingFrom: AppConstants.comingFromUserProfile,
+                  userID:FirebaseAuth.instance.currentUser!.uid,)));
           },
           child: Stack(
             children: [
@@ -180,6 +178,12 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _fetchReels() {
+    if (_isLoading) return;
+    setState(()=> _isLoading = true);
+
   }
 
 

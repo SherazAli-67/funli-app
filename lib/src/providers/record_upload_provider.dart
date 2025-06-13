@@ -1,16 +1,11 @@
 import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/notification_service/notification_service.dart';
 import 'package:funli_app/src/services/publish_reel_service.dart';
 import 'package:video_compress/video_compress.dart';
-
 import '../helpers/hashtag_helper.dart';
-import '../res/firebase_constants.dart';
 
 class RecordUploadProvider extends ChangeNotifier{
   bool isRecording = false;

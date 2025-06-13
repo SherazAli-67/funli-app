@@ -25,15 +25,15 @@ import '../../../widgets/mood_selecting_scroll_wheel_widget.dart';
 import '../../../widgets/post_comment_widget.dart';
 import '../../../widgets/post_like_widget.dart';
 import '../../../widgets/post_share_widget.dart';
-class ReelsPage extends StatefulWidget {
+class HomeReelsPage extends StatefulWidget {
 
-  const ReelsPage({super.key});
+  const HomeReelsPage({super.key});
 
   @override
-  State<ReelsPage> createState() => _ReelsPageState();
+  State<HomeReelsPage> createState() => _HomeReelsPageState();
 }
 
-class _ReelsPageState extends State<ReelsPage> {
+class _HomeReelsPageState extends State<HomeReelsPage> {
   late ScrollController _scrollController;
   UserModel? _userModel;
 
