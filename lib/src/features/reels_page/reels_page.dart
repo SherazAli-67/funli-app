@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/res/app_constants.dart';
+import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:video_player/video_player.dart';
 import 'package:whitecodel_reels/models/video_model.dart';
 import 'package:whitecodel_reels/whitecodel_reels.dart';
@@ -84,7 +85,6 @@ class _ReelsPageState extends State<ReelsPage> {
                   curve: Curves.easeInOut,
                 );
               } else {
-                debugPrint("Fetching more reels");
                 _loadMoreReels();
               }
             }
@@ -148,12 +148,12 @@ class _ReelsPageState extends State<ReelsPage> {
                       builder: (ctx, snap) {
                         if (snap.hasData && snap.data != null) {
                           _userModel = snap.data!;
-                          return Text(_userModel!.userName, style: TextStyle(color: Colors.white));
+                          return Text(_userModel!.userName, style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w700));
                         }
                         return const SizedBox();
                       },
                     ),
-                    Text(reel.caption, style: TextStyle(color: Colors.white)),
+                    Text(reel.caption, style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white)),
                     const SizedBox(height: 30),
                   ],
                 ),
@@ -257,7 +257,14 @@ class _ReelsPageState extends State<ReelsPage> {
           onLastDoc: (doc)=> _lastDocument = doc,
           onHasMore: (hasMore)=> _hasMore = hasMore);
     }else if(widget.comingFrom == AppConstants.comingFromMood){
-
+      ReelsService.fetchReelsByMood(mood: widget.mood!, lastDoc: _lastDocument, limit: _limit,
+          onLastDoc: (doc)=> _lastDocument = doc,
+          onHasMore: (hasMore)=> _hasMore = hasMore);
+    }else if(widget.comingFrom == AppConstants.comingFromSearch){
+      ReelsService.fetchMoreReels(lastDoc: _lastDocument,
+          limit: _limit,
+          onLastDoc: (doc) => _lastDocument = doc,
+          onHasMore: (hasMore) => _hasMore = hasMore);
     }
   }
 

@@ -21,4 +21,5 @@ class AppConstants {
   static const comingFromMood = 'mood';
   static const comingFromBookmark = 'bookmark';
 
+  static const comingFromSearch = 'comingFromSearch';
 }

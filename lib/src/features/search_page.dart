@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
+import 'package:funli_app/src/features/reels_page/reels_page.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/filter_model.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
@@ -209,7 +210,7 @@ class _SearchPageState extends State<SearchPage> {
           final reel =  _feelProvider.reels[index];
           return GestureDetector(
             onTap: () {
-              // open reel detail page if needed
+              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> ReelsPage(initialReels: _feelProvider.reels, selectedIndex: index, comingFrom: AppConstants.comingFromSearch, lastDocument: _feelProvider.lastDoc,)));
             },
             child: Stack(
               children: [
@@ -243,7 +244,7 @@ class _SearchPageState extends State<SearchPage> {
                                 backgroundImage: CachedNetworkImageProvider(user.profilePicture ?? AppIcons.icDummyImgUrl),
                               ),
                             ),
-                            Expanded(child: Text(user.userName, style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
+                            Expanded(child: Text(user.userName, style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white,),))
                           ],
                         );
                       }

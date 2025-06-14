@@ -6,7 +6,7 @@ import '../res/firebase_constants.dart';
 
 class FeelsSearchProvider extends ChangeNotifier {
   List<ReelModel> _reels = [];
-  DocumentSnapshot? _lastDoc;
+  DocumentSnapshot? lastDoc;
   bool _hasMore = true;
   bool _isLoading = false;
 
@@ -20,7 +20,7 @@ class FeelsSearchProvider extends ChangeNotifier {
 
     _query = query;
     _reels.clear();
-    _lastDoc = null;
+    lastDoc = null;
     _hasMore = true;
     if (!_hasMore || _isLoading) return;
 
@@ -54,7 +54,7 @@ class FeelsSearchProvider extends ChangeNotifier {
 // Fetch
     final snapshot = await queryRef.get();
     if (snapshot.docs.isNotEmpty) {
-      _lastDoc = snapshot.docs.last;
+      lastDoc = snapshot.docs.last;
       _reels.addAll(snapshot.docs.map((e) => ReelModel.fromMap(e.data())));
     }
 
@@ -69,7 +69,7 @@ class FeelsSearchProvider extends ChangeNotifier {
   Future<void> fetchInitial({String? query}) async {
     _query = query;
     _reels.clear();
-    _lastDoc = null;
+    lastDoc = null;
     _hasMore = true;
     await _fetchReels();
   }
@@ -89,19 +89,19 @@ class FeelsSearchProvider extends ChangeNotifier {
         .orderBy('createdAt', descending: true)
         .limit(10);
 
-    if (_query != null && _query!.isNotEmpty) {
+    /*if (_query != null && _query!.isNotEmpty) {
       queryRef =
           queryRef..where('userName', isGreaterThanOrEqualTo: _query)
               .where('userName', isLessThan: '${_query}z');
-    }
+    }*/
 
-    if (_lastDoc != null) {
-      queryRef = queryRef.startAfterDocument(_lastDoc!);
+    if (lastDoc != null) {
+      queryRef = queryRef.startAfterDocument(lastDoc!);
     }
 
     final snapshot = await queryRef.get();
     if (snapshot.docs.isNotEmpty) {
-      _lastDoc = snapshot.docs.last;
+      lastDoc = snapshot.docs.last;
       _reels.addAll(snapshot.docs.map((e) => ReelModel.fromMap(e.data() as Map<String, dynamic>)));
     }
 
