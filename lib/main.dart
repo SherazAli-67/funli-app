@@ -5,12 +5,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
+import 'package:funli_app/src/providers/feels_search_provider.dart';
+import 'package:funli_app/src/providers/hashtag_search_provider.dart';
+import 'package:funli_app/src/providers/mood_reels_provider.dart';
 import 'package:funli_app/src/providers/personal_info_provider.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/providers/reels_provider.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/providers/tab_change_provider.dart';
+import 'package:funli_app/src/providers/users_search_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:provider/provider.dart';
 
@@ -30,6 +34,10 @@ void main() async{
         ChangeNotifierProvider(create: (_)=> ReelProvider()),
         ChangeNotifierProvider(create: (_)=> SizeProvider()),
         ChangeNotifierProvider(create: (_)=> ProfileProvider()..initUserProfile()),
+        ChangeNotifierProvider(create: (_)=> MoodReelsProvider()),
+        ChangeNotifierProvider(create: (_)=> FeelsSearchProvider()..fetchInitial()),
+        ChangeNotifierProvider(create: (_)=> UsersSearchProvider()..fetchInitial()),
+        ChangeNotifierProvider(create: (_)=> HashtagSearchProvider()..fetchInitial()),
       ],
       child: const MyApp()));
 }

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_data.dart';
@@ -6,6 +7,7 @@ import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.
 import 'package:funli_app/src/features/main_menu/discover_page/filter_bottomsheet.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/filtered_reels_page.dart';
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
+import 'package:funli_app/src/features/reels_page/reels_page.dart';
 import 'package:funli_app/src/features/search_page.dart';
 import 'package:funli_app/src/helpers/formatting_helpers.dart';
 import 'package:funli_app/src/loading_shimmers/trending_feels_widget.dart';
@@ -108,7 +110,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
               prefixIcon: Icon(Icons.search, color: AppColors.greyTextColor,),
             ),
           ),
-          const SizedBox(height: 20,),
+         /* const SizedBox(height: 20,),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -205,69 +207,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
             style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),),
           const SizedBox(height: 20,),
 
-         /*Column(
-           children: List.generate(4, (index){
-             Color baseColor = Colors.grey[300]!;
-             Color highlightColor = Colors.grey[100]!;
-             return Column(
-               children: [
-                 Card(
-                   margin: EdgeInsets.only(bottom: 10),
-                   elevation: 1,
-                   color: Colors.white,
-                   shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(16)
-                   ),
-                   child: Padding(
-                     padding: const EdgeInsets.all(8.0),
-                     child: Column(
-                       children: [
-                         Row(
-                           spacing: 20,
-                           children: [
-                             Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
-                               height: 50,
-                               width: 50,
-                               decoration: BoxDecoration(
-                                 shape: BoxShape.circle,
-                                 color: Colors.grey,
-                               ),
-                             )),
-                             Column(
-                               crossAxisAlignment: CrossAxisAlignment.start,
-                               spacing: 10,
-                               children: [
-                                 Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
-                                   height: 20,
-                                   width: 50,
-                                   color: Colors.grey,
-                                 )),
-                                 Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
-                                   height: 10,
-                                   width: 100,
-                                   color: Colors.grey,
-                                 )),
-                               ],
-                             ),
-                             const Spacer(),
-                             Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
-                               height: 25,
-                               width: 100,
-                               decoration: BoxDecoration(
-                                 borderRadius: BorderRadius.circular(5),
-                                 color: Colors.grey,
-                               ),
-                             )),
-                           ],
-                         )
-                       ],
-                     ),
-                   ),
-                 )
-               ],
-             );
-           }).toList(),
-         )*/
           FutureBuilder(future: HashtagService.getTrendingMoods(),
               builder: (ctx, snapshot) {
                 if (snapshot.hasData) {
@@ -328,6 +267,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                 contentPadding: EdgeInsets.symmetric(
                                     horizontal: 10),
                               ),
+
+
                               SizedBox(
                                 height: 200,
                                 width: double.infinity,
@@ -335,19 +276,43 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                     future: MoodService.getReelsbyMood(mood: mood.mood),
                                     builder: (ctx, snapshot) {
                                       if (snapshot.hasData) {
+                                        List<ReelModel> reels = snapshot.requireData['reels'];
+                                        DocumentSnapshot? lastDoc = snapshot.requireData['lastDocument'];
                                         return ListView.builder(
                                             scrollDirection: Axis.horizontal,
-                                            itemCount: snapshot.requireData.length,
+                                            itemCount: mood.reelsCount > reels.length ? (reels.length+1) : reels.length,
                                             itemBuilder: (ctx, index) {
-                                              ReelModel reel = snapshot.requireData[index];
-                                              return Padding(
-                                                padding: const EdgeInsets.all(5),
-                                                child: ClipRRect(
-                                                  borderRadius: BorderRadius.circular(10),
-                                                  child: CachedNetworkImage(
-                                                    placeholder: (context, url) => ReelThumbnailShimmerItem(),
-                                                    imageUrl: reel.thumbnailUrl ?? AppIcons.icDummyImgUrl,
-                                                    height: 150,),
+                                              return index == reels.length 
+                                                  ? IconButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    shape: CircleBorder(
+                                                      side: BorderSide.none
+                                                    ),
+                                                    backgroundColor: AppColors.yellowAccentColor,
+                                                    padding: EdgeInsets.all(20)
+                                                  ),
+                                                  onPressed: ()=> _onMoodTap(context, mood.mood), icon: Icon(Icons.arrow_forward_rounded, size: 30,))
+                                                  : GestureDetector(
+                                                onTap: (){
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (ctx) =>
+                                                              ReelsPage(
+                                                                  initialReels: reels,
+                                                                  selectedIndex: index,
+                                                                  lastDocument: lastDoc,
+                                                                  mood: mood.mood,
+                                                                  comingFrom: AppConstants.comingFromMood)));
+                                                },
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(5),
+                                                  child: ClipRRect(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                    child: CachedNetworkImage(
+                                                      placeholder: (context, url) => ReelThumbnailShimmerItem(),
+                                                      imageUrl: reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
+                                                      height: 150,),
+                                                  ),
                                                 ),
                                               );
                                             });
@@ -371,11 +336,12 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 }
 
                 return SizedBox();
-              }),
+              }),*/
         ],
       ),
     );
   }
+
 
   Center _buildFeaturesCommenttedWidget() => Center(child: Text(
     "Set to comment due to development of other features",

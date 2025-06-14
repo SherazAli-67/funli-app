@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/res/app_constants.dart';
 import 'package:video_player/video_player.dart';
 import 'package:whitecodel_reels/models/video_model.dart';
 import 'package:whitecodel_reels/whitecodel_reels.dart';
@@ -84,11 +85,7 @@ class _ReelsPageState extends State<ReelsPage> {
                 );
               } else {
                 debugPrint("Fetching more reels");
-                ReelsService.fetchUserReels(userId: widget.userID!,
-                    lastDoc: _lastDocument,
-                    limit: _limit,
-                    onLastDoc: (doc)=> _lastDocument = doc,
-                    onHasMore: (hasMore)=> _hasMore = hasMore);
+                _loadMoreReels();
               }
             }
 
@@ -243,6 +240,24 @@ class _ReelsPageState extends State<ReelsPage> {
           ),
         ),
       );
+    }
+  }
+
+  void _loadMoreReels() {
+    if(widget.comingFrom == AppConstants.comingFromUserProfile){
+      ReelsService.fetchUserReels(userId: widget.userID!,
+          lastDoc: _lastDocument,
+          limit: _limit,
+          onLastDoc: (doc)=> _lastDocument = doc,
+          onHasMore: (hasMore)=> _hasMore = hasMore);
+    }else if(widget.comingFrom == AppConstants.comingFromBookmark){
+      ReelsService.fetchUserBookmarkedReels(userId: widget.userID!,
+          lastDoc: _lastDocument,
+          limit: _limit,
+          onLastDoc: (doc)=> _lastDocument = doc,
+          onHasMore: (hasMore)=> _hasMore = hasMore);
+    }else if(widget.comingFrom == AppConstants.comingFromMood){
+
     }
   }
 

@@ -6,7 +6,6 @@ import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
-import 'package:funli_app/src/widgets/app_back_button.dart';
 import 'package:funli_app/src/widgets/profile_info_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -65,17 +64,8 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
                   children: [
                     Expanded(
                         flex: 2,
-                        child: SingleChildScrollView(
-                          child: Row(
-                            spacing: 20,
-                            children: [
-
-                              AppBackButton(color: Colors.black,),
-                              Text(provider.currentUser != null ? provider.currentUser!.userName : "User not found",
-                                style: AppTextStyles.headingTextStyle3,),
-
-                            ],),
-                        )),
+                        child: Text(provider.currentUser != null ? provider.currentUser!.userName : "User not found",
+                          style: AppTextStyles.headingTextStyle3,),),
                     Expanded(child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [

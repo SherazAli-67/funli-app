@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/reels_page/reels_page.dart';
+import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
@@ -76,7 +77,7 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
   @override
   Widget build(BuildContext context) {
     if (_reels.isEmpty && _isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return ReelsGridShimmer();
     }
 
     if (_reels.isEmpty) {

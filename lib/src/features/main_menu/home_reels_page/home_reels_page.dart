@@ -233,7 +233,12 @@ class _HomeReelsPageState extends State<HomeReelsPage> {
                                               FutureBuilder(future: UserService.getUserByID(userID: reel.userID), builder: (ctx, snap){
                                                 if(snap.hasData && snap.requireData != null){
                                                   _userModel = snap.requireData!;
-                                                  return Text(_userModel!.userName, style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),);
+                                                  return Text(
+                                                    _userModel!.userName,
+                                                    style: AppTextStyles
+                                                        .buttonTextStyle
+                                                        .copyWith(
+                                                        color: Colors.white, fontWeight: FontWeight.w700),);
                                                 }else if(snap.connectionState == ConnectionState.waiting){
                                                   return Align(
                                                       alignment: Alignment.topLeft,
@@ -242,7 +247,7 @@ class _HomeReelsPageState extends State<HomeReelsPage> {
 
                                                 return const SizedBox();
                                               }),
-                                              AppTextWidget(text: reel.caption),
+                                              AppTextWidget(text: reel.caption,),
                                             ],
                                           ),
                                         ),

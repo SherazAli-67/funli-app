@@ -5,12 +5,14 @@ import 'package:funli_app/src/res/firebase_constants.dart';
 class MoodService {
   static final CollectionReference _moodCollectionRef =  FirebaseFirestore.instance.collection(FirebaseConstants.moodsCollection);
 
-  static Future<List<ReelModel>> getReelsbyMood({required String mood})async{
+  static Future<Map<String, dynamic>> getReelsbyMood({required String mood})async{
+    DocumentSnapshot? lastDocument;
     List<ReelModel> reels = [];
     QuerySnapshot querySnapshot = await _moodCollectionRef
         .doc(mood)
-        .collection(FirebaseConstants.reelsCollection)
+        .collection(FirebaseConstants.reelsCollection).limit(5)
         .get();
+    lastDocument = querySnapshot.docs.last;
     List<String> reelIDs = querySnapshot.docs.map((doc)=> doc.id).toList();
 
     for (var reelID in reelIDs) {
@@ -23,6 +25,9 @@ class MoodService {
       }
     }
 
-    return reels;
+    return {
+      'reels' : reels,
+      'lastDocument' : lastDocument
+    };
   }
 }

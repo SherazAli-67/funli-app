@@ -19,5 +19,6 @@ class AppConstants {
   static const comingFromUserProfile = 'userProfile';
   static const comingFromHashtag = 'hashtag';
   static const comingFromMood = 'mood';
+  static const comingFromBookmark = 'bookmark';
 
 }

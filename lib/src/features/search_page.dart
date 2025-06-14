@@ -1,23 +1,29 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
+import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/filter_model.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
-import 'package:funli_app/src/models/reel_model.dart';
+import 'package:funli_app/src/providers/feels_search_provider.dart';
+import 'package:funli_app/src/providers/hashtag_search_provider.dart';
+import 'package:funli_app/src/providers/users_search_provider.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/services/search_service.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
+import 'package:provider/provider.dart';
 import '../helpers/formatting_helpers.dart';
 import '../models/user_model.dart';
 import '../res/app_colors.dart';
 import '../res/app_constants.dart';
 import '../res/app_textstyles.dart';
 import '../services/hashtag_service.dart';
+import '../services/reels_service.dart';
 import '../services/user_service.dart';
 import '../widgets/loading_widget.dart';
+import '../widgets/reel_likes_count.dart';
 import 'hashtagged_reels_page/hashtag_reels_page.dart';
 
 class SearchPage extends StatefulWidget{
@@ -30,10 +36,17 @@ class SearchPage extends StatefulWidget{
 class _SearchPageState extends State<SearchPage> {
 
   int selectedIndex = 0;
-  // List<ReelModel> _reels = [];
   String query = '';
+  late FeelsSearchProvider _feelProvider;
+  late UsersSearchProvider _userProvider;
+  late HashtagSearchProvider _hashtagProvider;
+
+  
   @override
   Widget build(BuildContext context) {
+     _userProvider = Provider.of<UsersSearchProvider>(context); // listen: true by default
+     _feelProvider = Provider.of<FeelsSearchProvider>(context);
+     _hashtagProvider = Provider.of<HashtagSearchProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Search Results", style: AppTextStyles.headingTextStyle3,),
@@ -47,7 +60,7 @@ class _SearchPageState extends State<SearchPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15),
             child: Column(
-              spacing: 10,
+              spacing: 20,
               children: [
                 SizedBox(
                   height: 48,
@@ -79,40 +92,38 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                 ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    spacing: 5,
-                    children: [
-                      SizedBox(
-                        height: 35,
-                        width: 100,
-                        child: selectedIndex == 0
-                            ?  PrimaryBtn(btnText: "Feels", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
-                            : SecondaryBtn(btnText: "Feels", icon: '', onTap: ()=> _onSelectFilterTypeTap(0), textStyle: AppTextStyles.bodyTextStyle,),
-                      ),
+                Row(
+                  spacing: 5,
+                  children: [
+                    SizedBox(
+                      height: 35,
+                      width: 100,
+                      child: selectedIndex == 0
+                          ?  PrimaryBtn(btnText: "Feels", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
+                          : SecondaryBtn(btnText: "Feels", icon: '', onTap: ()=> _onSelectFilterTypeTap(0), textStyle: AppTextStyles.bodyTextStyle,),
+                    ),
 
-                      SizedBox(
-                        height: 35,
-                        width: 100,
-                        child: selectedIndex == 1
-                            ?  PrimaryBtn(btnText: "Users", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
-                            : SecondaryBtn(btnText: "Users", icon: '', onTap: ()=> _onSelectFilterTypeTap(1), textStyle: AppTextStyles.bodyTextStyle,),
-                      ),
+                    SizedBox(
+                      height: 35,
+                      width: 100,
+                      child: selectedIndex == 1
+                          ?  PrimaryBtn(btnText: "Users", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
+                          : SecondaryBtn(btnText: "Users", icon: '', onTap: ()=> _onSelectFilterTypeTap(1), textStyle: AppTextStyles.bodyTextStyle,),
+                    ),
 
-                      SizedBox(
-                        height: 35,
-                        width: 127,
-                        child: selectedIndex == 2
-                            ?  PrimaryBtn(btnText: "Hashtags", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
-                            : SecondaryBtn(btnText: "Hashtags", icon: '', onTap: ()=> _onSelectFilterTypeTap(2), textStyle: AppTextStyles.bodyTextStyle,),
-                      ),
-                    ],
-                  ),
-                )
+                    SizedBox(
+                      height: 35,
+                      width: 127,
+                      child: selectedIndex == 2
+                          ?  PrimaryBtn(btnText: "Hashtags", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
+                          : SecondaryBtn(btnText: "Hashtags", icon: '', onTap: ()=> _onSelectFilterTypeTap(2), textStyle: AppTextStyles.bodyTextStyle,),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
+
           if(selectedIndex == 0)
             Expanded(child: _buildFeelsSearchWidget()),
 
@@ -126,160 +137,143 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  void _onSelectFilterTypeTap(int index) {
-    setState(()=> selectedIndex = index);
-  }
-
   Widget _buildUsersSearchWidget() {
-    return FutureBuilder(future: SearchService.getUsers(query), builder: (ctx,snapshot){
-      if(snapshot.hasData){
-        List<UserModel> users = snapshot.requireData;
-        return ListView.builder(
+    return NotificationListener<ScrollNotification>(
+        onNotification: (scrollInfo) {
+          if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+            _userProvider.fetchMore();
+          }
+          return false;
+        },
+        child: ListView.builder(
           padding: const EdgeInsets.all(8),
-          itemCount: users.length,
-         
+          itemCount: _userProvider.users.length,
+
           itemBuilder: (context, index) {
-            if (index >= users.length) {
+            if (index >= _userProvider.users.length) {
               return LoadingWidget();
             }
-            UserModel user = users[index];
+            UserModel user = _userProvider.users[index];
             return ListTile(
               onTap: (){
                 Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> RemoteUserProfilePage(userID: user.userID, userName: user.userName, profilePicture: user.profilePicture,)));
               },
-              contentPadding: EdgeInsets.zero,
+              contentPadding: EdgeInsets.symmetric(vertical: 10),
               leading: ProfilePictureWidget(profilePicture: user.profilePicture),
               title: Text(user.userName, style: AppTextStyles.buttonTextStyle,),
-              trailing: SizedBox(
-
-                width: 100,
-                child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
-                  if(snapshot.hasData){
-                    return snapshot.requireData
-                        ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 38,)
-                        : SizedBox(
-                      height: 38,
-                      width: 75,
-                      child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient,),
-                    );
-                  }else if(snapshot.connectionState == ConnectionState.waiting){
-                    return LoadingWidget();
-                  }
-
+              trailing: ConstrainedBox(constraints: BoxConstraints(maxWidth: 140, minWidth: 100), child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
+                if(snapshot.hasData){
+                  return snapshot.requireData
+                      ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 38,)
+                      : SizedBox(
+                    height: 38,
+                    width: 75,
+                    child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient,),
+                  );
+                }else if(snapshot.connectionState == ConnectionState.waiting){
                   return LoadingWidget();
-                }),
-              ),
+                }
+
+                return LoadingWidget();
+              }),),
             );
           },
-        );
-      }else if(snapshot.connectionState == ConnectionState.waiting){
-        return LoadingWidget();
-      }
-
-      return SizedBox();
-    });
+        ));
   }
 
   Widget _buildFeelsSearchWidget() {
-    return StreamBuilder(stream: SearchService.getReelsStream(query), builder: (ctx,snapshot){
-      if(snapshot.hasData){
-        List<ReelModel> reels = snapshot.requireData;
-        debugPrint("Reels found ${reels.length} for $query");
-        return GridView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: reels.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollInfo) {
+        if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+          _feelProvider.fetchMore();
+        }
+        return false;
+      },
+      child: _feelProvider.isLoading ? ReelsGridShimmer() : GridView.builder(
+        padding: const EdgeInsets.all(10),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            crossAxisSpacing: 6,
-            mainAxisSpacing: 6,
-            childAspectRatio: 9 / 16,
-          ),
-          itemBuilder: (context, index) {
-            if (index >= reels.length) {
-              return LoadingWidget();
-            }
-            ReelModel reel = reels[index];
-            final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
-
-            return GestureDetector(
-              onTap: () {
-                // open reel detail page if needed
-              },
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(thumbnailUrl),
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.grey[200],
+            childAspectRatio: 0.8,
+            crossAxisSpacing: 5,
+            mainAxisSpacing: 5
+        ),
+        itemCount: _feelProvider.reels.length,
+        itemBuilder: (ctx, index) {
+          final reel =  _feelProvider.reels[index];
+          return GestureDetector(
+            onTap: () {
+              // open reel detail page if needed
+            },
+            child: Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: CachedNetworkImageProvider(reel.thumbnailUrl!),
+                      fit: BoxFit.cover,
                     ),
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey[200],
                   ),
-                  Positioned(
-                      top: 10,
-                      left: 5,
-                      right: 5,
-                      child: FutureBuilder(future: UserService.getUserByID(userID: reel.userID), builder: (ctx, snapshot){
-                        if(snapshot.hasData && snapshot.requireData != null){
-                          UserModel user = snapshot.requireData!;
-                          return Row(
-                            spacing: 5,
-                            children: [
+                ),
+                Positioned(
+                    top: 10,
+                    left: 5,
+                    right: 5,
+                    child: FutureBuilder(future: UserService.getUserByID(userID: reel.userID), builder: (ctx, snapshot){
+                      if(snapshot.hasData && snapshot.requireData != null){
+                        UserModel user = snapshot.requireData!;
+                        return Row(
+                          spacing: 5,
+                          children: [
 
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundColor: AppColors.purpleColor,
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.white,
-                                  radius: 19,
-                                  backgroundImage: CachedNetworkImageProvider(user.profilePicture ?? AppIcons.icDummyImgUrl),
-                                ),
+                            CircleAvatar(
+                              radius: 20,
+                              backgroundColor: AppColors.purpleColor,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 19,
+                                backgroundImage: CachedNetworkImageProvider(user.profilePicture ?? AppIcons.icDummyImgUrl),
                               ),
-                              Expanded(child: Text(user.userName, style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
-                            ],
-                          );
-                        }
+                            ),
+                            Expanded(child: Text(user.userName, style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
+                          ],
+                        );
+                      }
 
-                        return SizedBox();
-                      })),
-                  Positioned(
-                      bottom: 10,
-                      left: 10,
-                      right: 0,
-                      child: Row(
-                        spacing: 5,
-                        children: [
+                      return SizedBox();
+                    })),
+                Positioned(
+                    bottom: 10,
+                    left: 10,
+                    right: 0,
+                    child: Row(
+                      spacing: 5,
+                      children: [
 
-                          CircleAvatar(
-                            radius: 12,
-                            backgroundColor: Colors.white,
-                            child: Center(child: Icon(Icons.play_arrow_rounded, ),),
-                          ),
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundColor: Colors.white,
+                          child: Center(child: Icon(Icons.play_arrow_rounded, ),),
+                        ),
 
-                         /* Expanded(
-                              child: FutureBuilder(future: ReelsService.getReelViewsCount(reelID: reel.reelID),
-                                  builder: (ctx, snapshot) {
-                                    if(snapshot.hasData && snapshot.requireData > 0){
-                                      return ReelLikesCountWidget(count: snapshot.requireData);
-                                    }
+                        Expanded(
+                            child: FutureBuilder(future: ReelsService.getReelViewsCount(reelID: reel.reelID),
+                                builder: (ctx, snapshot) {
+                                  if(snapshot.hasData && snapshot.requireData > 0){
+                                    return ReelLikesCountWidget(count: snapshot.requireData);
+                                  }
 
-                                    return ReelLikesCountWidget();
-                                  }))*/
-                        ],
-                      ))
-                ],
-              ),
-            );
-          },
-        );
-      }else if(snapshot.connectionState == ConnectionState.waiting){
-        return LoadingWidget();
-      }
-
-      return SizedBox();
-    });
+                                  return ReelLikesCountWidget();
+                                }))
+                      ],
+                    ))
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildHashtagSearchWidget() {
@@ -338,5 +332,26 @@ class _SearchPageState extends State<SearchPage> {
 
       return SizedBox();
     });
+  }
+
+
+  void _loadInitialData() {
+    switch (selectedIndex) {
+      case 0:
+        _feelProvider.fetchInitial();
+        break;
+      case 1:
+        _userProvider.fetchInitial(query: query);
+        break;
+      case 2:
+        _hashtagProvider.fetchInitial();
+        break;
+    }
+  }
+
+
+  void _onSelectFilterTypeTap(int index) {
+    setState(()=> selectedIndex = index);
+    _loadInitialData();
   }
 }
