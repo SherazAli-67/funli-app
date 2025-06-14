@@ -66,12 +66,19 @@ class _SearchPageState extends State<SearchPage> {
                   height: 48,
                   child: TextField(
                     onChanged: (val){
-                      query = val;
-                      setState(() {});
+                      if(selectedIndex == 0){
+                        val.isEmpty ? _feelProvider.fetchInitial(query: val) : _feelProvider.fetchReelsByQuery(query: val);
+                      }else if(selectedIndex == 1){
+                        _userProvider.fetchInitial(query: val);
+                      }
+
                     },
                     onSubmitted: (val){
-                      query = val;
-                      setState(() {});
+                      if(selectedIndex == 0){
+                        val.isEmpty ? _feelProvider.fetchInitial(query: val) : _feelProvider.fetchReelsByQuery(query: val);
+                      }else if(selectedIndex == 1){
+                        _userProvider.fetchInitial(query: val);
+                      }
                     },
                     textCapitalization: TextCapitalization.words,
                     onTapOutside: (val)=> FocusManager.instance.primaryFocus!.unfocus(),
@@ -189,7 +196,7 @@ class _SearchPageState extends State<SearchPage> {
         }
         return false;
       },
-      child: _feelProvider.isLoading ? ReelsGridShimmer() : GridView.builder(
+      child: _feelProvider.isLoading && _feelProvider.reels.isEmpty ? ReelsGridShimmer() : GridView.builder(
         padding: const EdgeInsets.all(10),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,

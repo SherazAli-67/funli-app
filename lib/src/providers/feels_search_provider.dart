@@ -16,6 +16,56 @@ class FeelsSearchProvider extends ChangeNotifier {
   bool get hasMore => _hasMore;
   bool get isLoading => _isLoading;
 
+  Future<void> fetchReelsByQuery({required String query}) async {
+
+    _query = query;
+    _reels.clear();
+    _lastDoc = null;
+    _hasMore = true;
+    if (!_hasMore || _isLoading) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    debugPrint("Fetching reels by query");
+    final userQuerySnap = await FirebaseFirestore.instance
+        .collection(FirebaseConstants.userCollection)
+        .where('userName', isGreaterThanOrEqualTo: query)
+        .where('userName', isLessThan: '${query}z')
+        .get();
+
+    final userIDs = userQuerySnap.docs.map((doc) => doc.id).toList();
+
+    Query<Map<String, dynamic>> queryRef = FirebaseFirestore.instance
+        .collection(FirebaseConstants.reelsCollection);
+
+// Search by caption
+//     if (query.isNotEmpty) {
+//       queryRef = queryRef
+//           .where('caption', isGreaterThanOrEqualTo: query)
+//           .where('caption', isLessThan: '${query}z');
+//     }
+
+// Additionally filter by matching userIDs (if any found)
+    if (userIDs.isNotEmpty) {
+      queryRef = queryRef.where('userID', whereIn: userIDs.take(5).toList()); // Firestore limit
+    }
+
+// Fetch
+    final snapshot = await queryRef.get();
+    if (snapshot.docs.isNotEmpty) {
+      _lastDoc = snapshot.docs.last;
+      _reels.addAll(snapshot.docs.map((e) => ReelModel.fromMap(e.data())));
+    }
+
+    debugPrint("Queried reels received: ${_reels.length}");
+    if (snapshot.docs.length < 10) {
+      _hasMore = false;
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
   Future<void> fetchInitial({String? query}) async {
     _query = query;
     _reels.clear();
@@ -30,7 +80,7 @@ class FeelsSearchProvider extends ChangeNotifier {
   }
 
   Future<void> _fetchReels() async {
-    debugPrint("Getting reels for search");
+    debugPrint("Getting reels for search: $_query");
     _isLoading = true;
     notifyListeners();
 
@@ -41,8 +91,8 @@ class FeelsSearchProvider extends ChangeNotifier {
 
     if (_query != null && _query!.isNotEmpty) {
       queryRef =
-          queryRef.where('caption', isGreaterThanOrEqualTo: _query!).where(
-              'caption', isLessThanOrEqualTo: '${_query!}\uf8ff');
+          queryRef..where('userName', isGreaterThanOrEqualTo: _query)
+              .where('userName', isLessThan: '${_query}z');
     }
 
     if (_lastDoc != null) {
