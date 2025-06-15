@@ -35,7 +35,7 @@ class AppRouter {
           BottomNavigationWidget(
             location: state.uri.toString(),
             backgroundColor:
-            state.uri.toString() == RouterEnum.dashboardView.routeName
+            state.uri.toString() == RouterEnum.discoverView.routeName
                 ? Colors.black
                 : null,
             child: child,
@@ -59,7 +59,7 @@ class AppRouter {
             ),
           ),
           GoRoute(
-            path: RouterEnum.dashboardView.routeName,
+            path: RouterEnum.discoverView.routeName,
             pageBuilder: (context, state) => customPageBuilderWidget(
               context,
               state,

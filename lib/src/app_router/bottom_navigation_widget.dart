@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:go_router/go_router.dart';
+import '../notification_service/notification_service.dart';
+import '../providers/size_provider.dart';
 import '../res/app_gradients.dart';
 
 
 
-class BottomNavigationWidget extends StatelessWidget {
+class BottomNavigationWidget extends StatefulWidget {
   const BottomNavigationWidget({
     super.key,
     this.child,
@@ -20,12 +23,26 @@ class BottomNavigationWidget extends StatelessWidget {
   final Color? backgroundColor;
 
   @override
+  State<BottomNavigationWidget> createState() => _BottomNavigationWidgetState();
+}
+
+class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
+
+  @override
+  void initState() {
+
+    _initNotificationService();
+    _initSize();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         alignment: Alignment.bottomCenter,
         children: [
-          child!,
+          widget.child!,
           Positioned(
               bottom: 0,
               right: 0,
@@ -114,6 +131,26 @@ class BottomNavigationWidget extends StatelessWidget {
   Widget _buildBottomNavigationItemWidget({required String icon, required bool isSelected, required VoidCallback onTap}) =>
       IconButton(onPressed: onTap, icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(isSelected ? Colors.black : Colors.white, BlendMode.srcIn),));
 
+  void _initNotificationService()async{
+    //Get notification permission then
+    await FirebaseNotificationsService.requestPermissions().then((value) {});
+    try{
+      await FirebaseNotificationsService.initializeLocalNotifications();
+      await FirebaseNotificationsService.initializeFirebaseMessaging().then((value) {
+        FirebaseNotificationsService.startNotificationListeners();
+      });
+      FirebaseNotificationsService.startNotificationClickListeners();
+    }catch(e){
+      debugPrint("Exception while notification configuration: ${e.toString()}");
+    }
+  }
+
+  void _initSize() {
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      Size size = MediaQuery.of(context).size;
+      context.read<SizeProvider>().setSize(size);
+    });
+  }
 }
 
 int _calculateSelectedIndex(BuildContext context) {
@@ -122,7 +159,7 @@ int _calculateSelectedIndex(BuildContext context) {
   if (location == RouterEnum.videoFeedView.routeName) {
     return 0;
   }
-  if (location == RouterEnum.dashboardView.routeName) {
+  if (location == RouterEnum.discoverView.routeName) {
     return 1;
   }
   if (location == RouterEnum.notificationView.routeName) {
@@ -140,7 +177,7 @@ void _onItemTapped(int index, BuildContext context) {
       GoRouter.of(context).go(RouterEnum.videoFeedView.routeName);
       break;
     case 1:
-      GoRouter.of(context).go(RouterEnum.dashboardView.routeName);
+      GoRouter.of(context).go(RouterEnum.discoverView.routeName);
       break;
     case 2:
       GoRouter.of(context).go(RouterEnum.notificationView.routeName);
@@ -151,4 +188,7 @@ void _onItemTapped(int index, BuildContext context) {
       break;
   }
 }
+
+
+
 

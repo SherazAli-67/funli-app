@@ -50,7 +50,8 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
     if(provider.currentUser != null){
       profilePicture = provider.currentUser!.profilePicture;
     }
-    // profilePicture = provider.
+
+
     return SafeArea(
       child: SingleChildScrollView(
         child: SizedBox(
@@ -64,9 +65,9 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                        flex: 2,
-                        child: Text(provider.currentUser != null ? provider.currentUser!.userName : "User not found",
-                          style: AppTextStyles.headingTextStyle3,),),
+                      flex: 2,
+                      child: Text(provider.currentUser != null ? provider.currentUser!.userName : "User not found",
+                        style: AppTextStyles.headingTextStyle3,),),
                     Expanded(child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -83,7 +84,7 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
                 ),
               ),
               const SizedBox(height: 20,),
-               ProfileInfoWidget(userID: userID),
+              ProfileInfoWidget(userID: userID),
               TabBar(
                 controller: _tabController,
                 dividerHeight: 1,
