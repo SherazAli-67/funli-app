@@ -51,6 +51,14 @@ class AppRouter {
             ),
           ),
           GoRoute(
+            path: RouterEnum.notificationView.routeName,
+            pageBuilder: (context, state) => customPageBuilderWidget(
+              context,
+              state,
+              const NotificationPage(),
+            ),
+          ),
+          GoRoute(
             path: RouterEnum.dashboardView.routeName,
             pageBuilder: (context, state) => customPageBuilderWidget(
               context,

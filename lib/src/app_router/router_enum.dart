@@ -18,6 +18,7 @@ enum RouterEnum {
 enum RouterEnum {
   dashboardView('/dashboard_view'),
   videoFeedView('/video_feed_view'),
+  notificationView('/notification_view'),
   profileView('/profile_view');
 
   final String routeName;
