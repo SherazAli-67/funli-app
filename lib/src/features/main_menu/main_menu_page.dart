@@ -4,6 +4,7 @@ import 'package:funli_app/src/features/main_menu/notifications/notification_page
 import 'package:funli_app/src/features/main_menu/home_reels_page/home_reels_page.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/discover_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart';
+import 'package:funli_app/src/features/main_menu/video_feed_view.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:provider/provider.dart';
 import '../../../main.dart';
@@ -23,7 +24,7 @@ class MainMenuPage extends StatefulWidget{
 class _MainMenuPageState extends State<MainMenuPage> with RouteAware{
 
   final List<Widget> _pages = [
-    SizedBox.expand(child: const HomeReelsPage()),
+    SizedBox.expand(child: VideoFeedView()),
     SizedBox.expand(child: const DiscoverPage()),
     SizedBox.expand(child: const NotificationPage()),
     SizedBox.expand(child: const UserProfilePage()),
@@ -74,7 +75,8 @@ class _MainMenuPageState extends State<MainMenuPage> with RouteAware{
                       gradient: AppGradients.primaryGradient
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 10.0, bottom: 25,top: 10, right: 10),
+                    // padding: const EdgeInsets.only(left: 10.0, bottom: 25,top: 10, right: 10),
+                    padding: EdgeInsets.all(10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

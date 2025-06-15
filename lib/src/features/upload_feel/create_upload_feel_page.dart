@@ -106,7 +106,11 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                     alignment: Alignment.bottomCenter,
                     children: [
             // Image.network(AppIcons.icDummyImgUrl,fit: BoxFit.cover, height: size.height,),
-                      CameraPreview(_controller),
+                      Transform.scale(
+                        scale: scale,
+                        alignment: Alignment.topCenter,
+                        child: CameraPreview(_controller),
+                      ),
             Positioned(
               bottom: 0,
               left: 30,

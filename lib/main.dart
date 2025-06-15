@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
+import 'package:funli_app/src/bloc_cubit/video_feed_cubit.dart';
+import 'package:funli_app/src/dependancy_injection/dependency_injector.dart';
 import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:funli_app/src/providers/feels_search_provider.dart';
@@ -26,6 +28,8 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
+
+  injectionSetup();
   runApp(MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_)=> PersonalInfoProvider()),
@@ -50,7 +54,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_)=> AuthCubit())
+        BlocProvider(create: (_)=> AuthCubit()),
+        BlocProvider(create: (context) => getIt<VideoFeedCubit>(),)
       ],
       child: MaterialApp(
         title: AppConstants.appTitle, navigatorObservers: [routeObserver],

@@ -29,7 +29,7 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      height: size.height*0.5,
+      height: size.height*0.6,
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -48,7 +48,7 @@ class _MoodSelectingScrollWheelWidgetState extends State<MoodSelectingScrollWhee
           const SizedBox(height: 24),
 
           SizedBox(
-            height: size.height * 0.19,
+            height: size.height * 0.2,
             child: Stack(
               alignment: Alignment.center,
               children: [

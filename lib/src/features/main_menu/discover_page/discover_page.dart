@@ -110,7 +110,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
               prefixIcon: Icon(Icons.search, color: AppColors.greyTextColor,),
             ),
           ),
-         /* const SizedBox(height: 20,),
+          const SizedBox(height: 20,),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -336,7 +336,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 }
 
                 return SizedBox();
-              }),*/
+              }),
         ],
       ),
     );

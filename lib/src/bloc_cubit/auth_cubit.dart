@@ -34,7 +34,7 @@ class AuthCubit extends Cubit<AuthStates>{
             errorMessage = e.message ?? e.toString();
             debugPrint("error while google sign in: ${e.message}");
           }
-
+          debugPrint("error while google sign in: ${errorMessage}");
           emit(SigningInFailed(errorMessage: errorMessage));
         }
       } else {

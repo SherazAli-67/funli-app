@@ -68,7 +68,7 @@ class _HomeReelsPageState extends State<HomeReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildCommentWidget();
+    debugPrint("In home reels page");
     return Consumer<ReelProvider>(
       builder: (context, provider, _) {
         final reels = provider.reels;
@@ -80,7 +80,8 @@ class _HomeReelsPageState extends State<HomeReelsPage> {
               provider.isLoading && reels.isEmpty
                   ? ReelsShimmerWidget()
                 : reels.isEmpty
-                  ?  Center(child: Text("No reels found for ${provider.selectedMood}, Try another", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),textAlign: TextAlign.center,) ) : buildReelsWidget(context, reels, provider),
+                  ? Center(child: Text("No reels found for ${provider.selectedMood}, Try another", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white), textAlign: TextAlign.center,))
+                  : buildReelsWidget(context, reels, provider),
               StreamBuilder(
                   stream: UserService.getCurrentUserStream(),
                   builder: (context, snapshot,) {
@@ -144,7 +145,6 @@ class _HomeReelsPageState extends State<HomeReelsPage> {
         child: WhiteCodelReels(
             context: context,
             loader: ReelsShimmerWidget(),
-            // loader: Expanded(child: Text("Loading", style: AppTextStyles.headingTextStyle3.copyWith(color: AppColors.purpleColor),)),
             isCaching: true,
             videoList:
             List.generate(reels.length, (index) => VideoModel(url: reels[index].videoUrl)),
@@ -174,6 +174,7 @@ class _HomeReelsPageState extends State<HomeReelsPage> {
 
               ReelsService.addViewToReel(reelID: reel.reelID);
               bool isPortrait = videoPlayerController.value.size.height > videoPlayerController.value.size.width;
+
 
               return Stack(
                 children: [
@@ -266,7 +267,7 @@ class _HomeReelsPageState extends State<HomeReelsPage> {
                     ),
                   ),
                   Positioned(
-                    bottom: 150,
+                    bottom: 100,
                     right: 5,
                     child: Column(
                       spacing: 10,

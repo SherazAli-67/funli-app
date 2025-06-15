@@ -66,7 +66,7 @@ class _AppTextFieldState extends State<AppTextField> {
             ],
           ),
         SizedBox(
-          height:  widget._maxLines > 1 ? null : 48,
+          height:  widget._maxLines > 1 ? null : 50,
           child: TextField(
             controller: widget._textController,
             style: AppTextStyles.bodyTextStyle,
