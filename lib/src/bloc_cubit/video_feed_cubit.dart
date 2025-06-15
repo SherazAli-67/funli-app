@@ -6,6 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:funli_app/src/bloc_cubit/video_feed_state.dart';
 import 'package:funli_app/src/models/reel_model.dart';
+import 'package:funli_app/src/res/local_storage_constants.dart';
+import 'package:funli_app/src/services/user_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../repository/i_video_feed_repository.dart';
 
@@ -136,5 +139,15 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     _preloadQueue.clear();
     _preloadedFiles.clear();
     return super.close();
+  }
+
+  Future<void> onMoodChange({required String mood}) async {
+    _preloadQueue.clear();
+    _preloadedFiles.clear();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setString(LocalStorageConstants.currentMoodKey, mood);
+
+    await UserService.updateMoodTo(mood);
+    loadVideos();
   }
 }

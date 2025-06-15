@@ -14,6 +14,7 @@ import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../helpers/formatting_helpers.dart';
 import '../models/user_model.dart';
@@ -55,6 +56,7 @@ class _SearchPageState extends State<SearchPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
+        leading: IconButton(onPressed: ()=> context.pop(), icon: Icon(Icons.arrow_back_ios_new_rounded)),
       ),
       body: SafeArea(child: Column(
         children: [

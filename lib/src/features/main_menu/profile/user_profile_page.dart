@@ -43,6 +43,7 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
   }
   @override
   Widget build(BuildContext context) {
+    debugPrint("User profile page");
     Size size  = Provider.of<SizeProvider>(context).size;
     final provider  = Provider.of<ProfileProvider>(context);
     userName = provider.userName;

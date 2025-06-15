@@ -344,7 +344,7 @@ class ReelsService {
     required void Function(bool) onHasMore,
   }) async {
     List<ReelModel> fetchedReels = [];
-    Query query = await FirebaseFirestore.instance
+    Query query =  FirebaseFirestore.instance
         .collection(FirebaseConstants.moodsCollection)
         .doc(mood)
         .collection(FirebaseConstants.reelsCollection)

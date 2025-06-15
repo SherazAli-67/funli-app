@@ -5,8 +5,6 @@ import 'package:funli_app/src/models/reel_model.dart';
 
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
-
-import '../../../main.dart';
 import '../../bloc_cubit/video_feed_cubit.dart';
 import '../../bloc_cubit/video_feed_state.dart';
 
@@ -17,8 +15,7 @@ class VideoFeedView extends StatefulWidget{
   State<VideoFeedView> createState() => _VideoFeedViewState();
 }
 
-class _VideoFeedViewState extends State<VideoFeedView>
-    with WidgetsBindingObserver,  RouteAware {
+class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserver{
   /// Maximum number of controllers to keep in cache
   final int _maxCacheSize = 3;
 
@@ -54,13 +51,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _disposeAllControllers();
-    routeObserver.unsubscribe(this);
     super.dispose();
-  }
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)! as PageRoute);
   }
 
   @override
@@ -77,19 +68,6 @@ class _VideoFeedViewState extends State<VideoFeedView>
     }
   }
 
-  // Called when page becomes visible again
-  @override
-  void didPopNext() {
-    _cleanupAndReinitializeCurrentVideo();
-    print("✅ MyPage is now visible again (returned to this page)");
-  }
-
-  // Called when page is pushed on top of this page
-  @override
-  void didPushNext() {
-    _pauseAllControllers();
-    print("🚫 MyPage is now covered (navigated to new page)");
-  }
   /// Initialize the first video when the view loads
   void _initializeFirstVideo() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -165,7 +143,15 @@ class _VideoFeedViewState extends State<VideoFeedView>
       await controller.initialize();
 
       // Set looping
-      controller.setLooping(true);
+      controller.setLooping(false); // important for detecting end
+      controller.addListener(() {
+        final isEnded = controller.value.position >= controller.value.duration &&
+            !controller.value.isPlaying;
+        if (isEnded) {
+          _onVideoCompleted();
+        }
+      });
+
 
       // Add to cache and update access order
       _controllerCache[video.reelID] = controller;
@@ -181,6 +167,14 @@ class _VideoFeedViewState extends State<VideoFeedView>
     }
   }
 
+  void _onVideoCompleted() {
+    if (_currentPage + 1 < _videos.length) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
   /// Play a controller if it exists and is initialized
   Future<void> _playController(String videoId) async {
     final controller = _controllerCache[videoId];

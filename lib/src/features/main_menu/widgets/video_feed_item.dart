@@ -1,17 +1,22 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:funli_app/src/bloc_cubit/video_feed_cubit.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 
 import 'package:video_player/video_player.dart';
 
+import '../../../app_data.dart';
 import '../../../res/app_colors.dart';
+import '../../../res/app_constants.dart';
 import '../../../res/app_icons.dart';
 import '../../../res/app_textstyles.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/app_text_widget.dart';
 import '../../../widgets/loading_widget.dart';
+import '../../../widgets/mood_selecting_scroll_wheel_widget.dart';
 import '../../../widgets/post_bookmark_widget.dart';
 import '../../../widgets/post_comment_widget.dart';
 import '../../../widgets/post_like_widget.dart';
@@ -185,6 +190,56 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
               ],
             ),
           ),
+          StreamBuilder(
+              stream: UserService.getCurrentUserStream(),
+              builder: (context, snapshot,) {
+                if(snapshot.hasData){
+                  String mood = snapshot.requireData.mood ?? 'Happy';
+                  return Positioned(
+                      top: 45,
+                      left: 20,
+                      right: 20,
+                      child: GestureDetector(
+                        onTap: ()async{
+                          final result = await showModalBottomSheet(
+                              isDismissible: false,
+                              context: context, builder: (_){
+                            return MoodSelectingScrollWheelWidget(selectedMood: mood,);
+                          });
+
+                          if(result != null){
+                            debugPrint("result found: $result");
+                            // Clear existing feed
+                            //Fetch new reels based on the mood
+                            context.read<VideoFeedCubit>().onMoodChange(mood: result);
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(AppConstants.appTitle, style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(99)
+                              ),
+                              child: Row(
+                                spacing: 20,
+                                children: [
+                                  Text("${AppData.getEmojiByMood(mood)} $mood", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w600),),
+                                  Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white,)
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ));
+                }
+
+                return SizedBox();
+              }
+          )
 
         ],
       ),

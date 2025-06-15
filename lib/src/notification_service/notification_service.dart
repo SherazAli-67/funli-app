@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:funli_app/src/services/auth_service.dart';
 
-import '../../main.dart';
-import '../features/main_menu/main_menu_page.dart';
 
 class FirebaseNotificationsService {
   static final notification = FlutterLocalNotificationsPlugin();
@@ -76,7 +74,6 @@ class FirebaseNotificationsService {
   }
   static Future<String?> notificationClickAction({required RemoteMessage message,}) async {
     try {
-      navigatorKey.currentState?.push(MaterialPageRoute(builder: (ctx)=> const MainMenuPage(comingFromNotification: true,)));
       return null;
     } catch (e) {
       return e.toString();

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:funli_app/src/app_router/app_router.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/bloc_cubit/video_feed_cubit.dart';
 import 'package:funli_app/src/dependancy_injection/dependency_injector.dart';
@@ -20,14 +21,11 @@ import 'package:funli_app/src/providers/users_search_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:provider/provider.dart';
 
-final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
-GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
 
   injectionSetup();
   runApp(MultiProvider(
@@ -52,13 +50,35 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final appRouter = getIt<AppRouter>();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_)=> AuthCubit()),
         BlocProvider(create: (context) => getIt<VideoFeedCubit>(),)
       ],
-      child: MaterialApp(
-        title: AppConstants.appTitle, navigatorObservers: [routeObserver],
+      child:  MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        routerConfig: appRouter.router,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          fontFamily: AppConstants.appFontFamily,
+          scaffoldBackgroundColor: Colors.white
+      ),
+      )
+
+     /* MaterialApp.router(
+        title: AppConstants.appTitle,
+        debugShowCheckedModeBanner: false,
+        routerConfig: appRouter.router,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          fontFamily: AppConstants.appFontFamily,
+          scaffoldBackgroundColor: Colors.white
+      ),
+      )*/
+
+      /*MaterialApp(
+        title: AppConstants.appTitle,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           fontFamily: AppConstants.appFontFamily,
@@ -80,7 +100,7 @@ class MyApp extends StatelessWidget {
               }
             },
           )
-      ),
+      ),*/
     );
   }
 }

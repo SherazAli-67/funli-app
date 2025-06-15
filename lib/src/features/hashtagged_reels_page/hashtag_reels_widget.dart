@@ -72,14 +72,14 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
           onTap: () {
             final reels = _reels.map((map)=> ReelModel.fromMap(map)).toList();
             Navigator.of(context).push(MaterialPageRoute(builder: (_) =>
-                ReelsPage(initialReels: reels,
+                ReelsPage(initialReels: reels.sublist(0,2),
                     selectedIndex: index,
                     mood: widget.isComingFromMood ? widget.tag : null,
                     tag: !widget.isComingFromMood ? widget.tag : null,
                     comingFrom: widget.isComingFromMood
                         ? AppConstants.comingFromMood
                         : AppConstants.comingFromHashtag,
-                  lastDocument: _lastDoc,
+                  lastDocument: null,
                 )));
           },
           child: Stack(

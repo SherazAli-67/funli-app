@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_data.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/filter_bottomsheet.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/filtered_reels_page.dart';
@@ -26,6 +27,7 @@ import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
+import 'package:go_router/go_router.dart';
 import '../../../loading_shimmers/reel_thumbnail_shimmer_item.dart';
 import '../../../loading_shimmers/trending_hashtag_shimmer.dart';
 import '../../../models/filter_model.dart';
@@ -91,8 +93,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
           TextField(
             readOnly: true,
             onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => SearchPage()));
+              // context.go(RouterEnum.searchView.routeName);
+              // Navigator.of(context).push(
+              //     MaterialPageRoute(builder: (ctx) => SearchPage()));
             },
             decoration: InputDecoration(
               filled: true,

@@ -4,10 +4,8 @@ import 'package:funli_app/src/features/main_menu/notifications/notification_page
 import 'package:funli_app/src/features/main_menu/home_reels_page/home_reels_page.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/discover_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart';
-import 'package:funli_app/src/features/main_menu/video_feed_view.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:provider/provider.dart';
-import '../../../main.dart';
 import '../../notification_service/notification_service.dart';
 import '../../providers/size_provider.dart';
 import '../../providers/tab_change_provider.dart';
@@ -15,16 +13,15 @@ import '../../res/app_icons.dart';
 import '../upload_feel/create_upload_feel_page.dart';
 
 class MainMenuPage extends StatefulWidget{
-  const MainMenuPage({super.key, this.comingFromNotification = false});
-  final bool comingFromNotification;
+  const MainMenuPage({super.key,});
   @override
   State<MainMenuPage> createState() => _MainMenuPageState();
 }
 
-class _MainMenuPageState extends State<MainMenuPage> with RouteAware{
+class _MainMenuPageState extends State<MainMenuPage>{
 
   final List<Widget> _pages = [
-    SizedBox.expand(child: VideoFeedView()),
+    SizedBox.expand(child: const HomeReelsPage()),
     SizedBox.expand(child: const DiscoverPage()),
     SizedBox.expand(child: const NotificationPage()),
     SizedBox.expand(child: const UserProfilePage()),
@@ -32,28 +29,12 @@ class _MainMenuPageState extends State<MainMenuPage> with RouteAware{
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_){
-      if(widget.comingFromNotification){
-        final provider = Provider.of<MainMenuTabChangeProvider>(context, listen: false);
-        provider.onTabChange(2);
 
-      }
-    });
     _initNotificationService();
     _initSize();
     super.initState();
   }
 
-  @override
-  void didChangeDependencies() {
-    routeObserver.subscribe(this, ModalRoute.of(context)! as PageRoute);
-    super.didChangeDependencies();
-  }
-  @override
-  void dispose() {
-    routeObserver.unsubscribe(this);
-    super.dispose();
-  }
   @override
   Widget build(BuildContext context) {
     return Consumer<MainMenuTabChangeProvider>(builder: (ctx, provider, _){
