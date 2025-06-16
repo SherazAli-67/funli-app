@@ -4,13 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
-import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/filter_bottomsheet.dart';
-import 'package:funli_app/src/features/main_menu/discover_page/filtered_reels_page.dart';
-import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
-import 'package:funli_app/src/features/reels_page/reels_page.dart';
-import 'package:funli_app/src/features/reels_page/updated_reels_page.dart';
-import 'package:funli_app/src/features/search_page.dart';
 import 'package:funli_app/src/helpers/formatting_helpers.dart';
 import 'package:funli_app/src/loading_shimmers/trending_feels_widget.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
@@ -68,11 +62,12 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   elevation: 0
               ),
               onPressed: () async {
-                final newFilter = await showFilterBottomSheet(
-                    context, currentFilter);
-              /* if(newFilter != null){
-                 Navigator.of(context).push(MaterialPageRoute(builder: (_)=> FilteredReelsPage(filter: newFilter)));
-               }*/
+                final newFilter = await showFilterBottomSheet( currentFilter);
+               if(newFilter != null){
+                 context.push(RouterEnum.filteredReelsView.routeName, extra: {
+                   'filter' : newFilter
+                 });
+               }
               }, child: Row(
             spacing: 10,
             children: [
@@ -95,9 +90,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
             readOnly: true,
             onTap: () {
               context.push(RouterEnum.searchView.routeName);
-              // context.go(RouterEnum.searchView.routeName);
-              // Navigator.of(context).push(
-              //     MaterialPageRoute(builder: (ctx) => SearchPage()));
             },
             decoration: InputDecoration(
               filled: true,
@@ -138,7 +130,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () {
-                                      Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => HashtagReelsPage(hashtag: hashtag.tag)));
+                                      context.push(RouterEnum.hashtagsReelsView.routeName, extra: {
+                                        'tag' : hashtag.tag
+                                      });
                                     },
                                     child: RichText(text: TextSpan(
                                       children: [
@@ -229,7 +223,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                             spacing: 10,
                             children: [
                               ListTile(
-                                onTap: () => _onMoodTap(context, mood.mood),
+                                onTap: () => _onMoodTap(mood.mood),
                                 leading: Container(
                                   decoration: BoxDecoration(
                                       shape: BoxShape.circle,
@@ -247,7 +241,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                       .copyWith(fontWeight: FontWeight.w300,
                                       color: AppColors.hintTextColor),),
                                 trailing: GestureDetector(
-                                  onTap: () => _onMoodTap(context, mood.mood),
+                                  onTap: () => _onMoodTap(mood.mood),
                                   child: SizedBox(
                                       width: 100,
                                       child: Row(
@@ -296,18 +290,19 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                     backgroundColor: AppColors.yellowAccentColor,
                                                     padding: EdgeInsets.all(20)
                                                   ),
-                                                  onPressed: ()=> _onMoodTap(context, mood.mood), icon: Icon(Icons.arrow_forward_rounded, size: 30,))
+                                                  onPressed: ()=> _onMoodTap(mood.mood), icon: Icon(Icons.arrow_forward_rounded, size: 30,))
                                                   : GestureDetector(
                                                 onTap: (){
-                                                  Navigator.of(context).push(
-                                                      MaterialPageRoute(
-                                                          builder: (ctx) =>
-                                                              UpdatedReelsPage(
-                                                                  initialReels: reels,
-                                                                  selectedIndex: index,
-                                                                  lastDocument: lastDoc,
-                                                                  mood: mood.mood,
-                                                                  comingFrom: AppConstants.comingFromMood)));
+                                                  context.push(
+                                                    RouterEnum.updatedReelsView.routeName,
+                                                    extra: {
+                                                      'initialReels': reels,
+                                                      'selectedIndex': index,
+                                                      'lastDocument': lastDoc,
+                                                      'comingFrom': AppConstants.comingFromMood, // or 'profile', etc.
+                                                      'mood': mood.mood,
+                                                    },
+                                                  );
                                                 },
                                                 child: Padding(
                                                   padding: const EdgeInsets.all(5),
@@ -352,12 +347,13 @@ class _DiscoverPageState extends State<DiscoverPage> {
     "Set to comment due to development of other features",
     style: AppTextStyles.bodyTextStyle, textAlign: TextAlign.center,),);
 
-  void _onMoodTap(BuildContext context, String mood) {
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => MoodReelsPage(mood: mood)));
+  void _onMoodTap(String mood) {
+    context.push(RouterEnum.moodReelsView.routeName, extra: {
+      'mood' : mood
+    });
   }
 
-  Future<ReelFilter?> showFilterBottomSheet(BuildContext context, ReelFilter currentFilter) {
+  Future<ReelFilter?> showFilterBottomSheet(ReelFilter currentFilter) {
     return showModalBottomSheet<ReelFilter>(
       context: context,
       backgroundColor: Colors.white,

@@ -1,7 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
+import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../models/filter_model.dart';
 import '../../../models/reel_model.dart';
@@ -136,8 +139,7 @@ class _FilteredReelsPageState extends State<FilteredReelsPage> {
             return LoadingWidget();
           }
           if (index < _reels.length) {
-            ReelModel reel = _reels[index];
-            return _buildReelItem(reel);
+            return _buildReelItem(index);
           } else if (_hasMore) {
             return const Padding(
               padding: EdgeInsets.all(16.0),
@@ -156,11 +158,21 @@ class _FilteredReelsPageState extends State<FilteredReelsPage> {
     );
   }
 
-  Widget _buildReelItem(ReelModel reel) {
+  Widget _buildReelItem(int index) {
+    ReelModel reel = _reels[index];
     final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
     return GestureDetector(
       onTap: () {
         // open reel detail page if needed
+        context.push(
+          RouterEnum.updatedReelsView.routeName,
+          extra: {
+            'initialReels': _reels,
+            'selectedIndex': index,
+            'lastDocument': _lastDocument,
+            'comingFrom': AppConstants.comingFromSearch,
+          },
+        );
       },
       child: Stack(
         children: [

@@ -27,7 +27,7 @@ class TrendingFeelsWidget extends StatelessWidget {
               child: Column(
                 children: [
                   Row(
-                    spacing: 20,
+                    spacing: 10,
                     children: [
                       Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
                         height: 50,

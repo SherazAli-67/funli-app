@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/reels_page/reels_page.dart';
 import 'package:funli_app/src/features/reels_page/updated_reels_page.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
@@ -10,6 +11,7 @@ import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/reel_likes_count.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../models/reel_model.dart';
 import '../../res/app_colors.dart';
@@ -72,16 +74,14 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
         return GestureDetector(
           onTap: () {
             final reels = _reels.map((map)=> ReelModel.fromMap(map)).toList();
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) =>
-                UpdatedReelsPage(initialReels: reels,
-                    selectedIndex: index,
-                    mood: widget.isComingFromMood ? widget.tag : null,
-                    tag: !widget.isComingFromMood ? widget.tag : null,
-                    comingFrom: widget.isComingFromMood
-                        ? AppConstants.comingFromMood
-                        : AppConstants.comingFromHashtag,
-                  lastDocument: null,
-                )));
+            context.push(RouterEnum.updatedReelsView.routeName,  extra: {
+              'initialReels': reels,
+              'selectedIndex': index,
+              'lastDocument': _lastDoc,
+              'comingFrom':widget.isComingFromMood ? AppConstants.comingFromMood : AppConstants.comingFromHashtag,
+              'mood': widget.isComingFromMood ? widget.tag : null,
+              'tag':!widget.isComingFromMood ? widget.tag : null,
+            },);
           },
           child: Stack(
             children: [

@@ -17,7 +17,7 @@ class FilterBottomSheet extends StatelessWidget{
 
     return StatefulBuilder(builder: (context, setState) {
       return Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.only(left: 20,right: 20, top: 20, bottom: 100),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           spacing: 16,
@@ -111,7 +111,7 @@ class FilterBottomSheet extends StatelessWidget{
                 prefixIcon: AppIcons.icLanguage,
                 hintText: 'Urdu',
                 titleText: 'Language'),*/
-            const SizedBox(height: 20,),
+
             Row(
               spacing: 20,
               children: [

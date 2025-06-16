@@ -1,8 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
-import 'package:funli_app/src/features/reels_page/reels_page.dart';
-import 'package:funli_app/src/features/reels_page/updated_reels_page.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/filter_model.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
@@ -27,7 +26,6 @@ import '../services/reels_service.dart';
 import '../services/user_service.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/reel_likes_count.dart';
-import 'hashtagged_reels_page/hashtag_reels_page.dart';
 
 class SearchPage extends StatefulWidget{
   const SearchPage({super.key, this.reelFilter});
@@ -171,7 +169,12 @@ class _SearchPageState extends State<SearchPage> {
             UserModel user = _userProvider.users[index];
             return ListTile(
               onTap: (){
-                Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> RemoteUserProfilePage(userID: user.userID, userName: user.userName, profilePicture: user.profilePicture,)));
+                context.push(RouterEnum.remoteUserProfileView.routeName, extra: {
+                  'userID' : user.userID,
+                  'userName' : user.userName,
+                  'profilePicture' : user.profilePicture
+                });
+
               },
               contentPadding: EdgeInsets.symmetric(vertical: 10),
               leading: ProfilePictureWidget(profilePicture: user.profilePicture),
@@ -217,7 +220,12 @@ class _SearchPageState extends State<SearchPage> {
           final reel =  _feelProvider.reels[index];
           return GestureDetector(
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> UpdatedReelsPage(initialReels: _feelProvider.reels, selectedIndex: index, comingFrom: AppConstants.comingFromSearch, lastDocument: _feelProvider.lastDoc,)));
+              context.push(RouterEnum.updatedReelsView.routeName,   extra: {
+                'initialReels': _feelProvider.reels,
+                'selectedIndex': index,
+                'lastDocument': _feelProvider.lastDoc,
+                'comingFrom':  AppConstants.comingFromSearch,
+              },);
             },
             child: Stack(
               children: [
@@ -312,7 +320,9 @@ class _SearchPageState extends State<SearchPage> {
                   Expanded(
                     child: GestureDetector(
                       onTap: (){
-                        Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> HashtagReelsPage(hashtag: hashtag.tag)));
+                        context.push(RouterEnum.hashtagsReelsView.routeName, extra: {
+                          'tag' : hashtag.tag
+                        });
                       },
                       child: RichText(text: TextSpan(
                         children: [
