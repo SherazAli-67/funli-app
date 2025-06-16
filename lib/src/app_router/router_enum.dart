@@ -31,6 +31,16 @@ enum RouterEnum {
   hashtagsReelsView('/hashtagReels-view'),
   filteredReelsView('/filteredReels-view'),
   remoteUserProfileView('/remoteUserProfile-view'),
+
+  //profile pages
+  profileSettingsView('/profileSettings-view'),
+  updateProfileView('updateProfile-view'),
+  securityAndPrivacyView('/securityAndPrivacy-view'),
+  contentPreferenceView('/contentPreference-view'),
+  reportAProblemView('/reportAProblem-view'),
+  helpCenterView('/helpCenter-view'),
+  termsAndPrivacyView('/termsAndPrivacy-view'),
+
   //BottomNav
   discoverView('/discover_view'),
   videoFeedView('/video_feed_view'),

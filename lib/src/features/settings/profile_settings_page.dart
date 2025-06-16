@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
-import 'package:funli_app/src/features/settings/content_preferences_page.dart';
-import 'package:funli_app/src/features/settings/privacy_security.dart';
 import 'package:funli_app/src/features/settings/widgets/settings_item_widget.dart';
-import 'package:funli_app/src/features/welcome_page.dart';
-import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class ProfileSettingsPage extends StatelessWidget{
@@ -63,10 +61,10 @@ class ProfileSettingsPage extends StatelessWidget{
                   SettingsItemWidget(icon: AppIcons.icVisibility, title: 'Dark Mode',  isSwitch: true,),
                   SettingsItemWidget(icon: AppIcons.icSecurity, title: 'Security & Privacy', onTap: ()=> _onSecurityPrivacyTap(context),),
                   SettingsItemWidget(icon: AppIcons.icVideo, title: 'Content Preferences', onTap: ()=> _onContentPreferencesTap(context),),
-                  SettingsItemWidget(icon: AppIcons.icEdit, title: 'Report a Problem', ),
+                  SettingsItemWidget(icon: AppIcons.icEdit, title: 'Report a Problem', onTap: ()=> _onReportProblemTap(context),),
                   SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Dark Mode',),
-                  SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Help Center',),
-                  SettingsItemWidget(icon: AppIcons.icTermsPrivacy, title: 'Terms & Service', ),
+                  SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Help Center', onTap: ()=> _onHelpCenterTap(context),),
+                  SettingsItemWidget(icon: AppIcons.icTermsPrivacy, title: 'Terms & Service',onTap: ()=> _onTermsPrivacyTap(context), ),
         
                 ],
               ),
@@ -87,18 +85,34 @@ class ProfileSettingsPage extends StatelessWidget{
     debugPrint("DOB year: ${dob.toIso8601String()}");
     return currentYear - dobYear;
   }
+
   void _onLogoutTap(BuildContext context){
     //Clear all cache and logout - reset from everywhere
     final provider = Provider.of<ProfileProvider>(context, listen: false);
     provider.clear();
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> WelcomePage()), (val)=> false);
+    while(context.canPop()){
+      context.pop();
+    }
+    context.push(RouterEnum.welcomeView.routeName);
   }
   
   void _onSecurityPrivacyTap(BuildContext context){
-    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> PrivacySecurity()));
+    context.push(RouterEnum.securityAndPrivacyView.routeName);
   }
 
   void _onContentPreferencesTap(BuildContext context){
-    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> ContentPreferencesPage()));
+    context.push(RouterEnum.contentPreferenceView.routeName);
+  }
+
+  void _onReportProblemTap(BuildContext context){
+    context.push(RouterEnum.reportAProblemView.routeName);
+  }
+
+  void _onHelpCenterTap(BuildContext context){
+    context.push(RouterEnum.helpCenterView.routeName);
+  }
+
+  void _onTermsPrivacyTap(BuildContext context){
+    context.push(RouterEnum.termsAndPrivacyView.routeName);
   }
 }

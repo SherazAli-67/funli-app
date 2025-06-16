@@ -6,12 +6,19 @@ import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.
 import 'package:funli_app/src/features/main_menu/discover_page/discover_page.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/filtered_reels_page.dart';
 import 'package:funli_app/src/features/main_menu/notifications/notification_page.dart';
+import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/home_reels_page/video_feed_view.dart';
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
 import 'package:funli_app/src/features/personalization/personalization_page.dart';
 import 'package:funli_app/src/features/search_page.dart';
+import 'package:funli_app/src/features/settings/content_preferences_page.dart';
+import 'package:funli_app/src/features/settings/help_center_page.dart';
+import 'package:funli_app/src/features/settings/privacy_security.dart';
+import 'package:funli_app/src/features/settings/profile_settings_page.dart';
+import 'package:funli_app/src/features/settings/report_problem_page.dart';
+import 'package:funli_app/src/features/settings/terms_privacy_page.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:go_router/go_router.dart';
 
@@ -141,6 +148,41 @@ class AppRouter {
             child: RemoteUserProfilePage(userID: extras['userID'], userName: extras['userName'], profilePicture: extras['profilePicture'],)
           );
         },
+      ),
+      GoRoute(
+        path: RouterEnum.profileSettingsView.routeName,
+        builder: (BuildContext context, GoRouterState state) =>
+        const ProfileSettingsPage(),
+      ),
+      GoRoute(
+        path: RouterEnum.updateProfileView.routeName,
+        builder: (BuildContext context, GoRouterState state) =>
+        const EditProfilePage(),
+      ),
+      GoRoute(
+        path: RouterEnum.securityAndPrivacyView.routeName,
+        builder: (BuildContext context, GoRouterState state) =>
+        const PrivacySecurity(),
+      ),
+      GoRoute(
+        path: RouterEnum.contentPreferenceView.routeName,
+        builder: (BuildContext context, GoRouterState state) =>
+        const ContentPreferencesPage(),
+      ),
+      GoRoute(
+        path: RouterEnum.reportAProblemView.routeName,
+        builder: (BuildContext context, GoRouterState state) =>
+        const ReportProblemPage(),
+      ),
+      GoRoute(
+        path: RouterEnum.helpCenterView.routeName,
+        builder: (BuildContext context, GoRouterState state) =>
+        const HelpCenterPage(),
+      ),
+      GoRoute(
+        path: RouterEnum.termsAndPrivacyView.routeName,
+        builder: (BuildContext context, GoRouterState state) =>
+        const TermsPrivacyPage(),
       ),
       GoRoute(
         path: RouterEnum.updatedReelsView.routeName,
