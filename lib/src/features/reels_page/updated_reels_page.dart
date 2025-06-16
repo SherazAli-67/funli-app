@@ -73,6 +73,7 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
         _initializeControllerIfNeeded(
           _videos[_currentPage].reelID,
           _videos[_currentPage].videoUrl,
+          shouldPlay: true,
         );
       }
     });
@@ -96,7 +97,37 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
     }
   }
 
-  void _initializeControllerIfNeeded(String reelID, String videoUrl) async {
+  void _initializeControllerIfNeeded(String reelID, String videoUrl, {bool shouldPlay = false}) async {
+    if (_controllerCache.containsKey(reelID)) {
+      _accessOrder.remove(reelID);
+      _accessOrder.insert(0, reelID);
+
+      if (shouldPlay) {
+        _playController(reelID);
+      }
+      return;
+    }
+
+    final file = await _cubit.getCachedVideoFile(videoUrl);
+    final controller = VideoPlayerController.file(file);
+    await controller.initialize();
+    controller.setLooping(true);
+    _controllerCache[reelID] = controller;
+    _accessOrder.insert(0, reelID);
+
+    if (_controllerCache.length > _maxCacheSize) {
+      final String lastUsed = _accessOrder.removeLast();
+      _disposeController(lastUsed);
+    }
+
+    if (shouldPlay) {
+      controller.play();
+    }
+
+    if (mounted) setState(() {});
+  }
+
+  /*void _initializeControllerIfNeeded(String reelID, String videoUrl) async {
     if (_controllerCache.containsKey(reelID)) {
       _accessOrder.remove(reelID);
       _accessOrder.insert(0, reelID);
@@ -116,7 +147,7 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
     }
 
     if (mounted) setState(() {});
-  }
+  }*/
 
   void _disposeController(String reelID) async {
     if (_disposingControllers.contains(reelID)) return;
@@ -151,8 +182,11 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
               setState(() => _currentPage = index);
               _cubit.onPageChanged(index);
 
-              _initializeControllerIfNeeded(_videos[index].reelID, _videos[index].videoUrl);
-              _playController(_videos[index].reelID);
+              _initializeControllerIfNeeded(
+                _videos[index].reelID,
+                _videos[index].videoUrl,
+                shouldPlay: true,
+              );
             },
             itemBuilder: (context, index) {
               final reel = _videos[index];

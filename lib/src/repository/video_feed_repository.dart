@@ -54,10 +54,7 @@ class VideoFeedRepository implements IVideoFeedRepository {
           _reelsColRef.where("moodTag", isEqualTo: mood)
           .orderBy('createdAt', descending: true)
               .limit(2);
-      // Query query = _firestore
-      //     .collection(FirebaseConstants.reelsCollection)
-      //     .orderBy('createdAt', descending: true)
-      //     .limit(2);
+
 
       if (startAfterDocument != null) {
         query = query.startAfterDocument(startAfterDocument);

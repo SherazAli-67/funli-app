@@ -73,9 +73,13 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final state = context.read<VideoFeedCubit>().state;
       if (state.videos.isNotEmpty) {
-        setState(() => _videos = state.videos);
+        _videos = state.videos;
+
 
         await _initAndPlayVideo(0);
+        if(mounted) {
+          setState(() {});
+        }
       }
     });
   }
@@ -106,7 +110,9 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
 
     final video = _videos[index];
     await _getOrCreateController(video);
-    await _playController(video.reelID);
+    if(index != 0){
+      await _playController(video.reelID);
+    }
 
     if (mounted) setState(() {});
   }
@@ -152,7 +158,6 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
         }
       });
 
-
       // Add to cache and update access order
       _controllerCache[video.reelID] = controller;
       _touchController(video.reelID);
@@ -160,6 +165,18 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
       // Enforce cache size limit
       _enforceCacheLimit();
 
+
+      if(_currentPage == 0){
+        // ✅ Immediately play if it's the current video
+        if (_videos.isNotEmpty &&
+            _videos[_currentPage].reelID == video.reelID &&
+            mounted) {
+          await controller.play();
+        }
+      }
+      if(mounted){
+        setState(() {});
+      }
       return controller;
     } catch (e) {
       debugPrint('Error initializing controller: $e');
@@ -178,9 +195,7 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
   /// Play a controller if it exists and is initialized
   Future<void> _playController(String videoId) async {
     final controller = _controllerCache[videoId];
-    if (controller != null &&
-        controller.value.isInitialized &&
-        !controller.value.isPlaying) {
+    if (controller != null && controller.value.isInitialized && !controller.value.isPlaying) {
       try {
         await controller.play();
       } catch (e) {

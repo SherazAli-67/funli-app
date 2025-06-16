@@ -59,7 +59,7 @@ class AppRouter {
             pageBuilder: (context, state) => customPageBuilderWidget(
               context,
               state,
-              const VideoFeedView(),
+              SizedBox.expand(child: const VideoFeedView()),
             ),
           ),
           GoRoute(
