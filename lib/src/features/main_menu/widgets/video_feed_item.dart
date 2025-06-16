@@ -48,7 +48,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
         children: [
           OptimizedVideoPlayer(controller: widget.controller, videoId: widget.reel.reelID),
           Positioned(
-            bottom: 80,
+            bottom: 0,
             left: 0,
             right: 0,
             child: Column(
@@ -123,7 +123,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
             ),
           ),
           Positioned(
-            bottom: 100,
+            bottom: 20,
             right: 5,
             child: Column(
               spacing: 10,

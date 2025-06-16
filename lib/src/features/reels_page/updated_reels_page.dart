@@ -105,16 +105,26 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
       if (shouldPlay) {
         _playController(reelID);
       }
-
       return;
     }
 
     final file = await _cubit.getCachedVideoFile(videoUrl);
     final controller = VideoPlayerController.file(file);
     await controller.initialize();
-    controller.setLooping(true);
+    controller.setLooping(false); // Disable looping to detect video end
     _controllerCache[reelID] = controller;
     _accessOrder.insert(0, reelID);
+
+    // Listen for video end
+    controller.addListener(() {
+      final bool isEnded = controller.value.position >= controller.value.duration &&
+          !controller.value.isPlaying &&
+          controller.value.position != Duration.zero;
+
+      if (isEnded && _videos.indexWhere((v) => v.reelID == reelID) == _currentPage) {
+        _goToNextReel();
+      }
+    });
 
     if (_controllerCache.length > _maxCacheSize) {
       final String lastUsed = _accessOrder.removeLast();
@@ -127,28 +137,6 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
 
     if (mounted) setState(() {});
   }
-
-  /*void _initializeControllerIfNeeded(String reelID, String videoUrl) async {
-    if (_controllerCache.containsKey(reelID)) {
-      _accessOrder.remove(reelID);
-      _accessOrder.insert(0, reelID);
-      return;
-    }
-
-    final file = await _cubit.getCachedVideoFile(videoUrl);
-    final controller = VideoPlayerController.file(file);
-    await controller.initialize();
-    controller.setLooping(true);
-    _controllerCache[reelID] = controller;
-    _accessOrder.insert(0, reelID);
-
-    if (_controllerCache.length > _maxCacheSize) {
-      final String lastUsed = _accessOrder.removeLast();
-      _disposeController(lastUsed);
-    }
-
-    if (mounted) setState(() {});
-  }*/
 
   void _disposeController(String reelID) async {
     if (_disposingControllers.contains(reelID)) return;
@@ -164,22 +152,6 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
     final controller = _controllerCache[reelID];
     if (controller != null && controller.value.isInitialized) {
       controller.play();
-      controller.addListener(() {
-        final isEnded = controller.value.position >= controller.value.duration &&
-            !controller.value.isPlaying;
-        if (isEnded) {
-          _onVideoCompleted();
-        }
-      });
-    }
-  }
-
-  void _onVideoCompleted() {
-    if (_currentPage + 1 < _videos.length) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
     }
   }
 
@@ -191,34 +163,33 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
         _videos = state.videos;
 
         return Scaffold(
-          body: PreloadPageView.builder(
-            scrollDirection: Axis.vertical,
-            controller: _pageController,
-            itemCount: _videos.length,
-            onPageChanged: (index) {
-              setState(() => _currentPage = index);
-              _cubit.onPageChanged(index);
-
-              _initializeControllerIfNeeded(
-                _videos[index].reelID,
-                _videos[index].videoUrl,
-                shouldPlay: true,
-              );
-            },
-            itemBuilder: (context, index) {
-              final reel = _videos[index];
-              final controller = _controllerCache[reel.reelID];
-
-              return controller != null && controller.value.isInitialized
-                  ? RepaintBoundary(
-                child: VideoFeedItem(
-                  key: ValueKey(reel.reelID),
-                  controller: controller,
-                  reel: reel,
-                ),
-              )
-                  : const Center(child: CircularProgressIndicator());
-            },
+          body: SafeArea(
+            child: PreloadPageView.builder(
+              scrollDirection: Axis.vertical,
+              controller: _pageController,
+              itemCount: _videos.length,
+              onPageChanged: (index) {
+                setState(() => _currentPage = index);
+                _cubit.onPageChanged(index);
+            
+                _initializeControllerIfNeeded(_videos[index].reelID, _videos[index].videoUrl, shouldPlay: true);
+                _playController(_videos[index].reelID);
+              },
+              itemBuilder: (context, index) {
+                final reel = _videos[index];
+                final controller = _controllerCache[reel.reelID];
+            
+                return controller != null && controller.value.isInitialized
+                    ? RepaintBoundary(
+                  child: VideoFeedItem(
+                    key: ValueKey(reel.reelID),
+                    controller: controller,
+                    reel: reel,
+                  ),
+                )
+                    : const Center(child: CircularProgressIndicator());
+              },
+            ),
           ),
         );
       },
@@ -234,5 +205,16 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
     _controllerCache.clear();
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _goToNextReel() {
+    final nextIndex = _currentPage + 1;
+    if (nextIndex < _videos.length && _pageController.hasClients) {
+      _pageController.animateToPage(
+        nextIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 }
