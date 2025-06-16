@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
 import 'package:funli_app/src/features/reels_page/reels_page.dart';
+import 'package:funli_app/src/features/reels_page/updated_reels_page.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/filter_model.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
@@ -216,7 +217,7 @@ class _SearchPageState extends State<SearchPage> {
           final reel =  _feelProvider.reels[index];
           return GestureDetector(
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> ReelsPage(initialReels: _feelProvider.reels, selectedIndex: index, comingFrom: AppConstants.comingFromSearch, lastDocument: _feelProvider.lastDoc,)));
+              Navigator.of(context).push(MaterialPageRoute(builder: (_)=> UpdatedReelsPage(initialReels: _feelProvider.reels, selectedIndex: index, comingFrom: AppConstants.comingFromSearch, lastDocument: _feelProvider.lastDoc,)));
             },
             child: Stack(
               children: [

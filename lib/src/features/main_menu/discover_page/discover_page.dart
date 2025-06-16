@@ -9,6 +9,7 @@ import 'package:funli_app/src/features/main_menu/discover_page/filter_bottomshee
 import 'package:funli_app/src/features/main_menu/discover_page/filtered_reels_page.dart';
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
 import 'package:funli_app/src/features/reels_page/reels_page.dart';
+import 'package:funli_app/src/features/reels_page/updated_reels_page.dart';
 import 'package:funli_app/src/features/search_page.dart';
 import 'package:funli_app/src/helpers/formatting_helpers.dart';
 import 'package:funli_app/src/loading_shimmers/trending_feels_widget.dart';
@@ -301,7 +302,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                                   Navigator.of(context).push(
                                                       MaterialPageRoute(
                                                           builder: (ctx) =>
-                                                              ReelsPage(
+                                                              UpdatedReelsPage(
                                                                   initialReels: reels,
                                                                   selectedIndex: index,
                                                                   lastDocument: lastDoc,

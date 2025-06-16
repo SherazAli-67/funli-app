@@ -5,8 +5,8 @@ import 'package:funli_app/src/models/reel_model.dart';
 
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
-import '../../bloc_cubit/video_feed_cubit.dart';
-import '../../bloc_cubit/video_feed_state.dart';
+import '../../../bloc_cubit/video_feed_cubit.dart';
+import '../../../bloc_cubit/video_feed_state.dart';
 
 class VideoFeedView extends StatefulWidget{
   const VideoFeedView({super.key});

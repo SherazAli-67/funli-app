@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:funli_app/src/features/reels_page/reels_page.dart';
+import 'package:funli_app/src/features/reels_page/updated_reels_page.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_constants.dart';
@@ -72,7 +73,7 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
           onTap: () {
             final reels = _reels.map((map)=> ReelModel.fromMap(map)).toList();
             Navigator.of(context).push(MaterialPageRoute(builder: (_) =>
-                ReelsPage(initialReels: reels.sublist(0,2),
+                UpdatedReelsPage(initialReels: reels,
                     selectedIndex: index,
                     mood: widget.isComingFromMood ? widget.tag : null,
                     tag: !widget.isComingFromMood ? widget.tag : null,

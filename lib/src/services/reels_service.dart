@@ -380,6 +380,51 @@ class ReelsService {
     return fetchedReels;
   }
 
+  static Future<List<ReelModel>> fetchReelsByTag({
+    required String tag,
+    required DocumentSnapshot? lastDoc,
+    required int limit,
+    required void Function(DocumentSnapshot?) onLastDoc,
+    required void Function(bool) onHasMore,
+  }) async {
+    List<ReelModel> fetchedReels = [];
+    Query query =  FirebaseFirestore.instance
+        .collection(FirebaseConstants.hashtagsCollections)
+        .doc(tag)
+        .collection(FirebaseConstants.reelsCollection)
+        .orderBy('createdAt', descending: true)
+        .limit(limit);
+
+    if (lastDoc != null) {
+      query = query.startAfterDocument(lastDoc);
+    }
+
+    final querySnapshot = await query.get();
+    final docs = querySnapshot.docs;
+
+    if (docs.isNotEmpty) {
+      onLastDoc(querySnapshot.docs.last);
+      onHasMore(querySnapshot.docs.length == limit);
+      for (var doc in querySnapshot.docs) {
+        final reelID = doc.id;
+        final reelSnap = await FirebaseFirestore.instance
+            .collection(FirebaseConstants.reelsCollection)
+            .doc(reelID)
+            .get();
+
+        if (reelSnap.exists) {
+          fetchedReels.add(ReelModel.fromMap(reelSnap.data()!));
+        }
+      }
+
+    }else{
+      onHasMore(false);
+    }
+
+    return fetchedReels;
+  }
+
+
   static Future<List<ReelModel>> fetchMoreReels({
     required DocumentSnapshot? lastDoc,
     required int limit,

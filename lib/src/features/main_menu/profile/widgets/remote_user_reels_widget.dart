@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/reels_page/reels_page.dart';
+import 'package:funli_app/src/features/reels_page/updated_reels_page.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
@@ -105,7 +106,7 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
         return GestureDetector(
           onTap: () {
             Navigator.of(context).push(MaterialPageRoute(builder: (ctx) =>
-                ReelsPage(
+                UpdatedReelsPage(
                   initialReels: _reels,
                   selectedIndex: index,
                   lastDocument: _lastDocument,
