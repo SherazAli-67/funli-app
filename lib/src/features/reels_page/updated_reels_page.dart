@@ -105,6 +105,7 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
       if (shouldPlay) {
         _playController(reelID);
       }
+
       return;
     }
 
@@ -163,6 +164,22 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
     final controller = _controllerCache[reelID];
     if (controller != null && controller.value.isInitialized) {
       controller.play();
+      controller.addListener(() {
+        final isEnded = controller.value.position >= controller.value.duration &&
+            !controller.value.isPlaying;
+        if (isEnded) {
+          _onVideoCompleted();
+        }
+      });
+    }
+  }
+
+  void _onVideoCompleted() {
+    if (_currentPage + 1 < _videos.length) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:video_player/video_player.dart';
 
 class OptimizedVideoPlayer extends StatefulWidget {
@@ -17,32 +16,31 @@ class OptimizedVideoPlayer extends StatefulWidget {
 }
 
 class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _loadingController;
+
   bool _isBuffering = false;
+  bool _isPlaying = false;
+  bool _showPlayPauseOverlay = false;
+
   VideoPlayerController? _oldController;
   String? _currentVideoId;
-  bool _isPlaying = false;
   Key _playerKey = UniqueKey();
 
   @override
   void initState() {
     super.initState();
+
     _loadingController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat();
+
+
+
     _oldController = widget.controller;
     _currentVideoId = widget.videoId;
     _addControllerListener();
-  }
-
-  void _addControllerListener() {
-    if (widget.controller != null) {
-      _isBuffering = widget.controller!.value.isBuffering;
-      _isPlaying = widget.controller!.value.isPlaying;
-      widget.controller!.addListener(_onControllerUpdate);
-    }
   }
 
   @override
@@ -59,14 +57,12 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
       _playerKey = UniqueKey();
       _addControllerListener();
 
-      // Schedule the setState for the next frame to avoid build errors
-      final bool shouldUpdateBuffering =
-          widget.controller?.value.isBuffering ?? false;
-      if (mounted && _isBuffering != shouldUpdateBuffering) {
+      final shouldBuffer = widget.controller?.value.isBuffering ?? false;
+      if (mounted && _isBuffering != shouldBuffer) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             setState(() {
-              _isBuffering = shouldUpdateBuffering;
+              _isBuffering = shouldBuffer;
             });
           }
         });
@@ -82,6 +78,15 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
     super.dispose();
   }
 
+  void _addControllerListener() {
+    final controller = widget.controller;
+    if (controller != null) {
+      _isBuffering = controller.value.isBuffering;
+      _isPlaying = controller.value.isPlaying;
+      controller.addListener(_onControllerUpdate);
+    }
+  }
+
   void _onControllerUpdate() {
     if (!mounted) return;
 
@@ -90,9 +95,7 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
 
     if (widget.videoId != _currentVideoId) return;
 
-    // Check if controller is disposed or in error state
     if (controller.value.hasError) {
-      // Schedule UI update for next frame to avoid build conflicts
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) setState(() => _isBuffering = false);
       });
@@ -102,10 +105,6 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
     final isBuffering = controller.value.isBuffering;
     final isPlaying = controller.value.isPlaying;
 
-    // Hide buffering indicator if:
-    // 1. Video is actually playing and has advanced
-    // 2. Video has loaded content (position > 0)
-    // 3. Video duration is known and valid
     bool shouldShowBuffering = isBuffering;
     if ((isPlaying && controller.value.position > Duration.zero) ||
         (controller.value.position > Duration.zero &&
@@ -113,9 +112,7 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
       shouldShowBuffering = false;
     }
 
-    // Only update state if something changed
     if (_isBuffering != shouldShowBuffering || _isPlaying != isPlaying) {
-      // Use post-frame callback to avoid setState during build
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           setState(() {
@@ -127,15 +124,34 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
     }
   }
 
+  void _togglePlayPause() async {
+    final controller = widget.controller;
+    if (controller == null || !controller.value.isInitialized) return;
+
+    setState(()=> _showPlayPauseOverlay = true);
+
+
+    if (controller.value.isPlaying) {
+      await controller.pause();
+    } else {
+      await controller.play();
+    }
+
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() => _showPlayPauseOverlay = false);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = widget.controller;
-
     if (controller == null || !controller.value.isInitialized) {
       return Center(
         child: RotationTransition(
           turns: Tween(begin: 0.0, end: 1.0).animate(_loadingController),
-          child: LoadingWidget(),
+          child: const CircularProgressIndicator(),
         ),
       );
     }
@@ -143,82 +159,67 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
     bool isPortrait = controller.value.size.height > controller.value.size.width;
 
     return GestureDetector(
-      onTap: () {
-        // Schedule state updates for the next frame to avoid build errors
-        if (controller.value.isPlaying) {
-          controller
-              .pause()
-              .then((_) {
-                if (mounted) {
-                  // Use post-frame callback to avoid setState during build
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) setState(() {});
-                  });
-                }
-              })
-              .catchError((e) {
-                debugPrint('Error pausing video: $e');
-              });
-        } else {
-          controller
-              .play()
-              .then((_) {
-                if (mounted) {
-                  // Use post-frame callback to avoid setState during build
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) setState(() {});
-                  });
-                }
-              })
-              .catchError((e) {
-                debugPrint('Error playing video: $e');
-              });
-        }
-      },
-      child: SizedBox.expand(
-        child:  Center(
-          key: _playerKey,
-          child: isPortrait
-              ? SizedBox.expand(
-            child: AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child: Stack(
-                children: [
-                  VideoPlayer(controller),
-                  if (_isBuffering)
-                    const Center(child: CircularProgressIndicator()),
-                ],
+      onTap: _togglePlayPause,
+      child: Center(
+        key: _playerKey,
+        child: isPortrait
+            ? SizedBox.expand(
+          child: AspectRatio(
+            aspectRatio: controller.value.aspectRatio,
+            child: _buildVideoPlayerStack(controller),
+          ),
+        )
+            : AspectRatio(
+          aspectRatio: controller.value.aspectRatio,
+          child: _buildVideoPlayerStack(controller),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVideoPlayerStack(VideoPlayerController controller) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        VideoPlayer(controller),
+        if (_isBuffering)
+          const Center(child: CircularProgressIndicator()),
+        if (_showPlayPauseOverlay)
+          Opacity(
+            opacity: .5,
+            child: AnimatedOpacity(
+              opacity: controller.value.isPlaying ? 0 : 1,
+              duration: const Duration(milliseconds: 500),
+              child: Container(
+                alignment: Alignment.center,
+                width: 70,
+                height: 70,
+                decoration: const BoxDecoration(
+                  color: Colors.black38,
+                  shape: BoxShape.circle,
+                  border: Border.fromBorderSide(
+                    BorderSide(color: Colors.white, width: 1),
+                  ),
+                ),
+                child: controller.value.isPlaying
+                    ? const Icon(Icons.pause, color: Colors.white, size: 40)
+                    : const Icon(
+                  Icons.play_arrow,
+                  color: Colors.white,
+                  size: 40,
+                ),
               ),
             ),
           )
-              : AspectRatio(
-            aspectRatio: controller.value.aspectRatio,
-            child: Stack(
-              children: [
-                VideoPlayer(controller),
-                if (_isBuffering)
-                  const Center(child: CircularProgressIndicator()),
-              ],
+          /*ScaleTransition(
+            scale: _iconScaleAnimation,
+            child: Icon(
+              controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+              size: 80,
+              color: Colors.white70,
             ),
-          ),
-        ),
-
-        // FittedBox(
-        //   key: _playerKey,
-        //   fit: BoxFit.cover,
-        //   child: SizedBox(
-        //     width: controller.value.size.width,
-        //     height: controller.value.size.height,
-        //     child: Stack(
-        //       children: [
-        //         VideoPlayer(controller),
-        //         if (_isBuffering)
-        //           const Center(child: CircularProgressIndicator()),
-        //       ],
-        //     ),
-        //   ),
-        // ),
-      ),
+          ),*/
+      ],
     );
   }
 }

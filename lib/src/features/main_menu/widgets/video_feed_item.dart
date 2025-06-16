@@ -239,8 +239,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
 
                 return SizedBox();
               }
-          )
-
+          ),
         ],
       ),
     );

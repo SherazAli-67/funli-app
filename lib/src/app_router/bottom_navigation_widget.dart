@@ -39,58 +39,60 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          widget.child!,
-          Positioned(
-              bottom: 0,
-              right: 0,
-              left: 0,
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-                    gradient: AppGradients.primaryGradient
-                ),
-                child: Padding(
-                  // padding: const EdgeInsets.only(left: 10.0, bottom: 25,top: 10, right: 10),
-                  padding: EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildBottomNavigationItemWidget(icon: AppIcons.icHome, isSelected: _calculateSelectedIndex(context) == 0, onTap: ()=> _onItemTapped(0, context)),
-                      _buildBottomNavigationItemWidget(icon: AppIcons.icSearch, isSelected: _calculateSelectedIndex(context) == 1, onTap: ()=> _onItemTapped(1, context)),
-
-                      Container(
-                        width: 50,
-                        height: 65,
-                        padding: EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                            gradient: AppGradients.uploadBtnGradient,
-                            borderRadius: BorderRadius.circular(35)
-                        ),
-                        child: Container(
+      body: SafeArea(
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            widget.child!,
+            Positioned(
+                bottom: 0,
+                right: 0,
+                left: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
+                      gradient: AppGradients.primaryGradient
+                  ),
+                  child: Padding(
+                    // padding: const EdgeInsets.only(left: 10.0, bottom: 25,top: 10, right: 10),
+                    padding: EdgeInsets.all(10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildBottomNavigationItemWidget(icon: AppIcons.icHome, isSelected: _calculateSelectedIndex(context) == 0, onTap: ()=> _onItemTapped(0, context)),
+                        _buildBottomNavigationItemWidget(icon: AppIcons.icSearch, isSelected: _calculateSelectedIndex(context) == 1, onTap: ()=> _onItemTapped(1, context)),
+        
+                        Container(
+                          width: 50,
+                          height: 65,
+                          padding: EdgeInsets.all(3),
                           decoration: BoxDecoration(
-                              color: Colors.black,
+                              gradient: AppGradients.uploadBtnGradient,
                               borderRadius: BorderRadius.circular(35)
                           ),
-                          child: IconButton(onPressed: ()async{
-                            // Show the wheel selector in a modal bottom sheet
-
-                            // Navigator.of(context).push(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()), );
-                          }, icon: Icon(Icons.add, color: Colors.white,)),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(35)
+                            ),
+                            child: IconButton(onPressed: ()async{
+                              // Show the wheel selector in a modal bottom sheet
+        
+                              // Navigator.of(context).push(MaterialPageRoute(builder: (_)=> CreateUploadFeelPage()), );
+                            }, icon: Icon(Icons.add, color: Colors.white,)),
+                          ),
                         ),
-                      ),
-
-
-                      _buildBottomNavigationItemWidget(icon: AppIcons.icNotification, isSelected: _calculateSelectedIndex(context)== 2, onTap: ()=> _onItemTapped(2, context)),
-                      _buildBottomNavigationItemWidget(icon: AppIcons.icUserProfile, isSelected: _calculateSelectedIndex(context) == 3, onTap: ()=> _onItemTapped(3, context)),
-
-                    ],
+        
+        
+                        _buildBottomNavigationItemWidget(icon: AppIcons.icNotification, isSelected: _calculateSelectedIndex(context)== 2, onTap: ()=> _onItemTapped(2, context)),
+                        _buildBottomNavigationItemWidget(icon: AppIcons.icUserProfile, isSelected: _calculateSelectedIndex(context) == 3, onTap: ()=> _onItemTapped(3, context)),
+        
+                      ],
+                    ),
                   ),
-                ),
-              )),
-        ],
+                )),
+          ],
+        ),
       ),
       // body: child,
       // backgroundColor: backgroundColor,
