@@ -69,9 +69,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
               onPressed: () async {
                 final newFilter = await showFilterBottomSheet(
                     context, currentFilter);
-               if(newFilter != null){
+              /* if(newFilter != null){
                  Navigator.of(context).push(MaterialPageRoute(builder: (_)=> FilteredReelsPage(filter: newFilter)));
-               }
+               }*/
               }, child: Row(
             spacing: 10,
             children: [
@@ -93,6 +93,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
           TextField(
             readOnly: true,
             onTap: () {
+              context.push(RouterEnum.searchView.routeName);
               // context.go(RouterEnum.searchView.routeName);
               // Navigator.of(context).push(
               //     MaterialPageRoute(builder: (ctx) => SearchPage()));

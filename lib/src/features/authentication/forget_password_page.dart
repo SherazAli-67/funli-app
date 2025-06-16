@@ -11,6 +11,7 @@ import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/auth_pages_header_text_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
 class ForgetPasswordPage extends StatefulWidget {
@@ -127,9 +128,8 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
           Padding(
             padding: const EdgeInsets.only(bottom: 20.0),
             child: PrimaryBtn(btnText: "Done", icon: '', onTap: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-
+              context.pop();
+              context.pop();
             }),
           ),
 

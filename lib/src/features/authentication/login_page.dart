@@ -1,11 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/bloc_cubit/auth_states.dart';
-import 'package:funli_app/src/features/authentication/forget_password_page.dart';
-import 'package:funli_app/src/features/authentication/signup_page.dart';
-import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
 import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
@@ -17,6 +15,7 @@ import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/auth_pages_header_text_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends StatefulWidget {
 
@@ -92,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                         Align(
                           alignment: Alignment.bottomRight,
                           child: TextButton(onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> ForgetPasswordPage()));
+                            context.push(RouterEnum.forgetPassView.routeName);
                           }, child: Text(
                             "Oops! Forgot your password?",
                             style: AppTextStyles.bodyTextStyle.copyWith(
@@ -110,7 +109,10 @@ class _LoginPageState extends State<LoginPage> {
                               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Login Failed", message: state.errorMessage, isError: true);
                             }else if(state is SignedIn){
                               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedInSuccessTitle, message: AppConstants.signedInSuccessMessage);
-                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);
+                              while(context.canPop()){
+                                context.pop();
+                              }
+                              context.push(RouterEnum.videoFeedView.routeName);
                             }
                           },
                           builder: (ctx, state){
@@ -123,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
                             TextSpan(text: "Don’t have any account? ", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.colorBlack, fontFamily: AppConstants.appFontFamily, fontWeight: FontWeight.w400)),
                             TextSpan(
                                 recognizer: TapGestureRecognizer()..onTap = (){
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> SignupPage()));
+                                  context.pushReplacement(RouterEnum.signupView.routeName);
                                 },
                                 text: "Create one!", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontFamily: AppConstants.appFontFamily, fontWeight: FontWeight.w400)),
 

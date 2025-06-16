@@ -3,11 +3,9 @@ import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/bloc_cubit/auth_states.dart';
-import 'package:funli_app/src/features/authentication/login_page.dart';
-import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
-import 'package:funli_app/src/features/personalization/personalization_page.dart';
 import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/models/onboarding_model.dart';
 import 'package:funli_app/src/providers/personal_info_provider.dart';
@@ -18,6 +16,7 @@ import 'package:funli_app/src/res/spacing_constants.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
+import 'package:go_router/go_router.dart';
 import '../widgets/primary_btn.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -86,7 +85,9 @@ class WelcomePage extends StatelessWidget {
                 child: Column(
                   spacing: 14,
                   children: [
-                    PrimaryBtn(btnText: "Continue with Email",icon: AppIcons.icMail, onTap: ()=> _onEmailTap(context), isPrefix: true,),
+                    PrimaryBtn(btnText: "Continue with Email",icon: AppIcons.icMail, onTap: (){
+                      context.push(RouterEnum.loginView.routeName);
+                    }, isPrefix: true,),
                     Row(
                       spacing: 20,
                       children: [
@@ -118,11 +119,17 @@ class WelcomePage extends StatelessWidget {
               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Sign in with Google Failed", message: state.errorMessage, isError: true);
             }else if(state is SignedInGoogle){
               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedInSuccessTitle, message: AppConstants.signedInSuccessMessage);
-              // Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> MainMenuPage()), (val)=> false);
+              while (context.canPop()) {
+                context.pop();
+              }
+              context.push(RouterEnum.videoFeedView.routeName);
             }else if(state is SignedUpGoogle){
               context.read<PersonalInfoProvider>().setUserName(state.user.user!.displayName ?? '');
               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedUpSuccessTitle, message: AppConstants.signedUpSuccessMessage);
-              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> PersonalizationPage()), (val)=> false);
+              while (context.canPop()) {
+                context.pop();
+              }
+              context.push(RouterEnum.personalizationView.routeName);
             }
           })
         ],
@@ -131,7 +138,7 @@ class WelcomePage extends StatelessWidget {
   }
 
   void _onEmailTap(BuildContext context){
-    Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> LoginPage()));
+    context.push(RouterEnum.loginView.routeName);
   }
 
   void _onSignInWithGoogleTap(BuildContext context){

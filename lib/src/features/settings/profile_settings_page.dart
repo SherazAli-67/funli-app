@@ -26,6 +26,7 @@ class ProfileSettingsPage extends StatelessWidget{
         centerTitle: false,
       ),
       body: SafeArea(child: SingleChildScrollView(
+        padding: EdgeInsets.only(bottom: 75),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 30,

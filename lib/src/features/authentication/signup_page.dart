@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/features/authentication/login_page.dart';
 import 'package:funli_app/src/features/personalization/personalization_page.dart';
@@ -14,6 +15,7 @@ import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/auth_pages_header_text_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
+import 'package:go_router/go_router.dart';
 import '../../bloc_cubit/auth_states.dart';
 import '../../widgets/app_back_button.dart';
 
@@ -61,14 +63,16 @@ class _SignupPageState extends State<SignupPage> {
                       spacing: 15,
                       children: [
                         AppBackButton(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
                             Text("Join the Mood Movement!", style: AppTextStyles.headingTextStyle3,),
-                            const SizedBox(height: 14,),
-                            Text("Let’s get you onboard 👊’", style: AppTextStyles.bodyTextStyle,)
-                          ],
+                              const SizedBox(height: 14,),
+                              Text("Let’s get you onboard 👊’", style: AppTextStyles.bodyTextStyle,)
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -110,7 +114,7 @@ class _SignupPageState extends State<SignupPage> {
                               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Account Creation Failed", message: state.errorMessage);
                             }else if(state is SignedUp){
                               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedUpSuccessTitle, message: AppConstants.signedUpSuccessMessage);
-                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> PersonalizationPage()), (val)=> false);
+                              context.pushReplacement(RouterEnum.personalizationView.routeName);
                             }
                           },
                           builder: (ctx, state){
@@ -124,7 +128,7 @@ class _SignupPageState extends State<SignupPage> {
                             TextSpan(text: "Already have any account? ", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.colorBlack, fontFamily: AppConstants.appFontFamily)),
                             TextSpan(
                                 recognizer: TapGestureRecognizer()..onTap = (){
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> LoginPage()));
+                                  context.pushReplacement(RouterEnum.loginView.routeName);
                                 },
                                 text: "Sign in!", style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontFamily: AppConstants.appFontFamily)),
 

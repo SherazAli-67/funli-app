@@ -43,14 +43,12 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
   }
   @override
   Widget build(BuildContext context) {
-    debugPrint("User profile page");
     Size size  = Provider.of<SizeProvider>(context).size;
     final provider  = Provider.of<ProfileProvider>(context);
     userName = provider.userName;
     if(provider.currentUser != null){
       profilePicture = provider.currentUser!.profilePicture;
     }
-
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -146,5 +144,4 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
       ),
     );
   }
-
 }

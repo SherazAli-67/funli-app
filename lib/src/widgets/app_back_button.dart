@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../res/app_icons.dart';
 
@@ -12,7 +13,11 @@ class AppBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: ()=> Navigator.of(context).pop(),
+        onTap: (){
+          if(context.canPop()){
+            context.pop();
+          }
+        },
         child: Padding(
           padding: const EdgeInsets.only(top: 10.0),
           child: SvgPicture.asset(AppIcons.icArrowBack, colorFilter: ColorFilter.mode(_color, BlendMode.srcIn),),

@@ -64,19 +64,7 @@ class MyApp extends StatelessWidget {
           fontFamily: AppConstants.appFontFamily,
           scaffoldBackgroundColor: Colors.white
       ),
-      )
-
-     /* MaterialApp.router(
-        title: AppConstants.appTitle,
-        debugShowCheckedModeBanner: false,
-        routerConfig: appRouter.router,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          fontFamily: AppConstants.appFontFamily,
-          scaffoldBackgroundColor: Colors.white
       ),
-      )*/
-
       /*MaterialApp(
         title: AppConstants.appTitle,
         theme: ThemeData(
