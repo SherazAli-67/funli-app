@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_data.dart';
-import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -14,6 +14,7 @@ import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/mood_selecting_scroll_wheel_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -275,8 +276,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 20.0),
               child: SecondaryBtn(btnText: "Go to 🏠 Home", icon: '', onTap: (){
-                Navigator.of(context).pop();
-                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);
+                _navigateBackToMainMenu();
               }),
             )
           ],
@@ -309,8 +309,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
             onPressed: (){
               String caption = captionController.text;
               context.read<RecordUploadProvider>().saveToDrafts(caption: caption, visibility: visibility,);
-              Navigator.of(context).pop();
-              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx)=> MainMenuPage()), (val)=> false);
+              _navigateBackToMainMenu();
             },
             child: GradientTextWidget(gradient: AppGradients.primaryGradient, text: "Save Draft", textStyle: AppTextStyles.buttonTextStyle,),
           ),
@@ -323,7 +322,12 @@ class _PublishReelPageState extends State<PublishReelPage> {
         ],
       );
     });
+  }
 
-
+  void _navigateBackToMainMenu(){
+    while(context.canPop()){
+      context.pop();
+    }
+    context.push(RouterEnum.videoFeedView.routeName);
   }
 }

@@ -12,6 +12,7 @@ import 'package:video_trimmer/video_trimmer.dart';
 import '../../providers/record_upload_provider.dart';
 import '../../res/app_textstyles.dart';
 import '../../widgets/app_back_button.dart';
+import '../../widgets/play_pause_widget.dart';
 
 class EditUploadedFeelPage extends StatefulWidget{
   const EditUploadedFeelPage({super.key, required this.videoPath});
@@ -60,19 +61,25 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
+        alignment: Alignment.center,
         children: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              VideoViewer(trimmer: _trimmer),
-              IconButton(onPressed: () async {
-                bool playbackState = await _trimmer.videoPlaybackControl(
-                  startValue: _startValue,
-                  endValue: _endValue,
-                );
-                setState(() => _isPlaying = playbackState);
-              }, icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow, size: 45,))
-            ],
+
+          GestureDetector(
+            onTap: () async {
+              bool playbackState = await _trimmer.videoPlaybackControl(
+                startValue: _startValue,
+                endValue: _endValue,
+              );
+              setState(() => _isPlaying = playbackState);
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+
+                  VideoViewer(trimmer: _trimmer), // fallback
+                PlayPauseWidget(isPlaying: _isPlaying)
+              ],
+            ),
           ),
           Positioned(
             top: 65 ,
@@ -82,21 +89,19 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
                 builder: (ctx, provider, _) {
                   return Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      spacing: 16,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            AppBackButton(color: Colors.white,),
-                            Text("Create a Feel", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
-                            TextButton(onPressed: (){
-                              context.push(RouterEnum.publishReelView.routeName);
-                            }, child: Text("Next", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),))
-                          ],
-                        ),
-
+                        AppBackButton(color: Colors.white,),
+                        Text("Create a Feel", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                        GestureDetector(
+                            onTap: (){
+                              context.pushReplacement(RouterEnum.publishReelView.routeName);
+                            }, child: Padding(
+                              padding: const EdgeInsets.only(top: 5.0),
+                              child: Text("Next", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),),
+                            ))
                       ],
                     ),
                   );
@@ -301,5 +306,9 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
 
   void _loadVideo() async {
     await _trimmer.loadVideo(videoFile: File(widget.videoPath));
+    if(_trimmer.videoPlayerController != null){
+      _trimmer.videoPlayerController!.play();
+    }
   }
 }
+

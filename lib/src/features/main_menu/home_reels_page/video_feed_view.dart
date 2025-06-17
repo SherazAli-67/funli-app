@@ -377,7 +377,7 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
     return VisibilityDetector(
       onVisibilityChanged: (val){
         var visiblePercentage = val.visibleFraction * 100;
-
+        debugPrint("Visibility percentage found: $visiblePercentage");
         if (visiblePercentage < 1) {
           // If the widget is not visible and the video is playing, pause it.
           _pauseAllControllers();

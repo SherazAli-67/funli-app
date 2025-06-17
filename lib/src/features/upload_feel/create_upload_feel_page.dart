@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
-import 'package:funli_app/src/features/upload_feel/edit_uploaded_feel.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -202,9 +201,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                           IconButton(onPressed: ()async{
                             String? selectedVideoPath = await _onSelectVideoFromGalleryTap();
                             if(selectedVideoPath != null){
-                              context.push(RouterEnum.editUploadedReelView.routeName, extra: {
-                                'videoPath' : selectedVideoPath
-                              });
+                              _navigateToEditFeelPage(context: context, path: selectedVideoPath);
                             }
                           }, icon: SvgPicture.asset(AppIcons.icUpload))
                         ],
@@ -358,9 +355,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
 
     _timer?.cancel();
     _timer = null;
-    context.push(RouterEnum.editUploadedReelView.routeName, extra: {
-      'videoPath' : file.path
-    });
+    _navigateToEditFeelPage(context: context, path: file.path);
   }
 
   void _onScaleStart(ScaleStartDetails details) {
@@ -373,6 +368,12 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
     double newZoom = (_baseZoom * details.scale).clamp(_minZoom, _maxZoom);
     await _controller.setZoomLevel(newZoom);
     setState(()=>  _currentZoom = newZoom);
+  }
+
+  void _navigateToEditFeelPage({required BuildContext context, required String path}) {
+    context.pushReplacement(RouterEnum.editUploadedReelView.routeName, extra: {
+      'videoPath' : path
+    });
   }
 
 }

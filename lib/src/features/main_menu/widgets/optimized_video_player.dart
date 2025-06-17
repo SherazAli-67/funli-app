@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/widgets/play_pause_widget.dart';
 import 'package:video_player/video_player.dart';
 
 class OptimizedVideoPlayer extends StatefulWidget {
@@ -185,32 +186,7 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
         if (_isBuffering)
           const Center(child: CircularProgressIndicator()),
         if (_showPlayPauseOverlay)
-          Opacity(
-            opacity: .5,
-            child: AnimatedOpacity(
-              opacity: controller.value.isPlaying ? 0 : 1,
-              duration: const Duration(milliseconds: 500),
-              child: Container(
-                alignment: Alignment.center,
-                width: 70,
-                height: 70,
-                decoration: const BoxDecoration(
-                  color: Colors.black38,
-                  shape: BoxShape.circle,
-                  border: Border.fromBorderSide(
-                    BorderSide(color: Colors.white, width: 1),
-                  ),
-                ),
-                child: controller.value.isPlaying
-                    ? const Icon(Icons.pause, color: Colors.white, size: 40)
-                    : const Icon(
-                  Icons.play_arrow,
-                  color: Colors.white,
-                  size: 40,
-                ),
-              ),
-            ),
-          )
+          PlayPauseWidget(isPlaying: controller.value.isPlaying)
           /*ScaleTransition(
             scale: _iconScaleAnimation,
             child: Icon(
