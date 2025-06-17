@@ -57,12 +57,12 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
 
     _cubit = ReelsCubit(
       ReelsRepository(
-        initialReels: widget.initialReels,
-        lastDoc: widget.lastDocument,
-        userID: widget.userID,
-        mood: widget.mood,
-        tag: widget.tag,
-        comingFrom: widget.comingFrom
+          initialReels: widget.initialReels,
+          lastDoc: widget.lastDocument,
+          userID: widget.userID,
+          mood: widget.mood,
+          tag: widget.tag,
+          comingFrom: widget.comingFrom
       ),
     );
 
@@ -171,14 +171,14 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
               onPageChanged: (index) {
                 setState(() => _currentPage = index);
                 _cubit.onPageChanged(index);
-            
+
                 _initializeControllerIfNeeded(_videos[index].reelID, _videos[index].videoUrl, shouldPlay: true);
                 _playController(_videos[index].reelID);
               },
               itemBuilder: (context, index) {
                 final reel = _videos[index];
                 final controller = _controllerCache[reel.reelID];
-            
+
                 return controller != null && controller.value.isInitialized
                     ? RepaintBoundary(
                   child: VideoFeedItem(

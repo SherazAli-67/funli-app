@@ -348,7 +348,7 @@ class ReelsService {
         .collection(FirebaseConstants.moodsCollection)
         .doc(mood)
         .collection(FirebaseConstants.reelsCollection)
-        .orderBy('timestamp', descending: true)
+        .orderBy('createdAt', descending: true)
         .limit(limit);
 
     if (lastDoc != null) {

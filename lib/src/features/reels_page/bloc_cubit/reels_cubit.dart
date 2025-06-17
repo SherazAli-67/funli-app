@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:funli_app/src/features/reels_page/bloc_cubit/reels_state.dart';
@@ -23,6 +24,7 @@ class ReelsCubit extends Cubit<ReelsState> {
     _preloadNext();
 
     if (!state.isPaginating && state.hasMore && index >= state.videos.length - 2) {
+      debugPrint("Loading more");
       await _loadMore();
     }
   }

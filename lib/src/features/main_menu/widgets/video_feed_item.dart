@@ -27,12 +27,14 @@ import 'optimized_video_player.dart';
 class VideoFeedItem extends StatefulWidget {
   const VideoFeedItem({
     super.key,
+    this.isComingFromHome = false,
     required this.reel,
     required this.controller,
   });
 
   final ReelModel reel;
   final VideoPlayerController? controller;
+  final bool isComingFromHome;
 
   @override
   State<VideoFeedItem> createState() => _VideoFeedItemState();
@@ -47,149 +49,8 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
       child: Stack(
         children: [
           OptimizedVideoPlayer(controller: widget.controller, videoId: widget.reel.reelID),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                StatefulBuilder(
-                  builder: (context, setState) {
-                    return GestureDetector(
-                      onTap: () {
-                        // setState(() => isReadMore = !isReadMore);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withValues(alpha: 0.0),
-                              Colors.black.withValues(alpha: 0.2),
-                              Colors.black.withValues(alpha: 0.5),
-                            ],
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              constraints: const BoxConstraints(
-                                maxHeight: 300,
-                              ),
-                              child: SingleChildScrollView(
-                                child: Padding(
-                                  padding:
-                                  const EdgeInsets.only(right: 50, left: 10,bottom: 10),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      FutureBuilder(future: UserService.getUserByID(userID: widget.reel.userID), builder: (ctx, snap){
-                                        if(snap.hasData && snap.requireData != null){
-                                          _userModel = snap.requireData!;
-                                          return Text(
-                                            _userModel!.userName,
-                                            style: AppTextStyles
-                                                .buttonTextStyle
-                                                .copyWith(
-                                                color: Colors.white, fontWeight: FontWeight.w700),);
-                                        }else if(snap.connectionState == ConnectionState.waiting){
-                                          return Align(
-                                              alignment: Alignment.topLeft,
-                                              child: LoadingWidget());
-                                        }
-
-                                        return const SizedBox();
-                                      }),
-                                      AppTextWidget(text: widget.reel.caption,),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 30,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 20,
-            right: 5,
-            child: Column(
-              spacing: 10,
-              children: [
-                Stack(
-                  children: [
-                    GestureDetector(
-                      onTap: (){
-                        String? userName = _userModel?.userName;
-                        String? userID = _userModel?.userID;
-                        showModalBottomSheet(
-                            isScrollControlled: true,
-                            context: context, builder: (ctx){
-                          return FractionallySizedBox(
-                              heightFactor: 0.75,
-                              child: SingleChildScrollView(child: RemoteUserProfileInfoWidget(userName: userName, userID: userID!,)));
-                        });
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(bottom: 20),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white, width: 2),
-                            shape: BoxShape.circle
-                        ),
-                        child: CircleAvatar(
-                          radius: 30,
-                          backgroundImage: CachedNetworkImageProvider( _userModel != null ? _userModel!.profilePicture ?? AppIcons.icDummyImgUrl: AppIcons.icDummyImgUrl),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                        bottom: 0,
-                        right: 0,
-                        left: 0,
-                        child: StreamBuilder(stream: UserService.getIsFollowingStream(widget.reel.userID), builder: (ctx, snapshot){
-
-                          if(snapshot.hasData && !snapshot.requireData){
-                            return Container(
-                                decoration: BoxDecoration(
-                                    color: AppColors.deepPurpleColor,
-                                    shape: BoxShape.circle
-                                ),
-                                child: IconButton(
-                                    padding: EdgeInsets.zero,
-                                    style: const ButtonStyle(
-                                      tapTargetSize: MaterialTapTargetSize
-                                          .shrinkWrap,
-                                    ),
-                                    onPressed: () => UserService.onFollowTap(remoteUID: widget.reel.userID, userName: _userModel != null ? _userModel!.userName : ''),
-                                    icon: SvgPicture.asset(
-                                      AppIcons.icAdd, height: 20,))
-                            );
-                          }
-
-                          return SizedBox();
-                        })
-                    ),
-                  ],
-                ),
-                PostLikeWidget(reel: widget.reel, iconColor: Colors.white, isReel: true,),
-                PostCommentWidget(iconColor: Colors.white, isReel: true, reel: widget.reel,),
-                PostBookmarkWidget(reelID: widget.reel.reelID,),
-                PostShareWidget( iconColor: Colors.white,),
-              ],
-            ),
-          ),
+          _buildUserNameCaptionWidget(),
+          _buildLikeCommentsIcon(context),
           StreamBuilder(
               stream: UserService.getCurrentUserStream(),
               builder: (context, snapshot,) {
@@ -243,5 +104,154 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
         ],
       ),
     );
+  }
+
+  Positioned _buildUserNameCaptionWidget() {
+    return Positioned(
+          bottom: widget.isComingFromHome ? 80 : 0,
+          left: 0,
+          right: 0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              StatefulBuilder(
+                builder: (context, setState) {
+                  return GestureDetector(
+                    onTap: () {
+                      // setState(() => isReadMore = !isReadMore);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black.withValues(alpha: 0.0),
+                            Colors.black.withValues(alpha: 0.2),
+                            Colors.black.withValues(alpha: 0.5),
+                          ],
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            constraints: const BoxConstraints(
+                              maxHeight: 300,
+                            ),
+                            child: SingleChildScrollView(
+                              child: Padding(
+                                padding:
+                                const EdgeInsets.only(right: 50, left: 10,bottom: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    FutureBuilder(future: UserService.getUserByID(userID: widget.reel.userID), builder: (ctx, snap){
+                                      if(snap.hasData && snap.requireData != null){
+                                        _userModel = snap.requireData!;
+                                        return Text(
+                                          _userModel!.userName,
+                                          style: AppTextStyles
+                                              .buttonTextStyle
+                                              .copyWith(
+                                              color: Colors.white, fontWeight: FontWeight.w700),);
+                                      }else if(snap.connectionState == ConnectionState.waiting){
+                                        return Align(
+                                            alignment: Alignment.topLeft,
+                                            child: LoadingWidget());
+                                      }
+
+                                      return const SizedBox();
+                                    }),
+                                    AppTextWidget(text: widget.reel.caption,),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+  }
+
+  Positioned _buildLikeCommentsIcon(BuildContext context) {
+    return Positioned(
+          bottom: widget.isComingFromHome ? 85 : 0,
+          right: 5,
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  GestureDetector(
+                    onTap: (){
+                      String? userName = _userModel?.userName;
+                      String? userID = _userModel?.userID;
+                      showModalBottomSheet(
+                          isScrollControlled: true,
+                          context: context, builder: (ctx){
+                        return FractionallySizedBox(
+                            heightFactor: 0.75,
+                            child: SingleChildScrollView(child: RemoteUserProfileInfoWidget(userName: userName, userID: userID!,)));
+                      });
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white, width: 2),
+                          shape: BoxShape.circle
+                      ),
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundImage: CachedNetworkImageProvider( _userModel != null ? _userModel!.profilePicture ?? AppIcons.icDummyImgUrl: AppIcons.icDummyImgUrl),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                      bottom: 0,
+                      right: 0,
+                      left: 0,
+                      child: StreamBuilder(stream: UserService.getIsFollowingStream(widget.reel.userID), builder: (ctx, snapshot){
+
+                        if(snapshot.hasData && !snapshot.requireData){
+                          return Container(
+                              decoration: BoxDecoration(
+                                  color: AppColors.deepPurpleColor,
+                                  shape: BoxShape.circle
+                              ),
+                              child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  style: const ButtonStyle(
+                                    tapTargetSize: MaterialTapTargetSize
+                                        .shrinkWrap,
+                                  ),
+                                  onPressed: () => UserService.onFollowTap(remoteUID: widget.reel.userID, userName: _userModel != null ? _userModel!.userName : ''),
+                                  icon: SvgPicture.asset(
+                                    AppIcons.icAdd, height: 20,))
+                          );
+                        }
+
+                        return SizedBox();
+                      })
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10,),
+              PostLikeWidget(reel: widget.reel, iconColor: Colors.white, isReel: true,),
+              PostCommentWidget(iconColor: Colors.white, isReel: true, reel: widget.reel,),
+              PostBookmarkWidget(reelID: widget.reel.reelID,),
+              PostShareWidget( iconColor: Colors.white,),
+            ],
+          ),
+        );
   }
 }

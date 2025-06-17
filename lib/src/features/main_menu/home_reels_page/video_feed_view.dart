@@ -379,6 +379,7 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
                 key: ValueKey(reel.reelID),
                 controller: _getController(reel.reelID),
                 reel: reel,
+                isComingFromHome: true,
               ),
             );
           },
