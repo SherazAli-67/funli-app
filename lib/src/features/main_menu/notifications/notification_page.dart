@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/main_menu/notifications/notification_item_widge.dart';
+import 'package:funli_app/src/loading_shimmers/notification_shimmer_item_widget.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/widgets/gradient_icon.dart';
-import 'package:funli_app/src/widgets/loading_widget.dart';
 import '../../../models/notification_model.dart';
 
 class NotificationPage extends StatefulWidget{
@@ -84,7 +84,7 @@ class _NotificationPageState extends State<NotificationPage> {
             child: Text("Notifications", style: AppTextStyles.headingTextStyle3,),
           ),
           Expanded(child: _isLoading && grouped.entries.isEmpty
-              ? LoadingWidget()
+              ? ListView.builder(itemCount: 10, itemBuilder: (ctx, index)=> NotificationShimmerItemWidget())
               : _notifications.isEmpty
               ? _buildEmptyNotesPage()
               : Padding(

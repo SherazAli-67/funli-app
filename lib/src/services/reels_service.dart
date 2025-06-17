@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/comment_model.dart';
 import 'package:funli_app/src/models/like_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
-import 'package:funli_app/src/services/notifications_service.dart';
 
 import '../models/reel_model.dart';
 

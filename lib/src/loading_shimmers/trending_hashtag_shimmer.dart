@@ -10,9 +10,6 @@ class TrendingHashtagShimmerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Color baseColor = Colors.grey[300]!;
     Color highlightColor = Colors.grey[100]!;
-    // bool isDarkTheme = Provider.of<ThemeProvider>(context).isDarkTheme;
-    // Color baseColor =  isDarkTheme ? darkGreyColor : Colors.grey[300]!;
-    // Color highlightColor =  isDarkTheme ? primaryDarkColor : Colors.grey[100]!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
       child: Row(

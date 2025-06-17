@@ -8,6 +8,7 @@ import 'package:funli_app/src/bloc_cubit/video_feed_cubit.dart';
 import 'package:funli_app/src/dependancy_injection/dependency_injector.dart';
 import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
+import 'package:funli_app/src/providers/discover_provider.dart';
 import 'package:funli_app/src/providers/feels_search_provider.dart';
 import 'package:funli_app/src/providers/hashtag_search_provider.dart';
 import 'package:funli_app/src/providers/mood_reels_provider.dart';
@@ -40,6 +41,7 @@ void main() async{
         ChangeNotifierProvider(create: (_)=> FeelsSearchProvider()..fetchInitial()),
         ChangeNotifierProvider(create: (_)=> UsersSearchProvider()..fetchInitial()),
         ChangeNotifierProvider(create: (_)=> HashtagSearchProvider()..fetchInitial()),
+        ChangeNotifierProvider(create: (_) => DiscoverProvider()..loadAll()),
       ],
       child: const MyApp()));
 }

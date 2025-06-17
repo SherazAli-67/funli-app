@@ -5,7 +5,7 @@ import '../models/reel_model.dart';
 import '../res/firebase_constants.dart';
 
 class FeelsSearchProvider extends ChangeNotifier {
-  List<ReelModel> _reels = [];
+  final List<ReelModel> _reels = [];
   DocumentSnapshot? lastDoc;
   bool _hasMore = true;
   bool _isLoading = false;

@@ -4,7 +4,7 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 class GradientTextWidget extends StatelessWidget{
   const GradientTextWidget(
       {super.key, required LinearGradient gradient, required String text, TextStyle textStyle = AppTextStyles
-          .buttonTextStyle,})
+          .smallBoldTextStyle,})
       : _linearGradient = gradient,
         _text = text,
         _textStyle = textStyle;

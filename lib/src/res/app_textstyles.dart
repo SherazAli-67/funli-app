@@ -10,6 +10,7 @@ class AppTextStyles {
   static const bodyTextStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.w300,);
   static const tileTitleTextStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.w700,);
   static const smallTextStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w400, );
+  static const smallBoldTextStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w600, );
   static const captionTextStyle = TextStyle(fontSize: 12, fontWeight: FontWeight.w400, );
   static const hintTextStyle = TextStyle(fontSize: 16, fontWeight: FontWeight.w300, color: AppColors.hintTextColor);
   static const commentTextStyle = TextStyle(fontSize: 14, fontWeight: FontWeight.w300, color: AppColors.commentTextColor);

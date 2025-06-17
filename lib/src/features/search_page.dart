@@ -176,17 +176,19 @@ class _SearchPageState extends State<SearchPage> {
                 });
 
               },
-              contentPadding: EdgeInsets.symmetric(vertical: 10),
+              dense: true,
+              horizontalTitleGap: 5,
+              contentPadding: EdgeInsets.symmetric(vertical: 12),
               leading: ProfilePictureWidget(profilePicture: user.profilePicture),
-              title: Text(user.userName, style: AppTextStyles.buttonTextStyle,),
-              trailing: ConstrainedBox(constraints: BoxConstraints(maxWidth: 140, minWidth: 100), child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
+              title: Text(user.userName, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w700),),
+              trailing: ConstrainedBox(constraints: BoxConstraints(maxWidth: 120, minWidth: 80), child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
                 if(snapshot.hasData){
                   return snapshot.requireData
                       ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 38,)
                       : SizedBox(
                     height: 38,
                     width: 75,
-                    child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient,),
+                    child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallBoldTextStyle,),
                   );
                 }else if(snapshot.connectionState == ConnectionState.waiting){
                   return LoadingWidget();

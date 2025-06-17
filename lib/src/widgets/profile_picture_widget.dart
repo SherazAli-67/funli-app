@@ -14,11 +14,11 @@ class ProfilePictureWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      radius: 40,
+      radius: 35,
       backgroundColor: AppColors.amberYellowColor,
       child: CircleAvatar(
         backgroundColor: AppColors.amberYellowColor,
-        radius: 35,
+        radius: 33,
         backgroundImage: _profilePicture != null
             ? CachedNetworkImageProvider(_profilePicture)
             : CachedNetworkImageProvider(AppIcons.icDummyImgUrl),

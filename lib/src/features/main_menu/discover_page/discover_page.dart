@@ -7,7 +7,6 @@ import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/filter_bottomsheet.dart';
 import 'package:funli_app/src/helpers/formatting_helpers.dart';
 import 'package:funli_app/src/loading_shimmers/trending_feels_widget.dart';
-import 'package:funli_app/src/models/hashtag_model.dart';
 import 'package:funli_app/src/models/mood_model.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
@@ -23,9 +22,11 @@ import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../loading_shimmers/reel_thumbnail_shimmer_item.dart';
 import '../../../loading_shimmers/trending_hashtag_shimmer.dart';
 import '../../../models/filter_model.dart';
+import '../../../providers/discover_provider.dart';
 
 class DiscoverPage extends StatefulWidget{
   const DiscoverPage({super.key});
@@ -40,329 +41,243 @@ class _DiscoverPageState extends State<DiscoverPage> {
 
   final TextEditingController locationTextEditingController = TextEditingController();
   final TextEditingController languageTextEditingController = TextEditingController();
-  
+
+
 
   @override
   Widget build(BuildContext context) {
+    final discoverProvider = Provider.of<DiscoverProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
-        title: Text("Discover", style: AppTextStyles.headingTextStyle3,),
-        centerTitle: false,
-       /* leading: IconButton(
-            onPressed: () {}, icon: Icon(Icons.arrow_back_ios_new_rounded)),*/
-        leadingWidth: 30,
+        title: Text("Discover", style: AppTextStyles.headingTextStyle3),
         actions: [
           ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.greyFillColor,
-                  padding: EdgeInsets.symmetric(horizontal: 15),
-                  elevation: 0
-              ),
-              onPressed: () async {
-                final newFilter = await showFilterBottomSheet( currentFilter);
-               if(newFilter != null){
-                 context.push(RouterEnum.filteredReelsView.routeName, extra: {
-                   'filter' : newFilter
-                 });
-               }
-              }, child: Row(
-            spacing: 10,
-            children: [
-              SvgPicture.asset(AppIcons.icFilter),
-              Text("Filter", style: AppTextStyles.smallTextStyle,)
-            ],
-          ))
-        ],
-      ),
-      body: SafeArea(child: _buildDiscoverWidget(context)),
-    );
-  }
-
-  Widget _buildDiscoverWidget(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 18.0, right: 18, top: 8, bottom: 100),
-      child: ListView(
-        children: [
-          TextField(
-            readOnly: true,
-            onTap: () {
-              context.push(RouterEnum.searchView.routeName);
+            onPressed: () async {
+              final newFilter = await showFilterBottomSheet(currentFilter);
+              if (newFilter != null) {
+                context.push(RouterEnum.filteredReelsView.routeName, extra: {
+                  'filter': newFilter,
+                });
+              }
             },
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: AppColors.searchFillColor,
-              enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.transparent)
-              ),
-              focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.transparent)
-              ),
-              hintText: 'Search users, feels, trends, hashtags',
-              hintStyle: AppTextStyles.hintTextStyle,
-              prefixIcon: Icon(Icons.search, color: AppColors.greyTextColor,),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.greyFillColor,
+              elevation: 0,
+            ),
+            child: Row(
+              children: [
+                SvgPicture.asset(AppIcons.icFilter),
+                SizedBox(width: 6),
+                Text("Filter", style: AppTextStyles.smallTextStyle),
+              ],
             ),
           ),
-          const SizedBox(height: 20,),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Trending Hashtags",
-                style: AppTextStyles.buttonTextStyle.copyWith(
-                    fontWeight: FontWeight.w700),),
-
-              FutureBuilder(future: HashtagService.getTrendingHashtags(),
-                  builder: (ctx, snapshot) {
-                    if (snapshot.hasData) {
-                      List<HashtagModel> trendingHashtags = snapshot.requireData;
-                      return Column(
-                        children: trendingHashtags.map((hashtag) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      context.push(RouterEnum.hashtagsReelsView.routeName, extra: {
-                                        'tag' : hashtag.tag
-                                      });
-                                    },
-                                    child: RichText(text: TextSpan(
-                                      children: [
-                                        TextSpan(text: "#${hashtag.tag}  ",
-                                          style: AppTextStyles.smallTextStyle
-                                              .copyWith(
-                                              fontWeight: FontWeight.w700,
-                                              fontFamily: AppConstants.appFontFamily, color: Colors.black),),
-                                        TextSpan(text: "${FormatingHelpers
-                                            .formatNumber(
-                                            hashtag.reelsCount)} feels ",
-                                          style: AppTextStyles.smallTextStyle.copyWith(fontFamily: AppConstants.appFontFamily, color: AppColors.hashtagCountGreyColor),),
-                                      ],
-
-                                    )),
-                                  ),
-                                ),
-                                StreamBuilder(
-                                    stream: HashtagService.getIsFollowing(
-                                        hashtag: hashtag.tag),
-                                    builder: (ctx, snapshot) {
-                                      if (snapshot.hasData) {
-                                        bool isFollowing = snapshot
-                                            .requireData;
-                                        return isFollowing
-                                            ? SecondaryGradientBtn(
-                                          btnText: "Following",
-                                          icon: '',
-                                          onTap: () =>
-                                              HashtagService.oddToFollow(
-                                                  hashtag: hashtag.tag,
-                                                  isUnfollowRequest: true),
-                                          buttonHeight: 40,)
-                                            : SizedBox(
-                                            height: 40,
-                                            width: 100,
-                                            child: PrimaryBtn(
-                                              btnText: "Follow",
-                                              icon: '',
-                                              onTap: () =>
-                                                  HashtagService.oddToFollow(
-                                                      hashtag: hashtag.tag),
-                                              bgGradient: AppIcons
-                                                  .primaryBgGradient,));
-                                      }
-
-                                      return SizedBox();
-                                    })
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    }
-                    else
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Column(
-                        children: List.generate(4, (index){
-                          return TrendingHashtagShimmerWidget();
-                        }),
-                      );
-                    }
-
-                    return SizedBox();
-                  })
-
-            ],
-          ),
-          const SizedBox(height: 20,),
-          Text("Trending Feels",
-            style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),),
-          const SizedBox(height: 20,),
-
-          FutureBuilder(future: HashtagService.getTrendingMoods(),
-              builder: (ctx, snapshot) {
-                if (snapshot.hasData) {
-                  List<MoodModel> trendingMoods = snapshot.requireData;
-                  return Column(
-                      children: trendingMoods.map((mood) {
-                        return Card(
-                          margin: EdgeInsets.only(bottom: 10),
-                          elevation: 1,
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)
-                          ),
-                          child: Column(
-                            spacing: 10,
-                            children: [
-                              ListTile(
-                                onTap: () => _onMoodTap(mood.mood),
-                                leading: Container(
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.yellowAccentColor
-                                  ),
-                                  padding: EdgeInsets.all(5),
-                                  child: Text(AppData.getEmojiByMood(mood.mood),
-                                    style: TextStyle(fontSize: 30),),
-                                ),
-                                title: Text(mood.mood,
-                                  style: AppTextStyles.bodyTextStyle.copyWith(
-                                      fontWeight: FontWeight.w700),),
-                                subtitle: Text('${mood.reelsCount} feels',
-                                  style: AppTextStyles.captionTextStyle
-                                      .copyWith(fontWeight: FontWeight.w300,
-                                      color: AppColors.hintTextColor),),
-                                trailing: GestureDetector(
-                                  onTap: () => _onMoodTap(mood.mood),
-                                  child: SizedBox(
-                                      width: 100,
-                                      child: Row(
-                                        children: [
-                                          GradientTextWidget(
-                                            gradient: AppGradients
-                                                .primaryGradient,
-                                            text: "SEE ALL",
-                                            textStyle: AppTextStyles
-                                                .buttonTextStyle.copyWith(
-                                                fontWeight: FontWeight
-                                                    .w700),),
-                                          GradientIcon(
-                                              icon: Icons.navigate_next_sharp,
-                                              size: 30,
-                                              gradient: AppGradients
-                                                  .primaryGradient),
-                                        ],
-                                      )
-                                  ),
-                                ),
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 10),
-                              ),
-
-
-                              SizedBox(
-                                height: 200,
-                                width: double.infinity,
-                                child: FutureBuilder(
-                                    future: MoodService.getReelsbyMood(mood: mood.mood),
-                                    builder: (ctx, snapshot) {
-                                      if (snapshot.hasData) {
-                                        List<ReelModel> reels = snapshot.requireData['reels'];
-                                        DocumentSnapshot? lastDoc = snapshot.requireData['lastDocument'];
-                                        return ListView.builder(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: mood.reelsCount > reels.length ? (reels.length+1) : reels.length,
-                                            itemBuilder: (ctx, index) {
-                                              return index == reels.length 
-                                                  ? IconButton(
-                                                  style: ElevatedButton.styleFrom(
-                                                    shape: CircleBorder(
-                                                      side: BorderSide.none
-                                                    ),
-                                                    backgroundColor: AppColors.yellowAccentColor,
-                                                    padding: EdgeInsets.all(20)
-                                                  ),
-                                                  onPressed: ()=> _onMoodTap(mood.mood), icon: Icon(Icons.arrow_forward_rounded, size: 30,))
-                                                  : GestureDetector(
-                                                onTap: (){
-                                                  context.push(
-                                                    RouterEnum.updatedReelsView.routeName,
-                                                    extra: {
-                                                      'initialReels': reels,
-                                                      'selectedIndex': index,
-                                                      'lastDocument': lastDoc,
-                                                      'comingFrom': AppConstants.comingFromMood, // or 'profile', etc.
-                                                      'mood': mood.mood,
-                                                    },
-                                                  );
-                                                },
-                                                child: Padding(
-                                                  padding: const EdgeInsets.all(5),
-                                                  child: ClipRRect(
-                                                    borderRadius: BorderRadius.circular(10),
-                                                    child: CachedNetworkImage(
-                                                      placeholder: (context, url) => ReelThumbnailShimmerItem(),
-                                                      imageUrl: reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
-                                                      height: 150,),
-                                                  ),
-                                                ),
-                                              );
-                                            });
-                                      } else if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return LoadingWidget();
-                                      }
-
-                                      return SizedBox();
-                                    }),
-                              )
-                            ],
-                          ),
-                        );
-                      }).toList()
-                  );
-                }
-                else
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return TrendingFeelsWidget();
-                }
-
-                return SizedBox();
-              }),
         ],
       ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 8, 18, 100),
+          child: ListView(
+            children: [
+              // 🔍 Search Field
+              TextField(
+                readOnly: true,
+                onTap: () => context.push(RouterEnum.searchView.routeName),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: AppColors.searchFillColor,
+                  hintText: 'Search users, feels, trends, hashtags',
+                  hintStyle: AppTextStyles.hintTextStyle,
+                  prefixIcon: Icon(Icons.search, color: AppColors.greyTextColor),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+              Text("Trending Hashtags",
+                  style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700)),
+
+              const SizedBox(height: 10),
+
+              discoverProvider.isLoadingHashtags
+                  ? Column(
+                children: List.generate(4, (_) => TrendingHashtagShimmerWidget()),
+              )
+                  : Column(
+                children: discoverProvider.trendingHashtags.map((hashtag) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => context.push(RouterEnum.hashtagsReelsView.routeName, extra: {'tag': hashtag.tag}),
+                            child: RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: "#${hashtag.tag}  ",
+                                    style: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700, color: Colors.black),
+                                  ),
+                                  TextSpan(
+                                    text: "${FormatingHelpers.formatNumber(hashtag.reelsCount)} feels",
+                                    style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.hashtagCountGreyColor),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        StreamBuilder<bool>(
+                            stream: HashtagService.getIsFollowing(
+                                hashtag: hashtag.tag),
+                            builder: (ctx, snapshot) {
+                              if (snapshot.hasData) {
+                                bool isFollowing = snapshot.requireData;
+                                return isFollowing
+                                    ? SecondaryGradientBtn(btnText: "Following", icon: '',
+                                  onTap: () => HashtagService.oddToFollow(hashtag: hashtag.tag, isUnfollowRequest: true), buttonHeight: 40,)
+                                    : SizedBox(
+                                    height: 40,
+                                    width: 100,
+                                    child: PrimaryBtn(
+                                      btnText: "Follow",
+                                      icon: '',
+                                      onTap: () => HashtagService.oddToFollow(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
+                              }
+
+                              return SizedBox();
+                            })
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+
+              const SizedBox(height: 20),
+              Text("Trending Feels",
+                  style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700)),
+
+              const SizedBox(height: 20),
+
+              discoverProvider.isLoadingMoods
+                  ? TrendingFeelsWidget()
+                  : Column(
+                children: discoverProvider.trendingMoods.map((mood) {
+                  return MoodCard(mood: mood); // 🔄 Move this logic to a reusable widget
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
-  }
-
-
-  Center _buildFeaturesCommenttedWidget() => Center(child: Text(
-    "Set to comment due to development of other features",
-    style: AppTextStyles.bodyTextStyle, textAlign: TextAlign.center,),);
-
-  void _onMoodTap(String mood) {
-    context.push(RouterEnum.moodReelsView.routeName, extra: {
-      'mood' : mood
-    });
   }
 
   Future<ReelFilter?> showFilterBottomSheet(ReelFilter currentFilter) {
     return showModalBottomSheet<ReelFilter>(
       context: context,
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       isScrollControlled: true,
-      builder: (context) {
-      return FilterBottomSheet(currentFilter: currentFilter);
-      },
+      builder: (context) => FilterBottomSheet(currentFilter: currentFilter),
     );
   }
+}
+class MoodCard extends StatelessWidget {
+  final MoodModel mood;
+  const MoodCard({required this.mood, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        children: [
+          ListTile(
+            onTap: () => context.push(RouterEnum.moodReelsView.routeName, extra: {'mood': mood.mood}),
+            leading: CircleAvatar(
+              backgroundColor: AppColors.yellowAccentColor,
+              child: Text(AppData.getEmojiByMood(mood.mood), style: TextStyle(fontSize: 24)),
+            ),
+            title: Text(mood.mood, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.bold)),
+            subtitle: Text('${mood.reelsCount} feels', style: AppTextStyles.captionTextStyle),
+            trailing:  GestureDetector(
+              onTap: () {
+                context.push(RouterEnum.moodReelsView.routeName, extra: {'mood' : mood});
+              },
+              child: SizedBox(
+                  width: 100,
+                  child: Row(
+                    children: [
+                      GradientTextWidget(
+                        gradient: AppGradients
+                            .primaryGradient,
+                        text: "SEE ALL",
+                        textStyle: AppTextStyles
+                            .buttonTextStyle.copyWith(
+                            fontWeight: FontWeight
+                                .w700),),
+                      GradientIcon(
+                          icon: Icons.navigate_next_sharp,
+                          size: 30,
+                          gradient: AppGradients
+                              .primaryGradient),
+                    ],
+                  )
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 200,
+            child: FutureBuilder(
+              future: MoodService.getReelsbyMood(mood: mood.mood),
+              builder: (ctx, snapshot) {
+                if (!snapshot.hasData) return LoadingWidget();
+                final reels = snapshot.data!['reels'] as List<ReelModel>;
+                final lastDoc = snapshot.data!['lastDocument'];
+
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: reels.length,
+                  itemBuilder: (ctx, index) => GestureDetector(
+                    onTap: () => context.push(
+                      RouterEnum.updatedReelsView.routeName,
+                      extra: {
+                        'initialReels': reels,
+                        'selectedIndex': index,
+                        'lastDocument': lastDoc,
+                        'comingFrom': AppConstants.comingFromMood,
+                        'mood': mood.mood,
+                      },
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: CachedNetworkImage(
+                          placeholder: (_, __) => ReelThumbnailShimmerItem(),
+                          imageUrl: reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
+                          height: 150,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
 }

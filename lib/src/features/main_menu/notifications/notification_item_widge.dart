@@ -43,9 +43,6 @@ class _NotificationItemWidgetState extends State<NotificationItemWidget> {
               heightFactor: 0.75,
               child: SingleChildScrollView(child: RemoteUserProfileInfoWidget(userName: userName, userID: userID!,)));
         });
-        /*if(widget._notification.notificationType == NotificationType.follow){
-
-        }*/
       },
       contentPadding: EdgeInsets.only(right: 10),
       leading: ProfilePictureWidget(
