@@ -41,6 +41,10 @@ enum RouterEnum {
   helpCenterView('/helpCenter-view'),
   termsAndPrivacyView('/termsAndPrivacy-view'),
 
+  //upload pages router setting
+  createUploadReelView("/createUploadReel-view"),
+  editUploadedReelView('/editUploadedReel-view'),
+  publishReelView('/publishReel-view'),
   //BottomNav
   discoverView('/discover_view'),
   videoFeedView('/video_feed_view'),

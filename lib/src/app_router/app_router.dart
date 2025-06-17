@@ -19,6 +19,9 @@ import 'package:funli_app/src/features/settings/privacy_security.dart';
 import 'package:funli_app/src/features/settings/profile_settings_page.dart';
 import 'package:funli_app/src/features/settings/report_problem_page.dart';
 import 'package:funli_app/src/features/settings/terms_privacy_page.dart';
+import 'package:funli_app/src/features/upload_feel/create_upload_feel_page.dart';
+import 'package:funli_app/src/features/upload_feel/edit_uploaded_feel.dart';
+import 'package:funli_app/src/features/upload_feel/publish_reel_page.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,9 +37,12 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'shell',
 );
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+
 class AppRouter {
   final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
+    observers: [routeObserver],
     initialLocation: RouterEnum.videoFeedView.routeName,
     routes: [
       ShellRoute(
@@ -88,6 +94,7 @@ class AppRouter {
           ),
         ],
       ),
+
       GoRoute(
         path: RouterEnum.welcomeView.routeName,
         builder: (BuildContext context, GoRouterState state) =>
@@ -183,6 +190,30 @@ class AppRouter {
         path: RouterEnum.termsAndPrivacyView.routeName,
         builder: (BuildContext context, GoRouterState state) =>
         const TermsPrivacyPage(),
+      ),
+      GoRoute(
+        // Add the parentNavigatorKey to use the root navigator
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RouterEnum.createUploadReelView.routeName,
+        builder: (BuildContext context, GoRouterState state) =>
+        const CreateUploadFeelPage(),
+      ),
+      GoRoute(
+        path: RouterEnum.editUploadedReelView.routeName,
+        pageBuilder: (context, state) {
+          final extras = state.extra! as Map<String, dynamic>;
+
+          return MaterialPage(
+            child: EditUploadedFeelPage(
+              videoPath: extras['videoPath'],
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouterEnum.publishReelView.routeName,
+        builder: (BuildContext context, GoRouterState state) =>
+        const PublishReelPage(),
       ),
       GoRoute(
         path: RouterEnum.updatedReelsView.routeName,

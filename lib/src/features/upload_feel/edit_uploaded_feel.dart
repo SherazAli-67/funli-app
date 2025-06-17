@@ -2,9 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:funli_app/src/features/upload_feel/publish_reel_page.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:video_trimmer/video_trimmer.dart';
 
@@ -91,7 +92,7 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
                             AppBackButton(color: Colors.white,),
                             Text("Create a Feel", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
                             TextButton(onPressed: (){
-                              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (ctx)=> PublishReelPage()));
+                              context.push(RouterEnum.publishReelView.routeName);
                             }, child: Text("Next", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),))
                           ],
                         ),

@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
-
-import '../features/main_menu/profile/remote_user_profile_page.dart';
+import 'package:go_router/go_router.dart';
+import '../app_router/router_enum.dart';
 import '../models/follow_model.dart';
 import '../models/user_model.dart';
 import '../res/app_colors.dart';
@@ -71,7 +71,6 @@ class _FollowingAndFollowersBottomSheetState extends State<FollowingAndFollowers
         ? await colRef.get()
         : await colRef.startAfterDocument(_lastFollowerDoc!).get();
 
-    debugPrint("Docs found: ${snapshot.docs.length}");
     if (snapshot.docs.isEmpty) {
       setState(() => _hasMore = false);
       _isLoading = false;
@@ -140,31 +139,35 @@ class _FollowingAndFollowersBottomSheetState extends State<FollowingAndFollowers
                       final user = _followers[index];
                       return ListTile(
                         onTap: (){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> RemoteUserProfilePage(userID: user.userID, userName: user.userName, profilePicture: user.profilePicture,)));
+                          context.push(RouterEnum.remoteUserProfileView.routeName, extra: {
+                            'userID' : user.userID,
+                            'userName' : user.userName,
+                            'profilePicture' : user.profilePicture
+                          });
+
                         },
-                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                        dense: true,
+                        horizontalTitleGap: 0,
+                        contentPadding: EdgeInsets.symmetric(vertical: 12),
                         leading: ProfilePictureWidget(profilePicture: user.profilePicture),
-                        title: Text(user.userName, style: AppTextStyles.buttonTextStyle,),
-                        trailing: SizedBox(
-
-                          width: 150,
-                          child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
-                            if(snapshot.hasData){
-                              return snapshot.requireData
-                                  ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 38,)
-                                  : SizedBox(
-                                height: 38,
-                                width: 75,
-                                child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient,),
-                              );
-                            }else if(snapshot.connectionState == ConnectionState.waiting){
-                              return LoadingWidget();
-                            }
-
+                        title: Text(user.userName, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w700),),
+                        trailing: ConstrainedBox(constraints: BoxConstraints(maxWidth: 120, minWidth: 80), child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
+                          if(snapshot.hasData){
+                            return snapshot.requireData
+                                ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 38,)
+                                : SizedBox(
+                              height: 38,
+                              width: 75,
+                              child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallBoldTextStyle,),
+                            );
+                          }else if(snapshot.connectionState == ConnectionState.waiting){
                             return LoadingWidget();
-                          }),
-                        ),
+                          }
+
+                          return LoadingWidget();
+                        }),),
                       );
+
                     } else {
                       return const Padding(
                         padding: EdgeInsets.all(16.0),

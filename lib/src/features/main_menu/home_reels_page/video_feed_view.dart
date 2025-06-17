@@ -5,6 +5,8 @@ import 'package:funli_app/src/models/reel_model.dart';
 
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
+import '../../../app_router/app_router.dart';
 import '../../../bloc_cubit/video_feed_cubit.dart';
 import '../../../bloc_cubit/video_feed_state.dart';
 
@@ -15,7 +17,7 @@ class VideoFeedView extends StatefulWidget{
   State<VideoFeedView> createState() => _VideoFeedViewState();
 }
 
-class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserver{
+class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserver, RouteAware{
   /// Maximum number of controllers to keep in cache
   final int _maxCacheSize = 3;
 
@@ -68,6 +70,23 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didPushNext() {
+    print("VideoFeedView - Pushing next route, pausing video.");
+    _pauseAllControllers();
+  }
+
+  @override
+  void didPopNext() {
+    print("VideoFeedView - Popped back, resuming video.");
+    _cleanupAndReinitializeCurrentVideo();
+  }
   /// Initialize the first video when the view loads
   void _initializeFirstVideo() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -355,34 +374,51 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: BlocListener<VideoFeedCubit, VideoFeedState>(
-        listenWhen:
-            (p, c) =>
-                p.videos != c.videos ||
-                p.isLoading != c.isLoading ||
-                p.preloadedVideoUrls != c.preloadedVideoUrls,
-        listener: (context, state) {
-          setState(() => _videos = state.videos);
-          _manageControllerWindow(_currentPage);
-        },
-        child: PreloadPageView.builder(
-          scrollDirection: Axis.vertical,
-          controller: _pageController,
-          itemCount: _videos.length,
-          physics: const AlwaysScrollableScrollPhysics(),
-          onPageChanged: (index) => _handlePageChange(index),
-          itemBuilder: (context, index) {
-            ReelModel reel = _videos[index];
-            return RepaintBoundary(
-              child: VideoFeedItem(
-                key: ValueKey(reel.reelID),
-                controller: _getController(reel.reelID),
-                reel: reel,
-                isComingFromHome: true,
-              ),
-            );
-          },
+    return VisibilityDetector(
+      onVisibilityChanged: (val){
+        var visiblePercentage = val.visibleFraction * 100;
+
+        if (visiblePercentage < 1) {
+          // If the widget is not visible and the video is playing, pause it.
+          _pauseAllControllers();
+        } else if (visiblePercentage > 0 ){
+          // If the widget is visible and the video is paused, play it.
+         _cleanupAndReinitializeCurrentVideo();
+        }
+      },
+      key: const Key('video_feed_visibility_detector'),
+      child: RepaintBoundary(
+        child: Container(
+          color: Colors.black,
+          child: BlocListener<VideoFeedCubit, VideoFeedState>(
+            listenWhen:
+                (p, c) =>
+                    p.videos != c.videos ||
+                    p.isLoading != c.isLoading ||
+                    p.preloadedVideoUrls != c.preloadedVideoUrls,
+            listener: (context, state) {
+              setState(() => _videos = state.videos);
+              _manageControllerWindow(_currentPage);
+            },
+            child: PreloadPageView.builder(
+              scrollDirection: Axis.vertical,
+              controller: _pageController,
+              itemCount: _videos.length,
+              physics: const AlwaysScrollableScrollPhysics(),
+              onPageChanged: (index) => _handlePageChange(index),
+              itemBuilder: (context, index) {
+                ReelModel reel = _videos[index];
+                return RepaintBoundary(
+                  child: VideoFeedItem(
+                    key: ValueKey(reel.reelID),
+                    controller: _getController(reel.reelID),
+                    reel: reel,
+                    isComingFromHome: true,
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

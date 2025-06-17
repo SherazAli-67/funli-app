@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_data.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/upload_feel/edit_uploaded_feel.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
@@ -13,6 +14,7 @@ import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
 import 'package:funli_app/src/widgets/mood_selecting_scroll_wheel_widget.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -200,7 +202,9 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                           IconButton(onPressed: ()async{
                             String? selectedVideoPath = await _onSelectVideoFromGalleryTap();
                             if(selectedVideoPath != null){
-                              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_)=> EditUploadedFeelPage(videoPath: selectedVideoPath)));
+                              context.push(RouterEnum.editUploadedReelView.routeName, extra: {
+                                'videoPath' : selectedVideoPath
+                              });
                             }
                           }, icon: SvgPicture.asset(AppIcons.icUpload))
                         ],
@@ -354,7 +358,9 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
 
     _timer?.cancel();
     _timer = null;
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (ctx)=> EditUploadedFeelPage(videoPath: file.path,)));
+    context.push(RouterEnum.editUploadedReelView.routeName, extra: {
+      'videoPath' : file.path
+    });
   }
 
   void _onScaleStart(ScaleStartDetails details) {

@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,8 +5,6 @@ import 'package:funli_app/src/app_router/app_router.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/bloc_cubit/video_feed_cubit.dart';
 import 'package:funli_app/src/dependancy_injection/dependency_injector.dart';
-import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
-import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:funli_app/src/providers/discover_provider.dart';
 import 'package:funli_app/src/providers/feels_search_provider.dart';
 import 'package:funli_app/src/providers/hashtag_search_provider.dart';

@@ -44,65 +44,62 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
   UserModel? _userModel;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black,
-      child: Stack(
-        children: [
-          OptimizedVideoPlayer(controller: widget.controller, videoId: widget.reel.reelID),
-          _buildUserNameCaptionWidget(),
-          _buildLikeCommentsIcon(context),
-          StreamBuilder(
-              stream: UserService.getCurrentUserStream(),
-              builder: (context, snapshot,) {
-                if(snapshot.hasData){
-                  String mood = snapshot.requireData.mood ?? 'Happy';
-                  return Positioned(
-                      top: 45,
-                      left: 20,
-                      right: 20,
-                      child: GestureDetector(
-                        onTap: ()async{
-                          final result = await showModalBottomSheet(
-                              isDismissible: false,
-                              context: context, builder: (_){
-                            return MoodSelectingScrollWheelWidget(selectedMood: mood,);
-                          });
+    return Stack(
+      children: [
+        OptimizedVideoPlayer(controller: widget.controller, videoId: widget.reel.reelID),
+        _buildUserNameCaptionWidget(),
+        _buildLikeCommentsIcon(context),
+        StreamBuilder(
+            stream: UserService.getCurrentUserStream(),
+            builder: (context, snapshot,) {
+              if(snapshot.hasData){
+                String mood = snapshot.requireData.mood ?? 'Happy';
+                return Positioned(
+                    top: 45,
+                    left: 20,
+                    right: 20,
+                    child: GestureDetector(
+                      onTap: ()async{
+                        final result = await showModalBottomSheet(
+                            isDismissible: false,
+                            context: context, builder: (_){
+                          return MoodSelectingScrollWheelWidget(selectedMood: mood,);
+                        });
 
-                          if(result != null){
-                            debugPrint("result found: $result");
-                            // Clear existing feed
-                            //Fetch new reels based on the mood
-                            context.read<VideoFeedCubit>().onMoodChange(mood: result);
-                          }
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(AppConstants.appTitle, style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  color: Colors.black54,
-                                  borderRadius: BorderRadius.circular(99)
-                              ),
-                              child: Row(
-                                spacing: 20,
-                                children: [
-                                  Text("${AppData.getEmojiByMood(mood)} $mood", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w600),),
-                                  Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white,)
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ));
-                }
-
-                return SizedBox();
+                        if(result != null){
+                          debugPrint("result found: $result");
+                          // Clear existing feed
+                          //Fetch new reels based on the mood
+                          context.read<VideoFeedCubit>().onMoodChange(mood: result);
+                        }
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(AppConstants.appTitle, style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(99)
+                            ),
+                            child: Row(
+                              spacing: 20,
+                              children: [
+                                Text("${AppData.getEmojiByMood(mood)} $mood", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w600),),
+                                Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white,)
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ));
               }
-          ),
-        ],
-      ),
+
+              return SizedBox();
+            }
+        ),
+      ],
     );
   }
 
