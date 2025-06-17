@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
 import 'package:funli_app/src/features/settings/widgets/settings_item_widget.dart';
@@ -24,7 +25,6 @@ class ProfileSettingsPage extends StatelessWidget{
         centerTitle: false,
       ),
       body: SafeArea(child: SingleChildScrollView(
-        padding: EdgeInsets.only(bottom: 75),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 30,
@@ -58,11 +58,12 @@ class ProfileSettingsPage extends StatelessWidget{
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("App Settings", style: AppTextStyles.subHeadingTextStyle,),
-                  SettingsItemWidget(icon: AppIcons.icVisibility, title: 'Dark Mode',  isSwitch: true,),
+                  SettingsItemWidget(icon: AppIcons.icVisibility, title: 'Dark Mode',  isSwitch: true, onTap: (){
+                    Fluttertoast.showToast(msg: "Dark mode development in-progress");
+                  },),
                   SettingsItemWidget(icon: AppIcons.icSecurity, title: 'Security & Privacy', onTap: ()=> _onSecurityPrivacyTap(context),),
                   SettingsItemWidget(icon: AppIcons.icVideo, title: 'Content Preferences', onTap: ()=> _onContentPreferencesTap(context),),
                   SettingsItemWidget(icon: AppIcons.icEdit, title: 'Report a Problem', onTap: ()=> _onReportProblemTap(context),),
-                  SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Dark Mode',),
                   SettingsItemWidget(icon: AppIcons.icHelpCenter, title: 'Help Center', onTap: ()=> _onHelpCenterTap(context),),
                   SettingsItemWidget(icon: AppIcons.icTermsPrivacy, title: 'Terms & Service',onTap: ()=> _onTermsPrivacyTap(context), ),
         

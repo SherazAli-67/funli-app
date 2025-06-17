@@ -163,33 +163,32 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
         _videos = state.videos;
 
         return Scaffold(
-          body: SafeArea(
-            child: PreloadPageView.builder(
-              scrollDirection: Axis.vertical,
-              controller: _pageController,
-              itemCount: _videos.length,
-              onPageChanged: (index) {
-                setState(() => _currentPage = index);
-                _cubit.onPageChanged(index);
+          backgroundColor: Colors.black,
+          body: PreloadPageView.builder(
+            scrollDirection: Axis.vertical,
+            controller: _pageController,
+            itemCount: _videos.length,
+            onPageChanged: (index) {
+              setState(() => _currentPage = index);
+              _cubit.onPageChanged(index);
 
-                _initializeControllerIfNeeded(_videos[index].reelID, _videos[index].videoUrl, shouldPlay: true);
-                _playController(_videos[index].reelID);
-              },
-              itemBuilder: (context, index) {
-                final reel = _videos[index];
-                final controller = _controllerCache[reel.reelID];
+              _initializeControllerIfNeeded(_videos[index].reelID, _videos[index].videoUrl, shouldPlay: true);
+              _playController(_videos[index].reelID);
+            },
+            itemBuilder: (context, index) {
+              final reel = _videos[index];
+              final controller = _controllerCache[reel.reelID];
 
-                return controller != null && controller.value.isInitialized
-                    ? RepaintBoundary(
-                  child: VideoFeedItem(
-                    key: ValueKey(reel.reelID),
-                    controller: controller,
-                    reel: reel,
-                  ),
-                )
-                    : const Center(child: CircularProgressIndicator());
-              },
-            ),
+              return controller != null && controller.value.isInitialized
+                  ? RepaintBoundary(
+                child: VideoFeedItem(
+                  key: ValueKey(reel.reelID),
+                  controller: controller,
+                  reel: reel,
+                ),
+              )
+                  : const Center(child: CircularProgressIndicator());
+            },
           ),
         );
       },

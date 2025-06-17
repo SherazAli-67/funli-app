@@ -1,3 +1,4 @@
+/*
 import 'dart:io';
 
 import 'package:camera/camera.dart';
@@ -342,3 +343,4 @@ class FaceDetectionPainter extends CustomPainter{
     return oldDelegate._faces == _faces;
   }
 }
+*/

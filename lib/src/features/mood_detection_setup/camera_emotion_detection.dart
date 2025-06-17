@@ -1,3 +1,4 @@
+/*
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -810,10 +811,12 @@ class _GalleryViewState extends State<GalleryView> {
                         children: [
                           for (final path in assets)
                             GestureDetector(
-                              /*onTap: () async {
+                              */
+/*onTap: () async {
                                 Navigator.of(context).pop();
                                 _processFile(await getAssetPath(path));
-                              },*/
+                              },*//*
+
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Image.asset(path),
@@ -889,4 +892,4 @@ double translateY(
     case InputImageRotation.rotation180deg:
       return y * canvasSize.height / imageSize.height;
   }
-}
+}*/

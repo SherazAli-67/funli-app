@@ -142,13 +142,14 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                 bool isFollowing = snapshot.requireData;
                                 return isFollowing
                                     ? SecondaryGradientBtn(btnText: "Following", icon: '',
-                                  onTap: () => HashtagService.oddToFollow(hashtag: hashtag.tag, isUnfollowRequest: true), buttonHeight: 40,)
+                                  onTap: () => HashtagService.oddToFollow(hashtag: hashtag.tag, isUnfollowRequest: true), buttonHeight: 35, )
                                     : SizedBox(
-                                    height: 40,
-                                    width: 100,
+                                    height: 35,
+                                    width: 80,
                                     child: PrimaryBtn(
                                       btnText: "Follow",
                                       icon: '',
+                                      textStyle: AppTextStyles.smallBoldTextStyle,
                                       onTap: () => HashtagService.oddToFollow(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
                               }
 
@@ -167,7 +168,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
               const SizedBox(height: 20),
 
               discoverProvider.isLoadingMoods
-                  ? TrendingFeelsWidget()
+                  ? TrendingFeelsShimmerWidget()
                   : Column(
                 children: discoverProvider.trendingMoods.map((mood) {
                   return MoodCard(mood: mood); // 🔄 Move this logic to a reusable widget
@@ -190,6 +191,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
     );
   }
 }
+
 class MoodCard extends StatelessWidget {
   final MoodModel mood;
   const MoodCard({required this.mood, super.key});
@@ -197,22 +199,35 @@ class MoodCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: EdgeInsets.only(bottom: 10),
+      elevation: 1,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16)
+      ),
       child: Column(
+        spacing: 10,
         children: [
           ListTile(
-            onTap: () => context.push(RouterEnum.moodReelsView.routeName, extra: {'mood': mood.mood}),
-            leading: CircleAvatar(
-              backgroundColor: AppColors.yellowAccentColor,
-              child: Text(AppData.getEmojiByMood(mood.mood), style: TextStyle(fontSize: 24)),
+            onTap: () => _onMoodTap(context, mood.mood),
+            leading: Container(
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.yellowAccentColor
+              ),
+              padding: EdgeInsets.all(5),
+              child: Text(AppData.getEmojiByMood(mood.mood),
+                style: TextStyle(fontSize: 30),),
             ),
-            title: Text(mood.mood, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.bold)),
-            subtitle: Text('${mood.reelsCount} feels', style: AppTextStyles.captionTextStyle),
-            trailing:  GestureDetector(
-              onTap: () {
-                context.push(RouterEnum.moodReelsView.routeName, extra: {'mood' : mood});
-              },
+            title: Text(mood.mood,
+              style: AppTextStyles.bodyTextStyle.copyWith(
+                  fontWeight: FontWeight.w700),),
+            subtitle: Text('${mood.reelsCount} feels',
+              style: AppTextStyles.captionTextStyle
+                  .copyWith(fontWeight: FontWeight.w300,
+                  color: AppColors.hintTextColor),),
+            trailing: GestureDetector(
+              onTap: () => _onMoodTap(context, mood.mood),
               child: SizedBox(
                   width: 100,
                   child: Row(
@@ -234,50 +249,76 @@ class MoodCard extends StatelessWidget {
                   )
               ),
             ),
+            contentPadding: EdgeInsets.symmetric(
+                horizontal: 10),
           ),
+
+
           SizedBox(
             height: 200,
+            width: double.infinity,
             child: FutureBuilder(
-              future: MoodService.getReelsbyMood(mood: mood.mood),
-              builder: (ctx, snapshot) {
-                if (!snapshot.hasData) return LoadingWidget();
-                final reels = snapshot.data!['reels'] as List<ReelModel>;
-                final lastDoc = snapshot.data!['lastDocument'];
+                future: MoodService.getReelsbyMood(mood: mood.mood),
+                builder: (ctx, snapshot) {
+                  if (snapshot.hasData) {
+                    List<ReelModel> reels = snapshot.requireData['reels'];
+                    DocumentSnapshot? lastDoc = snapshot.requireData['lastDocument'];
+                    return ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: mood.reelsCount > reels.length ? (reels.length+1) : reels.length,
+                        itemBuilder: (ctx, index) {
+                          return index == reels.length
+                              ? IconButton(
+                              style: ElevatedButton.styleFrom(
+                                  shape: CircleBorder(
+                                      side: BorderSide.none
+                                  ),
+                                  backgroundColor: AppColors.yellowAccentColor,
+                                  padding: EdgeInsets.all(20)
+                              ),
+                              onPressed: (){
+                                _onMoodTap(context, mood.mood);
+                              },
+                              icon: Icon(Icons.arrow_forward_rounded, size: 30,))
+                              : GestureDetector(
+                            onTap: (){
+                              context.push(
+                                RouterEnum.updatedReelsView.routeName,
+                                extra: {
+                                  'initialReels': reels,
+                                  'selectedIndex': index,
+                                  'lastDocument': lastDoc,
+                                  'comingFrom': AppConstants.comingFromMood, // or 'profile', etc.
+                                  'mood': mood.mood,
+                                },
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: CachedNetworkImage(
+                                  placeholder: (context, url) => ReelThumbnailShimmerItem(),
+                                  imageUrl: reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
+                                  height: 150,),
+                              ),
+                            ),
+                          );
+                        });
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return LoadingWidget();
+                  }
 
-                return ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: reels.length,
-                  itemBuilder: (ctx, index) => GestureDetector(
-                    onTap: () => context.push(
-                      RouterEnum.updatedReelsView.routeName,
-                      extra: {
-                        'initialReels': reels,
-                        'selectedIndex': index,
-                        'lastDocument': lastDoc,
-                        'comingFrom': AppConstants.comingFromMood,
-                        'mood': mood.mood,
-                      },
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: CachedNetworkImage(
-                          placeholder: (_, __) => ReelThumbnailShimmerItem(),
-                          imageUrl: reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
-                          height: 150,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+                  return SizedBox();
+                }),
+          )
         ],
       ),
     );
   }
 
-
+  void _onMoodTap(BuildContext context, String mood){
+    context.push(RouterEnum.moodReelsView.routeName, extra: {'mood' : mood});
+  }
 }

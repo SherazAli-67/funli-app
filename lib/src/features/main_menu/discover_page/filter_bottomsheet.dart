@@ -35,7 +35,7 @@ class FilterBottomSheet extends StatelessWidget{
                             borderRadius: BorderRadius.circular(
                                 100))
                     ),
-                    onPressed: () {}, icon: Icon(Icons.close))
+                    onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close))
               ],
             ),
             Column(

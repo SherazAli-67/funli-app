@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_widget.dart';
-import 'package:funli_app/src/res/app_colors.dart';
-import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
-import 'package:funli_app/src/services/reels_service.dart';
-import 'package:funli_app/src/widgets/primary_btn.dart';
 
 class MoodReelsPage extends StatelessWidget{
   const MoodReelsPage({super.key, required String mood}): _mood = mood;

@@ -1,12 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/settings/profile_settings_page.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/profile_info_widget.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../res/app_gradients.dart';
@@ -72,7 +74,7 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
                         IconButton(onPressed: () {},
                             icon: SvgPicture.asset(AppIcons.icAnalytics)),
                         IconButton(onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> ProfileSettingsPage()));
+                         context.push(RouterEnum.profileSettingsView.routeName);
                         },
                             icon: SvgPicture.asset(AppIcons.icSettings)),
                       ],))

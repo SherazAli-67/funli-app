@@ -541,14 +541,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.2.12"
-  get:
-    dependency: transitive
-    description:
-      name: get
-      sha256: c79eeb4339f1f3deffd9ec912f8a923834bec55f7b49c9e882b8fef2c139d425
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.7.2"
   get_it:
     dependency: "direct main"
     description:
@@ -581,22 +573,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.3+1"
-  google_mlkit_commons:
-    dependency: "direct main"
-    description:
-      name: google_mlkit_commons
-      sha256: "8f40fbac10685cad4715d11e6a0d86837d9ad7168684dfcad29610282a88e67a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.11.0"
-  google_mlkit_face_detection:
-    dependency: "direct main"
-    description:
-      name: google_mlkit_face_detection
-      sha256: f336737d5b8a86797fd4368f42a5c26aeaa9c6dcc5243f0a16b5f6f663cfb70a
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.13.1"
   google_sign_in:
     dependency: "direct main"
     description:
@@ -1346,14 +1322,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
-  whitecodel_reels:
-    dependency: "direct main"
-    description:
-      name: whitecodel_reels
-      sha256: db4d01d9274683da1bcc4ec2329f88033211f19821059d6e044f280c8ac60395
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.9+4"
   win32:
     dependency: transitive
     description:

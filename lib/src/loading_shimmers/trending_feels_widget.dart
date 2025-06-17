@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-class TrendingFeelsWidget extends StatelessWidget {
-  const TrendingFeelsWidget({
+class TrendingFeelsShimmerWidget extends StatelessWidget {
+  const TrendingFeelsShimmerWidget({
     super.key,
   });
 
@@ -71,7 +71,7 @@ class TrendingFeelsWidget extends StatelessWidget {
                         itemCount: 4,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (ctx, index){
-                          Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
+                         return Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
                             height: 200,
                             width: double.infinity,
                             decoration: BoxDecoration(

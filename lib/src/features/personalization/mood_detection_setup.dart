@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/mood_detection_setup/camera_emotion_detection_setup.dart';
@@ -252,4 +253,4 @@ class MoodDetectionSetupState extends State<MoodDetectionSetup> with SingleTicke
   }
 }
 
-enum CardState { camera, voice, text }
+enum CardState { camera, voice, text }*/

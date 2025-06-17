@@ -93,7 +93,7 @@ class PrivacySecurity extends StatelessWidget{
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Who can see your feels", style: AppTextStyles.headingTextStyle3,),
+                  Expanded(child: Text("Who can see your feels", style: AppTextStyles.headingTextStyle3,)),
                   IconButton(onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close), style: IconButton.styleFrom(
                       backgroundColor: AppColors.lightGreyColor,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100))
