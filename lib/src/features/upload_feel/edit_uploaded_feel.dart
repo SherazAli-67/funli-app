@@ -97,7 +97,10 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
                         Text("Create a Feel", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
                         GestureDetector(
                             onTap: (){
-                              context.pushReplacement(RouterEnum.publishReelView.routeName);
+                              // Step 3: EditUploadReel -> PublishReel (replace Edit)
+                              context.pushReplacement(
+                                RouterEnum.publishReelView.routeName,
+                              );
                             }, child: Padding(
                               padding: const EdgeInsets.only(top: 5.0),
                               child: Text("Next", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),),

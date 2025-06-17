@@ -73,7 +73,7 @@ class TrendingFeelsShimmerWidget extends StatelessWidget {
                         itemBuilder: (ctx, index){
                          return Shimmer.fromColors(baseColor: baseColor, highlightColor:  highlightColor, child: Container(
                             height: 200,
-                            width: double.infinity,
+                            // width: double.infinity,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               color: Colors.grey,

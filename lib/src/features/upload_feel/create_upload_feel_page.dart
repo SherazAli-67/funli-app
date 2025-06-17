@@ -226,7 +226,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        IconButton(onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white,)),
+                                        IconButton(onPressed: ()=> context.pop(), icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white,)),
                                         Text("Record a video", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
                                         const SizedBox(width: 40,),
                                       ],

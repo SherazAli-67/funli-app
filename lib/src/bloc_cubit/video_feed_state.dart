@@ -10,6 +10,7 @@ class VideoFeedState extends Equatable {
     this.error = '',
     this.currentVideoIndex = 0,
     this.preloadedVideoUrls = const {},
+    this.shouldPauseVideo = false
   });
 
   final List<ReelModel> videos;
@@ -19,7 +20,7 @@ class VideoFeedState extends Equatable {
   final String error;
   final int currentVideoIndex;
   final Set<String> preloadedVideoUrls;
-
+  final bool shouldPauseVideo;
   @override
   List<Object> get props => [
     videos,
@@ -29,6 +30,7 @@ class VideoFeedState extends Equatable {
     error,
     currentVideoIndex,
     preloadedVideoUrls,
+    shouldPauseVideo,
   ];
 
   VideoFeedState copyWith({
@@ -39,6 +41,7 @@ class VideoFeedState extends Equatable {
     String? error,
     int? currentVideoIndex,
     Set<String>? preloadedVideoUrls,
+    bool? shouldPauseVideo,
   }) {
     return VideoFeedState(
       videos: videos ?? this.videos,
@@ -48,6 +51,7 @@ class VideoFeedState extends Equatable {
       error: error ?? this.error,
       currentVideoIndex: currentVideoIndex ?? this.currentVideoIndex,
       preloadedVideoUrls: preloadedVideoUrls ?? this.preloadedVideoUrls,
+      shouldPauseVideo: shouldPauseVideo ?? this.shouldPauseVideo,
     );
   }
 

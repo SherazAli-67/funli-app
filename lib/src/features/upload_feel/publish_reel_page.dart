@@ -255,12 +255,14 @@ class _PublishReelPageState extends State<PublishReelPage> {
 
   void _onPublishReelTap() {
     String caption = captionController.text;
-    context.read<RecordUploadProvider>().publishReel(caption: caption, visibility: visibility, navigationCallback: navigationCallback);
+    context.read<RecordUploadProvider>().publishReel(caption: caption,
+        visibility: visibility,
+        navigationCallback: navigationCallback);
 
   }
 
   void navigationCallback()async{
-   final result = await showModalBottomSheet(
+   await showModalBottomSheet(
         backgroundColor: Colors.white,
         context: context, builder: (ctx){
       return Padding(
@@ -283,7 +285,6 @@ class _PublishReelPageState extends State<PublishReelPage> {
         ),
       );
     });
-   debugPrint("Came below");
   }
 
   void _onSaveAsDraft(){
@@ -325,9 +326,10 @@ class _PublishReelPageState extends State<PublishReelPage> {
   }
 
   void _navigateBackToMainMenu(){
-    while(context.canPop()){
-      context.pop();
-    }
-    context.push(RouterEnum.videoFeedView.routeName);
+    context.pop();
+    // while(context.canPop()){
+    //   context.pop();
+    // }
+    // context.push(RouterEnum.videoFeedView.routeName);
   }
 }

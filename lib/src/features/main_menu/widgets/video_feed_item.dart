@@ -42,6 +42,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
   @override
   Widget build(BuildContext context) {
     return Stack(
+      alignment: Alignment.center,
       children: [
         OptimizedVideoPlayer(controller: widget.controller, videoId: widget.reel.reelID),
         _buildUserNameCaptionWidget(),

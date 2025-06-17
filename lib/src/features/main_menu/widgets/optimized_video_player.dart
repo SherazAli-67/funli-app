@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/res/app_colors.dart';
+import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/play_pause_widget.dart';
 import 'package:video_player/video_player.dart';
 
@@ -152,7 +154,7 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
       return Center(
         child: RotationTransition(
           turns: Tween(begin: 0.0, end: 1.0).animate(_loadingController),
-          child: const CircularProgressIndicator(),
+          child: LoadingWidget(),
         ),
       );
     }
@@ -161,22 +163,34 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
 
     return GestureDetector(
       onTap: _togglePlayPause,
-      child: Center(
-        key: _playerKey,
-        child: isPortrait
-            ? SizedBox.expand(
-          child: AspectRatio(
-            aspectRatio: controller.value.aspectRatio,
-            child: _buildVideoPlayerStack(controller),
-          ),
-        )
-            : AspectRatio(
+      child: isPortrait ? SizedBox.expand(
+        child: AspectRatio(
           aspectRatio: controller.value.aspectRatio,
           child: _buildVideoPlayerStack(controller),
         ),
+      ) : SizedBox.expand(
+        child: FittedBox(
+          key: _playerKey,
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: controller.value.size.width,
+            height: controller.value.size.height,
+            child: Stack(
+              children: [
+                VideoPlayer(controller),
+                if (_isBuffering)
+                  LoadingWidget(color: AppColors.purpleColor,),
+                if (_showPlayPauseOverlay)
+                  PlayPauseWidget(isPlaying: controller.value.isPlaying)
+              ],
+            ),
+          ),
+        ),
       ),
     );
+
   }
+
 
   Widget _buildVideoPlayerStack(VideoPlayerController controller) {
     return Stack(

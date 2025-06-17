@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:funli_app/src/app_router/app_router.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:go_router/go_router.dart';
+import '../bloc_cubit/video_feed_cubit.dart';
 import '../notification_service/notification_service.dart';
 import '../providers/size_provider.dart';
 import '../res/app_gradients.dart';
@@ -76,6 +76,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                               borderRadius: BorderRadius.circular(35)
                           ),
                           child: IconButton(onPressed: ()async{
+                            context.read<VideoFeedCubit>().setShouldPauseVideo(true);
                             context.push(RouterEnum.createUploadReelView.routeName);
                           }, icon: Icon(Icons.add, color: Colors.white,)),
                         ),
@@ -138,6 +139,11 @@ int _calculateSelectedIndex(BuildContext context) {
 }
 
 void _onItemTapped(int index, BuildContext context) {
+  if (index == 0) { // Assuming VideoFeedView is at index 0
+    context.read<VideoFeedCubit>().setShouldPauseVideo(false);
+  } else {
+    context.read<VideoFeedCubit>().setShouldPauseVideo(true);
+  }
   switch (index) {
     case 0:
       GoRouter.of(context).go(RouterEnum.videoFeedView.routeName);

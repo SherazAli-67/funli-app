@@ -122,6 +122,11 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     }
   }
 
+  void setShouldPauseVideo(bool value) {
+    debugPrint("ShouldPauseState received: $value");
+    emit(state.copyWith(shouldPauseVideo: value));
+  }
+
   Future<File> getCachedVideoFile(String videoUrl) async {
     if (_preloadedFiles.containsKey(videoUrl)) {
       return _preloadedFiles[videoUrl]!;

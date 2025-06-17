@@ -212,8 +212,7 @@ class AppRouter {
       ),
       GoRoute(
         path: RouterEnum.publishReelView.routeName,
-        builder: (BuildContext context, GoRouterState state) =>
-        const PublishReelPage(),
+        builder: (BuildContext context, GoRouterState state) => const PublishReelPage(),
       ),
       GoRoute(
         path: RouterEnum.updatedReelsView.routeName,

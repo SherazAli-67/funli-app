@@ -5,8 +5,6 @@ import 'package:funli_app/src/models/reel_model.dart';
 
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
-import 'package:visibility_detector/visibility_detector.dart';
-import '../../../app_router/app_router.dart';
 import '../../../bloc_cubit/video_feed_cubit.dart';
 import '../../../bloc_cubit/video_feed_state.dart';
 
@@ -17,7 +15,7 @@ class VideoFeedView extends StatefulWidget{
   State<VideoFeedView> createState() => _VideoFeedViewState();
 }
 
-class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserver, RouteAware{
+class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserver{
   /// Maximum number of controllers to keep in cache
   final int _maxCacheSize = 3;
 
@@ -70,31 +68,12 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
     }
   }
 
-  @override
-  void didChangeDependencies() {
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
-    super.didChangeDependencies();
-  }
-
-  @override
-  void didPushNext() {
-    print("VideoFeedView - Pushing next route, pausing video.");
-    _pauseAllControllers();
-  }
-
-  @override
-  void didPopNext() {
-    print("VideoFeedView - Popped back, resuming video.");
-    _cleanupAndReinitializeCurrentVideo();
-  }
   /// Initialize the first video when the view loads
   void _initializeFirstVideo() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final state = context.read<VideoFeedCubit>().state;
       if (state.videos.isNotEmpty) {
         _videos = state.videos;
-
-
         await _initAndPlayVideo(0);
         if(mounted) {
           setState(() {});
@@ -129,9 +108,7 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
 
     final video = _videos[index];
     await _getOrCreateController(video);
-    if(index != 0){
-      await _playController(video.reelID);
-    }
+    await _playController(video.reelID);
 
     if (mounted) setState(() {});
   }
@@ -170,8 +147,7 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
       // Set looping
       controller.setLooping(false); // important for detecting end
       controller.addListener(() {
-        final isEnded = controller.value.position >= controller.value.duration &&
-            !controller.value.isPlaying;
+        final isEnded = controller.value.position >= controller.value.duration && !controller.value.isPlaying;
         if (isEnded) {
           _onVideoCompleted();
         }
@@ -184,15 +160,6 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
       // Enforce cache size limit
       _enforceCacheLimit();
 
-
-      if(_currentPage == 0){
-        // ✅ Immediately play if it's the current video
-        if (_videos.isNotEmpty &&
-            _videos[_currentPage].reelID == video.reelID &&
-            mounted) {
-          await controller.play();
-        }
-      }
       if(mounted){
         setState(() {});
       }
@@ -374,50 +341,49 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
 
   @override
   Widget build(BuildContext context) {
-    return VisibilityDetector(
-      onVisibilityChanged: (val){
-        var visiblePercentage = val.visibleFraction * 100;
-        debugPrint("Visibility percentage found: $visiblePercentage");
-        if (visiblePercentage < 1) {
-          // If the widget is not visible and the video is playing, pause it.
-          _pauseAllControllers();
-        } else if (visiblePercentage > 0 ){
-          // If the widget is visible and the video is paused, play it.
-         _cleanupAndReinitializeCurrentVideo();
+    return RepaintBoundary(
+      child: Container(
+        color: Colors.black,
+        child: BlocListener<VideoFeedCubit, VideoFeedState>(
+
+          listenWhen:
+              (p, c) =>
+          p.videos != c.videos ||
+              p.isLoading != c.isLoading ||
+              p.preloadedVideoUrls != c.preloadedVideoUrls ||
+              p.shouldPauseVideo != c.shouldPauseVideo,
+          listener: (context, state) {
+            setState(() => _videos = state.videos);
+            _manageControllerWindow(_currentPage);
+             if (state.videos.isNotEmpty &&
+            state.currentVideoIndex == 0 && state.videos.first.reelID ==
+            _videos.first.reelID) {
+          _initAndPlayVideo(0);
         }
-      },
-      key: const Key('video_feed_visibility_detector'),
-      child: RepaintBoundary(
-        child: Container(
-          color: Colors.black,
-          child: BlocListener<VideoFeedCubit, VideoFeedState>(
-            listenWhen:
-                (p, c) =>
-                    p.videos != c.videos ||
-                    p.isLoading != c.isLoading ||
-                    p.preloadedVideoUrls != c.preloadedVideoUrls,
-            listener: (context, state) {
-              setState(() => _videos = state.videos);
-              _manageControllerWindow(_currentPage);
+        if (state.shouldPauseVideo) {
+          debugPrint("shouldPauseVideo received in build: ${state.shouldPauseVideo}");
+          _pauseAllControllers();
+        } else {
+          _initAndPlayVideo(_currentPage);
+        }
+          },
+          child: PreloadPageView.builder(
+            scrollDirection: Axis.vertical,
+            controller: _pageController,
+            itemCount: _videos.length,
+            physics: const AlwaysScrollableScrollPhysics(),
+            onPageChanged: (index) => _handlePageChange(index),
+            itemBuilder: (context, index) {
+              ReelModel reel = _videos[index];
+              return RepaintBoundary(
+                child: VideoFeedItem(
+                  key: ValueKey(reel.reelID),
+                  controller: _getController(reel.reelID),
+                  reel: reel,
+                  isComingFromHome: true,
+                ),
+              );
             },
-            child: PreloadPageView.builder(
-              scrollDirection: Axis.vertical,
-              controller: _pageController,
-              itemCount: _videos.length,
-              physics: const AlwaysScrollableScrollPhysics(),
-              onPageChanged: (index) => _handlePageChange(index),
-              itemBuilder: (context, index) {
-                ReelModel reel = _videos[index];
-                return RepaintBoundary(
-                  child: VideoFeedItem(
-                    key: ValueKey(reel.reelID),
-                    controller: _getController(reel.reelID),
-                    reel: reel,
-                    isComingFromHome: true,
-                  ),
-                );
-              },
-            ),
           ),
         ),
       ),
