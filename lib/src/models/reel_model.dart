@@ -39,6 +39,28 @@ class ReelModel {
   });
 
   factory ReelModel.fromMap(Map<String, dynamic> map) {
+    // Handle different formats of createdAt
+    DateTime createdAtDateTime;
+    final createdAtValue = map['createdAt'];
+    
+    if (createdAtValue is Timestamp) {
+      // Handle Firestore Timestamp
+      createdAtDateTime = createdAtValue.toDate();
+    } else if (createdAtValue is Map) {
+      // Handle Map format with seconds and nanoseconds
+      final seconds = createdAtValue['seconds'] as int;
+      final nanoseconds = createdAtValue['nanoseconds'] as int;
+      createdAtDateTime = DateTime.fromMillisecondsSinceEpoch(
+        seconds * 1000 + (nanoseconds / 1000000).round(),
+      );
+    } else if (createdAtValue is String) {
+      // Handle ISO 8601 string
+      createdAtDateTime = DateTime.parse(createdAtValue);
+    } else {
+      // Fallback to current time if format is unknown
+      createdAtDateTime = DateTime.now();
+    }
+    
     return ReelModel(
       reelID: map['reelID'] ?? '',
       userID: map['userID'] ?? '',
@@ -52,11 +74,10 @@ class ReelModel {
       moodTag: map['moodTag'] ?? '',
       // duration: (map['duration'] ?? 0).toDouble(),
       visibility: map['visibility'] ?? 'public',
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      createdAt: createdAtDateTime,
       location: map['location'] != null ? Map<String, dynamic>.from(map['location']) : null,
       isMuted: map['isMuted'] ?? false,
       playbackSpeed: map['playbackSpeed'] ?? 1.0
-
     );
   }
 
@@ -74,7 +95,7 @@ class ReelModel {
       'moodTag': moodTag,
       // 'duration': duration,
       'visibility': visibility,
-      'createdAt': createdAt,
+      'createdAt': createdAt.toIso8601String(), // Convert DateTime to ISO string for JSON serialization
       if (location != null) 'location': location,
       'isMuted' : isMuted,
       'playbackSpeed' : playbackSpeed

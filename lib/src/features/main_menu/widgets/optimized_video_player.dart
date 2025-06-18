@@ -107,10 +107,21 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
     final isBuffering = controller.value.isBuffering;
     final isPlaying = controller.value.isPlaying;
 
-    bool shouldShowBuffering = isBuffering;
-    if ((isPlaying && controller.value.position > Duration.zero) ||
-        (controller.value.position > Duration.zero &&
-            controller.value.duration.inMilliseconds > 0)) {
+    // Improved buffering detection logic
+    // Only show buffering indicator if we're actually buffering AND not playing
+    // This prevents the buffering indicator from showing during normal playback
+    bool shouldShowBuffering = isBuffering && !isPlaying;
+    
+    // If video has started playing, don't show buffering even if technically buffering
+    // This creates a smoother user experience
+    if (isPlaying && controller.value.position > Duration.zero) {
+      shouldShowBuffering = false;
+    }
+    
+    // If video has loaded some content but isn't playing yet, don't show buffering
+    if (!isPlaying && 
+        controller.value.position > Duration.zero &&
+        controller.value.duration.inMilliseconds > 0) {
       shouldShowBuffering = false;
     }
 
@@ -162,28 +173,36 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
 
     bool isPortrait = controller.value.size.height > controller.value.size.width;
 
-    Widget child = VideoPlayer(controller);
+    // Use a RepaintBoundary to optimize rendering performance
+    Widget child = RepaintBoundary(
+      child: VideoPlayer(controller),
+    );
+    
     return GestureDetector(
       onTap: _togglePlayPause,
       key: _playerKey,
       child: Stack(
         alignment: Alignment.center,
         children: [
+          // Optimize video rendering based on orientation
           isPortrait
-              ? SizedBox.expand(child: AspectRatio(aspectRatio: controller.value.aspectRatio, child: child))
-              : AspectRatio(aspectRatio: controller.value.aspectRatio, child: child),
-          /*isPortrait ? SizedBox.expand(
-            child: AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child:VideoPlayer(controller),
-            ),
-          ): AspectRatio(
-            aspectRatio: controller.value.aspectRatio,
-            child: VideoPlayer(controller),
-          ),*/
+              ? SizedBox.expand(
+                  child: AspectRatio(
+                    aspectRatio: controller.value.aspectRatio, 
+                    child: child
+                  )
+                )
+              : AspectRatio(
+                  aspectRatio: controller.value.aspectRatio, 
+                  child: child
+                ),
+          
+          // Only show buffering indicator when actually buffering
           if (_isBuffering)
-            LoadingWidget(color: AppColors.purpleColor,),
-          // if (_showPlayPauseOverlay )
+            LoadingWidget(color: AppColors.purpleColor),
+          
+          // Only show play/pause overlay when needed
+          if (_showPlayPauseOverlay)
             PlayPauseWidget(isPlaying: controller.value.isPlaying)
         ],
       ),

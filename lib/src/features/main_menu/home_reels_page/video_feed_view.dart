@@ -1,7 +1,10 @@
+import 'dart:io';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/models/reel_model.dart';
-
+import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
 
@@ -22,9 +25,9 @@ class VideoFeedView extends StatefulWidget {
 }
 
 class _VideoFeedViewState extends State<VideoFeedView>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, AutomaticKeepAliveClientMixin {
   /// Maximum number of controllers to keep in cache
-  final int _maxCacheSize = 3;
+  final int _maxCacheSize = 5; // Increased for better performance
 
   /// The current videos to display
   List<ReelModel> _videos = [];
@@ -33,7 +36,9 @@ class _VideoFeedViewState extends State<VideoFeedView>
   int _currentPage = 0;
 
   /// PageView controller
-  final PreloadPageController _pageController = PreloadPageController();
+  final PreloadPageController _pageController = PreloadPageController(
+    // preloadPagesCount: 3, // Preload 3 pages in each direction
+  );
 
   /// Whether the app is currently active
   bool _isAppActive = true;
@@ -46,6 +51,15 @@ class _VideoFeedViewState extends State<VideoFeedView>
 
   /// Set of video IDs currently being disposed to prevent race conditions
   final Set<String> _disposingControllers = <String>{};
+  
+  /// Flag to track if initial videos have been loaded
+  bool _initialVideosLoaded = false;
+  
+  /// Flag to track if we're showing a background refresh indicator
+  bool _showingBackgroundRefresh = false;
+  
+  @override
+  bool get wantKeepAlive => true; // Keep state when widget is not visible
 
   @override
   void initState() {
@@ -80,7 +94,16 @@ class _VideoFeedViewState extends State<VideoFeedView>
       final state = context.read<VideoFeedCubit>().state;
       if (state.videos.isNotEmpty) {
         _videos = state.videos;
+        _initialVideosLoaded = true;
+        
+        // Pre-initialize controllers for first few videos
+        for (int i = 0; i < math.min(3, _videos.length); i++) {
+          await _getOrCreateController(_videos[i]);
+        }
+        
+        // Play the first video
         await _initAndPlayVideo(0);
+        
         if(mounted) {
           setState(() {});
         }
@@ -112,14 +135,26 @@ class _VideoFeedViewState extends State<VideoFeedView>
   Future<void> _initAndPlayVideo(int index) async {
     if (_videos.isEmpty || index >= _videos.length) return;
 
+    // First ensure all other videos are paused
+    await _pauseAllControllers();
+    
     final video = _videos[index];
     VideoPlayerController? controller = await _getOrCreateController(video);
-    // FIXED: Ensure volume is restored to full when playing video
+    
+    // Ensure volume is restored to full when playing video
     if (controller != null && controller.value.isInitialized) {
+      // Reset position to beginning to ensure smooth start
+      await controller.seekTo(Duration.zero);
+      
+      // Set volume before playing
       if(!video.isMuted){
         await controller.setVolume(1.0);
+      } else {
+        await controller.setVolume(0.0);
       }
     }
+    
+    // Play the video
     await _playController(video.reelID);
 
     if (mounted) setState(() {});
@@ -145,33 +180,47 @@ class _VideoFeedViewState extends State<VideoFeedView>
     }
 
     try {
-      // Get cached file from the cubit
-      final videoFile = await context.read<VideoFeedCubit>().getCachedVideoFile(
-        video.videoUrl,
-      );
+      File? videoFile;
+      
+      // First try to get from ReelsCacheService directly for faster loading
+      videoFile = await ReelsCacheService.getCachedVideo(video.videoUrl);
+      
+      // If not found in direct cache, get from cubit which will handle downloading
+      if (videoFile == null) {
+        videoFile = await context.read<VideoFeedCubit>().getCachedVideoFile(
+          video.videoUrl,
+        );
+      }
 
       // Create a new controller
       final controller = VideoPlayerController.file(videoFile);
 
       // Initialize the controller
       await controller.initialize();
-      // FIXED: Set volume to full for new controllers
 
+      // Ensure volume is set correctly
       if(!video.isMuted){
-        debugPrint("Video is set for mute: ${video.reelID}");
         await controller.setVolume(1.0);
-      }else{
-        controller.setVolume(0.0);
+      } else {
+        await controller.setVolume(0.0);
       }
-      // Set looping
-      controller.setLooping(false); // important for detecting end
-      controller.addListener(() {
-        final isEnded = controller.value.position >= controller.value.duration && !controller.value.isPlaying;
-        if (isEnded) {
-          _onVideoCompleted();
-        }
-      });
-
+      
+      // Set looping to true to prevent buffering at the end of videos
+      controller.setLooping(true);
+      
+      // Still detect when video completes a loop for auto-scrolling
+      // controller.addListener(() {
+      //   if (!mounted) return;
+      //
+      //   // Check if video has completed a loop (position near zero after playing)
+      //   final isLoopCompleted = controller.value.position.inMilliseconds < 300 &&
+      //                          controller.value.isPlaying &&
+      //                          controller.value.duration.inSeconds > 1;
+      //
+      //   if (isLoopCompleted) {
+      //     _onVideoCompleted();
+      //   }
+      // });
 
       controller.setPlaybackSpeed(video.playbackSpeed);
 
@@ -221,9 +270,12 @@ class _VideoFeedViewState extends State<VideoFeedView>
 
     for (final controller in controllers) {
       try {
-        if (controller.value.isInitialized && controller.value.isPlaying) {
+        if (controller.value.isInitialized) {
+          // Always pause, even if not playing, to ensure complete stop
           await controller.pause();
+          // Mute to prevent audio leakage
           await controller.setVolume(0.0);
+          // Reset position to beginning
           await controller.seekTo(Duration.zero);
         }
       } catch (e) {
@@ -285,8 +337,9 @@ class _VideoFeedViewState extends State<VideoFeedView>
   Future<void> _manageControllerWindow(int currentPage) async {
     if (_videos.isEmpty) return;
 
-    // Define window of pages to keep
-    final windowStart = (currentPage - 1).clamp(0, _videos.length - 1);
+    // Define a smaller window to reduce memory usage and prevent background playback
+    // Only preload next video, not previous (to prevent previous videos from playing)
+    final windowStart = currentPage;
     final windowEnd = (currentPage + 1).clamp(0, _videos.length - 1);
 
     // Get IDs in window
@@ -304,19 +357,14 @@ class _VideoFeedViewState extends State<VideoFeedView>
       await _removeController(id);
     }
 
-    // Initialize controllers in window, prioritizing current page
+    // Initialize controllers in window with priority order
     if (currentPage < _videos.length) {
       // Current page first
       await _getOrCreateController(_videos[currentPage]);
-
-      // Then previous page if in range
-      if (windowStart < currentPage && windowStart >= 0) {
-        await _getOrCreateController(_videos[windowStart]);
-      }
-
-      // Then next page if in range
-      if (windowEnd > currentPage && windowEnd < _videos.length) {
-        await _getOrCreateController(_videos[windowEnd]);
+      
+      // Next page only
+      if (currentPage + 1 < _videos.length) {
+        await _getOrCreateController(_videos[currentPage + 1]);
       }
     }
   }
@@ -331,7 +379,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
     // For fast scrolling, be more aggressive
     final isFastScroll = (newPage - previousPage).abs() > 1;
 
-    // First pause all videos
+    // First pause all videos - this is critical to stop previous videos
     await _pauseAllControllers();
 
     try {
@@ -343,6 +391,16 @@ class _VideoFeedViewState extends State<VideoFeedView>
         for (final id in idsToDispose) {
           if (id != videoId) {
             await _removeController(id);
+          }
+        }
+      } else {
+        // For normal scrolling, immediately dispose the previous controller
+        // to ensure it doesn't continue playing
+        if (previousPage >= 0 && previousPage < _videos.length && previousPage != newPage) {
+          final previousVideoId = _videos[previousPage].reelID;
+          if (_controllerCache.containsKey(previousVideoId)) {
+            // Don't await this to avoid blocking UI
+            _removeController(previousVideoId);
           }
         }
       }
@@ -364,37 +422,58 @@ class _VideoFeedViewState extends State<VideoFeedView>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    
     return RepaintBoundary(
       child: Container(
         color: Colors.black,
         child: BlocListener<VideoFeedCubit, VideoFeedState>(
-          listenWhen:
-              (p, c) =>
-          p.videos != c.videos ||
+          listenWhen: (p, c) =>
+              p.videos != c.videos ||
               p.isLoading != c.isLoading ||
               p.preloadedVideoUrls != c.preloadedVideoUrls ||
-              p.shouldPauseVideo != c.shouldPauseVideo,
+              p.shouldPauseVideo != c.shouldPauseVideo ||
+              p.loadingSource != c.loadingSource,
           listener: (context, state) {
-            setState(() => _videos = state.videos);
-            _manageControllerWindow(_currentPage);
-            if (state.videos.isNotEmpty &&
-                state.currentVideoIndex == 0 && state.videos.first.reelID ==
-                _videos.first.reelID) {
+            // Show background refresh indicator if loading from background
+            if (state.loadingSource == 'background' && state.isLoading) {
+              setState(() {
+                _showingBackgroundRefresh = true;
+              });
+            } else if (_showingBackgroundRefresh && !state.isLoading) {
+              setState(() {
+                _showingBackgroundRefresh = false;
+              });
+            }
+            
+            // Update videos list
+            if (state.videos != _videos) {
+              setState(() => _videos = state.videos);
+              _manageControllerWindow(_currentPage);
+            }
+            
+            // Handle initial video loading
+            if (state.videos.isNotEmpty && !_initialVideosLoaded) {
+              _initialVideosLoaded = true;
               _initAndPlayVideo(0);
             }
+            
+            // Handle video pausing
             if (state.shouldPauseVideo) {
               debugPrint("shouldPauseVideo received in build: ${state.shouldPauseVideo}");
               _pauseAllControllers();
-            } else {
+            } else if (!state.shouldPauseVideo && _isAppActive) {
               _initAndPlayVideo(_currentPage);
             }
           },
           child: Stack(
             children: [
+              // Main video feed
               PreloadPageView.builder(
                 scrollDirection: Axis.vertical,
                 controller: _pageController,
                 itemCount: _videos.length,
+                preloadPagesCount: 2,
                 physics: const AlwaysScrollableScrollPhysics(),
                 onPageChanged: (index) => _handlePageChange(index),
                 itemBuilder: (context, index) {
@@ -404,11 +483,45 @@ class _VideoFeedViewState extends State<VideoFeedView>
                       controller: _getController(_videos[index].reelID),
                       reel: _videos[index],
                       isComingFromHome: true,
-
                     ),
                   );
                 },
               ),
+              
+              // Background refresh indicator
+              if (_showingBackgroundRefresh)
+                Positioned(
+                  top: 120,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Refreshing',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               StreamBuilder(
                   stream: UserService.getCurrentUserStream(),
                   builder: (context, snapshot,) {

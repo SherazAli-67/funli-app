@@ -10,7 +10,8 @@ class VideoFeedState extends Equatable {
     this.error = '',
     this.currentVideoIndex = 0,
     this.preloadedVideoUrls = const {},
-    this.shouldPauseVideo = false
+    this.shouldPauseVideo = false,
+    this.loadingSource = 'network'
   });
 
   final List<ReelModel> videos;
@@ -21,6 +22,8 @@ class VideoFeedState extends Equatable {
   final int currentVideoIndex;
   final Set<String> preloadedVideoUrls;
   final bool shouldPauseVideo;
+  /// Indicates where videos are being loaded from: 'network', 'cache', or 'background'
+  final String loadingSource;
   @override
   List<Object> get props => [
     videos,
@@ -31,6 +34,7 @@ class VideoFeedState extends Equatable {
     currentVideoIndex,
     preloadedVideoUrls,
     shouldPauseVideo,
+    loadingSource,
   ];
 
   VideoFeedState copyWith({
@@ -42,6 +46,7 @@ class VideoFeedState extends Equatable {
     int? currentVideoIndex,
     Set<String>? preloadedVideoUrls,
     bool? shouldPauseVideo,
+    String? loadingSource,
   }) {
     return VideoFeedState(
       videos: videos ?? this.videos,
@@ -52,6 +57,7 @@ class VideoFeedState extends Equatable {
       currentVideoIndex: currentVideoIndex ?? this.currentVideoIndex,
       preloadedVideoUrls: preloadedVideoUrls ?? this.preloadedVideoUrls,
       shouldPauseVideo: shouldPauseVideo ?? this.shouldPauseVideo,
+      loadingSource: loadingSource ?? this.loadingSource,
     );
   }
 
