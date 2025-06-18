@@ -18,8 +18,7 @@ class OptimizedVideoPlayer extends StatefulWidget {
   State<OptimizedVideoPlayer> createState() => _OptimizedVideoPlayerState();
 }
 
-class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
-    with TickerProviderStateMixin {
+class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with TickerProviderStateMixin {
   late AnimationController _loadingController;
 
   bool _isBuffering = false;
@@ -153,63 +152,28 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer>
     if (controller == null || !controller.value.isInitialized) {
       return Center(
         child: RotationTransition(
-          turns: Tween(begin: 0.0, end: 1.0).animate(_loadingController),
+          turns: Tween(begin: 0.0, end:
+          1.0).animate(_loadingController),
           child: LoadingWidget(),
         ),
       );
     }
-
-    bool isPortrait = controller.value.size.height > controller.value.size.width;
-
     return GestureDetector(
       onTap: _togglePlayPause,
-      child: isPortrait ? SizedBox.expand(
-        child: AspectRatio(
-          aspectRatio: controller.value.aspectRatio,
-          child: _buildVideoPlayerStack(controller),
-        ),
-      ) : SizedBox.expand(
-        child: FittedBox(
-          key: _playerKey,
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: controller.value.size.width,
-            height: controller.value.size.height,
-            child: Stack(
-              children: [
-                VideoPlayer(controller),
-                if (_isBuffering)
-                  LoadingWidget(color: AppColors.purpleColor,),
-                if (_showPlayPauseOverlay)
-                  PlayPauseWidget(isPlaying: controller.value.isPlaying)
-              ],
-            ),
+      key: _playerKey,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          AspectRatio(
+            aspectRatio: controller.value.aspectRatio,
+            child: VideoPlayer(controller),
           ),
-        ),
+          if (_isBuffering)
+            LoadingWidget(color: AppColors.purpleColor,),
+          if (_showPlayPauseOverlay)
+            PlayPauseWidget(isPlaying: controller.value.isPlaying)
+        ],
       ),
-    );
-
-  }
-
-
-  Widget _buildVideoPlayerStack(VideoPlayerController controller) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        VideoPlayer(controller),
-        if (_isBuffering)
-          const Center(child: CircularProgressIndicator()),
-        if (_showPlayPauseOverlay)
-          PlayPauseWidget(isPlaying: controller.value.isPlaying)
-          /*ScaleTransition(
-            scale: _iconScaleAnimation,
-            child: Icon(
-              controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-              size: 80,
-              color: Colors.white70,
-            ),
-          ),*/
-      ],
     );
   }
 }

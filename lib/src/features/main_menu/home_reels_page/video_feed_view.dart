@@ -8,14 +8,15 @@ import 'package:video_player/video_player.dart';
 import '../../../bloc_cubit/video_feed_cubit.dart';
 import '../../../bloc_cubit/video_feed_state.dart';
 
-class VideoFeedView extends StatefulWidget{
+class VideoFeedView extends StatefulWidget {
   const VideoFeedView({super.key});
 
   @override
   State<VideoFeedView> createState() => _VideoFeedViewState();
 }
 
-class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserver{
+class _VideoFeedViewState extends State<VideoFeedView>
+    with WidgetsBindingObserver {
   /// Maximum number of controllers to keep in cache
   final int _maxCacheSize = 3;
 
@@ -44,7 +45,6 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _initializeFirstVideo();
   }
 
   @override
@@ -66,20 +66,6 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
       // App is going to background - pause all videos
       _pauseAllControllers();
     }
-  }
-
-  /// Initialize the first video when the view loads
-  void _initializeFirstVideo() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final state = context.read<VideoFeedCubit>().state;
-      if (state.videos.isNotEmpty) {
-        _videos = state.videos;
-        await _initAndPlayVideo(0);
-        if(mounted) {
-          setState(() {});
-        }
-      }
-    });
   }
 
   /// Clean up and reinitialize the current video when coming back from background
@@ -145,14 +131,13 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
       await controller.initialize();
 
       // Set looping
-      controller.setLooping(false); // important for detecting end
+      controller.setLooping(false);
       controller.addListener(() {
         final isEnded = controller.value.position >= controller.value.duration && !controller.value.isPlaying;
         if (isEnded) {
           _onVideoCompleted();
         }
       });
-
       // Add to cache and update access order
       _controllerCache[video.reelID] = controller;
       _touchController(video.reelID);
@@ -160,9 +145,6 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
       // Enforce cache size limit
       _enforceCacheLimit();
 
-      if(mounted){
-        setState(() {});
-      }
       return controller;
     } catch (e) {
       debugPrint('Error initializing controller: $e');
@@ -178,10 +160,13 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
       );
     }
   }
+
   /// Play a controller if it exists and is initialized
   Future<void> _playController(String videoId) async {
     final controller = _controllerCache[videoId];
-    if (controller != null && controller.value.isInitialized && !controller.value.isPlaying) {
+    if (controller != null &&
+        controller.value.isInitialized &&
+        !controller.value.isPlaying) {
       try {
         await controller.play();
       } catch (e) {
@@ -276,7 +261,7 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
 
     // Dispose controllers outside window
     final idsToDispose =
-        _controllerCache.keys.where((id) => !idsToKeep.contains(id)).toList();
+    _controllerCache.keys.where((id) => !idsToKeep.contains(id)).toList();
     for (final id in idsToDispose) {
       await _removeController(id);
     }
@@ -345,27 +330,19 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
       child: Container(
         color: Colors.black,
         child: BlocListener<VideoFeedCubit, VideoFeedState>(
-
           listenWhen:
               (p, c) =>
           p.videos != c.videos ||
               p.isLoading != c.isLoading ||
-              p.preloadedVideoUrls != c.preloadedVideoUrls ||
-              p.shouldPauseVideo != c.shouldPauseVideo,
+              p.preloadedVideoUrls != c.preloadedVideoUrls,
           listener: (context, state) {
             setState(() => _videos = state.videos);
             _manageControllerWindow(_currentPage);
-             if (state.videos.isNotEmpty &&
-            state.currentVideoIndex == 0 && state.videos.first.reelID ==
-            _videos.first.reelID) {
-          _initAndPlayVideo(0);
-        }
-        if (state.shouldPauseVideo) {
-          debugPrint("shouldPauseVideo received in build: ${state.shouldPauseVideo}");
-          _pauseAllControllers();
-        } else {
-          _initAndPlayVideo(_currentPage);
-        }
+            if (state.shouldPauseVideo) {
+              _pauseAllControllers();
+            } else {
+              _initAndPlayVideo(_currentPage);
+            }
           },
           child: PreloadPageView.builder(
             scrollDirection: Axis.vertical,
@@ -374,12 +351,11 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
             physics: const AlwaysScrollableScrollPhysics(),
             onPageChanged: (index) => _handlePageChange(index),
             itemBuilder: (context, index) {
-              ReelModel reel = _videos[index];
               return RepaintBoundary(
                 child: VideoFeedItem(
-                  key: ValueKey(reel.reelID),
-                  controller: _getController(reel.reelID),
-                  reel: reel,
+                  key: ValueKey(_videos[index].reelID),
+                  controller: _getController(_videos[index].reelID),
+                  reel: _videos[index],
                   isComingFromHome: true,
                 ),
               );
@@ -390,3 +366,5 @@ class _VideoFeedViewState extends State<VideoFeedView> with WidgetsBindingObserv
     );
   }
 }
+
+

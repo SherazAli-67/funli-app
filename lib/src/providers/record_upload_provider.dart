@@ -62,6 +62,7 @@ class RecordUploadProvider extends ChangeNotifier{
 
   Future<void> publishReel({required String caption, required String visibility, required VoidCallback navigationCallback}) async{
     isCompressingVideo = true;
+    await VideoCompress.deleteAllCache();
     notifyListeners();
     debugPrint("Video size before compression: ${await File(_recordedPath!).length()}");
     File thumbnailPath = await VideoCompress.getFileThumbnail(_recordedPath!);

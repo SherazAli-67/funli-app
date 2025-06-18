@@ -258,7 +258,7 @@ class MoodCard extends StatelessWidget {
             height: 200,
             width: double.infinity,
             child: FutureBuilder(
-                future: MoodService.getReelsbyMood(mood: mood.mood),
+                future: MoodService.getReelsByMood(mood: mood.mood),
                 builder: (ctx, snapshot) {
                   if (snapshot.hasData) {
                     List<ReelModel> reels = snapshot.requireData['reels'];
