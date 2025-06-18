@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/notification_service/notification_service.dart';
 import 'package:funli_app/src/services/publish_reel_service.dart';
@@ -61,67 +62,96 @@ class RecordUploadProvider extends ChangeNotifier{
   }
 
   Future<void> publishReel({required String caption, required String visibility, required VoidCallback navigationCallback}) async{
+    if(recordedPath == null){
+      Fluttertoast.showToast(msg: "No video was found to upload");
+      return;
+    }
+
     isCompressingVideo = true;
     await VideoCompress.deleteAllCache();
     notifyListeners();
     debugPrint("Video size before compression: ${await File(_recordedPath!).length()}");
-    File thumbnailPath = await VideoCompress.getFileThumbnail(_recordedPath!);
-
-    final MediaInfo? compressedVideo = await VideoCompress.compressVideo(
-      _recordedPath!,
-      quality: VideoQuality.MediumQuality,
-      deleteOrigin: false, // Set true to delete original file
-    );
-
-    if (compressedVideo == null || compressedVideo.file == null) {
-      throw Exception('Video compression failed');
+    File? thumbnailPath;
+    try{
+      thumbnailPath = await VideoCompress.getFileThumbnail(_recordedPath!);
+    }catch(e){
+      debugPrint("Error while creating thumbnail: ${e.toString()}");
     }
+
+    MediaInfo? compressedVideo;
+    try{
+       compressedVideo = await VideoCompress.compressVideo(
+        _recordedPath!,
+        quality: VideoQuality.MediumQuality,
+        deleteOrigin: false, // Set true to delete original file
+      );
+       debugPrint("Video size after compression: ${await compressedVideo?.file!.length()}");
+    }catch(e){
+      debugPrint("Exception while compressing the video: ${e.toString()}");
+    }
+
     isCompressingVideo = false;
     notifyListeners();
     navigationCallback();
-    debugPrint("Video size after compression: ${await compressedVideo.file!.length()}");
+
     String reelID = DateTime.now().microsecondsSinceEpoch.toString();
+    String? thumbnailUrl;
+    String? videoUrl;
+    if(thumbnailPath != null){
+      thumbnailUrl = await PublishReelService.getThumbnailUrl(reelID: reelID, file: thumbnailPath);
+    }
 
-    String? thumbnailUrl = await PublishReelService.getThumbnailUrl(reelID: reelID, file: thumbnailPath);
-    String? videoUrl = await PublishReelService.getReelUploadedUrl(reelID: reelID, file: compressedVideo.file!);
+    if(compressedVideo != null){
+      videoUrl = await PublishReelService.getReelUploadedUrl(reelID: reelID, file: compressedVideo.file!);
+    }
 
-    String userID = FirebaseAuth.instance.currentUser!.uid;
-    DateTime createdAt = DateTime.now();
-    ReelModel reel = ReelModel(reelID: reelID,
-        userID: userID,
-        videoUrl: videoUrl!,
-        thumbnailUrl: thumbnailUrl!,
-        caption: caption,
-        hashtags: [],
-        mentions: [],
-        commentsCount: 0,
-        shareCount: 0,
-        moodTag: currentMood,
-        visibility: visibility,
-        createdAt: createdAt);
-
-    bool isUploaded = await PublishReelService.uploadReel(reel: reel);
-    _resetData();
-    if(isUploaded){
-      FirebaseNotificationsService.show(
-        title: "Upload Completed",
-        body: 'Your reel has been uploaded successfully.',
+    if(videoUrl != null){
+      String userID = FirebaseAuth.instance.currentUser!.uid;
+      DateTime createdAt = DateTime.now();
+      ReelModel reel = ReelModel(reelID: reelID,
+          userID: userID,
+          videoUrl: videoUrl,
+          thumbnailUrl: thumbnailUrl,
+          caption: caption,
+          hashtags: [],
+          mentions: [],
+          commentsCount: 0,
+          shareCount: 0,
+          moodTag: currentMood,
+          visibility: visibility,
+          createdAt: createdAt,
+        isMuted: isMuted,
+        // playbackSpeed: playbackSpeed
       );
+
+
+      bool isUploaded = await PublishReelService.uploadReel(reel: reel);
+      _resetData();
+      if(isUploaded){
+        FirebaseNotificationsService.show(
+          title: "Upload Completed",
+          body: 'Your reel has been uploaded successfully.',
+        );
+      }
+
+      //Add reel to user collection
+      PublishReelService.addReelToUser(reelID: reel.reelID);
+      List<String> hashtags = HashtagHelper.extractHashtags(reel.caption);
+      for (var hashtag in hashtags) {
+        PublishReelService.addReelToHashtag(hashtag: hashtag, reelID: reelID);
+      }
+
+      // Add to mood
+      PublishReelService.addReelToMood(
+        mood: reel.moodTag,
+        reelID: reel.reelID,
+        userID: reel.userID,
+      );
+    }else{
+      Fluttertoast.showToast(msg: "Failed to upload reel, Try again!");
+      return;
     }
 
-    //Add reel to user collection
-    PublishReelService.addReelToUser(reelID: reel.reelID);
-    List<String> hashtags = HashtagHelper.extractHashtags(reel.caption);
-    for (var hashtag in hashtags) {
-      PublishReelService.addReelToHashtag(hashtag: hashtag, reelID: reelID);
-    }
-
-    // Add to mood
-    PublishReelService.addReelToMood(
-      mood: reel.moodTag,
-      reelID: reel.reelID,
-      userID: reel.userID,
-    );
   }
 
   Future<void> saveToDrafts({required String caption, required String visibility})async{

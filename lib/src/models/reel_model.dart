@@ -14,6 +14,8 @@ class ReelModel {
   // final double duration;
   final String visibility;
   final DateTime createdAt;
+  final bool isMuted;
+  final double playbackSpeed;
   final Map<String, dynamic>? location; // e.g., {'lat': 0.0, 'lng': 0.0}
 
 
@@ -32,6 +34,8 @@ class ReelModel {
     required this.visibility,
     required this.createdAt,
     this.location,
+    this.isMuted = false,
+    this.playbackSpeed = 1.0
   });
 
   factory ReelModel.fromMap(Map<String, dynamic> map) {
@@ -50,6 +54,8 @@ class ReelModel {
       visibility: map['visibility'] ?? 'public',
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       location: map['location'] != null ? Map<String, dynamic>.from(map['location']) : null,
+      isMuted: map['isMuted'] ?? false,
+      playbackSpeed: map['playbackSpeed'] ?? 1.0
 
     );
   }
@@ -70,6 +76,8 @@ class ReelModel {
       'visibility': visibility,
       'createdAt': createdAt,
       if (location != null) 'location': location,
+      'isMuted' : isMuted,
+      'playbackSpeed' : playbackSpeed
     };
   }
 }

@@ -8,11 +8,11 @@ class OptimizedVideoPlayer extends StatefulWidget {
   const OptimizedVideoPlayer({
     super.key,
     required this.controller,
-    required this.videoId,
+    required this.reelID,
   });
 
   final VideoPlayerController? controller;
-  final String videoId;
+  final String reelID;
 
   @override
   State<OptimizedVideoPlayer> createState() => _OptimizedVideoPlayerState();
@@ -41,7 +41,7 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
 
 
     _oldController = widget.controller;
-    _currentVideoId = widget.videoId;
+    _currentVideoId = widget.reelID;
     _addControllerListener();
   }
 
@@ -49,13 +49,13 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
   void didUpdateWidget(OptimizedVideoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final bool videoIdChanged = widget.videoId != _currentVideoId;
+    final bool videoIdChanged = widget.reelID != _currentVideoId;
     final bool controllerChanged = widget.controller != _oldController;
 
     if (videoIdChanged || controllerChanged) {
       _oldController?.removeListener(_onControllerUpdate);
       _oldController = widget.controller;
-      _currentVideoId = widget.videoId;
+      _currentVideoId = widget.reelID;
       _playerKey = UniqueKey();
       _addControllerListener();
 
@@ -95,7 +95,7 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
     final controller = widget.controller;
     if (controller == null) return;
 
-    if (widget.videoId != _currentVideoId) return;
+    if (widget.reelID != _currentVideoId) return;
 
     if (controller.value.hasError) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -149,6 +149,7 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
   @override
   Widget build(BuildContext context) {
     final controller = widget.controller;
+
     if (controller == null || !controller.value.isInitialized) {
       return Center(
         child: RotationTransition(
@@ -158,19 +159,31 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
         ),
       );
     }
+
+    bool isPortrait = controller.value.size.height > controller.value.size.width;
+
+    Widget child = VideoPlayer(controller);
     return GestureDetector(
       onTap: _togglePlayPause,
       key: _playerKey,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          AspectRatio(
+          isPortrait
+              ? SizedBox.expand(child: AspectRatio(aspectRatio: controller.value.aspectRatio, child: child))
+              : AspectRatio(aspectRatio: controller.value.aspectRatio, child: child),
+          /*isPortrait ? SizedBox.expand(
+            child: AspectRatio(
+              aspectRatio: controller.value.aspectRatio,
+              child:VideoPlayer(controller),
+            ),
+          ): AspectRatio(
             aspectRatio: controller.value.aspectRatio,
             child: VideoPlayer(controller),
-          ),
+          ),*/
           if (_isBuffering)
             LoadingWidget(color: AppColors.purpleColor,),
-          if (_showPlayPauseOverlay)
+          // if (_showPlayPauseOverlay )
             PlayPauseWidget(isPlaying: controller.value.isPlaying)
         ],
       ),

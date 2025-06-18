@@ -50,7 +50,7 @@ class VideoFeedRepository implements IVideoFeedRepository {
     try {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
       String mood = sharedPreferences.getString(LocalStorageConstants.currentMoodKey) ?? 'Happy';
-      debugPrint("Mood received while fetching reels: ${mood}");
+      debugPrint("Mood received while fetching the reels: $mood");
       Query query =
           _reelsColRef.where("moodTag", isEqualTo: mood)
           .orderBy('createdAt', descending: true).limit(2);

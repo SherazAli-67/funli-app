@@ -15,24 +15,29 @@ class FirebaseNotificationsService {
   static FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   static Future<void> initializeFirebaseMessaging() async {
-    await firebaseMessaging.setForegroundNotificationPresentationOptions(
-      alert: true, // Required to display a heads up notification
-      badge: true,
-      sound: true,
-    );
+    try{
+      await firebaseMessaging.setForegroundNotificationPresentationOptions(
+        alert: true, // Required to display a heads up notification
+        badge: true,
+        sound: true,
+      );
 
-    // On iOS, this helps to take the user permissions
-    await firebaseMessaging.requestPermission(
-      alert: true,
-      badge: true,
-      provisional: false,
-      sound: true,
-    );
+      // On iOS, this helps to take the user permissions
+      await firebaseMessaging.requestPermission(
+        alert: true,
+        badge: true,
+        provisional: false,
+        sound: true,
+      );
 
-    String? token =  await firebaseMessaging.getToken();
-    debugPrint("token received: $token");
-    await AuthService.instance.updateUserInfo(updatedMap: {"token" : token});
-    debugPrint("Token updated");
+      String? token =  await firebaseMessaging.getToken();
+      debugPrint("token received: $token");
+      await AuthService.instance.updateUserInfo(updatedMap: {"token" : token});
+      debugPrint("Token updated");
+    }catch(e){
+      debugPrint("Exception while initializing the notification service: ${e.toString()}");
+    }
+
   }
 
   static void startNotificationListeners() {
