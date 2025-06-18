@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:funli_app/src/app_router/app_router.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:preload_page_view/preload_page_view.dart';
@@ -25,7 +26,7 @@ class VideoFeedView extends StatefulWidget {
 }
 
 class _VideoFeedViewState extends State<VideoFeedView>
-    with WidgetsBindingObserver, AutomaticKeepAliveClientMixin {
+    with WidgetsBindingObserver, AutomaticKeepAliveClientMixin, RouteAware {
   /// Maximum number of controllers to keep in cache
   final int _maxCacheSize = 5; // Increased for better performance
 
@@ -69,10 +70,43 @@ class _VideoFeedViewState extends State<VideoFeedView>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Subscribe to route changes
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     WidgetsBinding.instance.removeObserver(this);
     _disposeAllControllers();
     super.dispose();
+  }
+  
+  // Called when this route is no longer visible
+  @override
+  void didPushNext() {
+    // Pause all videos when navigating away
+    _pauseAllControllers();
+    super.didPushNext();
+  }
+
+  // Called when this route becomes visible again
+  @override
+  void didPopNext() {
+    super.didPopNext();
+    // Check if we should resume playing
+    if (!context.read<VideoFeedCubit>().state.shouldPauseVideo) {
+      // First reinitialize the controller window to ensure proper caching
+      _manageControllerWindow(_currentPage);
+      
+      // Then play the current video
+      _initAndPlayVideo(_currentPage);
+      
+      // Request the cubit to preload videos for smoother experience
+      context.read<VideoFeedCubit>().preloadNextVideos();
+    }
   }
 
   @override
@@ -127,6 +161,9 @@ class _VideoFeedViewState extends State<VideoFeedView>
       await Future.delayed(const Duration(milliseconds: 50));
     }
 
+    // Manage the controller window to ensure proper caching
+    await _manageControllerWindow(_currentPage);
+    
     // Reinitialize and play current video
     await _initAndPlayVideo(_currentPage);
   }
@@ -186,11 +223,9 @@ class _VideoFeedViewState extends State<VideoFeedView>
       videoFile = await ReelsCacheService.getCachedVideo(video.videoUrl);
       
       // If not found in direct cache, get from cubit which will handle downloading
-      if (videoFile == null) {
-        videoFile = await context.read<VideoFeedCubit>().getCachedVideoFile(
+      videoFile ??= await context.read<VideoFeedCubit>().getCachedVideoFile(
           video.videoUrl,
         );
-      }
 
       // Create a new controller
       final controller = VideoPlayerController.file(videoFile);
@@ -205,22 +240,14 @@ class _VideoFeedViewState extends State<VideoFeedView>
         await controller.setVolume(0.0);
       }
       
-      // Set looping to true to prevent buffering at the end of videos
-      controller.setLooping(true);
-      
-      // Still detect when video completes a loop for auto-scrolling
-      // controller.addListener(() {
-      //   if (!mounted) return;
-      //
-      //   // Check if video has completed a loop (position near zero after playing)
-      //   final isLoopCompleted = controller.value.position.inMilliseconds < 300 &&
-      //                          controller.value.isPlaying &&
-      //                          controller.value.duration.inSeconds > 1;
-      //
-      //   if (isLoopCompleted) {
-      //     _onVideoCompleted();
-      //   }
-      // });
+      // Set looping to false to enable auto-play next video
+      controller.setLooping(false); // important for detecting end
+      controller.addListener(() {
+        final isEnded = controller.value.position >= controller.value.duration && !controller.value.isPlaying;
+        if (isEnded) {
+          _onVideoCompleted();
+        }
+      });
 
       controller.setPlaybackSpeed(video.playbackSpeed);
 
@@ -252,12 +279,25 @@ class _VideoFeedViewState extends State<VideoFeedView>
     }
   }
 
+  // Track if we're currently handling a video completion to prevent double navigation
+  bool _isHandlingCompletion = false;
+
   void _onVideoCompleted() {
+    // Prevent multiple calls from causing double navigation
+    if (_isHandlingCompletion) return;
+    
     if (_currentPage + 1 < _videos.length) {
-      _pageController.nextPage(
+      _isHandlingCompletion = true;
+      
+      // Navigate to the next page
+      _pageController.animateToPage(
+        _currentPage + 1,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-      );
+      ).then((_) {
+        // Reset the flag after navigation completes
+        _isHandlingCompletion = false;
+      });
     }
   }
 
@@ -337,9 +377,9 @@ class _VideoFeedViewState extends State<VideoFeedView>
   Future<void> _manageControllerWindow(int currentPage) async {
     if (_videos.isEmpty) return;
 
-    // Define a smaller window to reduce memory usage and prevent background playback
-    // Only preload next video, not previous (to prevent previous videos from playing)
-    final windowStart = currentPage;
+    // Define a window that includes both previous and next videos
+    // This ensures smoother navigation in both directions
+    final windowStart = (currentPage - 1).clamp(0, _videos.length - 1);
     final windowEnd = (currentPage + 1).clamp(0, _videos.length - 1);
 
     // Get IDs in window
@@ -362,7 +402,12 @@ class _VideoFeedViewState extends State<VideoFeedView>
       // Current page first
       await _getOrCreateController(_videos[currentPage]);
       
-      // Next page only
+      // Previous page (for backward navigation)
+      if (currentPage > 0) {
+        await _getOrCreateController(_videos[currentPage - 1]);
+      }
+      
+      // Next page
       if (currentPage + 1 < _videos.length) {
         await _getOrCreateController(_videos[currentPage + 1]);
       }
@@ -408,8 +453,8 @@ class _VideoFeedViewState extends State<VideoFeedView>
       // Manage the window controllers
       await _manageControllerWindow(newPage);
 
-      // Play only the current video
-      if (_videos.isNotEmpty && newPage < _videos.length) {
+      // Play only the current video if we're not supposed to pause
+      if (_videos.isNotEmpty && newPage < _videos.length && !context.read<VideoFeedCubit>().state.shouldPauseVideo) {
         await _initAndPlayVideo(newPage);
       }
 

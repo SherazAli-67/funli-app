@@ -139,11 +139,14 @@ int _calculateSelectedIndex(BuildContext context) {
 }
 
 void _onItemTapped(int index, BuildContext context) {
-  if (index == 0) { // Assuming VideoFeedView is at index 0
+  // First set the pause state based on which tab is selected
+  if (index == 0) { // VideoFeedView is at index 0
     context.read<VideoFeedCubit>().setShouldPauseVideo(false);
   } else {
     context.read<VideoFeedCubit>().setShouldPauseVideo(true);
   }
+  
+  // Then navigate to the selected tab
   switch (index) {
     case 0:
       GoRouter.of(context).go(RouterEnum.videoFeedView.routeName);
@@ -154,7 +157,6 @@ void _onItemTapped(int index, BuildContext context) {
     case 2:
       GoRouter.of(context).go(RouterEnum.notificationView.routeName);
       break;
-
     case 3:
       GoRouter.of(context).go(RouterEnum.profileView.routeName);
       break;

@@ -4,8 +4,10 @@ import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
+import 'package:funli_app/src/bloc_cubit/video_feed_cubit.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -226,7 +228,18 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        IconButton(onPressed: ()=> context.pop(), icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white,)),
+                                        IconButton(
+                                          onPressed: () {
+                                            // Reset shouldPauseVideo to false when returning to video feed
+                                            // Ensure we trigger preloading when returning to feed
+                                            final cubit = context.read<VideoFeedCubit>();
+                                            cubit.setShouldPauseVideo(false);
+                                            // Trigger preloading before navigation
+                                            cubit.preloadNextVideos();
+                                            context.pop();
+                                          }, 
+                                          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white,)
+                                        ),
                                         Text("Record a video", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
                                         const SizedBox(width: 40,),
                                       ],

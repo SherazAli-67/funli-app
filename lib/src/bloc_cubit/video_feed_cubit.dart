@@ -228,6 +228,17 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
       }
     }
     
+    // Also preload the previous video for smoother backward navigation
+    if (currentIndex > 0) {
+      final prevVideoUrl = state.videos[currentIndex - 1].videoUrl;
+      if (!_preloadedFiles.containsKey(prevVideoUrl) && 
+          !_preloadQueue.contains(prevVideoUrl)) {
+        _preloadQueue.add(prevVideoUrl);
+        // Use medium priority for previous video
+        _preloadVideo(prevVideoUrl, highPriority: true);
+      }
+    }
+    
     // Then preload additional videos for smoother experience
     final videosToPreload = state.videos
         .skip(currentIndex + 2) // Skip current and next (already handled)
@@ -242,8 +253,6 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
         _preloadVideo(videoUrl, highPriority: false);
       }
     }
-    
-    // Don't preload previous videos to prevent them from playing when not visible
   }
 
   Future<void> _preloadVideo(String videoUrl, {bool highPriority = false}) async {
@@ -277,7 +286,11 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
 
   void setShouldPauseVideo(bool value) {
     debugPrint("ShouldPauseState received: $value");
-    emit(state.copyWith(shouldPauseVideo: value));
+    
+    // Only emit if the state is actually changing to avoid unnecessary rebuilds
+    if (state.shouldPauseVideo != value) {
+      emit(state.copyWith(shouldPauseVideo: value));
+    }
   }
 
   Future<File> getCachedVideoFile(String videoUrl) async {

@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/app_data.dart';
+import 'package:funli_app/src/bloc_cubit/video_feed_cubit.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -60,7 +62,18 @@ class _PublishReelPageState extends State<PublishReelPage> {
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: AppBackButton(),
+          child: GestureDetector(
+            onTap: () {
+              // Reset shouldPauseVideo to false when returning to video feed
+              // Ensure we trigger preloading when returning to feed
+              final cubit = context.read<VideoFeedCubit>();
+              cubit.setShouldPauseVideo(false);
+              // Trigger preloading before navigation
+              cubit.preloadNextVideos();
+              context.pop();
+            },
+            child: AppBackButton(),
+          ),
         ),
         centerTitle: false,
         leadingWidth: 45,
@@ -327,6 +340,12 @@ class _PublishReelPageState extends State<PublishReelPage> {
   }
 
   void _navigateBackToMainMenu(){
+    // Reset shouldPauseVideo to false when returning to video feed
+    // Ensure we trigger preloading when returning to feed
+    final cubit = context.read<VideoFeedCubit>();
+    cubit.setShouldPauseVideo(false);
+    // Trigger preloading before navigation
+    cubit.preloadNextVideos();
     context.pop();
   }
 }

@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
+import 'package:funli_app/src/bloc_cubit/video_feed_cubit.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:go_router/go_router.dart';
@@ -93,7 +95,18 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppBackButton(color: Colors.white,),
+                        GestureDetector(
+                          onTap: () {
+                            // Reset shouldPauseVideo to false when returning to video feed
+                            // Ensure we trigger preloading when returning to feed
+                            final cubit = context.read<VideoFeedCubit>();
+                            cubit.setShouldPauseVideo(false);
+                            // Trigger preloading before navigation
+                            cubit.preloadNextVideos();
+                            context.pop();
+                          },
+                          child: AppBackButton(color: Colors.white),
+                        ),
                         Text("Create a Feel", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
                         GestureDetector(
                             onTap: (){
@@ -314,4 +327,3 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
     }
   }
 }
-
