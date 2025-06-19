@@ -34,16 +34,84 @@ class VideoFeedItem extends StatefulWidget {
 
 class _VideoFeedItemState extends State<VideoFeedItem> {
   UserModel? _userModel;
+  
+  // Use a key to force rebuild when controller changes
+  Key _playerKey = UniqueKey();
+  String? _lastReelId;
+  bool _isMuted = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    _isMuted = widget.reel.isMuted;
+  }
+  
+  @override
+  void didUpdateWidget(VideoFeedItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // If the reel ID changed or controller changed, update the key to force a rebuild
+    if (widget.reel.reelID != _lastReelId || 
+        widget.controller != oldWidget.controller) {
+      _playerKey = UniqueKey();
+      _lastReelId = widget.reel.reelID;
+      _isMuted = widget.reel.isMuted;
+    }
+  }
+  
+  void _toggleMute() {
+    if (widget.controller == null || !widget.controller!.value.isInitialized) return;
+    
+    setState(() {
+      _isMuted = !_isMuted;
+    });
+    
+    if (_isMuted) {
+      widget.controller!.setVolume(0);
+    } else {
+      widget.controller!.setVolume(1);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.center,
       children: [
-        OptimizedVideoPlayer(controller: widget.controller, reelID: widget.reel.reelID),
+        // Use RepaintBoundary to optimize rendering and prevent unnecessary repaints
+        RepaintBoundary(
+          child: OptimizedVideoPlayer(
+            key: _playerKey,
+            controller: widget.controller, 
+            reelID: widget.reel.reelID
+          ),
+        ),
         _buildUserNameCaptionWidget(),
         _buildLikeCommentsIcon(context),
+        _buildMuteButton(),
       ],
+    );
+  }
+  
+  Widget _buildMuteButton() {
+    return Positioned(
+      top: 100,
+      right: 16,
+      child: GestureDetector(
+        onTap: _toggleMute,
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.5),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            _isMuted ? Icons.volume_off : Icons.volume_up,
+            color: Colors.white,
+            size: 20,
+          ),
+        ),
+      ),
     );
   }
 

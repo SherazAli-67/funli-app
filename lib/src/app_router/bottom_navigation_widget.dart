@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:go_router/go_router.dart';
-import '../bloc_cubit/video_feed_cubit.dart';
+import '../features/main_menu/video_feed_view/bloc_cubit/video_feed_cubit.dart';
 import '../notification_service/notification_service.dart';
 import '../providers/size_provider.dart';
 import '../res/app_gradients.dart';

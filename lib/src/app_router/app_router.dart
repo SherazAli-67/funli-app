@@ -9,7 +9,7 @@ import 'package:funli_app/src/features/main_menu/notifications/notification_page
 import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart';
-import 'package:funli_app/src/features/main_menu/home_reels_page/video_feed_view.dart';
+import 'package:funli_app/src/features/main_menu/video_feed_view/video_feed_view.dart';
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
 import 'package:funli_app/src/features/personalization/personalization_page.dart';
 import 'package:funli_app/src/features/search_page.dart';

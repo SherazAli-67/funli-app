@@ -3,9 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 
 import '../app_router/app_router.dart';
-import '../bloc_cubit/video_feed_cubit.dart';
-import '../repository/i_video_feed_repository.dart';
-import '../repository/video_feed_repository.dart';
+import '../features/main_menu/video_feed_view/bloc_cubit/video_feed_cubit.dart';
+import '../features/main_menu/video_feed_view/repository/i_video_feed_repository.dart';
+import '../features/main_menu/video_feed_view/repository/video_feed_repository.dart';
 
 final getIt = GetIt.instance;
 

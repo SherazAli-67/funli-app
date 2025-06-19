@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/app_router/app_router.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
-import 'package:funli_app/src/bloc_cubit/video_feed_cubit.dart';
+import 'package:funli_app/src/features/main_menu/video_feed_view/bloc_cubit/video_feed_cubit.dart';
 import 'package:funli_app/src/dependancy_injection/dependency_injector.dart';
 import 'package:funli_app/src/providers/discover_provider.dart';
 import 'package:funli_app/src/providers/feels_search_provider.dart';
@@ -17,6 +17,7 @@ import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/providers/tab_change_provider.dart';
 import 'package:funli_app/src/providers/users_search_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
+import 'package:funli_app/src/features/main_menu/video_feed_view/service/reels_cache_service.dart';
 import 'package:provider/provider.dart';
 
 
@@ -25,7 +26,12 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
+  // Initialize dependency injection
   injectionSetup();
+  
+  // Preload videos for all moods in the background
+  // This ensures a smoother experience when switching between moods
+  ReelsCacheService.preloadAllMoods();
   runApp(MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_)=> PersonalInfoProvider()),
@@ -49,6 +55,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    // Clean up memory cache periodically to prevent memory leaks
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ReelsCacheService.cleanupMemoryCache();
+    });
     final appRouter = getIt<AppRouter>();
     return MultiBlocProvider(
       providers: [
