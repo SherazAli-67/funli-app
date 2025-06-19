@@ -139,9 +139,15 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
           _forcePlayTimer = Timer(const Duration(milliseconds: 20), () {
             if (mounted && !_isDisposed && widget.controller != null && 
                 widget.controller!.value.isInitialized && !widget.controller!.value.isPlaying) {
-              widget.controller!.play();
+              // Set volume to 1.0 before playing to ensure sound
+              widget.controller!.setVolume(1.0).then((_) {
+                widget.controller!.play();
+              });
             }
           });
+        } else if (widget.controller != null && widget.controller!.value.isPlaying) {
+          // If already playing, ensure volume is set to 1.0
+          widget.controller!.setVolume(1.0);
         }
       } else {
         // For non-initialized controllers, use a shorter timeout than before
@@ -196,9 +202,15 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
           _forcePlayTimer = Timer(const Duration(milliseconds: 20), () {
             if (mounted && !_isDisposed && controller.value.isInitialized && 
                 !controller.value.isPlaying) {
-              controller.play();
+              // Set volume to 1.0 before playing to ensure sound
+              controller.setVolume(1.0).then((_) {
+                controller.play();
+              });
             }
           });
+        } else {
+          // If already playing, ensure volume is set to 1.0
+          controller.setVolume(1.0);
         }
       } else {
         // For non-initialized controllers, use a shorter timeout
@@ -238,9 +250,15 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
         _forcePlayTimer = Timer(const Duration(milliseconds: 20), () {
           if (mounted && !_isDisposed && controller.value.isInitialized && 
               !controller.value.isPlaying) {
-            controller.play();
+            // Set volume to 1.0 before playing to ensure sound
+            controller.setVolume(1.0).then((_) {
+              controller.play();
+            });
           }
         });
+      } else {
+        // If already playing, ensure volume is set to 1.0
+        controller.setVolume(1.0);
       }
     }
 
@@ -349,7 +367,8 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
         await controller.setVolume(1.0);
       }
       
-      // Play the video
+      // Set volume to 1.0 and play the video
+      await controller.setVolume(1.0);
       await controller.play();
     }
 

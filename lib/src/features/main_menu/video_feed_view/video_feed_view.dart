@@ -290,11 +290,13 @@ class _VideoFeedViewState extends State<VideoFeedView>
         // Reset position to beginning to ensure smooth start
         await controller.seekTo(Duration.zero);
 
-        // Set volume before playing
+        // Set volume before playing - ALWAYS set to 1.0 unless explicitly muted
         if(!videoToPlay.isMuted){
           await controller.setVolume(1.0);
+          debugPrint("Setting volume to 1.0 for video ${videoToPlay.reelID}");
         } else {
           await controller.setVolume(0.0);
+          debugPrint("Setting volume to 0.0 for muted video ${videoToPlay.reelID}");
         }
 
         // Check again if we should still play this video
@@ -400,6 +402,16 @@ class _VideoFeedViewState extends State<VideoFeedView>
 
       // Start with volume at 0 to prevent audio leakage during initialization
       await controller.setVolume(0.0);
+      
+      // Add completion listener to automatically advance to next video
+      controller.addListener(() {
+        if (controller.value.isInitialized && 
+            controller.value.position >= controller.value.duration - const Duration(milliseconds: 500) &&
+            !controller.value.isBuffering &&
+            controller.value.isPlaying) {
+          _onVideoCompleted();
+        }
+      });
 
       try {
         // Initialize the controller with timeout
@@ -712,7 +724,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
       // Play only the current video if we're not supposed to pause
       if (_videos.isNotEmpty && newPage < _videos.length && !context.read<VideoFeedCubit>().state.shouldPauseVideo) {
         // Use a slight delay to ensure previous video is fully paused
-        await Future.delayed(const Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 50));
         await _initAndPlayVideo(newPage);
       }
 
