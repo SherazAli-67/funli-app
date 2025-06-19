@@ -16,10 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../repository/i_video_feed_repository.dart';
 class VideoFeedCubit extends Cubit<VideoFeedState> {
-  VideoFeedCubit(this.videoRepository) : super(VideoFeedState.initial()) {
-    // Load videos immediately on initialization
-    _initializeVideos();
-  }
+  VideoFeedCubit(this.videoRepository) : super(VideoFeedState.initial());
 
   final IVideoFeedRepository videoRepository;
   final _preloadQueue = Queue<String>();
@@ -609,5 +606,10 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     
     // Then load from network (even if we have cached reels, to get fresh content)
     loadVideos();
+  }
+
+  // Call this from your widget's initState or after BlocProvider is created
+  Future<void> initialize() async {
+    await _initializeVideos();
   }
 }

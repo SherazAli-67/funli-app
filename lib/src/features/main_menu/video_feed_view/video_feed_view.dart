@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/app_router/app_router.dart';
 import 'package:funli_app/src/models/reel_model.dart';
-import 'package:funli_app/src/features/main_menu/video_feed_view/service/reels_cache_service.dart';
+import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:preload_page_view/preload_page_view.dart';
@@ -86,8 +86,14 @@ class _VideoFeedViewState extends State<VideoFeedView>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // Initialize first video with a slight delay to ensure widget is fully built
-    Future.microtask(_initializeFirstVideo);
+    // Initialize the VideoFeedCubit first
+    Future.microtask(() {
+      // Initialize the cubit to load videos from cache or network
+      context.read<VideoFeedCubit>().initialize().then((_) {
+        // Then initialize the first video after cubit is initialized
+        _initializeFirstVideo();
+      });
+    });
   }
 
   @override
@@ -171,6 +177,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
   void _initializeFirstVideo() async {
     final state = context.read<VideoFeedCubit>().state;
     if (state.videos.isNotEmpty) {
+      debugPrint("Initialize First video: ${state.videos.length}");
       setState(() {
         _videos = state.videos;
         _initialVideosLoaded = true;
@@ -198,6 +205,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
         setState(() {});
       }
     }
+    debugPrint("Initializing videos empty First video: ${state.videos.length}");
   }
 
   /// Clean up and reinitialize the current video when coming back from background
@@ -704,7 +712,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
       // Play only the current video if we're not supposed to pause
       if (_videos.isNotEmpty && newPage < _videos.length && !context.read<VideoFeedCubit>().state.shouldPauseVideo) {
         // Use a slight delay to ensure previous video is fully paused
-        await Future.delayed(const Duration(milliseconds: 50));
+        await Future.delayed(const Duration(milliseconds: 10));
         await _initAndPlayVideo(newPage);
       }
 

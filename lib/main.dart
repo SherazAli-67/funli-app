@@ -17,7 +17,7 @@ import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/providers/tab_change_provider.dart';
 import 'package:funli_app/src/providers/users_search_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
-import 'package:funli_app/src/features/main_menu/video_feed_view/service/reels_cache_service.dart';
+import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:provider/provider.dart';
 
 
