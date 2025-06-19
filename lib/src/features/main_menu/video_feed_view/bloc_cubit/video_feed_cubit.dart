@@ -9,12 +9,12 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:funli_app/src/features/main_menu/video_feed_view/bloc_cubit/video_feed_state.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/local_storage_constants.dart';
-import 'package:funli_app/src/features/main_menu/video_feed_view/service/reels_cache_service.dart';
+import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../repository/i_video_feed_repository.dart';
-
 class VideoFeedCubit extends Cubit<VideoFeedState> {
   VideoFeedCubit(this.videoRepository) : super(VideoFeedState.initial()) {
     // Load videos immediately on initialization
@@ -27,6 +27,13 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
   bool _isPreloadingMore = false;
   bool _isRefreshingInBackground = false;
   Timer? _backgroundRefreshTimer;
+  Timer? _preloadDelayTimer;
+  
+  // Track last access time for preloaded files for better LRU management
+  final Map<String, int> _preloadedFilesLastAccess = {};
+  
+  // Maximum number of files to keep in memory
+  final int _maxMemoryCacheSize = 30;
   
   /// Initialize videos with optimized loading strategy
   Future<void> _initializeVideos() async {
@@ -35,13 +42,16 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     
     // Then start background refresh timer
     _startBackgroundRefreshTimer();
+    
+    // Preload all moods in the background for smoother mood switching
+    ReelsCacheService.preloadAllMoods();
   }
   
   /// Start a timer to periodically refresh videos in the background
   void _startBackgroundRefreshTimer() {
     _backgroundRefreshTimer?.cancel();
     _backgroundRefreshTimer = Timer.periodic(
-      const Duration(minutes: 15),
+      const Duration(minutes: 5), // Reduced to 5 minutes for fresher content
       (_) => _refreshVideosInBackground(),
     );
   }
@@ -214,54 +224,97 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
   }
 
   Future<void> preloadNextVideos() async {
+    // Cancel any existing preload delay timer
+    _preloadDelayTimer?.cancel();
+    
     if (state.videos.isEmpty) return;
 
     final currentIndex = state.currentVideoIndex;
     
-    // Prioritize preloading the next video first for immediate playback
+    // Enhanced preloading strategy for TikTok-like performance
+    
+    // 1. Prioritize preloading the next video first for immediate playback
     if (currentIndex + 1 < state.videos.length) {
       final nextVideoUrl = state.videos[currentIndex + 1].videoUrl;
       if (!_preloadedFiles.containsKey(nextVideoUrl) && 
           !_preloadQueue.contains(nextVideoUrl)) {
         _preloadQueue.add(nextVideoUrl);
         // Use high priority for next video - await to ensure it's ready
-        await _preloadVideo(nextVideoUrl, highPriority: true);
+        await _preloadVideo(nextVideoUrl, highPriority: true, usePriorityCache: true, useCurrentMoodCache: true);
       }
     }
     
-    // Also preload the previous video for smoother backward navigation
+    // 2. Also preload the previous video for smoother backward navigation
     if (currentIndex > 0) {
       final prevVideoUrl = state.videos[currentIndex - 1].videoUrl;
       if (!_preloadedFiles.containsKey(prevVideoUrl) && 
           !_preloadQueue.contains(prevVideoUrl)) {
         _preloadQueue.add(prevVideoUrl);
         // Use medium priority for previous video - don't await to keep UI responsive
-        _preloadVideo(prevVideoUrl, highPriority: true);
+        unawaited(_preloadVideo(prevVideoUrl, highPriority: true, usePriorityCache: true));
       }
     }
     
-    // Then preload additional videos for smoother experience
-    // Preload more videos for faster scrolling experience
-    final videosToPreload = state.videos
-        .skip(currentIndex + 2) // Skip current and next (already handled)
-        .take(3) // Preload 3 more for smoother fast scrolling
-        .map((v) => (v).videoUrl)
-        .where((url) => !_preloadedFiles.containsKey(url));
+    // Use a slight delay before preloading additional videos to avoid overloading
+    // This ensures the current and next videos are prioritized
+    _preloadDelayTimer = Timer(const Duration(milliseconds: 100), () {
+      if (state.videos.isEmpty) return;
+      
+      // 3. Preload next few videos for faster scrolling experience
+      // Increased from 5 to 8 videos for smoother fast scrolling
+      final nextVideosToPreload = state.videos
+          .skip(currentIndex + 2) // Skip current and next (already handled)
+          .take(8) // Preload 8 more for smoother fast scrolling
+          .map((v) => (v).videoUrl)
+          .where((url) => !_preloadedFiles.containsKey(url) && !_preloadQueue.contains(url));
 
-    for (final videoUrl in videosToPreload) {
-      if (!_preloadQueue.contains(videoUrl)) {
+      for (final videoUrl in nextVideosToPreload) {
         _preloadQueue.add(videoUrl);
         // Don't await these to avoid blocking UI
-        _preloadVideo(videoUrl, highPriority: false);
+        unawaited(_preloadVideo(videoUrl, highPriority: false, usePriorityCache: false));
       }
-    }
+      
+      // 4. Preload a few videos before the previous one for very fast backward scrolling
+      if (currentIndex > 1) {
+        final prevVideosToPreload = state.videos
+            .sublist(0, currentIndex - 1) // Get videos before the previous one
+            .reversed // Start from closest to current
+            .take(3) // Preload 3 for backward scrolling
+            .map((v) => (v).videoUrl)
+            .where((url) => !_preloadedFiles.containsKey(url) && !_preloadQueue.contains(url));
+            
+        for (final videoUrl in prevVideosToPreload) {
+          _preloadQueue.add(videoUrl);
+          // Lower priority for backward videos
+          unawaited(_preloadVideo(videoUrl, highPriority: false, usePriorityCache: false));
+        }
+      }
+      
+      // 5. Occasionally preload adjacent moods for faster mood switching
+      // Only do this when we have a good number of videos preloaded already
+      if (_preloadedFiles.length > 10 && math.Random().nextInt(5) == 0) {
+        ReelsCacheService.preloadAdjacentMoods();
+      }
+    });
   }
 
-  Future<void> _preloadVideo(String videoUrl, {bool highPriority = false}) async {
+  Future<void> _preloadVideo(String videoUrl, {
+    bool highPriority = false, 
+    bool usePriorityCache = false,
+    bool useCurrentMoodCache = false
+  }) async {
     try {
+      // Update last access time for this URL
+      _preloadedFilesLastAccess[videoUrl] = DateTime.now().millisecondsSinceEpoch;
+      
       // For high priority videos, await the result to ensure it's ready
       if (highPriority) {
-        final file = await getCachedVideoFile(videoUrl);
+        final file = await getCachedVideoFile(
+          videoUrl, 
+          usePriorityCache: usePriorityCache,
+          useCurrentMoodCache: useCurrentMoodCache
+        );
+        
         _preloadedFiles[videoUrl] = file;
   
         final currentPreloaded = Set<String>.from(state.preloadedVideoUrls)
@@ -269,7 +322,11 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
         emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
       } else {
         // For lower priority videos, don't block the UI thread
-        getCachedVideoFile(videoUrl).then((file) {
+        getCachedVideoFile(
+          videoUrl, 
+          usePriorityCache: usePriorityCache,
+          useCurrentMoodCache: useCurrentMoodCache
+        ).then((file) {
           _preloadedFiles[videoUrl] = file;
           
           final currentPreloaded = Set<String>.from(state.preloadedVideoUrls)
@@ -279,10 +336,34 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
           debugPrint('Error preloading video: $e');
         });
       }
+      
+      // Enforce memory cache size limit
+      _enforceMemoryCacheLimit();
     } catch (e) {
       debugPrint('Error preloading video: $e');
     } finally {
       _preloadQueue.remove(videoUrl);
+    }
+  }
+  
+  /// Enforce memory cache size limit using LRU strategy
+  void _enforceMemoryCacheLimit() {
+    if (_preloadedFiles.length <= _maxMemoryCacheSize) return;
+    
+    // Sort URLs by last access time (oldest first)
+    final sortedUrls = _preloadedFilesLastAccess.entries
+        .toList()
+        ..sort((a, b) => a.value.compareTo(b.value));
+    
+    // Remove oldest entries until we're under the limit
+    final urlsToRemove = sortedUrls
+        .take(sortedUrls.length - _maxMemoryCacheSize)
+        .map((e) => e.key)
+        .toList();
+    
+    for (final url in urlsToRemove) {
+      _preloadedFiles.remove(url);
+      _preloadedFilesLastAccess.remove(url);
     }
   }
 
@@ -295,10 +376,24 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     }
   }
 
-  Future<File> getCachedVideoFile(String videoUrl) async {
+  Future<File> getCachedVideoFile(String videoUrl, {
+    bool usePriorityCache = false,
+    bool useCurrentMoodCache = false
+  }) async {
+    // Update last access time for this URL
+    _preloadedFilesLastAccess[videoUrl] = DateTime.now().millisecondsSinceEpoch;
+    
     // Return from memory cache if available for fastest access
     if (_preloadedFiles.containsKey(videoUrl)) {
-      return _preloadedFiles[videoUrl]!;
+      final file = _preloadedFiles[videoUrl]!;
+      // Verify the file still exists
+      if (await file.exists()) {
+        return file;
+      } else {
+        // Remove invalid file from memory cache
+        _preloadedFiles.remove(videoUrl);
+        _preloadedFilesLastAccess.remove(videoUrl);
+      }
     }
 
     try {
@@ -323,9 +418,14 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
         // If file doesn't exist or is empty, continue to download it again
       }
       
-      // If not in our cache, use the custom cache manager with longer retention
+      // If not in our cache, use the enhanced cache service with priority support
       // This will download and cache the file if needed
-      final file = await ReelsCacheService.preCacheVideo(videoUrl);
+      final file = await ReelsCacheService.preCacheVideo(
+        videoUrl,
+        highPriority: true,
+        usePriorityCache: usePriorityCache,
+        useCurrentMoodCache: useCurrentMoodCache
+      );
       
       // Verify the downloaded file
       if (await file.exists() && await file.length() > 0) {
@@ -337,14 +437,8 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
           ..add(videoUrl);
         emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
         
-        // Limit memory cache size to prevent OOM issues
-        if (_preloadedFiles.length > 15) { // Increased for better performance
-          // Remove oldest entries when cache gets too large
-          final keysToRemove = _preloadedFiles.keys.take(_preloadedFiles.length - 15).toList();
-          for (final key in keysToRemove) {
-            _preloadedFiles.remove(key);
-          }
-        }
+        // Enforce memory cache size limit
+        _enforceMemoryCacheLimit();
         
         return file;
       } else {
@@ -360,22 +454,59 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
         if (fileInfo != null) {
           final file = fileInfo.file;
           _preloadedFiles[videoUrl] = file;
+          
+          // Add to preloaded URLs set
+          final currentPreloaded = Set<String>.from(state.preloadedVideoUrls)
+            ..add(videoUrl);
+          emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
+          
           return file;
         }
         
-        // If not in cache, download it
-        final file = await cacheManager.getSingleFile(videoUrl);
-        _preloadedFiles[videoUrl] = file;
+        // If not in cache, download it with retry logic
+        File? file;
+        int retries = 3;
         
-        // Add to preloaded URLs set
-        final currentPreloaded = Set<String>.from(state.preloadedVideoUrls)
-          ..add(videoUrl);
-        emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
+        while (retries > 0 && (file == null || !(await file.exists()))) {
+          try {
+            file = await cacheManager.getSingleFile(videoUrl);
+            break;
+          } catch (retryError) {
+            retries--;
+            if (retries > 0) {
+              // Wait before retry with exponential backoff
+              await Future.delayed(Duration(milliseconds: 200 * math.pow(2, 3 - retries).toInt()));
+            }
+          }
+        }
         
-        return file;
+        if (file != null && await file.exists()) {
+          _preloadedFiles[videoUrl] = file;
+          
+          // Add to preloaded URLs set
+          final currentPreloaded = Set<String>.from(state.preloadedVideoUrls)
+            ..add(videoUrl);
+          emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
+          
+          return file;
+        }
+        
+        // If all retries fail, create a fallback file
+        final tempDir = await getTemporaryDirectory();
+        final fallbackFile = File('${tempDir.path}/fallback_${DateTime.now().millisecondsSinceEpoch}.mp4');
+        await fallbackFile.create();
+        return fallbackFile;
       } catch (innerError) {
-        // If all caching methods fail, rethrow with more context
-        throw Exception('Failed to cache video after multiple attempts: $innerError');
+        // If all caching methods fail, create a fallback file to prevent crashes
+        debugPrint('Failed to cache video after multiple attempts: $innerError');
+        final tempDir = await getTemporaryDirectory();
+        final fallbackFile = File('${tempDir.path}/fallback_${DateTime.now().millisecondsSinceEpoch}.mp4');
+        try {
+          await fallbackFile.create();
+        } catch (e) {
+          // Ignore errors when creating fallback file
+        }
+        return fallbackFile;
       }
     }
   }
@@ -383,8 +514,14 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
   @override
   Future<void> close() {
     _backgroundRefreshTimer?.cancel();
+    _preloadDelayTimer?.cancel();
     _preloadQueue.clear();
     _preloadedFiles.clear();
+    _preloadedFilesLastAccess.clear();
+    
+    // Clean up memory cache in ReelsCacheService to prevent memory leaks
+    ReelsCacheService.cleanupMemoryCache();
+    
     return super.close();
   }
 
@@ -392,6 +529,8 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     // Clear preload queue and cached files to prevent memory leaks
     _preloadQueue.clear();
     _preloadedFiles.clear();
+    _preloadedFilesLastAccess.clear();
+    _preloadDelayTimer?.cancel();
     
     // Reset preloaded video URLs to prevent audio from previous mood's videos
     emit(state.copyWith(
@@ -421,17 +560,41 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
       
       // Immediately start preloading the first few videos with high priority
       if (cachedReels.isNotEmpty) {
-        // Preload first video with highest priority
-        final firstVideoUrl = cachedReels[0].videoUrl;
-        await _preloadVideo(firstVideoUrl, highPriority: true);
-        
-        // Preload next 2 videos with high priority but don't await
-        for (int i = 1; i < math.min(3, cachedReels.length); i++) {
-          _preloadVideo(cachedReels[i].videoUrl, highPriority: true);
+        try {
+          // Preload first video with highest priority and await to ensure it's ready
+          final firstVideoUrl = cachedReels[0].videoUrl;
+          await _preloadVideo(
+            firstVideoUrl, 
+            highPriority: true, 
+            usePriorityCache: true,
+            useCurrentMoodCache: true
+          );
+          
+          // Preload next few videos with high priority but don't await
+          // This ensures smooth scrolling right after mood change
+          for (int i = 1; i < math.min(5, cachedReels.length); i++) {
+            unawaited(_preloadVideo(
+              cachedReels[i].videoUrl, 
+              highPriority: i < 3, // First 3 are high priority
+              usePriorityCache: true, // All use priority cache
+              useCurrentMoodCache: i < 3 // First 3 use current mood cache
+            ));
+          }
+          
+          // Then preload more videos in background with a slight delay
+          // to avoid overloading the system
+          _preloadDelayTimer = Timer(const Duration(milliseconds: 300), () {
+            preloadNextVideos();
+
+            // Also start preloading adjacent moods for faster future mood changes
+            ReelsCacheService.preloadAdjacentMoods();
+           /* if (mounted) {
+
+            }*/
+          });
+        } catch (e) {
+          debugPrint('Error preloading initial videos for mood change: $e');
         }
-        
-        // Then preload more videos in background
-        preloadNextVideos();
       }
     } else {
       // If no cached reels, show loading indicator
