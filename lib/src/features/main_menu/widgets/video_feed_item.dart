@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:funli_app/src/features/reels_page/reels_optimized_player_widget.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:video_player/video_player.dart';
@@ -79,13 +80,17 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
       alignment: Alignment.center,
       children: [
         // Use RepaintBoundary to optimize rendering and prevent unnecessary repaints
-        RepaintBoundary(
+       widget.isComingFromHome ? RepaintBoundary(
           child: OptimizedVideoPlayer(
             key: _playerKey,
             controller: widget.controller, 
             reelID: widget.reel.reelID
           ),
-        ),
+        ) : ReelsOptimizedPlayerWidget(
+           key: _playerKey,
+           controller: widget.controller,
+           reelID: widget.reel.reelID),
+
         _buildUserNameCaptionWidget(),
         _buildLikeCommentsIcon(context),
         _buildMuteButton(),

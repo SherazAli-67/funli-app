@@ -20,6 +20,10 @@ class ReelsCacheService {
   static const String _preloadedMoodsKey = 'preloaded_moods_key';
   static const String _recentMoodsKey = 'recent_moods_key';
   static const String _videoLoadStatsKey = 'video_load_stats_key';
+  static const String _userReelsCacheKey = 'cached_user_reels_data';
+  static const String _userBookmarksCacheKey = 'cached_user_bookmarks_data';
+  static const String _lastUserReelsFetchTimeKey = 'last_user_reels_fetch_time';
+  static const String _lastUserBookmarksFetchTimeKey = 'last_user_bookmarks_fetch_time';
   
   // In-memory cache for faster access - increased size for better performance
   static final Map<String, File> _memoryCache = {};
@@ -619,6 +623,223 @@ class ReelsCacheService {
     }
   }
 
+  /// Cache user-specific reels
+  static Future<void> cacheUserReels(List<ReelModel> reels, String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Get existing cached user reels
+      final cachedReelsJson = prefs.getString(_userReelsCacheKey) ?? '{}';
+      final Map<String, dynamic> cachedReelsMap = json.decode(cachedReelsJson);
+      
+      // Convert reels to JSON
+      final List<Map<String, dynamic>> reelsJson = reels.map((reel) => reel.toMap()).toList();
+      
+      // Update cache with new reels, avoiding duplicates
+      final List<dynamic> existingReels = List.from(cachedReelsMap[userId] ?? []);
+      final Set<String> existingIds = existingReels
+          .map((reel) => reel['reelID'] as String)
+          .toSet();
+      
+      bool hasNewReels = false;
+      for (final reelJson in reelsJson) {
+        if (!existingIds.contains(reelJson['reelID'])) {
+          existingReels.add(reelJson);
+          existingIds.add(reelJson['reelID']);
+          hasNewReels = true;
+        }
+      }
+      
+      // Sort by createdAt (newest first)
+      existingReels.sort((a, b) {
+        final DateTime dateA = DateTime.parse(a['createdAt'].toString());
+        final DateTime dateB = DateTime.parse(b['createdAt'].toString());
+        return dateB.compareTo(dateA);
+      });
+      
+      // Limit cache size to 100 reels per user
+      if (existingReels.length > 100) {
+        existingReels.removeRange(100, existingReels.length);
+      }
+      
+      cachedReelsMap[userId] = existingReels;
+      
+      // Save updated cache
+      await prefs.setString(_userReelsCacheKey, json.encode(cachedReelsMap));
+      
+      // Update last fetch time
+      await prefs.setInt(_lastUserReelsFetchTimeKey, DateTime.now().millisecondsSinceEpoch);
+      
+      debugPrint('Cached ${reels.length} user reels for user: $userId');
+      
+      if (hasNewReels) {
+        // Start preloading videos for this user in the background
+        _preloadVideosForUser(reels, userId);
+      }
+    } catch (e) {
+      debugPrint('Error caching user reels: $e');
+    }
+  }
+
+  /// Get cached user-specific reels
+  static Future<List<ReelModel>> getCachedUserReels(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedReelsJson = prefs.getString(_userReelsCacheKey) ?? '{}';
+      final Map<String, dynamic> cachedReelsMap = json.decode(cachedReelsJson);
+      
+      if (!cachedReelsMap.containsKey(userId)) {
+        return [];
+      }
+      
+      final List<dynamic> reelsJson = cachedReelsMap[userId];
+      final reels = reelsJson.map((json) => 
+        ReelModel.fromMap(Map<String, dynamic>.from(json))
+      ).toList();
+      
+      // Start preloading videos for this user in the background
+      _preloadVideosForUser(reels, userId);
+      
+      return reels;
+    } catch (e) {
+      debugPrint('Error getting cached user reels: $e');
+      return [];
+    }
+  }
+
+  /// Check if we should refresh user reels from network
+  static Future<bool> shouldRefreshUserReelsFromNetwork(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lastFetchTime = prefs.getInt(_lastUserReelsFetchTimeKey) ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      
+      // Refresh if last fetch was more than 10 minutes ago
+      return (now - lastFetchTime) > 10 * 60 * 1000;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  /// Cache user-specific bookmarks
+  static Future<void> cacheUserBookmarks(List<ReelModel> reels, String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Get existing cached bookmarks
+      final cachedBookmarksJson = prefs.getString(_userBookmarksCacheKey) ?? '{}';
+      final Map<String, dynamic> cachedBookmarksMap = json.decode(cachedBookmarksJson);
+      
+      // Convert reels to JSON
+      final List<Map<String, dynamic>> reelsJson = reels.map((reel) => reel.toMap()).toList();
+      
+      // Update cache with new bookmarks, avoiding duplicates
+      final List<dynamic> existingBookmarks = List.from(cachedBookmarksMap[userId] ?? []);
+      final Set<String> existingIds = existingBookmarks
+          .map((reel) => reel['reelID'] as String)
+          .toSet();
+      
+      bool hasNewBookmarks = false;
+      for (final reelJson in reelsJson) {
+        if (!existingIds.contains(reelJson['reelID'])) {
+          existingBookmarks.add(reelJson);
+          existingIds.add(reelJson['reelID']);
+          hasNewBookmarks = true;
+        }
+      }
+      
+      // Sort by createdAt (newest first)
+      existingBookmarks.sort((a, b) {
+        final DateTime dateA = DateTime.parse(a['createdAt'].toString());
+        final DateTime dateB = DateTime.parse(b['createdAt'].toString());
+        return dateB.compareTo(dateA);
+      });
+      
+      // Limit cache size to 100 bookmarks per user
+      if (existingBookmarks.length > 100) {
+        existingBookmarks.removeRange(100, existingBookmarks.length);
+      }
+      
+      cachedBookmarksMap[userId] = existingBookmarks;
+      
+      // Save updated cache
+      await prefs.setString(_userBookmarksCacheKey, json.encode(cachedBookmarksMap));
+      
+      // Update last fetch time
+      await prefs.setInt(_lastUserBookmarksFetchTimeKey, DateTime.now().millisecondsSinceEpoch);
+      
+      debugPrint('Cached ${reels.length} bookmarks for user: $userId');
+      
+      if (hasNewBookmarks) {
+        // Start preloading videos for this user bookmarks in the background
+        _preloadVideosForUser(reels, userId);
+      }
+    } catch (e) {
+      debugPrint('Error caching user bookmarks: $e');
+    }
+  }
+
+  /// Get cached user-specific bookmarks
+  static Future<List<ReelModel>> getCachedUserBookmarks(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedBookmarksJson = prefs.getString(_userBookmarksCacheKey) ?? '{}';
+      final Map<String, dynamic> cachedBookmarksMap = json.decode(cachedBookmarksJson);
+      
+      if (!cachedBookmarksMap.containsKey(userId)) {
+        return [];
+      }
+      
+      final List<dynamic> bookmarksJson = cachedBookmarksMap[userId];
+      final bookmarks = bookmarksJson.map((json) => 
+        ReelModel.fromMap(Map<String, dynamic>.from(json))
+      ).toList();
+      
+      // Start preloading videos for this user bookmarks in the background
+      _preloadVideosForUser(bookmarks, userId);
+      
+      return bookmarks;
+    } catch (e) {
+      debugPrint('Error getting cached user bookmarks: $e');
+      return [];
+    }
+  }
+
+  /// Check if we should refresh user bookmarks from network
+  static Future<bool> shouldRefreshUserBookmarksFromNetwork(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lastFetchTime = prefs.getInt(_lastUserBookmarksFetchTimeKey) ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      
+      // Refresh if last fetch was more than 10 minutes ago
+      return (now - lastFetchTime) > 10 * 60 * 1000;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  /// Preload videos for a specific user in the background
+  static Future<void> _preloadVideosForUser(List<ReelModel> reels, String userId) async {
+    // Take first 5 videos to preload
+    final videosToPreload = reels.take(5).toList();
+    
+    for (int i = 0; i < videosToPreload.length; i++) {
+      try {
+        final reel = videosToPreload[i];
+        // Don't await to allow parallel downloads
+        unawaited(preCacheVideo(
+          reel.videoUrl, 
+          highPriority: i < 2, // First 2 videos are high priority
+          usePriorityCache: i < 3 // First 3 videos use priority cache
+        ));
+      } catch (e) {
+        // Silently handle errors for background preloading
+        debugPrint('Background user video preload error: $e');
+      }
+    }
+  }
+
   /// Clear all cached data (for testing or user-initiated cache clearing)
   static Future<void> clearCache() async {
     try {
@@ -629,6 +850,10 @@ class ReelsCacheService {
       await prefs.remove(_recentMoodsKey);
       await customCacheManager.emptyCache();
       await priorityCacheManager.emptyCache();
+      await prefs.remove(_userReelsCacheKey);
+      await prefs.remove(_userBookmarksCacheKey);
+      await prefs.remove(_lastUserReelsFetchTimeKey);
+      await prefs.remove(_lastUserBookmarksFetchTimeKey);
       _memoryCache.clear();
       _activeDownloads.clear();
       _preloadedMoodsInMemory.clear();

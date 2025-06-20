@@ -2,15 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
+import 'package:funli_app/src/loading_shimmers/reel_thumbnail_shimmer_item.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/services/user_service.dart';
-import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/reel_likes_count.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../models/reel_model.dart';
 import '../../res/app_colors.dart';
 import '../../res/app_icons.dart';
@@ -65,7 +64,7 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
       ),
       itemBuilder: (context, index) {
         if (index >= _reels.length) {
-          return LoadingWidget();
+          return ReelThumbnailShimmerItem();
         }
         ReelModel reel = ReelModel.fromMap( _reels[index]);
         final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
@@ -87,7 +86,7 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
               Container(
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: NetworkImage(thumbnailUrl),
+                    image: CachedNetworkImageProvider(thumbnailUrl),
                     fit: BoxFit.cover,
                   ),
                   borderRadius: BorderRadius.circular(8),

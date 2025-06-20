@@ -1,7 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/reels_page/reel_repository.dart';
+import 'package:funli_app/src/res/app_constants.dart';
+import 'package:funli_app/src/res/app_icons.dart';
+import 'package:funli_app/src/res/app_textstyles.dart';
+import 'package:funli_app/src/widgets/app_back_button.dart';
+import 'package:go_router/go_router.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
 
@@ -36,7 +42,7 @@ class UpdatedReelsPage extends StatefulWidget {
 
 class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBindingObserver {
   final _pageController = PreloadPageController(initialPage: 0);
-  final int _maxCacheSize = 3;
+  final int _maxCacheSize = 5; // Increased to accommodate preloading of adjacent reels
 
   late ReelsCubit _cubit;
   List<ReelModel> _videos = [];
@@ -66,15 +72,17 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
       ),
     );
 
+    // Initialize controller for the selected reel immediately
+    _initializeControllerIfNeeded(
+      _videos[_currentPage].reelID,
+      _videos[_currentPage].videoUrl,
+      shouldPlay: true,
+    );
+    
     // Defer jumpToPage until after first layout
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_pageController.hasClients) {
         _pageController.jumpToPage(_currentPage);
-        _initializeControllerIfNeeded(
-          _videos[_currentPage].reelID,
-          _videos[_currentPage].videoUrl,
-          shouldPlay: true,
-        );
       }
     });
   }
@@ -163,33 +171,57 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
         _videos = state.videos;
 
         return Scaffold(
-          body: SafeArea(
-            child: PreloadPageView.builder(
-              scrollDirection: Axis.vertical,
-              controller: _pageController,
-              itemCount: _videos.length,
-              onPageChanged: (index) {
-                setState(() => _currentPage = index);
-                _cubit.onPageChanged(index);
-
-                _initializeControllerIfNeeded(_videos[index].reelID, _videos[index].videoUrl, shouldPlay: true);
-                _playController(_videos[index].reelID);
-              },
-              itemBuilder: (context, index) {
-                final reel = _videos[index];
-                final controller = _controllerCache[reel.reelID];
-
-                return controller != null && controller.value.isInitialized
-                    ? RepaintBoundary(
-                  child: VideoFeedItem(
-                    key: ValueKey(reel.reelID),
-                    controller: controller,
-                    reel: reel,
-                  ),
-                )
-                    : const Center(child: CircularProgressIndicator());
-              },
-            ),
+          backgroundColor: Colors.black,
+          body: Stack(
+            children: [
+              PreloadPageView.builder(
+                scrollDirection: Axis.vertical,
+                controller: _pageController,
+                itemCount: _videos.length,
+                onPageChanged: (index) {
+                  setState(() => _currentPage = index);
+                  _cubit.onPageChanged(index);
+              
+                  _initializeControllerIfNeeded(_videos[index].reelID, _videos[index].videoUrl, shouldPlay: true);
+                  _playController(_videos[index].reelID);
+              
+                  // Preload controllers for previous 2 and next 2 reels
+                  for (int i = index - 2; i <= index + 2; i++) {
+                    if (i >= 0 && i < _videos.length && i != index) {
+                      _initializeControllerIfNeeded(_videos[i].reelID, _videos[i].videoUrl, shouldPlay: false);
+                    }
+                  }
+                },
+                itemBuilder: (context, index) {
+                  final reel = _videos[index];
+                  final controller = _controllerCache[reel.reelID];
+              
+                  return controller != null && controller.value.isInitialized
+                      ? RepaintBoundary(
+                    child: VideoFeedItem(
+                      key: ValueKey(reel.reelID),
+                      controller: controller,
+                      reel: reel,
+                    ),
+                  )
+                      : const Center(child: CircularProgressIndicator());
+                },
+              ),
+              Positioned(
+                top: 55,
+                left: 10,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 10,
+                  children: [
+                    IconButton(onPressed: (){
+                      context.pop();
+                    }, icon:SvgPicture.asset(AppIcons.icArrowBack, colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),)),
+                    Text(AppConstants.appTitle, style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),)
+                  ],
+                ),
+              )
+            ],
           ),
         );
       },

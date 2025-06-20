@@ -14,6 +14,7 @@ import 'package:funli_app/src/widgets/reel_likes_count.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app_router/router_enum.dart';
+import '../../../../services/reels_cache_service.dart';
 import '../../../../services/reels_service.dart';
 
 class BookmarkWidget extends StatefulWidget {
@@ -38,25 +39,41 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
   @override
   void initState() {
     super.initState();
-    _fetchReels(isFirstTime: true);
+    _initializeBookmarks();
     _scrollController.addListener(_scrollListener);
   }
 
   void _scrollListener() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 300 && !_isLoading && _hasMore) {
-      _fetchReels();
+      _fetchBookmarks();
     }
   }
 
-  Future<void> _fetchReels({bool isFirstTime = false}) async {
+  Future<void> _initializeBookmarks() async {
+    // Check for cached bookmarks first
+    List<ReelModel> cachedBookmarks = await ReelsCacheService.getCachedUserBookmarks(widget._userID);
+    if (cachedBookmarks.isNotEmpty) {
+      setState(() {
+        _reels.clear();
+        _reels.addAll(cachedBookmarks.map((reel) => reel.toMap()).toList());
+      });
+    }
+    
+    // Check if we should refresh from network
+    bool shouldRefresh = await ReelsCacheService.shouldRefreshUserBookmarksFromNetwork(widget._userID);
+    if (shouldRefresh) {
+      _fetchBookmarks();
+    }
+  }
+
+  Future<void> _fetchBookmarks({bool isFirstTime = false}) async {
     if (_isLoading) return;
     setState(() {
       _isLoading = true;
     });
 
     Query query = FirebaseFirestore.instance
-        .collection(FirebaseConstants.userCollection)
-        .doc(widget._userID)
+        .collection(FirebaseConstants.userCollection).doc(widget._userID)
         .collection(FirebaseConstants.bookmarksCollection)
         .orderBy("timestamp", descending: true)
         .limit(_limit);
@@ -68,6 +85,7 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
     final querySnapshot = await query.get();
     final docs = querySnapshot.docs;
 
+    List<ReelModel> newBookmarks = [];
 
     if (docs.isNotEmpty) {
       _lastDocument = querySnapshot.docs.last;
@@ -79,11 +97,16 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
             .get();
 
         if (reelSnap.exists) {
-          _reels.add(reelSnap.data()!..["id"] = reelSnap.id);
+          var reelData = reelSnap.data()!..["id"] = reelSnap.id;
+          _reels.add(reelData);
+          newBookmarks.add(ReelModel.fromMap(reelData));
         }
       }
-      /*_lastDocument = docs.last;
-      _reels.addAll(docs);*/
+    }
+
+    if (newBookmarks.isNotEmpty) {
+      // Cache the fetched bookmarks
+      await ReelsCacheService.cacheUserBookmarks(newBookmarks, widget._userID);
     }
 
     setState(() {
@@ -138,7 +161,7 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
               Container(
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: NetworkImage(thumbnailUrl),
+                    image: CachedNetworkImageProvider(thumbnailUrl),
                     fit: BoxFit.cover,
                   ),
                   borderRadius: BorderRadius.circular(8),

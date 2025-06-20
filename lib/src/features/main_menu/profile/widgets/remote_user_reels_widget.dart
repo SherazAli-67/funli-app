@@ -12,6 +12,7 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/reel_likes_count.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../services/reels_cache_service.dart';
 import '../../../../services/reels_service.dart';
 
 class RemoteUserReelsWidget extends StatefulWidget {
@@ -43,21 +44,41 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
   @override
   void initState() {
     super.initState();
-    fetchReels();
+    _initializeReels();
     _scrollController.addListener(_scrollListener);
   }
 
   void _scrollListener() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 300 && !_isLoading && _hasMore) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300 && !_isLoading &&
+        _hasMore) {
       _fetchReels();
     }
   }
 
-  Future<void> fetchReels() async {
+  Future<void> _initializeReels() async {
+    // Check for cached reels first
+    List<ReelModel> cachedReels = await ReelsCacheService.getCachedUserReels(
+        widget._userID);
+    if (cachedReels.isNotEmpty) {
+      setState(() {
+        _reels.clear();
+        _reels.addAll(cachedReels);
+      });
+    }
+
+    // Check if we should refresh from network
+    bool shouldRefresh = await ReelsCacheService
+        .shouldRefreshUserReelsFromNetwork(widget._userID);
+    if (shouldRefresh) {
+      _fetchReels();
+    }
+  }
+
+  Future<void> _fetchReels() async {
     if (_isLoading || !_hasMore) return;
 
-    setState(()=> _isLoading = true);
-
+    setState(() => _isLoading = true);
 
     final newReels = await ReelsService.fetchUserReels(
       userId: widget._userID,
@@ -67,12 +88,14 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
       onHasMore: (has) => _hasMore = has,
     );
 
-    _reels.addAll(newReels);
+    if (newReels.isNotEmpty) {
+      _reels.addAll(newReels);
+      // Cache the fetched reels
+      await ReelsCacheService.cacheUserReels(newReels, widget._userID);
+    }
 
-    _isLoading = false;
-    setState(()=> _isLoading = true);
+    setState(() => _isLoading = false);
   }
-
 
 
   @override
@@ -105,11 +128,11 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
 
         return GestureDetector(
           onTap: () {
-            context.push(RouterEnum.updatedReelsView.routeName,   extra: {
+            context.push(RouterEnum.updatedReelsView.routeName, extra: {
               'initialReels': _reels,
               'selectedIndex': index,
               'lastDocument': _lastDocument,
-              'comingFrom':AppConstants.comingFromUserProfile,
+              'comingFrom': AppConstants.comingFromUserProfile,
               'userID': FirebaseAuth.instance.currentUser!.uid,
             },);
           },
@@ -118,7 +141,7 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
               Container(
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: NetworkImage(thumbnailUrl),
+                    image: CachedNetworkImageProvider(thumbnailUrl),
                     fit: BoxFit.cover,
                   ),
                   borderRadius: BorderRadius.circular(8),
@@ -139,10 +162,13 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
                           radius: 19,
-                          backgroundImage: CachedNetworkImageProvider(widget._profilePicture ?? AppIcons.icDummyImgUrl),
+                          backgroundImage: CachedNetworkImageProvider(
+                              widget._profilePicture ?? AppIcons.icDummyImgUrl),
                         ),
                       ),
-                      Expanded(child: Text(widget._userName ?? '', style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
+                      Expanded(child: Text(widget._userName ?? '',
+                        style: AppTextStyles.smallTextStyle.copyWith(
+                            color: Colors.white),))
                     ],
                   )),
               Positioned(
@@ -156,13 +182,17 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
                       CircleAvatar(
                         radius: 12,
                         backgroundColor: Colors.white,
-                        child: Center(child: Icon(Icons.play_arrow_rounded, ),),
+                        child: Center(child: Icon(Icons.play_arrow_rounded,),),
                       ),
                       Expanded(
-                          child: FutureBuilder(future: ReelsService.getReelViewsCount(reelID: reel.reelID),
+                          child: FutureBuilder(
+                              future: ReelsService.getReelViewsCount(
+                                  reelID: reel.reelID),
                               builder: (ctx, snapshot) {
-                                if(snapshot.hasData && snapshot.requireData > 0){
-                                  return ReelLikesCountWidget(count: snapshot.requireData);
+                                if (snapshot.hasData &&
+                                    snapshot.requireData > 0) {
+                                  return ReelLikesCountWidget(
+                                      count: snapshot.requireData);
                                 }
 
                                 return ReelLikesCountWidget();
@@ -181,12 +211,4 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
     _scrollController.dispose();
     super.dispose();
   }
-
-  void _fetchReels() {
-    if (_isLoading) return;
-    setState(()=> _isLoading = true);
-
-  }
-
-
 }
