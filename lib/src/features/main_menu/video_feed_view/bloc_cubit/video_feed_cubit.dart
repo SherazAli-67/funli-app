@@ -25,44 +25,44 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
   bool _isRefreshingInBackground = false;
   Timer? _backgroundRefreshTimer;
   Timer? _preloadDelayTimer;
-  
+
   // Track last access time for preloaded files for better LRU management
   final Map<String, int> _preloadedFilesLastAccess = {};
-  
+
   // Maximum number of files to keep in memory
   final int _maxMemoryCacheSize = 30;
-  
+
   /// Initialize videos with optimized loading strategy
   Future<void> _initializeVideos() async {
     // First load cached videos immediately
     await _loadCachedVideosFirst();
-    
+
     // Then start background refresh timer
     _startBackgroundRefreshTimer();
-    
+
     // Preload all moods in the background for smoother mood switching
     ReelsCacheService.preloadAllMoods();
   }
-  
+
   /// Start a timer to periodically refresh videos in the background
   void _startBackgroundRefreshTimer() {
     _backgroundRefreshTimer?.cancel();
     _backgroundRefreshTimer = Timer.periodic(
       const Duration(minutes: 5), // Reduced to 5 minutes for fresher content
-      (_) => _refreshVideosInBackground(),
+          (_) => _refreshVideosInBackground(),
     );
   }
-  
+
   /// Load cached videos first for immediate display
   Future<void> _loadCachedVideosFirst() async {
     try {
       // Get current mood
       final prefs = await SharedPreferences.getInstance();
       final mood = prefs.getString(LocalStorageConstants.currentMoodKey) ?? 'Happy';
-      
+
       // Get cached reels for this mood
       final cachedReels = await ReelsCacheService.getCachedReels(mood);
-      
+
       if (cachedReels.isNotEmpty) {
         // Emit cached reels immediately
         emit(
@@ -74,10 +74,10 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
             loadingSource: 'cache',
           ),
         );
-        
+
         // Start preloading next videos
         preloadNextVideos();
-        
+
         // Then refresh from network in background
         _refreshVideosInBackground();
       } else {
@@ -90,29 +90,29 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
       loadVideos();
     }
   }
-  
+
   /// Refresh videos in background without blocking UI
   Future<void> _refreshVideosInBackground() async {
     if (_isRefreshingInBackground) return;
-    
+
     _isRefreshingInBackground = true;
     try {
       final freshVideos = await videoRepository.fetchVideos();
-      
+
       if (freshVideos.isNotEmpty) {
         // Only update if we got new videos and they're different from current ones
         final currentVideos = state.videos;
         final hasNewVideos = freshVideos.any(
-          (video) => !currentVideos.any((v) => v.reelID == video.reelID)
+                (video) => !currentVideos.any((v) => v.reelID == video.reelID)
         );
-        
+
         if (hasNewVideos) {
           // Merge with existing videos, keeping current position
           final currentIndex = state.currentVideoIndex;
           final currentVideoId = currentVideos.isNotEmpty && currentIndex < currentVideos.length
               ? currentVideos[currentIndex].reelID
               : null;
-          
+
           // Find index of current video in new list
           int newIndex = 0;
           if (currentVideoId != null) {
@@ -121,7 +121,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
               newIndex = matchIndex;
             }
           }
-          
+
           emit(
             state.copyWith(
               videos: freshVideos,
@@ -130,7 +130,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
               loadingSource: 'background',
             ),
           );
-          
+
           // Preload videos after background refresh
           preloadNextVideos();
         }
@@ -174,13 +174,13 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     try {
       if (state.videos.isNotEmpty) {
         final List<ReelModel> moreVideos =
-            await videoRepository.fetchMoreVideos();
+        await videoRepository.fetchMoreVideos();
         final bool hasMoreVideos = moreVideos.length >= 5;
-        
+
         // Check for duplicates before adding
         final existingIds = state.videos.map((v) => v.reelID).toSet();
         final newVideos = moreVideos.where((v) => !existingIds.contains(v.reelID)).toList();
-        
+
         if (newVideos.isNotEmpty) {
           final List<ReelModel> updatedVideos = List<ReelModel>.from(state.videos)
             ..addAll(newVideos);
@@ -223,40 +223,40 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
   Future<void> preloadNextVideos() async {
     // Cancel any existing preload delay timer
     _preloadDelayTimer?.cancel();
-    
+
     if (state.videos.isEmpty) return;
 
     final currentIndex = state.currentVideoIndex;
-    
+
     // Enhanced preloading strategy for TikTok-like performance
-    
+
     // 1. Prioritize preloading the next video first for immediate playback
     if (currentIndex + 1 < state.videos.length) {
       final nextVideoUrl = state.videos[currentIndex + 1].videoUrl;
-      if (!_preloadedFiles.containsKey(nextVideoUrl) && 
+      if (!_preloadedFiles.containsKey(nextVideoUrl) &&
           !_preloadQueue.contains(nextVideoUrl)) {
         _preloadQueue.add(nextVideoUrl);
         // Use high priority for next video - await to ensure it's ready
         await _preloadVideo(nextVideoUrl, highPriority: true, usePriorityCache: true, useCurrentMoodCache: true);
       }
     }
-    
+
     // 2. Also preload the previous video for smoother backward navigation
     if (currentIndex > 0) {
       final prevVideoUrl = state.videos[currentIndex - 1].videoUrl;
-      if (!_preloadedFiles.containsKey(prevVideoUrl) && 
+      if (!_preloadedFiles.containsKey(prevVideoUrl) &&
           !_preloadQueue.contains(prevVideoUrl)) {
         _preloadQueue.add(prevVideoUrl);
         // Use medium priority for previous video - don't await to keep UI responsive
         unawaited(_preloadVideo(prevVideoUrl, highPriority: true, usePriorityCache: true));
       }
     }
-    
+
     // Use a slight delay before preloading additional videos to avoid overloading
     // This ensures the current and next videos are prioritized
     _preloadDelayTimer = Timer(const Duration(milliseconds: 100), () {
       if (state.videos.isEmpty) return;
-      
+
       // 3. Preload next few videos for faster scrolling experience
       // Increased from 5 to 8 videos for smoother fast scrolling
       final nextVideosToPreload = state.videos
@@ -270,7 +270,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
         // Don't await these to avoid blocking UI
         unawaited(_preloadVideo(videoUrl, highPriority: false, usePriorityCache: false));
       }
-      
+
       // 4. Preload a few videos before the previous one for very fast backward scrolling
       if (currentIndex > 1) {
         final prevVideosToPreload = state.videos
@@ -279,14 +279,14 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
             .take(3) // Preload 3 for backward scrolling
             .map((v) => (v).videoUrl)
             .where((url) => !_preloadedFiles.containsKey(url) && !_preloadQueue.contains(url));
-            
+
         for (final videoUrl in prevVideosToPreload) {
           _preloadQueue.add(videoUrl);
           // Lower priority for backward videos
           unawaited(_preloadVideo(videoUrl, highPriority: false, usePriorityCache: false));
         }
       }
-      
+
       // 5. Occasionally preload adjacent moods for faster mood switching
       // Only do this when we have a good number of videos preloaded already
       if (_preloadedFiles.length > 10 && math.Random().nextInt(5) == 0) {
@@ -296,36 +296,36 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
   }
 
   Future<void> _preloadVideo(String videoUrl, {
-    bool highPriority = false, 
+    bool highPriority = false,
     bool usePriorityCache = false,
     bool useCurrentMoodCache = false
   }) async {
     try {
       // Update last access time for this URL
       _preloadedFilesLastAccess[videoUrl] = DateTime.now().millisecondsSinceEpoch;
-      
+
       // For high priority videos, await the result to ensure it's ready
       if (highPriority) {
         final file = await getCachedVideoFile(
-          videoUrl, 
-          usePriorityCache: usePriorityCache,
-          useCurrentMoodCache: useCurrentMoodCache
+            videoUrl,
+            usePriorityCache: usePriorityCache,
+            useCurrentMoodCache: useCurrentMoodCache
         );
-        
+
         _preloadedFiles[videoUrl] = file;
-  
+
         final currentPreloaded = Set<String>.from(state.preloadedVideoUrls)
           ..add(videoUrl);
         emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
       } else {
         // For lower priority videos, don't block the UI thread
         getCachedVideoFile(
-          videoUrl, 
-          usePriorityCache: usePriorityCache,
-          useCurrentMoodCache: useCurrentMoodCache
+            videoUrl,
+            usePriorityCache: usePriorityCache,
+            useCurrentMoodCache: useCurrentMoodCache
         ).then((file) {
           _preloadedFiles[videoUrl] = file;
-          
+
           final currentPreloaded = Set<String>.from(state.preloadedVideoUrls)
             ..add(videoUrl);
           emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
@@ -333,7 +333,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
           debugPrint('Error preloading video: $e');
         });
       }
-      
+
       // Enforce memory cache size limit
       _enforceMemoryCacheLimit();
     } catch (e) {
@@ -342,22 +342,22 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
       _preloadQueue.remove(videoUrl);
     }
   }
-  
+
   /// Enforce memory cache size limit using LRU strategy
   void _enforceMemoryCacheLimit() {
     if (_preloadedFiles.length <= _maxMemoryCacheSize) return;
-    
+
     // Sort URLs by last access time (oldest first)
     final sortedUrls = _preloadedFilesLastAccess.entries
         .toList()
-        ..sort((a, b) => a.value.compareTo(b.value));
-    
+      ..sort((a, b) => a.value.compareTo(b.value));
+
     // Remove oldest entries until we're under the limit
     final urlsToRemove = sortedUrls
         .take(sortedUrls.length - _maxMemoryCacheSize)
         .map((e) => e.key)
         .toList();
-    
+
     for (final url in urlsToRemove) {
       _preloadedFiles.remove(url);
       _preloadedFilesLastAccess.remove(url);
@@ -366,7 +366,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
 
   void setShouldPauseVideo(bool value) {
     debugPrint("ShouldPauseState received: $value");
-    
+
     // Only emit if the state is actually changing to avoid unnecessary rebuilds
     if (state.shouldPauseVideo != value) {
       emit(state.copyWith(shouldPauseVideo: value));
@@ -379,7 +379,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
   }) async {
     // Update last access time for this URL
     _preloadedFilesLastAccess[videoUrl] = DateTime.now().millisecondsSinceEpoch;
-    
+
     // Return from memory cache if available for fastest access
     if (_preloadedFiles.containsKey(videoUrl)) {
       final file = _preloadedFiles[videoUrl]!;
@@ -403,40 +403,40 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
           final fileSize = await cachedFile.length();
           if (fileSize > 0) {
             _preloadedFiles[videoUrl] = cachedFile;
-            
+
             // Add to preloaded URLs set to indicate it's ready for immediate playback
             final currentPreloaded = Set<String>.from(state.preloadedVideoUrls)
               ..add(videoUrl);
             emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
-            
+
             return cachedFile;
           }
         }
         // If file doesn't exist or is empty, continue to download it again
       }
-      
+
       // If not in our cache, use the enhanced cache service with priority support
       // This will download and cache the file if needed
       final file = await ReelsCacheService.preCacheVideo(
-        videoUrl,
-        highPriority: true,
-        usePriorityCache: usePriorityCache,
-        useCurrentMoodCache: useCurrentMoodCache
+          videoUrl,
+          highPriority: true,
+          usePriorityCache: usePriorityCache,
+          useCurrentMoodCache: useCurrentMoodCache
       );
-      
+
       // Verify the downloaded file
       if (await file.exists() && await file.length() > 0) {
         // Store in memory cache for faster access next time
         _preloadedFiles[videoUrl] = file;
-        
+
         // Add to preloaded URLs set
         final currentPreloaded = Set<String>.from(state.preloadedVideoUrls)
           ..add(videoUrl);
         emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
-        
+
         // Enforce memory cache size limit
         _enforceMemoryCacheLimit();
-        
+
         return file;
       } else {
         throw Exception('Downloaded file is invalid or empty');
@@ -447,23 +447,23 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
       try {
         final cacheManager = DefaultCacheManager();
         final fileInfo = await cacheManager.getFileFromCache(videoUrl);
-        
+
         if (fileInfo != null) {
           final file = fileInfo.file;
           _preloadedFiles[videoUrl] = file;
-          
+
           // Add to preloaded URLs set
           final currentPreloaded = Set<String>.from(state.preloadedVideoUrls)
             ..add(videoUrl);
           emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
-          
+
           return file;
         }
-        
+
         // If not in cache, download it with retry logic
         File? file;
         int retries = 3;
-        
+
         while (retries > 0 && (file == null || !(await file.exists()))) {
           try {
             file = await cacheManager.getSingleFile(videoUrl);
@@ -476,18 +476,18 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
             }
           }
         }
-        
+
         if (file != null && await file.exists()) {
           _preloadedFiles[videoUrl] = file;
-          
+
           // Add to preloaded URLs set
           final currentPreloaded = Set<String>.from(state.preloadedVideoUrls)
             ..add(videoUrl);
           emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
-          
+
           return file;
         }
-        
+
         // If all retries fail, create a fallback file
         final tempDir = await getTemporaryDirectory();
         final fallbackFile = File('${tempDir.path}/fallback_${DateTime.now().millisecondsSinceEpoch}.mp4');
@@ -515,10 +515,10 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     _preloadQueue.clear();
     _preloadedFiles.clear();
     _preloadedFilesLastAccess.clear();
-    
+
     // Clean up memory cache in ReelsCacheService to prevent memory leaks
     ReelsCacheService.cleanupMemoryCache();
-    
+
     return super.close();
   }
 
@@ -528,7 +528,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     _preloadedFiles.clear();
     _preloadedFilesLastAccess.clear();
     _preloadDelayTimer?.cancel();
-    
+
     // Create a timeout timer to ensure loading state is reset
     Timer? loadingTimeoutTimer;
     loadingTimeoutTimer = Timer(const Duration(seconds: 5), () {
@@ -538,7 +538,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
         ));
       }
     });
-    
+
     // Reset preloaded video URLs to prevent audio from previous mood's videos
     emit(state.copyWith(
       preloadedVideoUrls: {},
@@ -546,12 +546,12 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
       isLoading: true,
       loadingSource: 'cache',
     ));
-    
+
     // Update user preferences
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString(LocalStorageConstants.currentMoodKey, mood);
     await UserService.updateMoodTo(mood);
-    
+
     // First try to load from cache for immediate response
     try {
       final cachedReels = await ReelsCacheService.getCachedReels(mood);
@@ -565,33 +565,33 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
             loadingSource: 'cache',
           ),
         );
-        
+
         // Cancel the timeout timer since we've successfully loaded from cache
-        loadingTimeoutTimer?.cancel();
-        
+        loadingTimeoutTimer.cancel();
+
         // Immediately start preloading the first few videos with high priority
         if (cachedReels.isNotEmpty) {
           try {
             // Preload first video with highest priority and await to ensure it's ready
             final firstVideoUrl = cachedReels[0].videoUrl;
             await _preloadVideo(
-              firstVideoUrl, 
-              highPriority: true, 
-              usePriorityCache: true,
-              useCurrentMoodCache: true
+                firstVideoUrl,
+                highPriority: true,
+                usePriorityCache: true,
+                useCurrentMoodCache: true
             );
-            
+
             // Preload next few videos with high priority but don't await
             // This ensures smooth scrolling right after mood change
             for (int i = 1; i < math.min(5, cachedReels.length); i++) {
               unawaited(_preloadVideo(
-                cachedReels[i].videoUrl, 
-                highPriority: i < 3, // First 3 are high priority
-                usePriorityCache: true, // All use priority cache
-                useCurrentMoodCache: i < 3 // First 3 use current mood cache
+                  cachedReels[i].videoUrl,
+                  highPriority: i < 3, // First 3 are high priority
+                  usePriorityCache: true, // All use priority cache
+                  useCurrentMoodCache: i < 3 // First 3 use current mood cache
               ));
             }
-            
+
             // Then preload more videos in background with a slight delay
             // to avoid overloading the system
             _preloadDelayTimer = Timer(const Duration(milliseconds: 300), () {
@@ -625,7 +625,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
         ),
       );
     }
-    
+
     // Then load from network (even if we have cached reels, to get fresh content)
     try {
       await loadVideos();

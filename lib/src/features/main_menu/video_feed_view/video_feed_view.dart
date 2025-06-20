@@ -305,13 +305,13 @@ class _VideoFeedViewState extends State<VideoFeedView>
 
         // Add a small delay before playing to ensure UI is ready
         await Future.delayed(const Duration(milliseconds: 50));
-        
+
         // Double-check that we're still supposed to play this video
         if (_currentlyPlayingVideoId != videoId || !mounted) {
           _isInitializingVideo = false;
           return;
         }
-        
+
         // Play the video immediately
         await controller.play();
         debugPrint("Playing video at index $index: ${videoToPlay.reelID}");
@@ -485,7 +485,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
       debugPrint("Already handling completion, returning");
       return;
     }
-    
+
     _isHandlingCompletion = true;
     debugPrint("Starting video completion handling");
 
@@ -511,10 +511,10 @@ class _VideoFeedViewState extends State<VideoFeedView>
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
-      
+
       // The page change will trigger _handlePageChange which will handle playing the video
       // We don't need to manually call _initAndPlayVideo here
-      
+
     } catch (e) {
       debugPrint("Error in _onVideoCompleted: $e");
     } finally {
@@ -655,6 +655,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
       _removeController(id);
     }
 
+
     // Initialize controllers in window with priority order
     if (currentPage < _videos.length) {
       // Current page first - await this one to ensure it's ready
@@ -673,6 +674,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
         }
       }
     }
+    setState(() {});
   }
 
   /// Handle page changes in the video feed
@@ -889,44 +891,44 @@ class _VideoFeedViewState extends State<VideoFeedView>
                           right: 20,
                           child: GestureDetector(
                             onTap: ()async{
-                                              final result = await showModalBottomSheet(
-                                                  isDismissible: false,
-                                                  context: context, builder: (_){
-                                                return MoodSelectingScrollWheelWidget(selectedMood: mood,);
-                                              });
+                              final result = await showModalBottomSheet(
+                                  isDismissible: false,
+                                  context: context, builder: (_){
+                                return MoodSelectingScrollWheelWidget(selectedMood: mood,);
+                              });
 
-                                              if(result != null){
-                                                debugPrint("result found: $result");
+                              if(result != null){
+                                debugPrint("result found: $result");
 
-                                                // First pause all videos to prevent audio leakage
-                                                await _pauseAllControllers();
+                                // First pause all videos to prevent audio leakage
+                                await _pauseAllControllers();
 
-                                                // Dispose all controllers to prevent memory leaks and audio issues
-                                                await _disposeAllControllers();
+                                // Dispose all controllers to prevent memory leaks and audio issues
+                                await _disposeAllControllers();
 
-                                                // Reset current page to ensure we start from the first video
-                                                setState(() {
-                                                  _currentPage = 0;
-                                                  _videos = [];
-                                                  _initialVideosLoaded = false;
-                                                });
+                                // Reset current page to ensure we start from the first video
+                                setState(() {
+                                  _currentPage = 0;
+                                  _videos = [];
+                                  _initialVideosLoaded = false;
+                                });
 
-                                                // Reset page controller to index 0
-                                                if (_pageController.hasClients) {
-                                                  _pageController.jumpToPage(0);
-                                                }
+                                // Reset page controller to index 0
+                                if (_pageController.hasClients) {
+                                  _pageController.jumpToPage(0);
+                                }
 
-                                                // Show loading indicator while changing mood
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text('Loading ${result} reels...'),
-                                                    duration: const Duration(seconds: 2),
-                                                  ),
-                                                );
+                                // Show loading indicator while changing mood
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Loading ${result} reels...'),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
 
-                                                // Fetch new reels based on the mood
-                                                context.read<VideoFeedCubit>().onMoodChange(mood: result);
-                                              }
+                                // Fetch new reels based on the mood
+                                context.read<VideoFeedCubit>().onMoodChange(mood: result);
+                              }
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
