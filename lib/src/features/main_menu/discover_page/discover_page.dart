@@ -15,7 +15,6 @@ import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/hashtag_service.dart';
-import 'package:funli_app/src/services/mood_service.dart';
 import 'package:funli_app/src/widgets/gradient_icon.dart';
 import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
@@ -42,12 +41,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
   final TextEditingController locationTextEditingController = TextEditingController();
   final TextEditingController languageTextEditingController = TextEditingController();
 
-
-
   @override
   Widget build(BuildContext context) {
     final discoverProvider = Provider.of<DiscoverProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -257,61 +253,57 @@ class MoodCard extends StatelessWidget {
           SizedBox(
             height: 200,
             width: double.infinity,
-            child: FutureBuilder(
-                future: MoodService.getReelsByMood(mood: mood.mood),
-                builder: (ctx, snapshot) {
-                  if (snapshot.hasData) {
-                    List<ReelModel> reels = snapshot.requireData['reels'];
-                    DocumentSnapshot? lastDoc = snapshot.requireData['lastDocument'];
-                    return ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: mood.reelsCount > reels.length ? (reels.length+1) : reels.length,
-                        itemBuilder: (ctx, index) {
-                          return index == reels.length
-                              ? IconButton(
-                              style: ElevatedButton.styleFrom(
-                                  shape: CircleBorder(
-                                      side: BorderSide.none
-                                  ),
-                                  backgroundColor: AppColors.yellowAccentColor,
-                                  padding: EdgeInsets.all(20)
-                              ),
-                              onPressed: (){
-                                _onMoodTap(context, mood.mood);
-                              },
-                              icon: Icon(Icons.arrow_forward_rounded, size: 30,))
-                              : GestureDetector(
-                            onTap: (){
-                              context.push(
-                                RouterEnum.updatedReelsView.routeName,
-                                extra: {
-                                  'initialReels': reels,
-                                  'selectedIndex': index,
-                                  'lastDocument': lastDoc,
-                                  'comingFrom': AppConstants.comingFromMood, // or 'profile', etc.
-                                  'mood': mood.mood,
+            child: Consumer<DiscoverProvider>(
+              builder: (ctx, provider, child) {
+                List<ReelModel> reels = provider.moodReels[mood.mood] ?? [];
+                DocumentSnapshot? lastDoc = provider.moodLastDocuments[mood.mood];
+                if (reels.isNotEmpty) {
+                  return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: mood.reelsCount > reels.length ? (reels.length + 1) : reels.length,
+                      itemBuilder: (ctx, index) {
+                        return index == reels.length
+                            ? IconButton(
+                                style: ElevatedButton.styleFrom(
+                                    shape: CircleBorder(side: BorderSide.none),
+                                    backgroundColor: AppColors.yellowAccentColor,
+                                    padding: EdgeInsets.all(20)),
+                                onPressed: () {
+                                  _onMoodTap(context, mood.mood);
                                 },
+                                icon: Icon(Icons.arrow_forward_rounded, size: 30))
+                            : GestureDetector(
+                                onTap: () {
+                                  context.push(
+                                    RouterEnum.updatedReelsView.routeName,
+                                    extra: {
+                                      'initialReels': reels,
+                                      'selectedIndex': index,
+                                      'lastDocument': lastDoc,
+                                      'comingFrom': AppConstants.comingFromMood,
+                                      'mood': mood.mood,
+                                    },
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      placeholder: (context, url) => ReelThumbnailShimmerItem(),
+                                      imageUrl: reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
+                                      height: 150,
+                                    ),
+                                  ),
+                                ),
                               );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(5),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: CachedNetworkImage(
-                                  placeholder: (context, url) => ReelThumbnailShimmerItem(),
-                                  imageUrl: reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
-                                  height: 150,),
-                              ),
-                            ),
-                          );
-                        });
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return LoadingWidget();
-                  }
-
-                  return SizedBox();
-                }),
+                      });
+                } else if (provider.isLoadingMoods) {
+                  return LoadingWidget();
+                }
+                return SizedBox();
+              },
+            ),
           )
         ],
       ),

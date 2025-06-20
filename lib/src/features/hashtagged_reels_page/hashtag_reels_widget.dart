@@ -16,6 +16,7 @@ import '../../res/app_colors.dart';
 import '../../res/app_icons.dart';
 import '../../res/app_textstyles.dart';
 import '../../services/reels_service.dart';
+import '../../services/hashtag_mood_cached_reels.dart';
 
 class HashtagReelsGrid extends StatefulWidget {
   final String tag;
@@ -37,7 +38,7 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
   @override
   void initState() {
     super.initState();
-    _fetchHashtaggedReels();
+    _initializeReels();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 300 &&
@@ -158,6 +159,22 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
     super.dispose();
   }
 
+  Future<void> _initializeReels() async {
+    if (widget.isComingFromMood) {
+      // Check for cached mood reels and last document
+      List<ReelModel> cachedReels = await HashtagMoodCachedReels.getCachedReels(widget.tag);
+      DocumentSnapshot? cachedLastDoc = await HashtagMoodCachedReels.getCachedLastDocument(widget.tag);
+      if (cachedReels.isNotEmpty) {
+        setState(() {
+          _reels.clear();
+          _reels.addAll(cachedReels.map((reel) => reel.toMap()));
+          _lastDoc = cachedLastDoc;
+        });
+      }
+    }
+    // Proceed to fetch more reels if needed
+    _fetchHashtaggedReels();
+  }
 
   Future<void> _fetchHashtaggedReels() async {
     if (_isLoading || !_hasMore) return;
@@ -165,15 +182,15 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
     setState(() => _isLoading = true);
 
     try {
-      Query query =  FirebaseFirestore.instance
+      Query query = FirebaseFirestore.instance
           .collection(FirebaseConstants.hashtagsCollections)
           .doc(widget.tag)
           .collection(FirebaseConstants.reelsCollection)
           .orderBy("createdAt", descending: true)
           .limit(10);
 
-      if(widget.isComingFromMood){
-        query =  FirebaseFirestore.instance
+      if (widget.isComingFromMood) {
+        query = FirebaseFirestore.instance
             .collection(FirebaseConstants.moodsCollection)
             .doc(widget.tag)
             .collection(FirebaseConstants.reelsCollection)
@@ -198,6 +215,11 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
           if (reelSnap.exists) {
             _reels.add(reelSnap.data()!..["id"] = reelSnap.id);
           }
+        }
+        // Cache the fetched reels if coming from mood
+        if (widget.isComingFromMood) {
+          List<ReelModel> fetchedReels = _reels.map((map) => ReelModel.fromMap(map)).toList();
+          await HashtagMoodCachedReels.cacheReels(fetchedReels, widget.tag, _lastDoc);
         }
       }
     } catch (e) {

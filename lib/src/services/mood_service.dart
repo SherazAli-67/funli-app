@@ -10,7 +10,8 @@ class MoodService {
     List<ReelModel> reels = [];
     QuerySnapshot querySnapshot = await _moodCollectionRef
         .doc(mood)
-        .collection(FirebaseConstants.reelsCollection).orderBy('createdAt', descending: true).limit(5)
+        .collection(FirebaseConstants.reelsCollection).orderBy(
+        'createdAt', descending: true).limit(5)
         .get();
     lastDocument = querySnapshot.docs.last;
     List<String> reelIDs = querySnapshot.docs.map((doc)=> doc.id).toList();
