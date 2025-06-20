@@ -529,6 +529,16 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     _preloadedFilesLastAccess.clear();
     _preloadDelayTimer?.cancel();
     
+    // Create a timeout timer to ensure loading state is reset
+    Timer? loadingTimeoutTimer;
+    loadingTimeoutTimer = Timer(const Duration(seconds: 5), () {
+      if (state.isLoading) {
+        emit(state.copyWith(
+          isLoading: false,
+        ));
+      }
+    });
+    
     // Reset preloaded video URLs to prevent audio from previous mood's videos
     emit(state.copyWith(
       preloadedVideoUrls: {},
@@ -543,58 +553,70 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     await UserService.updateMoodTo(mood);
     
     // First try to load from cache for immediate response
-    final cachedReels = await ReelsCacheService.getCachedReels(mood);
-    if (cachedReels.isNotEmpty) {
-      emit(
-        state.copyWith(
-          isLoading: false,
-          videos: cachedReels,
-          hasMoreVideos: true,
-          currentVideoIndex: 0,
-          loadingSource: 'cache',
-        ),
-      );
-      
-      // Immediately start preloading the first few videos with high priority
+    try {
+      final cachedReels = await ReelsCacheService.getCachedReels(mood);
       if (cachedReels.isNotEmpty) {
-        try {
-          // Preload first video with highest priority and await to ensure it's ready
-          final firstVideoUrl = cachedReels[0].videoUrl;
-          await _preloadVideo(
-            firstVideoUrl, 
-            highPriority: true, 
-            usePriorityCache: true,
-            useCurrentMoodCache: true
-          );
-          
-          // Preload next few videos with high priority but don't await
-          // This ensures smooth scrolling right after mood change
-          for (int i = 1; i < math.min(5, cachedReels.length); i++) {
-            unawaited(_preloadVideo(
-              cachedReels[i].videoUrl, 
-              highPriority: i < 3, // First 3 are high priority
-              usePriorityCache: true, // All use priority cache
-              useCurrentMoodCache: i < 3 // First 3 use current mood cache
-            ));
+        emit(
+          state.copyWith(
+            isLoading: false,
+            videos: cachedReels,
+            hasMoreVideos: true,
+            currentVideoIndex: 0,
+            loadingSource: 'cache',
+          ),
+        );
+        
+        // Cancel the timeout timer since we've successfully loaded from cache
+        loadingTimeoutTimer?.cancel();
+        
+        // Immediately start preloading the first few videos with high priority
+        if (cachedReels.isNotEmpty) {
+          try {
+            // Preload first video with highest priority and await to ensure it's ready
+            final firstVideoUrl = cachedReels[0].videoUrl;
+            await _preloadVideo(
+              firstVideoUrl, 
+              highPriority: true, 
+              usePriorityCache: true,
+              useCurrentMoodCache: true
+            );
+            
+            // Preload next few videos with high priority but don't await
+            // This ensures smooth scrolling right after mood change
+            for (int i = 1; i < math.min(5, cachedReels.length); i++) {
+              unawaited(_preloadVideo(
+                cachedReels[i].videoUrl, 
+                highPriority: i < 3, // First 3 are high priority
+                usePriorityCache: true, // All use priority cache
+                useCurrentMoodCache: i < 3 // First 3 use current mood cache
+              ));
+            }
+            
+            // Then preload more videos in background with a slight delay
+            // to avoid overloading the system
+            _preloadDelayTimer = Timer(const Duration(milliseconds: 300), () {
+              preloadNextVideos();
+
+              // Also start preloading adjacent moods for faster future mood changes
+              ReelsCacheService.preloadAdjacentMoods();
+            });
+          } catch (e) {
+            debugPrint('Error preloading initial videos for mood change: $e');
           }
-          
-          // Then preload more videos in background with a slight delay
-          // to avoid overloading the system
-          _preloadDelayTimer = Timer(const Duration(milliseconds: 300), () {
-            preloadNextVideos();
-
-            // Also start preloading adjacent moods for faster future mood changes
-            ReelsCacheService.preloadAdjacentMoods();
-           /* if (mounted) {
-
-            }*/
-          });
-        } catch (e) {
-          debugPrint('Error preloading initial videos for mood change: $e');
         }
+      } else {
+        // If no cached reels, show loading indicator
+        emit(
+          state.copyWith(
+            isLoading: true,
+            videos: [],
+            loadingSource: 'network',
+          ),
+        );
       }
-    } else {
-      // If no cached reels, show loading indicator
+    } catch (e) {
+      debugPrint('Error loading cached reels: $e');
+      // If loading from cache fails, ensure we're not stuck in loading state
       emit(
         state.copyWith(
           isLoading: true,
@@ -605,7 +627,20 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     }
     
     // Then load from network (even if we have cached reels, to get fresh content)
-    loadVideos();
+    try {
+      await loadVideos();
+      // Cancel the timeout timer since we've successfully loaded from network
+      loadingTimeoutTimer?.cancel();
+    } catch (e) {
+      debugPrint('Error loading videos from network: $e');
+      // If loading from network fails, ensure we're not stuck in loading state
+      if (state.isLoading) {
+        emit(state.copyWith(
+          isLoading: false,
+          error: e.toString(),
+        ));
+      }
+    }
   }
 
   // Call this from your widget's initState or after BlocProvider is created

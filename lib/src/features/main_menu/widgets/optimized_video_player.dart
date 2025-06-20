@@ -142,17 +142,33 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
               // Set volume to 1.0 before playing to ensure sound
               widget.controller!.setVolume(1.0).then((_) {
                 widget.controller!.play();
+                // Mark as started playing to ensure proper state tracking
+                _hasStartedPlaying = true;
               });
             }
           });
         } else if (widget.controller != null && widget.controller!.value.isPlaying) {
           // If already playing, ensure volume is set to 1.0
           widget.controller!.setVolume(1.0);
+          // Mark as started playing to ensure proper state tracking
+          _hasStartedPlaying = true;
         }
       } else {
         // For non-initialized controllers, use a shorter timeout than before
         // This improves perceived performance
         _startBufferingTimeout(500); // 500ms timeout for non-initialized controllers
+        
+        // Set up a timer to check if the controller gets initialized
+        // This helps with videos that take longer to initialize
+        _forcePlayTimer = Timer(const Duration(milliseconds: 300), () {
+          if (mounted && !_isDisposed && widget.controller != null && 
+              widget.controller!.value.isInitialized && !widget.controller!.value.isPlaying) {
+            widget.controller!.setVolume(1.0).then((_) {
+              widget.controller!.play();
+              _hasStartedPlaying = true;
+            });
+          }
+        });
       }
     }
   }
@@ -243,6 +259,7 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
     // Update initialization state
     if (isInitialized && !_isInitialized) {
       _isInitialized = true;
+      _hasStartedPlaying = true; // Mark as started playing to ensure proper state tracking
       
       // For newly initialized videos, force play after a short delay
       if (!isPlaying) {
@@ -260,6 +277,19 @@ class _OptimizedVideoPlayerState extends State<OptimizedVideoPlayer> with Ticker
         // If already playing, ensure volume is set to 1.0
         controller.setVolume(1.0);
       }
+    }
+    
+    // If video is initialized but not playing, try to play it
+    // This helps with auto-play when changing pages
+    if (isInitialized && !isPlaying && _hasStartedPlaying) {
+      // Only try to play if we're not already trying to play
+      _forcePlayTimer ??= Timer(const Duration(milliseconds: 20), () {
+          if (mounted && !_isDisposed && controller.value.isInitialized &&
+              !controller.value.isPlaying) {
+            controller.play();
+          }
+          _forcePlayTimer = null;
+        });
     }
 
     // Track if video has started playing at least once
