@@ -139,11 +139,23 @@ int _calculateSelectedIndex(BuildContext context) {
 }
 
 void _onItemTapped(int index, BuildContext context) {
+  // Get the current location
+  final String currentLocation = GoRouterState.of(context).uri.toString();
+  
   // First set the pause state based on which tab is selected
   if (index == 0) { // VideoFeedView is at index 0
     context.read<VideoFeedCubit>().setShouldPauseVideo(false);
   } else {
     context.read<VideoFeedCubit>().setShouldPauseVideo(true);
+  }
+  
+  // Check if user is already on VideoFeedView and taps home icon again
+  if (index == 0 && currentLocation == RouterEnum.videoFeedView.routeName) {
+    // User is already on VideoFeedView and tapped home icon again
+    // Refresh the feed by calling loadVideos
+
+    context.read<VideoFeedCubit>().loadVideos(isRefresh: true);
+    return; // Don't navigate since we're already on the correct page
   }
   
   // Then navigate to the selected tab

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/models/notification_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
@@ -11,6 +12,7 @@ import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 
 import '../profile/remote_user_profile.dart';
+
 
 class NotificationItemWidget extends StatefulWidget{
   final NotificationModel _notification;
@@ -33,16 +35,23 @@ class _NotificationItemWidgetState extends State<NotificationItemWidget> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: (){
-        String? userName = user?.userName;
-        String? userID = user?.userID;
-        showModalBottomSheet(
-            isScrollControlled: true,
-            context: context, builder: (ctx){
-          return FractionallySizedBox(
-              heightFactor: 0.75,
-              child: SingleChildScrollView(child: RemoteUserProfileInfoWidget(userName: userName, userID: userID!,)));
-        });
+      onTap: ()async{
+       UserModel? user = await UserService.getUserByID(userID: widget._notification.userID);
+       if(user != null){
+         String userName = user.userName;
+         String userID = user.userID;
+         showModalBottomSheet(
+             isScrollControlled: true,
+             context: context, builder: (ctx){
+           return FractionallySizedBox(
+               heightFactor: 0.75,
+               child: SingleChildScrollView(child: RemoteUserProfileInfoWidget(
+                 userName: userName, userID: userID,)));
+         });
+       }else{
+         Fluttertoast.showToast(msg: "This account does not exists, now");
+       }
+
       },
       contentPadding: EdgeInsets.only(right: 10),
       leading: ProfilePictureWidget(

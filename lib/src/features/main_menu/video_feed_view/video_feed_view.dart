@@ -94,6 +94,17 @@ class _VideoFeedViewState extends State<VideoFeedView>
         _initializeFirstVideo();
       });
     });
+    
+    // Listen for refresh events from the VideoFeedCubit
+    Future.microtask(() {
+      final cubit = context.read<VideoFeedCubit>();
+      cubit.stream.listen((state) {
+        // If we're loading new videos and we're at the top level (not paginating)
+        if (state.isLoading && !state.isPaginating && state.loadingSource == 'network') {
+          _handleRefresh();
+        }
+      });
+    });
   }
 
   @override
@@ -208,6 +219,27 @@ class _VideoFeedViewState extends State<VideoFeedView>
     debugPrint("Initializing videos empty First video: ${state.videos.length}");
   }
 
+  /// Handle refresh when home icon is tapped while already on VideoFeedView
+  void _handleRefresh() {
+    // First pause all videos to prevent audio leakage
+    _pauseAllControllers();
+    
+    // Dispose all controllers to prevent memory leaks and audio issues
+    _disposeAllControllers();
+    
+    // Reset current page to ensure we start from the first video
+    setState(() {
+      _currentPage = 0;
+      _videos = [];
+      _initialVideosLoaded = false;
+    });
+    
+    // Reset page controller to index 0
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
+  }
+  
   /// Clean up and reinitialize the current video when coming back from background
   Future<void> _cleanupAndReinitializeCurrentVideo() async {
     if (_videos.isEmpty || _currentPage >= _videos.length) return;
@@ -262,7 +294,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
       }
 
       // Check if this video is already preloaded in the cubit
-      final isPreloaded = context.read<VideoFeedCubit>().state.preloadedVideoUrls.contains(videoToPlay.videoUrl);
+      context.read<VideoFeedCubit>().state.preloadedVideoUrls.contains(videoToPlay.videoUrl);
 
       // Get or create the controller with high priority for current video
       VideoPlayerController? controller = await _getOrCreateController(videoToPlay, highPriority: true);
@@ -432,7 +464,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
         final position = controller.value.position;
         final duration = controller.value.duration;
         bool reachedAtEnd = position.inSeconds == duration.inSeconds;
-        // debugPrint("Video: ${video.caption}\nController duration: ${controller.value.duration.inSeconds} and position: ${controller.value.position.inSeconds}\nIsCompleted: $reachedAtEnd");
+        debugPrint("Video: ${video.caption}\nController duration: ${controller.value.duration.inSeconds} and position: ${controller.value.position.inSeconds}\nIsCompleted: $reachedAtEnd");
 
         if(controller.value.isInitialized && reachedAtEnd){
           debugPrint("✅ Video completed: ${video.reelID}");
@@ -697,13 +729,13 @@ class _VideoFeedViewState extends State<VideoFeedView>
       // For fast scrolling, be more aggressive
       final isFastScroll = (newPage - previousPage).abs() > 1;
 
+      // First pause all videos immediately - this is critical to stop previous videos
+      await _pauseAllControllers();
+
       // Set current playing video ID to the new page's video to prevent race conditions
       if (newPage < _videos.length) {
         _currentlyPlayingVideoId = _videos[newPage].reelID;
       }
-
-      // First pause all videos immediately - this is critical to stop previous videos
-      await _pauseAllControllers();
 
       // For fast scrolling, immediately dispose controllers to prevent memory issues
       if (isFastScroll) {
@@ -816,7 +848,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
               _pauseAllControllers();
             } else if (!state.shouldPauseVideo && _isAppActive) {
               // Check if we're on the video feed tab before playing
-              final currentRoute = GoRouter.of(context).routerDelegate.currentConfiguration.uri.toString();;
+              final currentRoute = GoRouter.of(context).routerDelegate.currentConfiguration.uri.toString();
               final isMainFeedRoute = currentRoute == RouterEnum.videoFeedView.routeName;
 
               if (isMainFeedRoute) {
@@ -832,7 +864,6 @@ class _VideoFeedViewState extends State<VideoFeedView>
                 controller: _pageController,
                 itemCount: _videos.length,
                 preloadPagesCount: 3,
-                physics: const AlwaysScrollableScrollPhysics(),
                 onPageChanged: (index) => _handlePageChange(index),
                 itemBuilder: (context, index) {
                   return RepaintBoundary(
@@ -854,7 +885,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
+                      color: Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
@@ -921,7 +952,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
                                 // Show loading indicator while changing mood
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('Loading ${result} reels...'),
+                                    content: Text('Loading $result reels...'),
                                     duration: const Duration(seconds: 2),
                                   ),
                                 );

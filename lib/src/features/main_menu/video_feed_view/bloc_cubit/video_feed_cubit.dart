@@ -143,10 +143,22 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     }
   }
 
-  Future<void> loadVideos() async {
-    emit(state.copyWith(isLoading: true, loadingSource: 'network'));
+  Future<void> loadVideos({bool isRefresh = false}) async {
+    // Clear preload queue and cached files to prevent memory leaks
+    _preloadQueue.clear();
+    _preloadedFiles.clear();
+    _preloadedFilesLastAccess.clear();
+    _preloadDelayTimer?.cancel();
+
+    emit(state.copyWith(
+      isLoading: true,
+      loadingSource: 'network',
+      preloadedVideoUrls: {},
+      currentVideoIndex: 0
+    ));
+
     try {
-      final videos = await videoRepository.fetchVideos();
+      final videos = await videoRepository.fetchVideos(isRefresh: isRefresh);
       final hasMoreVideos = videos.length >= 5;
       emit(
         state.copyWith(
@@ -531,7 +543,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
 
     // Create a timeout timer to ensure loading state is reset
     Timer? loadingTimeoutTimer;
-    loadingTimeoutTimer = Timer(const Duration(seconds: 5), () {
+    loadingTimeoutTimer = Timer(const Duration(seconds: 2), () {
       if (state.isLoading) {
         emit(state.copyWith(
           isLoading: false,

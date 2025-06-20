@@ -91,10 +91,8 @@ class ProfileSettingsPage extends StatelessWidget{
     //Clear all cache and logout - reset from everywhere
     final provider = Provider.of<ProfileProvider>(context, listen: false);
     provider.clear();
-    while(context.canPop()){
-      context.pop();
-    }
-    context.push(RouterEnum.welcomeView.routeName);
+    // Use `go` to replace the entire stack and leave ShellRoute
+    context.go(RouterEnum.welcomeView.routeName);
   }
   
   void _onSecurityPrivacyTap(BuildContext context){

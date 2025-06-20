@@ -16,25 +16,29 @@ class VideoFeedRepository implements IVideoFeedRepository {
 
   final _reelsColRef = FirebaseFirestore.instance.collection(FirebaseConstants.reelsCollection);
   @override
-  Future<List<ReelModel>> fetchVideos() async {
+  Future<List<ReelModel>> fetchVideos({bool isRefresh = false}) async {
     try {
       // Reset pagination state for a fresh fetch
       _lastDocument = null;
-      
+      List<ReelModel> cachedReels = [];
       // Get current mood
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
       String mood = sharedPreferences.getString(LocalStorageConstants.currentMoodKey) ?? 'Happy';
-      
-      // First try to load from cache
-      final cachedReels = await ReelsCacheService.getCachedReels(mood);
-      
-      // Check if we need to refresh from network
-      final shouldRefresh = await ReelsCacheService.shouldRefreshFromNetwork();
-      
-      if (cachedReels.isNotEmpty && !shouldRefresh) {
-        debugPrint("Loading ${cachedReels.length} reels from cache for mood: $mood");
-        return cachedReels;
+
+      // debugPrint("Coming from refresh: $isRefresh");
+      if(!isRefresh){
+        // First try to load from cache
+       cachedReels = await ReelsCacheService.getCachedReels(mood);
+
+        // Check if we need to refresh from network
+        final shouldRefresh = await ReelsCacheService.shouldRefreshFromNetwork();
+
+        if (cachedReels.isNotEmpty && !shouldRefresh) {
+          debugPrint("Loading ${cachedReels.length} reels from cache for mood: $mood");
+          return cachedReels;
+        }
       }
+
       
       // If cache is empty or needs refresh, fetch from network
       final networkReels = await _fetchVideosHelper();

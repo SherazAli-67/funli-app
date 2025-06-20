@@ -43,7 +43,7 @@ class AppRouter {
   final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     observers: [routeObserver],
-    initialLocation: RouterEnum.videoFeedView.routeName,
+    initialLocation: RouterEnum.welcomeView.routeName,
     routes: [
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
@@ -53,7 +53,7 @@ class AppRouter {
           BottomNavigationWidget(
             location: state.uri.toString(),
             backgroundColor:
-            state.uri.toString() == RouterEnum.discoverView.routeName
+            state.uri.toString() == RouterEnum.videoFeedView.routeName
                 ? Colors.black
                 : null,
             child: child,
