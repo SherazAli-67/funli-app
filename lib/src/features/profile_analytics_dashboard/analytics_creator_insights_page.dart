@@ -1,9 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/profile_analytics_dashboard/reel_views_chart.dart';
+import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/services/settings_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
 
+import '../../loading_shimmers/reel_thumbnail_shimmer_item.dart';
 import '../../res/app_gradients.dart';
+import '../../res/app_icons.dart';
+import '../../res/app_textstyles.dart';
 import 'analytics_gradient_info_card.dart';
 
 class AnalyticsCreatorInsightsPage extends StatelessWidget{
@@ -45,137 +50,79 @@ class AnalyticsCreatorInsightsPage extends StatelessWidget{
 
 
   Widget _buildMostPopularFeels() {
-    return SizedBox(
-      height: 200,
-      child: FutureBuilder(future: UserService.getUserPopularReels(), builder: (ctx, snapshot){
-        if(snapshot.hasData){
-          return ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _mood.reelsCount > _reels.length ? (_reels.length + 1) : _reels.length,
-              itemBuilder: (ctx, index) {
-                return index == _reels.length
-                    ? IconButton(
-                    style: ElevatedButton.styleFrom(
-                        shape: CircleBorder(side: BorderSide.none),
-                        backgroundColor: AppColors.yellowAccentColor,
-                        padding: EdgeInsets.all(20)),
-                    onPressed: () {
-                      _onMoodTap(context, _mood.mood);
-                    },
-                    icon: Icon(Icons.arrow_forward_rounded, size: 30))
-                    : GestureDetector(
-                  onTap: () {
-                    context.push(
-                      RouterEnum.updatedReelsView.routeName,
-                      extra: {
-                        'initialReels': _reels,
-                        'selectedIndex': index,
-                        'lastDocument': _lastDoc,
-                        'comingFrom': AppConstants.comingFromMood,
-                        'mood': _mood.mood,
-                      },
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: CachedNetworkImage(
-                        placeholder: (context, url) => ReelThumbnailShimmerItem(),
-                        errorWidget: (ctx, val, err)=> CachedNetworkImage(imageUrl: AppIcons.icDefaultThumbnailUrl),
-                        imageUrl:  _reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
-                        height: 150,
-                      ),
-                    ),
-                  ),
-                );
-              });
-        }
-      }),
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Most Popular Feels',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: 120,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              _buildPopularFeelItem('assets/icons/ic_user.svg', '837.5K'),
-              _buildPopularFeelItem('assets/icons/ic_user.svg', '837.5K'),
-              _buildPopularFeelItem('assets/icons/ic_user.svg', '837.5K'),
-              _buildPopularFeelItem('assets/icons/ic_user.svg', '837.5K'),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPopularFeelItem(String imagePath, String views) {
     return Container(
-      width: 100,
-      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.grey[300],
-      ),
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              'assets/icons/ic_user.svg',
-              fit: BoxFit.cover,
-              width: 100,
-              height: 120,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 100,
-                  height: 120,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.image, size: 40),
-                );
-              },
-            ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 1),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.6),
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(8),
-                bottomRight: Radius.circular(8),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.play_circle_outline, color: Colors.white, size: 14),
-                const SizedBox(width: 4),
-                Text(
-                  views,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 10,
+        children: [
+          const Text(
+              'Most Popular Feels',
+              style: AppTextStyles.tileTitleTextStyle
+          ),
+          SizedBox(
+            height: 200,
+            child: FutureBuilder(future: UserService.getUserPopularReels(), builder: (ctx, snapshot){
+              if(snapshot.hasData){
+                List<ReelModel> reels = snapshot.requireData;
+                return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount:  reels.length,
+                    itemBuilder: (ctx, index) {
+                      return  GestureDetector(
+                        onTap: () {
+                          /*context.push(
+                            RouterEnum.updatedReelsView.routeName,
+                            extra: {
+                              'initialReels': _reels,
+                              'selectedIndex': index,
+                              'lastDocument': _lastDoc,
+                              'comingFrom': AppConstants.comingFromMood,
+                              'mood': _mood.mood,
+                            },
+                          );*/
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: CachedNetworkImage(
+                              placeholder: (context, url) => ReelThumbnailShimmerItem(),
+                              errorWidget: (ctx, val, err)=> CachedNetworkImage(imageUrl: AppIcons.icDefaultThumbnailUrl),
+                              imageUrl:  reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
+                              height: 150,
+                            ),
+                          ),
+                        ),
+                      );
+                    });
+              }else if(snapshot.connectionState == ConnectionState.waiting){
+                return ListView.builder(
+                    itemCount: 3,
+                    itemBuilder: (_, index){
+                  return ReelThumbnailShimmerItem();
+                });
+              }
+              return SizedBox();
+            }),
           ),
         ],
       ),
     );
   }
+
 
   Widget _buildTotalEngagements() {
     return Container(

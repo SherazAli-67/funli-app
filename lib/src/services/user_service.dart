@@ -157,7 +157,10 @@ class UserService {
   static Future<List<ReelModel>> getUserPopularReels() async{
     List<ReelModel> reels = [];
 
-
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(
+        FirebaseConstants.reelsCollection).orderBy(
+        'viewsCount', descending: true).limit(5).get();
+   reels = querySnapshot.docs.map((doc)=> ReelModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
     return reels;
   }
 
