@@ -17,6 +17,7 @@ class ReelModel {
   final bool isMuted;
   final double playbackSpeed;
   final Map<String, dynamic>? location; // e.g., {'lat': 0.0, 'lng': 0.0}
+  final int viewsCount;
 
 
   ReelModel({
@@ -35,7 +36,8 @@ class ReelModel {
     required this.createdAt,
     this.location,
     this.isMuted = false,
-    this.playbackSpeed = 1.0
+    this.playbackSpeed = 1.0,
+    this.viewsCount = 0
   });
 
   factory ReelModel.fromMap(Map<String, dynamic> map) {
@@ -77,7 +79,8 @@ class ReelModel {
       createdAt: createdAtDateTime,
       location: map['location'] != null ? Map<String, dynamic>.from(map['location']) : null,
       isMuted: map['isMuted'] ?? false,
-      playbackSpeed: map['playbackSpeed'] ?? 1.0
+      playbackSpeed: map['playbackSpeed'] ?? 1.0,
+      viewsCount: map['viewsCount'] ?? 0
     );
   }
 
@@ -98,7 +101,8 @@ class ReelModel {
       'createdAt': createdAt.toIso8601String(), // Convert DateTime to ISO string for JSON serialization
       if (location != null) 'location': location,
       'isMuted' : isMuted,
-      'playbackSpeed' : playbackSpeed
+      'playbackSpeed' : playbackSpeed,
+      'viewsCount' : viewsCount
     };
   }
 }

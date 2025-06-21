@@ -29,4 +29,5 @@ class AppColors {
   static const searchFillColor  = Color(0xffF7F5FE);
   static const redColor = Color(0xffFF1B1B);
   static const darkGreyColor = Color(0xff424242);
+  static const unSelectedTabColor = Color(0xff696974);
 }

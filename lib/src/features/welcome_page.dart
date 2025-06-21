@@ -86,9 +86,10 @@ class WelcomePage extends StatelessWidget {
                 child: Column(
                   spacing: 14,
                   children: [
-                    PrimaryBtn(btnText: "Continue with Email",icon: AppIcons.icMail, onTap: (){
-                      context.push(RouterEnum.loginView.routeName);
-                    }, isPrefix: true,),
+                    PrimaryBtn(btnText: "Continue with Email",
+                      icon: AppIcons.icMail,
+                      onTap: () => _onEmailTap(context),
+                      isPrefix: true,),
                     Row(
                       spacing: 20,
                       children: [
@@ -128,7 +129,7 @@ class WelcomePage extends StatelessWidget {
               context.read<PersonalInfoProvider>().setUserName(state.user.user!.displayName ?? '');
               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedUpSuccessTitle, message: AppConstants.signedUpSuccessMessage);
               //Initializing the Trending moods and Hashtags so that user don't have to wait
-              context.read<DiscoverProvider>().loadAll();
+              context.read<DiscoverProvider>();
               while (context.canPop()) {
                 context.pop();
               }

@@ -114,7 +114,7 @@ class _SignupPageState extends State<SignupPage> {
                             }else if(state is SignedUp){
                               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedUpSuccessTitle, message: AppConstants.signedUpSuccessMessage);
                               //Initializing the Trending moods and Hashtags so that user don't have to wait
-                              context.read<DiscoverProvider>().loadAll();
+                              context.read<DiscoverProvider>();
                               context.pushReplacement(RouterEnum.personalizationView.routeName);
                             }
                           },

@@ -26,7 +26,6 @@ class DiscoverProvider extends ChangeNotifier {
     isLoadingHashtags = true;
     notifyListeners();
     _trendingHashtags = await HashtagService.getTrendingHashtags();
-    debugPrint("Trending hashtags: ${trendingMoods.length}");
     isLoadingHashtags = false;
     notifyListeners();
   }

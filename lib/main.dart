@@ -44,7 +44,7 @@ void main() async{
         ChangeNotifierProvider(create: (_)=> FeelsSearchProvider()..fetchInitial()),
         ChangeNotifierProvider(create: (_)=> UsersSearchProvider()..fetchInitial()),
         ChangeNotifierProvider(create: (_)=> HashtagSearchProvider()..fetchInitial()),
-        ChangeNotifierProvider(create: (_) => DiscoverProvider()),
+        ChangeNotifierProvider(create: (_) => DiscoverProvider()..loadAll()),
       ],
       child: const MyApp()));
 }

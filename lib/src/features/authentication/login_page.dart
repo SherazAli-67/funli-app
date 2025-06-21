@@ -112,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedInSuccessTitle, message: AppConstants.signedInSuccessMessage);
 
                               //Initializing the Trending moods and Hashtags so that user don't have to wait
-                              context.read<DiscoverProvider>().loadAll();
+                              context.read<DiscoverProvider>();
                               while(context.canPop()){
                                 context.pop();
                               }
