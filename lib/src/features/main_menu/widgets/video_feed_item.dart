@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/features/reels_page/reels_optimized_player_widget.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
+import 'package:funli_app/src/services/video_audio_manager.dart';
 import 'package:video_player/video_player.dart';
 import '../../../res/app_colors.dart';
 import '../../../res/app_icons.dart';
@@ -68,9 +69,12 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
     });
     
     if (_isMuted) {
+      // Use VideoAudioManager to mute this video
       widget.controller!.setVolume(0);
+      // Don't call VideoAudioManager().muteAllControllers() as that would mute all videos
     } else {
-      widget.controller!.setVolume(1);
+      // Use VideoAudioManager to ensure only this video has audio
+      VideoAudioManager().playVideo(widget.reel.reelID);
     }
   }
 
@@ -84,7 +88,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
           child: OptimizedVideoPlayer(
             key: _playerKey,
             controller: widget.controller, 
-            reelID: widget.reel.reelID
+            videoId: widget.reel.reelID
           ),
         ) : ReelsOptimizedPlayerWidget(
            key: _playerKey,

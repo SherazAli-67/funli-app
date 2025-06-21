@@ -97,7 +97,27 @@ class WelcomePage extends StatelessWidget {
                           Expanded(child: SecondaryBtn(btnText: "Apple", icon: AppIcons.icApple, onTap: (){}, isPrefix: true, borderRadius: 16,))
 
                       ],
-                    )
+                    ),
+                    // Developer tools section
+                    SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () => _onAudioLeakTestTap(context),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.developer_mode, size: 16, color: Colors.grey),
+                          SizedBox(width: 5),
+                          Text(
+                            "Developer: Audio Leak Test",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -146,5 +166,23 @@ class WelcomePage extends StatelessWidget {
 
   void _onSignInWithGoogleTap(BuildContext context){
     context.read<AuthCubit>().onGoogleSignInTap();
+  }
+  
+  void _onAudioLeakTestTap(BuildContext context) {
+    // context.push(RouterEnum.audioLeakTestView.routeName);
+    // Test page not currently in router - add it if needed
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Test Page Not Available'),
+        content: const Text('The audio leak test page is not currently in the router. Please add it if needed.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 }

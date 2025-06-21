@@ -116,4 +116,22 @@ class ProfileSettingsPage extends StatelessWidget{
   void _onTermsPrivacyTap(BuildContext context){
     context.push(RouterEnum.termsAndPrivacyView.routeName);
   }
+  
+  void _onAudioLeakTestTap(BuildContext context){
+    // context.push(RouterEnum.audioLeakTestView.routeName);
+    // Test page not currently in router - add it if needed
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Test Page Not Available'),
+        content: const Text('The audio leak test page is not currently in the router. Please add it if needed.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 }

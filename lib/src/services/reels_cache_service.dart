@@ -23,40 +23,43 @@ class ReelsCacheService {
   static const String _userReelsCacheKey = 'cached_user_reels_data';
   static const String _userBookmarksCacheKey = 'cached_user_bookmarks_data';
   static const String _lastUserReelsFetchTimeKey = 'last_user_reels_fetch_time';
-  static const String _lastUserBookmarksFetchTimeKey = 'last_user_bookmarks_fetch_time';
-  
+  static const String _lastUserBookmarksFetchTimeKey =
+      'last_user_bookmarks_fetch_time';
+
   // In-memory cache for faster access - increased size for better performance
   static final Map<String, File> _memoryCache = {};
-  
+
   // Track ongoing downloads to prevent duplicate requests
   static final Map<String, Completer<File>> _activeDownloads = {};
-  
+
   // Track preloaded moods for faster access
   static final Set<String> _preloadedMoodsInMemory = {};
-  
+
   // Track video load times for analytics
   static final Map<String, int> _videoLoadTimes = {};
-  
+
   // Track failed downloads to avoid retrying repeatedly
   static final Map<String, int> _failedDownloads = {};
-  
+
   // Maximum number of retry attempts for failed downloads
   static const int _maxRetryAttempts = 3;
-  
+
   // Track last access time for memory cache items for better LRU management
   static final Map<String, int> _memoryCacheLastAccess = {};
-  
+
   // Custom cache manager with longer cache duration and larger size
   static final CacheManager customCacheManager = CacheManager(
     Config(
       'reels_cache',
-      stalePeriod: const Duration(days: 60), // Keep videos for 60 days (increased)
-      maxNrOfCacheObjects: 800, // Store up to 800 videos (significantly increased)
+      stalePeriod:
+          const Duration(days: 60), // Keep videos for 60 days (increased)
+      maxNrOfCacheObjects:
+          800, // Store up to 800 videos (significantly increased)
       repo: JsonCacheInfoRepository(databaseName: 'reels_cache_db'),
       fileService: HttpFileService(),
     ),
   );
-  
+
   // Secondary cache manager for high-priority videos (current mood)
   static final CacheManager priorityCacheManager = CacheManager(
     Config(
@@ -67,14 +70,16 @@ class ReelsCacheService {
       fileService: HttpFileService(),
     ),
   );
-  
+
   // Dedicated cache manager for current mood videos for fastest access
   static final CacheManager currentMoodCacheManager = CacheManager(
     Config(
       'current_mood_reels_cache',
-      stalePeriod: const Duration(days: 120), // Keep current mood videos longest
+      stalePeriod:
+          const Duration(days: 120), // Keep current mood videos longest
       maxNrOfCacheObjects: 100, // Store up to 100 current mood videos
-      repo: JsonCacheInfoRepository(databaseName: 'current_mood_reels_cache_db'),
+      repo:
+          JsonCacheInfoRepository(databaseName: 'current_mood_reels_cache_db'),
       fileService: HttpFileService(),
     ),
   );
@@ -83,25 +88,25 @@ class ReelsCacheService {
   static Future<void> cacheReels(List<ReelModel> reels, String mood) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Get existing cached reels
       final cachedReelsJson = prefs.getString(_cacheKey) ?? '{}';
       final Map<String, dynamic> cachedReelsMap = json.decode(cachedReelsJson);
-      
+
       // Get or create mood-specific cache
       if (!cachedReelsMap.containsKey(mood)) {
         cachedReelsMap[mood] = [];
       }
-      
+
       // Convert reels to JSON
-      final List<Map<String, dynamic>> reelsJson = reels.map((reel) => reel.toMap()).toList();
-      
+      final List<Map<String, dynamic>> reelsJson =
+          reels.map((reel) => reel.toMap()).toList();
+
       // Update cache with new reels, avoiding duplicates
       final List<dynamic> existingReels = List.from(cachedReelsMap[mood]);
-      final Set<String> existingIds = existingReels
-          .map((reel) => reel['reelID'] as String)
-          .toSet();
-      
+      final Set<String> existingIds =
+          existingReels.map((reel) => reel['reelID'] as String).toSet();
+
       bool hasNewReels = false;
       for (final reelJson in reelsJson) {
         if (!existingIds.contains(reelJson['reelID'])) {
@@ -110,37 +115,38 @@ class ReelsCacheService {
           hasNewReels = true;
         }
       }
-      
+
       // Sort by createdAt (newest first)
       existingReels.sort((a, b) {
         final DateTime dateA = DateTime.parse(a['createdAt'].toString());
         final DateTime dateB = DateTime.parse(b['createdAt'].toString());
         return dateB.compareTo(dateA);
       });
-      
+
       // Increased cache size to 300 reels per mood for better experience
       if (existingReels.length > 300) {
         existingReels.removeRange(300, existingReels.length);
       }
-      
+
       cachedReelsMap[mood] = existingReels;
-      
+
       // Save updated cache
       await prefs.setString(_cacheKey, json.encode(cachedReelsMap));
-      
+
       // Update last fetch time
-      await prefs.setInt(_lastFetchTimeKey, DateTime.now().millisecondsSinceEpoch);
-      
+      await prefs.setInt(
+          _lastFetchTimeKey, DateTime.now().millisecondsSinceEpoch);
+
       // Add to preloaded moods set
       final preloadedMoods = prefs.getStringList(_preloadedMoodsKey) ?? [];
       if (!preloadedMoods.contains(mood)) {
         preloadedMoods.add(mood);
         await prefs.setStringList(_preloadedMoodsKey, preloadedMoods);
       }
-      
+
       // Add to in-memory preloaded moods set
       _preloadedMoodsInMemory.add(mood);
-      
+
       // Update recent moods list (LRU style)
       final recentMoods = prefs.getStringList(_recentMoodsKey) ?? [];
       recentMoods.remove(mood); // Remove if exists
@@ -149,9 +155,9 @@ class ReelsCacheService {
         recentMoods.removeLast(); // Keep only 5 most recent moods
       }
       await prefs.setStringList(_recentMoodsKey, recentMoods);
-      
+
       debugPrint('Cached ${reels.length} reels for mood: $mood');
-      
+
       // Only preload videos if we have new reels or this is the current mood
       if (hasNewReels || mood == await getCurrentMood()) {
         // Start preloading videos for this mood in the background
@@ -168,20 +174,20 @@ class ReelsCacheService {
       final prefs = await SharedPreferences.getInstance();
       final cachedReelsJson = prefs.getString(_cacheKey) ?? '{}';
       final Map<String, dynamic> cachedReelsMap = json.decode(cachedReelsJson);
-      
+
       if (!cachedReelsMap.containsKey(mood)) {
         return [];
       }
-      
+
       final List<dynamic> reelsJson = cachedReelsMap[mood];
-      final reels = reelsJson.map((json) => 
-        ReelModel.fromMap(Map<String, dynamic>.from(json))
-      ).toList();
-      
+      final reels = reelsJson
+          .map((json) => ReelModel.fromMap(Map<String, dynamic>.from(json)))
+          .toList();
+
       // Start preloading videos for this mood in the background
       // This ensures videos are ready when user starts viewing
       _preloadVideosForMood(reels, mood);
-      
+
       // Update recent moods list (LRU style)
       final recentMoods = prefs.getStringList(_recentMoodsKey) ?? [];
       recentMoods.remove(mood); // Remove if exists
@@ -190,7 +196,7 @@ class ReelsCacheService {
         recentMoods.removeLast(); // Keep only 5 most recent moods
       }
       await prefs.setStringList(_recentMoodsKey, recentMoods);
-      
+
       return reels;
     } catch (e) {
       debugPrint('Error getting cached reels: $e');
@@ -204,7 +210,7 @@ class ReelsCacheService {
       final prefs = await SharedPreferences.getInstance();
       final lastFetchTime = prefs.getInt(_lastFetchTimeKey) ?? 0;
       final now = DateTime.now().millisecondsSinceEpoch;
-      
+
       // Refresh if last fetch was more than 10 minutes ago (reduced from 15)
       // This ensures more frequent updates for fresher content
       return (now - lastFetchTime) > 10 * 60 * 1000;
@@ -222,7 +228,7 @@ class ReelsCacheService {
       return 'Happy';
     }
   }
-  
+
   /// Get recent moods from cache
   static Future<List<String>> getRecentMoods() async {
     try {
@@ -234,68 +240,89 @@ class ReelsCacheService {
   }
 
   /// Preload videos for a specific mood in the background
-  static Future<void> _preloadVideosForMood(List<ReelModel> reels, String mood) async {
+  /// Enhanced with better error handling and more aggressive preloading for current mood
+  static Future<void> _preloadVideosForMood(
+      List<ReelModel> reels, String mood) async {
     // Add to in-memory preloaded moods set
     _preloadedMoodsInMemory.add(mood);
-    
+
     // For current mood, preload more videos with higher priority
     final currentMood = await getCurrentMood();
     final isCurrentMood = mood == currentMood;
-    
+
+    // Clean up memory cache before preloading to ensure we have space
+    cleanupMemoryCache(maxSize: isCurrentMood ? 60 : 50);
+
     // Determine how many videos to preload based on mood priority
-    final videosToPreload = isCurrentMood 
-        ? reels.take(15).toList()  // Current mood: preload 15 videos
-        : reels.take(8).toList();  // Other moods: preload 8 videos
-    
+    final videosToPreload = isCurrentMood
+        ? reels.take(20).toList() // Current mood: preload 20 videos (increased)
+        : reels.take(10).toList(); // Other moods: preload 10 videos (increased)
+
     // First preload the first few videos sequentially for immediate access
     if (isCurrentMood && videosToPreload.isNotEmpty) {
       try {
         // Preload first video with highest priority and wait for it to complete
         // This ensures at least one video is ready immediately
         final firstVideo = videosToPreload[0];
-        await preCacheVideo(
-          firstVideo.videoUrl,
-          highPriority: true,
-          usePriorityCache: true,
-          useCurrentMoodCache: true
-        );
-        
+        await preCacheVideo(firstVideo.videoUrl,
+            highPriority: true,
+            usePriorityCache: true,
+            useCurrentMoodCache: true);
+
         // Preload second and third videos with high priority but don't wait
         if (videosToPreload.length > 1) {
-          unawaited(preCacheVideo(
-            videosToPreload[1].videoUrl,
-            highPriority: true,
-            usePriorityCache: true,
-            useCurrentMoodCache: true
-          ));
+          unawaited(preCacheVideo(videosToPreload[1].videoUrl,
+              highPriority: true,
+              usePriorityCache: true,
+              useCurrentMoodCache: true));
         }
-        
+
         if (videosToPreload.length > 2) {
-          unawaited(preCacheVideo(
-            videosToPreload[2].videoUrl,
-            highPriority: true,
-            usePriorityCache: true,
-            useCurrentMoodCache: true
-          ));
+          unawaited(preCacheVideo(videosToPreload[2].videoUrl,
+              highPriority: true,
+              usePriorityCache: true,
+              useCurrentMoodCache: true));
+        }
+
+        // Also preload fourth and fifth videos with high priority
+        if (videosToPreload.length > 3) {
+          unawaited(preCacheVideo(videosToPreload[3].videoUrl,
+              highPriority: true,
+              usePriorityCache: true,
+              useCurrentMoodCache: true));
+        }
+
+        if (videosToPreload.length > 4) {
+          unawaited(preCacheVideo(videosToPreload[4].videoUrl,
+              highPriority: true,
+              usePriorityCache: true,
+              useCurrentMoodCache: true));
         }
       } catch (e) {
         debugPrint('Error preloading initial videos: $e');
       }
     }
-    
+
     // Then preload the rest in parallel with different priorities
-    for (int i = isCurrentMood ? 3 : 0; i < videosToPreload.length; i++) {
+    for (int i = isCurrentMood ? 5 : 0; i < videosToPreload.length; i++) {
       try {
         final reel = videosToPreload[i];
-        final isHighPriority = isCurrentMood && i < 8; // First 8 videos of current mood are high priority
-        
+        final isHighPriority = isCurrentMood &&
+            i < 12; // First 12 videos of current mood are high priority (increased)
+
         // Don't await to allow parallel downloads
-        unawaited(preCacheVideo(
-          reel.videoUrl, 
-          highPriority: isHighPriority,
-          usePriorityCache: isCurrentMood,
-          useCurrentMoodCache: isCurrentMood && i < 10
-        ));
+        unawaited(preCacheVideo(reel.videoUrl,
+            highPriority: isHighPriority,
+            usePriorityCache: isCurrentMood,
+            useCurrentMoodCache: isCurrentMood &&
+                i < 15 // Store more videos in current mood cache (increased)
+            ));
+
+        // Add a small delay between parallel downloads to prevent overwhelming the network
+        if (i % 3 == 0) {
+          // Every 3 videos
+          await Future.delayed(const Duration(milliseconds: 50));
+        }
       } catch (e) {
         // Silently handle errors for background preloading
         debugPrint('Background preload error: $e');
@@ -307,7 +334,7 @@ class ReelsCacheService {
   /// and implements retry logic for more reliable downloads
   static Future<http.Response> _httpGet(String url, {int retries = 3}) async {
     Exception? lastException;
-    
+
     for (int attempt = 0; attempt < retries; attempt++) {
       try {
         final response = await http.get(
@@ -317,37 +344,39 @@ class ReelsCacheService {
             'Accept-Encoding': 'gzip, deflate, br',
           },
         ).timeout(const Duration(seconds: 15));
-        
+
         // Accept 200 OK and 206 Partial Content as valid responses
         if (response.statusCode == 200 || response.statusCode == 206) {
           return response;
         } else {
-          throw HttpException('Invalid statusCode: ${response.statusCode}, uri = $url');
+          throw HttpException(
+              'Invalid statusCode: ${response.statusCode}, uri = $url');
         }
       } catch (e) {
         lastException = Exception('Download attempt ${attempt + 1} failed: $e');
         // Wait before retry with exponential backoff
         if (attempt < retries - 1) {
-          await Future.delayed(Duration(milliseconds: 200 * math.pow(2, attempt).toInt()));
+          await Future.delayed(
+              Duration(milliseconds: 200 * math.pow(2, attempt).toInt()));
         }
       }
     }
-    
-    throw lastException ?? Exception('Failed to download after $retries attempts');
+
+    throw lastException ??
+        Exception('Failed to download after $retries attempts');
   }
 
   /// Pre-cache a video file to ensure it's available offline
-  /// Enhanced with priority caching and performance tracking
-  static Future<File> preCacheVideo(String url, {
-    bool highPriority = false, 
-    bool usePriorityCache = false,
-    bool useCurrentMoodCache = false
-  }) async {
+  /// Enhanced with priority caching, performance tracking, and improved error handling
+  static Future<File> preCacheVideo(String url,
+      {bool highPriority = false,
+      bool usePriorityCache = false,
+      bool useCurrentMoodCache = false}) async {
     final startTime = DateTime.now().millisecondsSinceEpoch;
-    
+
     // Update last access time for memory cache management
     _memoryCacheLastAccess[url] = startTime;
-    
+
     // Check memory cache first for instant access
     if (_memoryCache.containsKey(url)) {
       final file = _memoryCache[url]!;
@@ -355,7 +384,7 @@ class ReelsCacheService {
         // Track load time for analytics
         final endTime = DateTime.now().millisecondsSinceEpoch;
         _videoLoadTimes[url] = endTime - startTime;
-        
+
         return file;
       } else {
         // Remove invalid file from memory cache
@@ -363,16 +392,16 @@ class ReelsCacheService {
         _memoryCacheLastAccess.remove(url);
       }
     }
-    
+
     // Check if download is already in progress
     if (_activeDownloads.containsKey(url)) {
       try {
         final file = await _activeDownloads[url]!.future;
-        
+
         // Track load time for analytics
         final endTime = DateTime.now().millisecondsSinceEpoch;
         _videoLoadTimes[url] = endTime - startTime;
-        
+
         return file;
       } catch (e) {
         // If the active download fails, continue to check cache
@@ -380,13 +409,15 @@ class ReelsCacheService {
         debugPrint('Active download failed, checking cache: $e');
       }
     }
-    
+
     // Check if this URL has failed too many times
-    if (_failedDownloads.containsKey(url) && _failedDownloads[url]! >= _maxRetryAttempts) {
+    if (_failedDownloads.containsKey(url) &&
+        _failedDownloads[url]! >= _maxRetryAttempts) {
       debugPrint('Skipping download for $url - too many failures');
       // Create a fallback file
       final tempDir = await getTemporaryDirectory();
-      final fallbackFile = File('${tempDir.path}/fallback_${DateTime.now().millisecondsSinceEpoch}.mp4');
+      final fallbackFile = File(
+          '${tempDir.path}/fallback_${DateTime.now().millisecondsSinceEpoch}.mp4');
       try {
         await fallbackFile.create();
       } catch (e) {
@@ -394,11 +425,11 @@ class ReelsCacheService {
       }
       return fallbackFile;
     }
-    
+
     // Create a new completer for this download
     final completer = Completer<File>();
     _activeDownloads[url] = completer;
-    
+
     try {
       // Choose the appropriate cache manager based on priority
       CacheManager cacheManager;
@@ -409,10 +440,10 @@ class ReelsCacheService {
       } else {
         cacheManager = customCacheManager;
       }
-      
+
       // First check if file is already in any cache (try all cache managers)
       FileInfo? fileInfo;
-      
+
       // Try current mood cache first for fastest access
       if (fileInfo == null) {
         try {
@@ -421,7 +452,7 @@ class ReelsCacheService {
           // Ignore errors and try next cache
         }
       }
-      
+
       // Then try priority cache
       if (fileInfo == null) {
         try {
@@ -430,7 +461,7 @@ class ReelsCacheService {
           // Ignore errors and try next cache
         }
       }
-      
+
       // Finally try regular cache
       if (fileInfo == null) {
         try {
@@ -439,117 +470,117 @@ class ReelsCacheService {
           // Ignore errors and continue
         }
       }
-      
+
       if (fileInfo != null) {
         final file = fileInfo.file;
         // Add to memory cache
         _memoryCache[url] = file;
         _memoryCacheLastAccess[url] = startTime;
-        
+
         // Track load time for analytics
         final endTime = DateTime.now().millisecondsSinceEpoch;
         _videoLoadTimes[url] = endTime - startTime;
-        
+
         // Reset failed download count if it exists
         _failedDownloads.remove(url);
-        
+
         completer.complete(file);
         _activeDownloads.remove(url);
         return file;
       }
-      
+
       // Try using the cache manager with priority
       try {
-        final file = await cacheManager.getSingleFile(
-          url,
-          // Use a custom HTTP getter that accepts 206 responses
-          // withProgress: true,
-        );
-        
+        final file = await cacheManager
+            .getSingleFile(
+              url,
+              // Use a custom HTTP getter that accepts 206 responses
+              // withProgress: true,
+            )
+            .timeout(const Duration(
+                seconds: 20)); // Add timeout to prevent hanging downloads
+
         // Add to memory cache
         _memoryCache[url] = file;
         _memoryCacheLastAccess[url] = startTime;
-        
+
         // Track load time for analytics
         final endTime = DateTime.now().millisecondsSinceEpoch;
         _videoLoadTimes[url] = endTime - startTime;
-        
+
         // Reset failed download count if it exists
         _failedDownloads.remove(url);
-        
+
         completer.complete(file);
         _activeDownloads.remove(url);
-        
+
         // If this is a high priority video, also store it in the current mood cache
         // This ensures it's available in multiple caches for faster access
         if (highPriority && !useCurrentMoodCache) {
           try {
             unawaited(currentMoodCacheManager.putFile(
-              url,
-              await file.readAsBytes(),
-              maxAge: const Duration(days: 120),
-              fileExtension: 'mp4'
-            ));
+                url, await file.readAsBytes(),
+                maxAge: const Duration(days: 120), fileExtension: 'mp4'));
           } catch (e) {
             // Ignore errors when storing in additional cache
           }
         }
-        
+
         return file;
       } catch (cacheError) {
         // If cache manager fails, try direct download
         debugPrint('Cache manager failed, trying direct download: $cacheError');
-        
+
         final tempDir = await getTemporaryDirectory();
         final fileName = url.split('/').last.split('?').first;
         final file = File('${tempDir.path}/$fileName');
-        
+
         // Download the file directly with retry logic
         final response = await _httpGet(url, retries: 3);
         await file.writeAsBytes(response.bodyBytes);
-        
+
         // Add to memory cache
         _memoryCache[url] = file;
         _memoryCacheLastAccess[url] = startTime;
-        
+
         // Track load time for analytics
         final endTime = DateTime.now().millisecondsSinceEpoch;
         _videoLoadTimes[url] = endTime - startTime;
-        
+
         // Reset failed download count if it exists
         _failedDownloads.remove(url);
-        
+
         completer.complete(file);
         _activeDownloads.remove(url);
-        
+
         // Also store in the appropriate cache manager for future use
         try {
-          unawaited(cacheManager.putFile(
-            url,
-            await file.readAsBytes(),
-            maxAge: useCurrentMoodCache ? const Duration(days: 120) : 
-                   usePriorityCache ? const Duration(days: 90) : 
-                   const Duration(days: 60),
-            fileExtension: 'mp4'
-          ));
+          unawaited(cacheManager.putFile(url, await file.readAsBytes(),
+              maxAge: useCurrentMoodCache
+                  ? const Duration(days: 120)
+                  : usePriorityCache
+                      ? const Duration(days: 90)
+                      : const Duration(days: 60),
+              fileExtension: 'mp4'));
         } catch (e) {
           // Ignore errors when storing in cache
         }
-        
+
         return file;
       }
     } catch (e) {
       _activeDownloads.remove(url);
       completer.completeError(e);
       debugPrint('Error pre-caching video: $e');
-      
+
       // Track failed download
       _failedDownloads[url] = (_failedDownloads[url] ?? 0) + 1;
-      
+
       // Create an empty file as fallback to prevent app crashes
       try {
         final tempDir = await getTemporaryDirectory();
-        final fallbackFile = File('${tempDir.path}/fallback_${DateTime.now().millisecondsSinceEpoch}.mp4');
+        final fallbackFile = File(
+            '${tempDir.path}/fallback_${DateTime.now().millisecondsSinceEpoch}.mp4');
         await fallbackFile.create();
         return fallbackFile;
       } catch (fallbackError) {
@@ -561,10 +592,10 @@ class ReelsCacheService {
     }
   }
 
-  /// Get a cached video file with enhanced performance tracking
+  /// Get a cached video file with enhanced performance tracking and multi-level caching
   static Future<File?> getCachedVideo(String url) async {
     final startTime = DateTime.now().millisecondsSinceEpoch;
-    
+
     // Check memory cache first for instant access
     if (_memoryCache.containsKey(url)) {
       final file = _memoryCache[url]!;
@@ -572,48 +603,72 @@ class ReelsCacheService {
         // Track load time for analytics
         final endTime = DateTime.now().millisecondsSinceEpoch;
         _videoLoadTimes[url] = endTime - startTime;
-        
+
+        // Update last access time for LRU management
+        _memoryCacheLastAccess[url] = startTime;
+
         return file;
       } else {
         // Remove invalid file from memory cache
         _memoryCache.remove(url);
+        _memoryCacheLastAccess.remove(url);
       }
     }
-    
+
     // Check if download is already in progress
     if (_activeDownloads.containsKey(url)) {
       try {
         final file = await _activeDownloads[url]!.future;
-        
+
         // Track load time for analytics
         final endTime = DateTime.now().millisecondsSinceEpoch;
         _videoLoadTimes[url] = endTime - startTime;
-        
+
         return file;
       } catch (e) {
         // If the active download fails, continue to check cache
         debugPrint('Active download failed, checking cache: $e');
       }
     }
-    
+
     try {
-      // Check priority cache first
-      FileInfo? fileInfo = await priorityCacheManager.getFileFromCache(url);
-      
-      // If not in priority cache, check regular cache
-      if (fileInfo == null) {
-        fileInfo = await customCacheManager.getFileFromCache(url);
+      // Try current mood cache first for fastest access
+      FileInfo? fileInfo;
+
+      try {
+        fileInfo = await currentMoodCacheManager.getFileFromCache(url);
+      } catch (e) {
+        // Ignore errors and try next cache
       }
-      
+
+      // Then try priority cache
+      if (fileInfo == null) {
+        try {
+          fileInfo = await priorityCacheManager.getFileFromCache(url);
+        } catch (e) {
+          // Ignore errors and try next cache
+        }
+      }
+
+      // Finally try regular cache
+      if (fileInfo == null) {
+        try {
+          fileInfo = await customCacheManager.getFileFromCache(url);
+        } catch (e) {
+          // Ignore errors and continue
+        }
+      }
+
       if (fileInfo != null) {
         final file = fileInfo.file;
         // Add to memory cache for faster future access
         _memoryCache[url] = file;
-        
+        _memoryCacheLastAccess[url] = startTime;
+
         // Track load time for analytics
         final endTime = DateTime.now().millisecondsSinceEpoch;
         _videoLoadTimes[url] = endTime - startTime;
-        
+
         return file;
       }
       return null;
@@ -624,23 +679,25 @@ class ReelsCacheService {
   }
 
   /// Cache user-specific reels
-  static Future<void> cacheUserReels(List<ReelModel> reels, String userId) async {
+  static Future<void> cacheUserReels(
+      List<ReelModel> reels, String userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Get existing cached user reels
       final cachedReelsJson = prefs.getString(_userReelsCacheKey) ?? '{}';
       final Map<String, dynamic> cachedReelsMap = json.decode(cachedReelsJson);
-      
+
       // Convert reels to JSON
-      final List<Map<String, dynamic>> reelsJson = reels.map((reel) => reel.toMap()).toList();
-      
+      final List<Map<String, dynamic>> reelsJson =
+          reels.map((reel) => reel.toMap()).toList();
+
       // Update cache with new reels, avoiding duplicates
-      final List<dynamic> existingReels = List.from(cachedReelsMap[userId] ?? []);
-      final Set<String> existingIds = existingReels
-          .map((reel) => reel['reelID'] as String)
-          .toSet();
-      
+      final List<dynamic> existingReels =
+          List.from(cachedReelsMap[userId] ?? []);
+      final Set<String> existingIds =
+          existingReels.map((reel) => reel['reelID'] as String).toSet();
+
       bool hasNewReels = false;
       for (final reelJson in reelsJson) {
         if (!existingIds.contains(reelJson['reelID'])) {
@@ -649,29 +706,30 @@ class ReelsCacheService {
           hasNewReels = true;
         }
       }
-      
+
       // Sort by createdAt (newest first)
       existingReels.sort((a, b) {
         final DateTime dateA = DateTime.parse(a['createdAt'].toString());
         final DateTime dateB = DateTime.parse(b['createdAt'].toString());
         return dateB.compareTo(dateA);
       });
-      
+
       // Limit cache size to 100 reels per user
       if (existingReels.length > 100) {
         existingReels.removeRange(100, existingReels.length);
       }
-      
+
       cachedReelsMap[userId] = existingReels;
-      
+
       // Save updated cache
       await prefs.setString(_userReelsCacheKey, json.encode(cachedReelsMap));
-      
+
       // Update last fetch time
-      await prefs.setInt(_lastUserReelsFetchTimeKey, DateTime.now().millisecondsSinceEpoch);
-      
+      await prefs.setInt(
+          _lastUserReelsFetchTimeKey, DateTime.now().millisecondsSinceEpoch);
+
       debugPrint('Cached ${reels.length} user reels for user: $userId');
-      
+
       if (hasNewReels) {
         // Start preloading videos for this user in the background
         _preloadVideosForUser(reels, userId);
@@ -687,19 +745,19 @@ class ReelsCacheService {
       final prefs = await SharedPreferences.getInstance();
       final cachedReelsJson = prefs.getString(_userReelsCacheKey) ?? '{}';
       final Map<String, dynamic> cachedReelsMap = json.decode(cachedReelsJson);
-      
+
       if (!cachedReelsMap.containsKey(userId)) {
         return [];
       }
-      
+
       final List<dynamic> reelsJson = cachedReelsMap[userId];
-      final reels = reelsJson.map((json) => 
-        ReelModel.fromMap(Map<String, dynamic>.from(json))
-      ).toList();
-      
+      final reels = reelsJson
+          .map((json) => ReelModel.fromMap(Map<String, dynamic>.from(json)))
+          .toList();
+
       // Start preloading videos for this user in the background
       _preloadVideosForUser(reels, userId);
-      
+
       return reels;
     } catch (e) {
       debugPrint('Error getting cached user reels: $e');
@@ -713,7 +771,7 @@ class ReelsCacheService {
       final prefs = await SharedPreferences.getInstance();
       final lastFetchTime = prefs.getInt(_lastUserReelsFetchTimeKey) ?? 0;
       final now = DateTime.now().millisecondsSinceEpoch;
-      
+
       // Refresh if last fetch was more than 10 minutes ago
       return (now - lastFetchTime) > 10 * 60 * 1000;
     } catch (e) {
@@ -722,23 +780,27 @@ class ReelsCacheService {
   }
 
   /// Cache user-specific bookmarks
-  static Future<void> cacheUserBookmarks(List<ReelModel> reels, String userId) async {
+  static Future<void> cacheUserBookmarks(
+      List<ReelModel> reels, String userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Get existing cached bookmarks
-      final cachedBookmarksJson = prefs.getString(_userBookmarksCacheKey) ?? '{}';
-      final Map<String, dynamic> cachedBookmarksMap = json.decode(cachedBookmarksJson);
-      
+      final cachedBookmarksJson =
+          prefs.getString(_userBookmarksCacheKey) ?? '{}';
+      final Map<String, dynamic> cachedBookmarksMap =
+          json.decode(cachedBookmarksJson);
+
       // Convert reels to JSON
-      final List<Map<String, dynamic>> reelsJson = reels.map((reel) => reel.toMap()).toList();
-      
+      final List<Map<String, dynamic>> reelsJson =
+          reels.map((reel) => reel.toMap()).toList();
+
       // Update cache with new bookmarks, avoiding duplicates
-      final List<dynamic> existingBookmarks = List.from(cachedBookmarksMap[userId] ?? []);
-      final Set<String> existingIds = existingBookmarks
-          .map((reel) => reel['reelID'] as String)
-          .toSet();
-      
+      final List<dynamic> existingBookmarks =
+          List.from(cachedBookmarksMap[userId] ?? []);
+      final Set<String> existingIds =
+          existingBookmarks.map((reel) => reel['reelID'] as String).toSet();
+
       bool hasNewBookmarks = false;
       for (final reelJson in reelsJson) {
         if (!existingIds.contains(reelJson['reelID'])) {
@@ -747,29 +809,31 @@ class ReelsCacheService {
           hasNewBookmarks = true;
         }
       }
-      
+
       // Sort by createdAt (newest first)
       existingBookmarks.sort((a, b) {
         final DateTime dateA = DateTime.parse(a['createdAt'].toString());
         final DateTime dateB = DateTime.parse(b['createdAt'].toString());
         return dateB.compareTo(dateA);
       });
-      
+
       // Limit cache size to 100 bookmarks per user
       if (existingBookmarks.length > 100) {
         existingBookmarks.removeRange(100, existingBookmarks.length);
       }
-      
+
       cachedBookmarksMap[userId] = existingBookmarks;
-      
+
       // Save updated cache
-      await prefs.setString(_userBookmarksCacheKey, json.encode(cachedBookmarksMap));
-      
+      await prefs.setString(
+          _userBookmarksCacheKey, json.encode(cachedBookmarksMap));
+
       // Update last fetch time
-      await prefs.setInt(_lastUserBookmarksFetchTimeKey, DateTime.now().millisecondsSinceEpoch);
-      
+      await prefs.setInt(_lastUserBookmarksFetchTimeKey,
+          DateTime.now().millisecondsSinceEpoch);
+
       debugPrint('Cached ${reels.length} bookmarks for user: $userId');
-      
+
       if (hasNewBookmarks) {
         // Start preloading videos for this user bookmarks in the background
         _preloadVideosForUser(reels, userId);
@@ -783,21 +847,23 @@ class ReelsCacheService {
   static Future<List<ReelModel>> getCachedUserBookmarks(String userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final cachedBookmarksJson = prefs.getString(_userBookmarksCacheKey) ?? '{}';
-      final Map<String, dynamic> cachedBookmarksMap = json.decode(cachedBookmarksJson);
-      
+      final cachedBookmarksJson =
+          prefs.getString(_userBookmarksCacheKey) ?? '{}';
+      final Map<String, dynamic> cachedBookmarksMap =
+          json.decode(cachedBookmarksJson);
+
       if (!cachedBookmarksMap.containsKey(userId)) {
         return [];
       }
-      
+
       final List<dynamic> bookmarksJson = cachedBookmarksMap[userId];
-      final bookmarks = bookmarksJson.map((json) => 
-        ReelModel.fromMap(Map<String, dynamic>.from(json))
-      ).toList();
-      
+      final bookmarks = bookmarksJson
+          .map((json) => ReelModel.fromMap(Map<String, dynamic>.from(json)))
+          .toList();
+
       // Start preloading videos for this user bookmarks in the background
       _preloadVideosForUser(bookmarks, userId);
-      
+
       return bookmarks;
     } catch (e) {
       debugPrint('Error getting cached user bookmarks: $e');
@@ -806,12 +872,13 @@ class ReelsCacheService {
   }
 
   /// Check if we should refresh user bookmarks from network
-  static Future<bool> shouldRefreshUserBookmarksFromNetwork(String userId) async {
+  static Future<bool> shouldRefreshUserBookmarksFromNetwork(
+      String userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final lastFetchTime = prefs.getInt(_lastUserBookmarksFetchTimeKey) ?? 0;
       final now = DateTime.now().millisecondsSinceEpoch;
-      
+
       // Refresh if last fetch was more than 10 minutes ago
       return (now - lastFetchTime) > 10 * 60 * 1000;
     } catch (e) {
@@ -820,19 +887,19 @@ class ReelsCacheService {
   }
 
   /// Preload videos for a specific user in the background
-  static Future<void> _preloadVideosForUser(List<ReelModel> reels, String userId) async {
+  static Future<void> _preloadVideosForUser(
+      List<ReelModel> reels, String userId) async {
     // Take first 5 videos to preload
     final videosToPreload = reels.take(5).toList();
-    
+
     for (int i = 0; i < videosToPreload.length; i++) {
       try {
         final reel = videosToPreload[i];
         // Don't await to allow parallel downloads
-        unawaited(preCacheVideo(
-          reel.videoUrl, 
-          highPriority: i < 2, // First 2 videos are high priority
-          usePriorityCache: i < 3 // First 3 videos use priority cache
-        ));
+        unawaited(preCacheVideo(reel.videoUrl,
+            highPriority: i < 2, // First 2 videos are high priority
+            usePriorityCache: i < 3 // First 3 videos use priority cache
+            ));
       } catch (e) {
         // Silently handle errors for background preloading
         debugPrint('Background user video preload error: $e');
@@ -863,7 +930,7 @@ class ReelsCacheService {
       debugPrint('Error clearing cache: $e');
     }
   }
-  
+
   /// Preload videos for all available moods
   static Future<void> preloadAllMoods() async {
     try {
@@ -888,17 +955,18 @@ class ReelsCacheService {
           }
         }
       }
-      
+
       // Then preload other moods
       final prefs = await SharedPreferences.getInstance();
       final preloadedMoods = prefs.getStringList(_preloadedMoodsKey) ?? [];
-      
+
       for (final mood in preloadedMoods) {
         // Skip already preloaded moods
-        if (recentMoods.contains(mood) || _preloadedMoodsInMemory.contains(mood)) {
+        if (recentMoods.contains(mood) ||
+            _preloadedMoodsInMemory.contains(mood)) {
           continue;
         }
-        
+
         final reels = await getCachedReels(mood);
         if (reels.isNotEmpty) {
           // Preload first 3 videos for each mood
@@ -917,7 +985,7 @@ class ReelsCacheService {
       debugPrint('Error preloading moods: $e');
     }
   }
-  
+
   /// Preload videos for adjacent moods
   /// This is useful when user is likely to switch moods
   static Future<void> preloadAdjacentMoods() async {
@@ -925,13 +993,13 @@ class ReelsCacheService {
       final currentMood = await getCurrentMood();
       final prefs = await SharedPreferences.getInstance();
       final preloadedMoods = prefs.getStringList(_preloadedMoodsKey) ?? [];
-      
+
       // Get a list of moods to preload (excluding current mood)
       final moodsToPreload = preloadedMoods
           .where((mood) => mood != currentMood)
           .take(3) // Limit to 3 adjacent moods
           .toList();
-      
+
       for (final mood in moodsToPreload) {
         final reels = await getCachedReels(mood);
         if (reels.isNotEmpty) {
@@ -951,26 +1019,38 @@ class ReelsCacheService {
       debugPrint('Error preloading adjacent moods: $e');
     }
   }
-  
+
   /// Clean up memory cache to prevent memory leaks
+  /// Uses LRU (Least Recently Used) strategy for better cache management
   static void cleanupMemoryCache({int maxSize = 50}) {
     if (_memoryCache.length > maxSize) {
-      final keysToRemove = _memoryCache.keys.take(_memoryCache.length - maxSize).toList();
+      // Sort keys by last access time (oldest first)
+      final sortedKeys = _memoryCacheLastAccess.keys.toList()
+        ..sort((a, b) =>
+            _memoryCacheLastAccess[a]!.compareTo(_memoryCacheLastAccess[b]!));
+
+      // Remove oldest entries until we're under the limit
+      final keysToRemove =
+          sortedKeys.take(_memoryCache.length - maxSize).toList();
       for (final key in keysToRemove) {
         _memoryCache.remove(key);
+        _memoryCacheLastAccess.remove(key);
       }
+
+      debugPrint(
+          'Memory cache cleaned up, removed ${keysToRemove.length} entries');
     }
   }
-  
+
   /// Get video load time statistics
   static Map<String, int> getVideoLoadTimes() {
     return Map.from(_videoLoadTimes);
   }
-  
+
   /// Get average video load time
   static double getAverageLoadTime() {
     if (_videoLoadTimes.isEmpty) return 0;
-    
+
     final total = _videoLoadTimes.values.reduce((a, b) => a + b);
     return total / _videoLoadTimes.length;
   }
