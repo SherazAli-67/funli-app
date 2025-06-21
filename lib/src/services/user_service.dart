@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/models/follow_model.dart';
 import 'package:funli_app/src/models/notification_model.dart';
+import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/services/notifications_service.dart';
@@ -151,6 +152,13 @@ class UserService {
     }
 
     return imageUrl;
+  }
+
+  static Future<List<ReelModel>> getUserPopularReels() async{
+    List<ReelModel> reels = [];
+
+
+    return reels;
   }
 
  /* static Future<UserModel> getUserFollowers() async {

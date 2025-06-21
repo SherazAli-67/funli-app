@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/features/profile_analytics_dashboard/reel_views_chart.dart';
+import 'package:funli_app/src/services/settings_service.dart';
+import 'package:funli_app/src/services/user_service.dart';
 
 import '../../res/app_gradients.dart';
 import 'analytics_gradient_info_card.dart';
@@ -12,12 +15,21 @@ class AnalyticsCreatorInsightsPage extends StatelessWidget{
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          AnalyticsGradientInfoCard(topText: 'Your global ranking is',
-              mainText: '5,674,464',
-              bottomText: ''),
+          FutureBuilder(future: SettingsService.rankCurrentUser(), builder: (ctx, snapshot){
+            if(snapshot.hasData){
+              return AnalyticsGradientInfoCard(topText: 'Your global ranking is',
+                  mainText: snapshot.requireData.toString(),
+                  bottomText: '');
+            }
+
+            return AnalyticsGradientInfoCard(topText: 'Your global ranking is',
+                mainText: '...',
+                bottomText: '');
+          }),
+
 
           const SizedBox(height: 16),
-          _buildFeelViews(),
+          ReelViewsChart(),
           const SizedBox(height: 16),
           _buildMostPopularFeels(),
           const SizedBox(height: 16),
@@ -31,103 +43,56 @@ class AnalyticsCreatorInsightsPage extends StatelessWidget{
     );
   }
 
-  Widget _buildFeelViews() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Feel Views',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildTimeRangeSelector(),
-          const SizedBox(height: 16),
-          _buildLineChart(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTimeRangeSelector() {
-    return Container(
-      height: 36,
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Center(
-              child: Text(
-                'Weekly',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                gradient: AppGradients.primaryGradient,
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                'Monthly',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Center(
-              child: Text(
-                'Yearly',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLineChart() {
-    return SizedBox(
-      height: 200,
-      child: CustomPaint(
-        painter: LineChartPainter(),
-        size: const Size(double.infinity, 200),
-      ),
-    );
-  }
 
   Widget _buildMostPopularFeels() {
+    return SizedBox(
+      height: 200,
+      child: FutureBuilder(future: UserService.getUserPopularReels(), builder: (ctx, snapshot){
+        if(snapshot.hasData){
+          return ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _mood.reelsCount > _reels.length ? (_reels.length + 1) : _reels.length,
+              itemBuilder: (ctx, index) {
+                return index == _reels.length
+                    ? IconButton(
+                    style: ElevatedButton.styleFrom(
+                        shape: CircleBorder(side: BorderSide.none),
+                        backgroundColor: AppColors.yellowAccentColor,
+                        padding: EdgeInsets.all(20)),
+                    onPressed: () {
+                      _onMoodTap(context, _mood.mood);
+                    },
+                    icon: Icon(Icons.arrow_forward_rounded, size: 30))
+                    : GestureDetector(
+                  onTap: () {
+                    context.push(
+                      RouterEnum.updatedReelsView.routeName,
+                      extra: {
+                        'initialReels': _reels,
+                        'selectedIndex': index,
+                        'lastDocument': _lastDoc,
+                        'comingFrom': AppConstants.comingFromMood,
+                        'mood': _mood.mood,
+                      },
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: CachedNetworkImage(
+                        placeholder: (context, url) => ReelThumbnailShimmerItem(),
+                        errorWidget: (ctx, val, err)=> CachedNetworkImage(imageUrl: AppIcons.icDefaultThumbnailUrl),
+                        imageUrl:  _reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
+                        height: 150,
+                      ),
+                    ),
+                  ),
+                );
+              });
+        }
+      }),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

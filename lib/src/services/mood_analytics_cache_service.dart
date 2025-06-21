@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:funli_app/src/services/settings_service.dart';
+import 'package:funli_app/src/features/profile_analytics_dashboard/reel_views_chart.dart';
 
 class MoodAnalyticsCacheService {
   static const String _moodAnalyticsKey = 'mood_analytics';
@@ -84,5 +86,27 @@ class MoodAnalyticsCacheService {
     await prefs.setString(_moodPercentagesKey, jsonEncode(moodPercentages));
     await prefs.setString(_moodStreaksKey, jsonEncode(moodStreaks));
     await prefs.setString(_lastUpdatedKey, DateTime.now().toIso8601String());
+  }
+
+  /// Get cached reel views data or fetch from server if cache is outdated
+  static Future<List<Map<String, dynamic>>> getReelViewsData(TimeRange timeRange) async {
+    final prefs = await SharedPreferences.getInstance();
+    final cacheKey = 'reel_views_${timeRange.toString().split('.').last}';
+    final cachedData = prefs.getString(cacheKey);
+    final lastUpdatedStr = prefs.getString(_lastUpdatedKey);
+
+    if (cachedData != null && lastUpdatedStr != null) {
+      final lastUpdated = DateTime.tryParse(lastUpdatedStr);
+      if (lastUpdated != null &&
+          DateTime.now().difference(lastUpdated).inHours < _cacheDurationHours) {
+        return List<Map<String, dynamic>>.from(jsonDecode(cachedData));
+      }
+    }
+
+    // Fetch from server if no cache or cache is outdated
+    final data = await SettingsService.getReelViewsData(timeRange);
+    await prefs.setString(cacheKey, jsonEncode(data));
+    await prefs.setString(_lastUpdatedKey, DateTime.now().toIso8601String());
+    return data;
   }
 }

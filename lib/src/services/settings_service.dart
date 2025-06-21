@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
+import 'package:funli_app/src/features/profile_analytics_dashboard/reel_views_chart.dart';
 
 import '../models/reel_model.dart';
 
@@ -300,5 +301,262 @@ class SettingsService {
     }
     
     return moodStreaks;
+  }
+  
+  /// Get reel views data for the specified time range
+  static Future<List<Map<String, dynamic>>> getReelViewsData(TimeRange timeRange) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('User not logged in');
+    }
+
+    final userId = user.uid;
+    
+    // Determine date range based on selected time range
+    DateTime startDate;
+    DateTime endDate = DateTime.now();
+    List<String> labels = [];
+    
+    switch (timeRange) {
+      case TimeRange.weekly:
+        // Last 7 days
+        startDate = endDate.subtract(const Duration(days: 6));
+        // Generate labels for each day (e.g., "Mon", "Tue", etc.)
+        for (int i = 0; i <= 6; i++) {
+          final date = startDate.add(Duration(days: i));
+          labels.add(date.day.toString());
+        }
+        break;
+      case TimeRange.monthly:
+        // Last 30 days
+        startDate = endDate.subtract(const Duration(days: 29));
+        // Generate labels for each week (e.g., "Week 1", "Week 2", etc.)
+        for (int i = 0; i < 30; i += 5) {
+          final date = startDate.add(Duration(days: i));
+          labels.add(date.day.toString());
+        }
+        break;
+      case TimeRange.yearly:
+        // Last 12 months
+        startDate = DateTime(endDate.year - 1, endDate.month + 1, 1);
+        // Generate labels for each month (e.g., "Jan", "Feb", etc.)
+        for (int i = 0; i < 12; i++) {
+          final month = (startDate.month + i) % 12;
+          final monthName = _getMonthName(month == 0 ? 12 : month);
+          labels.add(monthName);
+        }
+        break;
+    }
+    
+    // Fetch all reels for the user
+    final reelsSnapshot = await FirebaseFirestore.instance
+        .collection(FirebaseConstants.userCollection)
+        .doc(userId)
+        .collection(FirebaseConstants.reelsCollection)
+        .get();
+    
+    if (reelsSnapshot.docs.isEmpty) {
+      // Return empty data with labels
+      return labels.map((label) => {'label': label, 'value': 0.0}).toList();
+    }
+    
+    // Fetch view data for each reel
+    List<Map<String, dynamic>> viewsData = [];
+    Map<String, double> aggregatedData = {};
+    
+    // Initialize aggregated data with zeros
+    for (var label in labels) {
+      aggregatedData[label] = 0;
+    }
+    
+    for (var doc in reelsSnapshot.docs) {
+      final data = doc.data();
+      String reelID = data['reelID'];
+      
+      DocumentSnapshot reelSnapshot = await FirebaseFirestore.instance
+          .collection(FirebaseConstants.reelsCollection)
+          .doc(reelID).get();
+
+
+      if (reelSnapshot.exists) {
+        final reelData = reelSnapshot.data() as Map<String, dynamic>;
+        // debugPrint("Reel found.\nCreatedAt: ${reelData['createdAt']}, and ViewsCount: ${reelData['viewsCount']}");
+        
+        // Handle different types for createdAt (could be Timestamp or String)
+        DateTime createdAt;
+        if (reelData['createdAt'] is Timestamp) {
+          createdAt = (reelData['createdAt'] as Timestamp).toDate();
+        } else if (reelData['createdAt'] is String) {
+          createdAt = DateTime.parse(reelData['createdAt'] as String);
+        } else {
+          // Skip this reel if createdAt is not in a recognized format
+          debugPrint("Skipping reel with invalid createdAt format: ${reelData['createdAt']}");
+          continue;
+        }
+        
+        final viewsCount = reelData['viewsCount'] as int? ?? 0;
+        
+        // Skip reels created before the start date
+        if (createdAt.isBefore(startDate)) {
+          continue;
+        }
+        
+        // Determine which label/period this reel belongs to
+        String label;
+        
+        switch (timeRange) {
+          case TimeRange.weekly:
+            // Day of the week
+            final dayIndex = createdAt.difference(startDate).inDays;
+            if (dayIndex >= 0 && dayIndex < labels.length) {
+              label = labels[dayIndex];
+              aggregatedData[label] = (aggregatedData[label] ?? 0) + viewsCount;
+            }
+            break;
+          case TimeRange.monthly:
+            // Week of the month
+            final dayIndex = createdAt.difference(startDate).inDays ~/ 5;
+            if (dayIndex >= 0 && dayIndex < labels.length) {
+              label = labels[dayIndex];
+              aggregatedData[label] = (aggregatedData[label] ?? 0) + viewsCount;
+            }
+            break;
+          case TimeRange.yearly:
+            // Month of the year
+            final monthIndex = (createdAt.month - startDate.month + 12) % 12;
+            if (monthIndex >= 0 && monthIndex < labels.length) {
+              label = labels[monthIndex];
+              aggregatedData[label] = (aggregatedData[label] ?? 0) + viewsCount;
+            }
+            break;
+        }
+      }else{
+        debugPrint("Reel not found");
+      }
+    }
+    
+    // Convert aggregated data to the format expected by the chart
+    for (int i = 0; i < labels.length; i++) {
+      viewsData.add({
+        'label': labels[i],
+        'value': aggregatedData[labels[i]] ?? 0.0,
+      });
+    }
+    
+    // For demo purposes, if no data is available, generate some random data
+    if (viewsData.every((item) => item['value'] == 0)) {
+      return _generateDemoData(timeRange);
+    }
+    
+    return viewsData;
+  }
+  
+  /// Helper method to get month name from month number
+  static String _getMonthName(int month) {
+    const monthNames = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return monthNames[month - 1];
+  }
+  
+  /// Generate demo data for the chart when no real data is available
+  static List<Map<String, dynamic>> _generateDemoData(TimeRange timeRange) {
+    List<Map<String, dynamic>> demoData = [];
+    List<String> labels = [];
+    
+    switch (timeRange) {
+      case TimeRange.weekly:
+        labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        break;
+      case TimeRange.monthly:
+        labels = ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+        break;
+      case TimeRange.yearly:
+        labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        break;
+    }
+    
+    // Generate demo values based on the image provided
+    if (timeRange == TimeRange.weekly) {
+      demoData = [
+        {'label': labels[0], 'value': 450.0},
+        {'label': labels[1], 'value': 580.0},
+        {'label': labels[2], 'value': 780.0},
+        {'label': labels[3], 'value': 620.0},
+        {'label': labels[4], 'value': 510.0},
+        {'label': labels[5], 'value': 430.0},
+        {'label': labels[6], 'value': 470.0},
+      ];
+    } else if (timeRange == TimeRange.monthly) {
+      demoData = [
+        {'label': labels[0], 'value': 580.0},
+        {'label': labels[1], 'value': 420.0},
+        {'label': labels[2], 'value': 480.0},
+        {'label': labels[3], 'value': 580.0},
+        {'label': labels[4], 'value': 420.0},
+        {'label': labels[5], 'value': 480.0},
+      ];
+    } else {
+      demoData = [
+        {'label': labels[0], 'value': 450.0},
+        {'label': labels[1], 'value': 780.0},
+        {'label': labels[2], 'value': 580.0},
+        {'label': labels[3], 'value': 420.0},
+        {'label': labels[4], 'value': 480.0},
+        {'label': labels[5], 'value': 520.0},
+        {'label': labels[6], 'value': 480.0},
+        {'label': labels[7], 'value': 520.0},
+        {'label': labels[8], 'value': 580.0},
+        {'label': labels[9], 'value': 620.0},
+        {'label': labels[10], 'value': 580.0},
+        {'label': labels[11], 'value': 520.0},
+      ];
+    }
+    
+    return demoData;
+  }
+
+  static Future<int> rankCurrentUser() async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final String currentUserID = FirebaseAuth.instance.currentUser!.uid;
+
+    // 1. Fetch all users
+    final usersSnapshot = await firestore.collection(FirebaseConstants.userCollection).get();
+
+    // 2. Create a list to store user scores
+    List<Map<String, dynamic>> userScores = [];
+
+    for (var doc in usersSnapshot.docs) {
+      final userData = doc.data();
+      final String userID = doc.id;
+
+      final int totalLikes = userData['totalLikesCount'] ?? 0;
+      final int reelsPosted = userData['reelsPosted'] ?? 0;
+
+      // 3. Fetch followers count for each user
+      final followersSnap = await firestore
+          .collection(FirebaseConstants.userCollection)
+          .doc(userID)
+          .collection(FirebaseConstants.followersCollection)
+          .count()
+          .get();
+      final int followersCount = followersSnap.count ?? 0;
+
+      final int score = (totalLikes * 1) + (reelsPosted * 5) + (followersCount * 2);
+
+      userScores.add({
+        'userID': userID,
+        'score': score,
+      });
+    }
+
+    // 4. Sort users by score descending
+    userScores.sort((a, b) => b['score'].compareTo(a['score']));
+
+    // 5. Find the rank of current user
+    final int userRank = userScores.indexWhere((user) => user['userID'] == currentUserID) + 1;
+
+    return userRank;
   }
 }
