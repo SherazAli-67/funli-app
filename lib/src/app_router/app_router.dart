@@ -12,6 +12,7 @@ import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart'
 import 'package:funli_app/src/features/main_menu/video_feed_view/video_feed_view.dart';
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
 import 'package:funli_app/src/features/personalization/personalization_page.dart';
+import 'package:funli_app/src/features/profile_analytics_dashboard/profile_analytics_dashboard.dart';
 import 'package:funli_app/src/features/search_page.dart';
 import 'package:funli_app/src/features/settings/content_preferences_page.dart';
 import 'package:funli_app/src/features/settings/help_center_page.dart';
@@ -162,6 +163,11 @@ class AppRouter {
         path: RouterEnum.profileSettingsView.routeName,
         builder: (BuildContext context, GoRouterState state) =>
         const ProfileSettingsPage(),
+      ),
+      GoRoute(
+        path: RouterEnum.profileAnalyticsView.routeName,
+        builder: (BuildContext context, GoRouterState state) =>
+        const ProfileAnalyticsDashboard(),
       ),
       GoRoute(
         path: RouterEnum.updateProfileView.routeName,

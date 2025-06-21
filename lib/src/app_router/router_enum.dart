@@ -34,6 +34,7 @@ enum RouterEnum {
 
   //profile pages
   profileSettingsView('/profileSettings-view'),
+  profileAnalyticsView('/profileAnalyticsView'),
   updateProfileView('updateProfile-view'),
   securityAndPrivacyView('/securityAndPrivacy-view'),
   contentPreferenceView('/contentPreference-view'),

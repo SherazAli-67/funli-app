@@ -56,7 +56,9 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () =>
+                context.push(
+                    RouterEnum.profileAnalyticsView.routeName),
             icon: SvgPicture.asset(AppIcons.icAnalytics),
           ),
           IconButton(

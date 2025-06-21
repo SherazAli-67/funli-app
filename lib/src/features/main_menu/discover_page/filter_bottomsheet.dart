@@ -3,17 +3,39 @@ import 'package:funli_app/src/models/filter_model.dart';
 
 import '../../../res/app_icons.dart';
 import '../../../res/app_textstyles.dart';
+import '../../../widgets/app_textfield.dart';
 import '../../../widgets/primary_btn.dart';
 import '../../../widgets/secondary_btn.dart';
 import '../../../widgets/secondary_gradient_btn.dart';
 
-class FilterBottomSheet extends StatelessWidget{
+class FilterBottomSheet extends StatefulWidget{
   const FilterBottomSheet({super.key, required this.currentFilter});
   final ReelFilter currentFilter;
   @override
+  State<FilterBottomSheet> createState() => _FilterBottomSheetState();
+
+  static String _capitalize(String value) => value[0].toUpperCase() + value.substring(1);
+
+  static String _popularityLabel(Popularity pop) {
+    switch (pop) {
+      case Popularity.topFeels:
+        return "Top Feels";
+      case Popularity.newestFeels:
+        return "Newest Feels";
+      case Popularity.mostViewed:
+        return "Most Viewed";
+    }
+  }
+}
+
+class _FilterBottomSheetState extends State<FilterBottomSheet> {
+  final TextEditingController locController = TextEditingController();
+  final TextEditingController langController = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
-    Mood? selectedMood = currentFilter.selectedMood;
-    Popularity? selectedPopularity = currentFilter.selectedPopularity;
+    Mood? selectedMood = widget.currentFilter.selectedMood;
+    Popularity? selectedPopularity = widget.currentFilter.selectedPopularity;
 
     return StatefulBuilder(builder: (context, setState) {
       return Padding(
@@ -63,7 +85,7 @@ class FilterBottomSheet extends StatelessWidget{
                               setState(() => selectedMood = mood);
                             }),
                       ) : SecondaryGradientBtn(
-                        btnText: _capitalize(mood.name), icon: '', onTap: () {
+                        btnText: FilterBottomSheet._capitalize(mood.name), icon: '', onTap: () {
                         setState(() => selectedMood = mood);
                       },
                         buttonHeight: 38,
@@ -93,24 +115,24 @@ class FilterBottomSheet extends StatelessWidget{
                         height: 38,
                         child: PrimaryBtn(
                           bgGradient: AppIcons.primaryBgGradient,
-                          btnText: _popularityLabel(popularity), icon: '', onTap: ()=> setState(() => selectedPopularity = popularity),),
+                          btnText: FilterBottomSheet._popularityLabel(popularity), icon: '', onTap: ()=> setState(() => selectedPopularity = popularity),),
                       ) : SecondaryGradientBtn(
-                        btnText: _popularityLabel(popularity), icon: '', onTap: ()=> setState(() => selectedPopularity = popularity), buttonHeight: 38,),
+                        btnText: FilterBottomSheet._popularityLabel(popularity), icon: '', onTap: ()=> setState(() => selectedPopularity = popularity), buttonHeight: 38,),
                     );
                   }).toList(),
                 ),
               ],
             ),
-            /*AppTextField(
-                textController: locationTextEditingController,
+            AppTextField(
+                textController: locController,
                 prefixIcon: AppIcons.icLocation,
                 hintText: 'Abu Dahbi, UAE',
                 titleText: 'Location'),
             AppTextField(
-                textController: languageTextEditingController,
+                textController: langController,
                 prefixIcon: AppIcons.icLanguage,
                 hintText: 'Urdu',
-                titleText: 'Language'),*/
+                titleText: 'Language'),
 
             Row(
               spacing: 20,
@@ -133,18 +155,5 @@ class FilterBottomSheet extends StatelessWidget{
         ),
       );
     });
-  }
-
-  static String _capitalize(String value) => value[0].toUpperCase() + value.substring(1);
-
-  static String _popularityLabel(Popularity pop) {
-    switch (pop) {
-      case Popularity.topFeels:
-        return "Top Feels";
-      case Popularity.newestFeels:
-        return "Newest Feels";
-      case Popularity.mostViewed:
-        return "Most Viewed";
-    }
   }
 }

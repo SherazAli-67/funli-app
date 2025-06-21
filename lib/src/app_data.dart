@@ -1,5 +1,6 @@
 
 import 'package:funli_app/src/models/reel_model.dart';
+import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/testing/social_media/social_api_service.dart';
 
 class AppData {
@@ -125,4 +126,54 @@ class AppData {
 
     return 'Failed';
   }
+
+  static List<Map<String, dynamic>> faqs = [
+    {
+      "question": "What is the FUNLI app used for?",
+      "answer": "FUNLI is a short video platform where users can watch and share reels based on different moods like happy, sad, excited, etc."
+    },
+    {
+      "question": "How does the mood-based feed work?",
+      "answer": "You can select your current mood using the Mood Scroll Wheel. The app then shows reels tagged with that mood."
+    },
+    {
+      "question": "Can I upload videos from my device?",
+      "answer": "Yes, you can upload videos from your phone. Only .mp4 format is supported for now."
+    },
+    {
+      "question": "How to use FUNLI?",
+      "answer": "Select your mood, scroll through the video feed, like or comment on reels, and explore trending content."
+    },
+    {
+      "question": "How to upload a video on FUNLI?",
+      "answer": "Tap the '+' button, choose a video from your gallery, add a caption and mood tag, and publish your reel."
+    },
+  ];
+
+  static List<Map<String, dynamic>> contactUs = [
+    {
+      "title": "Customer Services",
+      "icon": AppIcons.icCustomerServices
+    },
+    {
+      "title": "Whatsapp",
+      "icon": AppIcons.icWhatsapp
+    },
+    {
+      "title": "Website",
+      "icon": AppIcons.icWebsite
+    },
+    {
+      "title": "Facebook",
+      "icon": AppIcons.icFacebook
+    },
+    {
+      "title": "Twitter",
+      "icon": AppIcons.icTwitter
+    },
+    {
+      "title": "Instagram",
+      "icon": AppIcons.icInstagram
+    },
+  ];
 }

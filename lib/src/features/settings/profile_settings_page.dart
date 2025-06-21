@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
@@ -31,7 +32,7 @@ class ProfileSettingsPage extends StatelessWidget{
           children: [
             Consumer<ProfileProvider>(
               builder: (context, provider, _) {
-                return ListTile(
+                return provider.currentUser != null ? ListTile(
                   onTap: (){
                     Navigator.of(context).push(MaterialPageRoute(builder: (_)=> EditProfilePage()));
                   },
@@ -49,7 +50,7 @@ class ProfileSettingsPage extends StatelessWidget{
                       ),
                       child: Icon(Icons.edit, color: Colors.white,)
                   ),
-                );
+                ) : const SizedBox();
               }
             ),
             Padding(
@@ -87,9 +88,10 @@ class ProfileSettingsPage extends StatelessWidget{
     return currentYear - dobYear;
   }
 
-  void _onLogoutTap(BuildContext context){
-    //Clear all cache and logout - reset from everywhere
+  void _onLogoutTap(BuildContext context) async {
+    // Clear all cache and logout - reset from everywhere
     final provider = Provider.of<ProfileProvider>(context, listen: false);
+    await FirebaseAuth.instance.signOut();
     provider.clear();
     // Use `go` to replace the entire stack and leave ShellRoute
     context.go(RouterEnum.welcomeView.routeName);

@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/loading_shimmers/reel_thumbnail_shimmer_item.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
@@ -58,12 +60,14 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
         _reels.addAll(cachedBookmarks.map((reel) => reel.toMap()).toList());
       });
     }
-    
+
     // Check if we should refresh from network
     bool shouldRefresh = await ReelsCacheService.shouldRefreshUserBookmarksFromNetwork(widget._userID);
-    if (shouldRefresh) {
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    if ((shouldRefresh || currentUID != widget._userID) && cachedBookmarks.isEmpty) {
       _fetchBookmarks();
     }
+
   }
 
   Future<void> _fetchBookmarks({bool isFirstTime = false}) async {
@@ -136,10 +140,9 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
             delegate: SliverChildBuilderDelegate(
                   (context, index) {
                 if (index == _reels.length) {
-                  return const Center(child: CircularProgressIndicator());
+                  return ReelThumbnailShimmerItem();
                 }
-
-
+                
                 ReelModel reel = ReelModel.fromMap( _reels[index]);
                 final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
 

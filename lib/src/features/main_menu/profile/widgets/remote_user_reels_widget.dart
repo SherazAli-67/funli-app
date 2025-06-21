@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
+import 'package:funli_app/src/loading_shimmers/reel_thumbnail_shimmer_item.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
@@ -29,6 +30,7 @@ class RemoteUserReelsWidget extends StatefulWidget {
   final String _userID;
   final String? _userName;
   final String? _profilePicture;
+
   @override
   State<RemoteUserReelsWidget> createState() => _RemoteUserReelsWidgetState();
 }
@@ -41,6 +43,7 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
   final int _limit = 4;
   DocumentSnapshot? _lastDocument;
 
+
   @override
   void initState() {
     super.initState();
@@ -52,14 +55,15 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 300 && !_isLoading &&
         _hasMore) {
+
       _fetchReels();
     }
   }
 
   Future<void> _initializeReels() async {
     // Check for cached reels first
-    List<ReelModel> cachedReels = await ReelsCacheService.getCachedUserReels(
-        widget._userID);
+    List<ReelModel> cachedReels = await ReelsCacheService.getCachedUserReels(widget._userID);
+    debugPrint("Cached reels for: ${widget._userName} found: ${cachedReels.length}");
     if (cachedReels.isNotEmpty) {
       setState(() {
         _reels.clear();
@@ -68,10 +72,13 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
     }
 
     // Check if we should refresh from network
-    bool shouldRefresh = await ReelsCacheService
-        .shouldRefreshUserReelsFromNetwork(widget._userID);
-    if (shouldRefresh) {
-      _fetchReels();
+    bool shouldRefresh = await ReelsCacheService.shouldRefreshUserReelsFromNetwork(widget._userID);
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    if (shouldRefresh || currentUID != widget._userID) {
+
+      if(cachedReels.isEmpty){
+        _fetchReels();
+      }
     }
   }
 
@@ -89,9 +96,21 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
     );
 
     if (newReels.isNotEmpty) {
-      _reels.addAll(newReels);
-      // Cache the fetched reels
-      await ReelsCacheService.cacheUserReels(newReels, widget._userID);
+      // Filter out duplicates by checking reelID
+      final existingReelIds = _reels.map((reel) => reel.reelID).toSet();
+      final uniqueNewReels = newReels.where((reel) => !existingReelIds.contains(reel.reelID)).toList();
+      if (uniqueNewReels.isNotEmpty) {
+        _reels.addAll(uniqueNewReels);
+        // Cache only the unique fetched reels
+        await ReelsCacheService.cacheUserReels(uniqueNewReels, widget._userID);
+      }
+      // If fewer reels than limit are returned or no unique reels added, assume no more data
+      if (newReels.length < _limit || uniqueNewReels.isEmpty) {
+        _hasMore = false;
+      }
+    } else {
+      // If no new reels are fetched, set hasMore to false
+      _hasMore = false;
     }
 
     setState(() => _isLoading = false);
@@ -110,16 +129,15 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
 
     return CustomScrollView(
       key: PageStorageKey('RemoteUserReels'),
-      physics: const ClampingScrollPhysics(),
-      shrinkWrap: true,
+      controller: _scrollController,
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.all(8),
           sliver: SliverGrid(
             delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    if (index == _reels.length) {
-                      return const Center(child: CircularProgressIndicator());
+                    if (index == _reels.length && _hasMore) {
+                      return ReelThumbnailShimmerItem();
                     }
                     ReelModel reel = _reels[index];
                     final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;

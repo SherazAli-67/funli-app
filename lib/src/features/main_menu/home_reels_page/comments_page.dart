@@ -29,7 +29,7 @@ class _CommentsPageState extends State<CommentsPage> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 22),
+      padding: const EdgeInsets.only(left: 23.0, right: 23, bottom: 100, top: 20),
       child: Column(
         spacing: 14,
         mainAxisSize: MainAxisSize.min,

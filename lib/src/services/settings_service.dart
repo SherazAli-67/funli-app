@@ -81,4 +81,15 @@ class SettingsService {
       'showAdultContent' : showAdultContent
     });
   }
+
+  static Future<void> reportProblem({required String topic, required String description}) async {
+    String userID = FirebaseAuth.instance.currentUser!.uid;
+    String reportID = DateTime.now().microsecondsSinceEpoch.toString();
+   await FirebaseFirestore.instance.collection(FirebaseConstants.reportProblemCollection).doc(reportID).set({
+      'topic' : topic,
+      'description' : description,
+      'userID' : userID,
+     'timestamp' : Timestamp.now()
+    });
+  }
 }

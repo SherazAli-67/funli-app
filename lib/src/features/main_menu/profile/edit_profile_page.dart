@@ -66,7 +66,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 30),
               child: SizedBox(
-                height: size.height * 0.8,
+                height: size.height * 0.9,
                 child: Column(
                   children: [
                     SizedBox(

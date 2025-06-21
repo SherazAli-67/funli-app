@@ -61,6 +61,14 @@ class AppIcons {
   static const icLogout = 'assets/icons/ic_logout.svg';
 
 
+  //Contact us
+  static const icCustomerServices = 'assets/icons/contact_us/ic_customer_services.svg';
+  static const icFacebook = 'assets/icons/contact_us/ic_facebook.svg';
+  static const icInstagram = 'assets/icons/contact_us/ic_insta.svg';
+  static const icTwitter = 'assets/icons/contact_us/ic_twitter.svg';
+  static const icWebsite = 'assets/icons/contact_us/ic_website.svg';
+  static const icWhatsapp = 'assets/icons/contact_us/ic_whatsapp.svg';
+
 
   // Gradients
   static const String primaryBgGradient = 'assets/icons/ic_splash_bg.png';
