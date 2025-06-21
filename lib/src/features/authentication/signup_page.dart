@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
-import 'package:funli_app/src/features/authentication/login_page.dart';
-import 'package:funli_app/src/features/personalization/personalization_page.dart';
 import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
@@ -17,6 +15,7 @@ import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
 import 'package:go_router/go_router.dart';
 import '../../bloc_cubit/auth_states.dart';
+import '../../providers/discover_provider.dart';
 import '../../widgets/app_back_button.dart';
 
 class SignupPage extends StatefulWidget {
@@ -114,6 +113,8 @@ class _SignupPageState extends State<SignupPage> {
                               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Account Creation Failed", message: state.errorMessage);
                             }else if(state is SignedUp){
                               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedUpSuccessTitle, message: AppConstants.signedUpSuccessMessage);
+                              //Initializing the Trending moods and Hashtags so that user don't have to wait
+                              context.read<DiscoverProvider>().loadAll();
                               context.pushReplacement(RouterEnum.personalizationView.routeName);
                             }
                           },

@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
-import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/filter_model.dart';
 import 'package:funli_app/src/models/hashtag_model.dart';
@@ -213,9 +212,9 @@ class _SearchPageState extends State<SearchPage> {
         padding: const EdgeInsets.all(10),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            childAspectRatio: 0.8,
-            crossAxisSpacing: 5,
-            mainAxisSpacing: 5
+            childAspectRatio: 2/3,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10
         ),
         itemCount: _feelProvider.reels.length,
         itemBuilder: (ctx, index) {

@@ -7,13 +7,15 @@ import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 
-class RemoteUserProfilePage extends StatefulWidget{
+class RemoteUserProfilePage extends StatefulWidget {
   const RemoteUserProfilePage({
     super.key,
     required String userID,
     String? userName,
     String? profilePicture,
-  }): _userID = userID, _userName = userName, _profilePicture = profilePicture;
+  })  : _userID = userID,
+        _userName = userName,
+        _profilePicture = profilePicture;
 
   final String _userID;
   final String? _userName;
@@ -23,122 +25,158 @@ class RemoteUserProfilePage extends StatefulWidget{
   State<RemoteUserProfilePage> createState() => _RemoteUserProfilePageState();
 }
 
-class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with TickerProviderStateMixin{
+class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with TickerProviderStateMixin {
   late TabController _tabController;
   int selectedTabIndex = 0;
+
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.index != selectedTabIndex) {
+        setState(() => selectedTabIndex = _tabController.index);
+      }
+    });
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
-        leading: IconButton(onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black,)),
-        title: Text(widget._userName ?? '', style: AppTextStyles.headingTextStyle3,),
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black),
+        ),
+        title: Text(widget._userName ?? '', style: AppTextStyles.headingTextStyle3),
         centerTitle: false,
         actions: [
           PopupMenuButton(
-              padding: EdgeInsets.zero,
-              onSelected: (val){},
-              position: PopupMenuPosition.under,
-              icon: Icon(Icons.more_vert_rounded),
-              color: Colors.white,
-              itemBuilder: (_){
-            return [
+            padding: EdgeInsets.zero,
+            onSelected: (val) {},
+            position: PopupMenuPosition.under,
+            icon: Icon(Icons.more_vert_rounded),
+            color: Colors.white,
+            itemBuilder: (_) => [
               PopupMenuItem(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  value: 1,
-                  child: Row(
-                    spacing: 12,
-                    children: [
+                value: 1,
+                child: Row(
+                  children: [
                     SvgPicture.asset(AppIcons.icReportUser),
-                    Text("Report user", style: AppTextStyles.smallTextStyle,)
-              ],)),
+                    SizedBox(width: 10),
+                    Text("Report user", style: AppTextStyles.smallTextStyle),
+                  ],
+                ),
+              ),
               PopupMenuItem(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  value: 1,
-                  child: Row(
-                    spacing: 12,
-                    children: [
-                      SvgPicture.asset(AppIcons.icBlockUser),
-                      Text("Block user", style: AppTextStyles.smallTextStyle,)
-                    ],))
-            ];
-          })
+                value: 2,
+                child: Row(
+                  children: [
+                    SvgPicture.asset(AppIcons.icBlockUser),
+                    SizedBox(width: 10),
+                    Text("Block user", style: AppTextStyles.smallTextStyle),
+                  ],
+                ),
+              ),
+            ],
+          )
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: SizedBox(
-            height: size.height * 0.9,
-            child: Column(
-              spacing: 20,
-              children: [
-                // User profile info
-                RemoteUserProfileInfoWidget(
-                  userID: widget._userID,
-                  userName: widget._userName,
-                  profilePicture: widget._profilePicture,
-                  isFromProfilePage: true,
-                ),
-          
+      body: DefaultTabController(
+        length: 2,
+        child: NestedScrollView(
+          headerSliverBuilder: (context, _) => [
+            SliverToBoxAdapter(
+              child: RemoteUserProfileInfoWidget(
+                userID: widget._userID,
+                userName: widget._userName,
+                profilePicture: widget._profilePicture,
+                isFromProfilePage: true,
+              ),
+            ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SliverTabBarDelegate(
                 TabBar(
                   controller: _tabController,
-                  dividerHeight: 1,
-                  indicatorSize: TabBarIndicatorSize.tab,
                   indicatorWeight: 4.0,
-                  labelPadding: EdgeInsets.only(left: 0.0, right: 0.0),
-                  unselectedLabelColor: Colors.black,
-                  labelColor: Colors.black,
-                  labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                  unselectedLabelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+                  labelPadding: EdgeInsets.only(left: 0.0, right: 0.0, top: 0, bottom: 0),
+
+                  indicatorSize: TabBarIndicatorSize.tab,
                   indicator: ShapeDecoration(
                     shape: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.transparent, width: 0),
+                      borderSide: BorderSide.none,
                     ),
                     gradient: AppGradients.primaryGradient,
                   ),
                   onTap: (index) {
-                    if (index != selectedTabIndex) {
-                      setState(() => selectedTabIndex = index);
-                    }
+                    setState(() => selectedTabIndex = index);
                   },
+                  labelColor: Colors.black,
+                  unselectedLabelColor: Colors.black54,
                   tabs: [
                     Container(
-                      height: 40,
+                      height: 50,
+
                       alignment: Alignment.center,
                       color: Colors.white,
-                      child: SvgPicture.asset(selectedTabIndex == 0 ? AppIcons.icSelectedCategory : AppIcons.icCategory),
+                      child: SvgPicture.asset(
+                        selectedTabIndex == 0 ? AppIcons.icSelectedCategory : AppIcons.icCategory,
+                      ),
                     ),
                     Container(
-                      height: 40,
+                      height: 50,
                       alignment: Alignment.center,
                       color: Colors.white,
-                      child: SvgPicture.asset(selectedTabIndex == 1 ? AppIcons.icSelectedBookMark : AppIcons.icBookMark),
+                      child: SvgPicture.asset(
+                        selectedTabIndex == 1 ? AppIcons.icSelectedBookMark : AppIcons.icBookMark,
+                      ),
                     ),
                   ],
                 ),
-                // Tabs and TabView
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      RemoteUserReelsWidget(userID: widget._userID, userName: widget._userName,),
-                      BookmarkWidget(userID: widget._userID,)
-                    ],
-                  ),
-                )
-              ],
+              ),
             ),
+          ],
+          body: TabBarView(
+            controller: _tabController,
+            children: [
+              RemoteUserReelsWidget(
+                userID: widget._userID,
+                userName: widget._userName,
+              ),
+              BookmarkWidget(userID: widget._userID),
+            ],
           ),
-        )
-      )
+        ),
+      ),
     );
   }
+}
+
+class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+  _SliverTabBarDelegate(this.tabBar);
+
+  @override
+  double get minExtent => tabBar.preferredSize.height;
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Colors.white,
+      alignment: Alignment.center,
+      child: SizedBox(
+        height: tabBar.preferredSize.height,
+        child: tabBar,
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => false;
 }

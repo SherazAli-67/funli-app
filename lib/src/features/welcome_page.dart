@@ -17,6 +17,7 @@ import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_gradient_background.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:go_router/go_router.dart';
+import '../providers/discover_provider.dart';
 import '../widgets/primary_btn.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -126,6 +127,8 @@ class WelcomePage extends StatelessWidget {
             }else if(state is SignedUpGoogle){
               context.read<PersonalInfoProvider>().setUserName(state.user.user!.displayName ?? '');
               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedUpSuccessTitle, message: AppConstants.signedUpSuccessMessage);
+              //Initializing the Trending moods and Hashtags so that user don't have to wait
+              context.read<DiscoverProvider>().loadAll();
               while (context.canPop()) {
                 context.pop();
               }

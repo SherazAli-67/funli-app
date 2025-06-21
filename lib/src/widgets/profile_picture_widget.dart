@@ -18,7 +18,7 @@ class ProfilePictureWidget extends StatelessWidget {
       backgroundColor: AppColors.amberYellowColor,
       child: CircleAvatar(
         backgroundColor: AppColors.amberYellowColor,
-        radius: 33,
+        radius: _profilePicture  != null ? 33 :22,
         backgroundImage: _profilePicture != null
             ? CachedNetworkImageProvider(_profilePicture)
             : CachedNetworkImageProvider(AppIcons.icDummyImgUrl),

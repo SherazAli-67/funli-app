@@ -51,7 +51,6 @@ class DiscoverProvider extends ChangeNotifier {
     // Check if we should refresh from network
     bool shouldRefresh = await HashtagMoodCachedReels.shouldRefreshFromNetwork();
 
-    debugPrint("Should refresh mood reels: $shouldRefresh");
     // Preload reels for each mood
     for (var mood in _trendingMoods) {
       if (shouldRefresh) {
@@ -72,6 +71,7 @@ class DiscoverProvider extends ChangeNotifier {
   }
 
   Future<void> loadAll() async {
+    debugPrint("Loading moods and tags reels");
     await Future.wait([
       fetchTrendingHashtags(),
       fetchTrendingMoods(),

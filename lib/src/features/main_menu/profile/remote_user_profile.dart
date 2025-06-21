@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -9,10 +9,12 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/gradient_text_widget.dart';
-import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/profile_info_widget.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../loading_shimmers/reel_thumbnail_shimmer_item.dart';
 
 class RemoteUserProfileInfoWidget extends StatelessWidget{
   const RemoteUserProfileInfoWidget(
@@ -40,7 +42,7 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
                        borderRadius: BorderRadius.circular(99)
                    )
                ),
-               onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close)),
+               onPressed: ()=> context.pop(), icon: Icon(Icons.close)),
          ),
         Column(
           spacing: 16,
@@ -82,7 +84,12 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
                 ),
                 SizedBox(
                   height: 200,
-                  child: FutureBuilder(future: ReelsService.getUserReels(limit: 10), builder: (ctx, snapshot){
+                  child: FutureBuilder(future: ReelsService.fetchUserReels(
+                    userId: _userID,
+                    limit: 5,
+                    onLastDoc: (doc){},
+                    onHasMore: (has){}, lastDoc: null,
+                  ), builder: (ctx, snapshot){
 
                     if(snapshot.hasData){
                       return ListView.builder(
@@ -98,7 +105,15 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
                             );
                           });
                     }else if(snapshot.connectionState == ConnectionState.waiting){
-                      return LoadingWidget();
+                      return ListView.builder(
+                          itemCount: 3,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (_, index){
+                            return Padding(
+                              padding: const EdgeInsets.only(left: 16.0),
+                              child: ReelThumbnailShimmerItem(),
+                            );
+                          });
                     }
 
                     return SizedBox();
@@ -109,9 +124,14 @@ class RemoteUserProfileInfoWidget extends StatelessWidget{
 
             if(!_isFromProfilePage)
               Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
+                padding: const EdgeInsets.only(bottom: 140.0),
                 child: TextButton(onPressed: () {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_)=> RemoteUserProfilePage(userID: _userID, userName: _userName, profilePicture: _profilePicture,)));
+                  context.pop();
+                  context.push(RouterEnum.remoteUserProfileView.routeName, extra: {
+                    'userID' : _userID,
+                    'userName' : _userName,
+                    'profilePicture' : _profilePicture
+                  });                  // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_)=> RemoteUserProfilePage(userID: _userID, userName: _userName, profilePicture: _profilePicture,)));
                 },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

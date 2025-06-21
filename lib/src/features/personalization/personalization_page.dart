@@ -37,8 +37,9 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
-      body: SafeArea(child: Padding(
+      body: SafeArea(child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24),
         child: Column(
           spacing: 14,
@@ -58,14 +59,17 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
                 )
               ],
             ),
-            Expanded(
-                child: PageView.builder(
-                controller: _pageController,
-                itemCount: _pages.length,
-                onPageChanged: (index)=> setState(() => _currentPage = index),
-                itemBuilder: (ctx, index){
-              return _pages[_currentPage];
-            })),
+            SizedBox(
+              height: size.height*0.75,
+              child: PageView.builder(
+                  controller: _pageController,
+
+                  itemCount: _pages.length,
+                  onPageChanged: (index)=> setState(() => _currentPage = index),
+                  itemBuilder: (ctx, index){
+                    return _pages[_currentPage];
+                  }),
+            ),
             BlocConsumer<AuthCubit, AuthStates>(
               listener: (_, state){
                 if(state is CompletedUserSignupInfoFailed){

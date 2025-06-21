@@ -258,56 +258,73 @@ class MoodCard extends StatelessWidget {
                 List<ReelModel> reels = provider.moodReels[mood.mood] ?? [];
                 DocumentSnapshot? lastDoc = provider.moodLastDocuments[mood.mood];
                 if (reels.isNotEmpty) {
-                  return ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: mood.reelsCount > reels.length ? (reels.length + 1) : reels.length,
-                      itemBuilder: (ctx, index) {
-                        return index == reels.length
-                            ? IconButton(
-                                style: ElevatedButton.styleFrom(
-                                    shape: CircleBorder(side: BorderSide.none),
-                                    backgroundColor: AppColors.yellowAccentColor,
-                                    padding: EdgeInsets.all(20)),
-                                onPressed: () {
-                                  _onMoodTap(context, mood.mood);
-                                },
-                                icon: Icon(Icons.arrow_forward_rounded, size: 30))
-                            : GestureDetector(
-                                onTap: () {
-                                  context.push(
-                                    RouterEnum.updatedReelsView.routeName,
-                                    extra: {
-                                      'initialReels': reels,
-                                      'selectedIndex': index,
-                                      'lastDocument': lastDoc,
-                                      'comingFrom': AppConstants.comingFromMood,
-                                      'mood': mood.mood,
-                                    },
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(5),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: CachedNetworkImage(
-                                      placeholder: (context, url) => ReelThumbnailShimmerItem(),
-                                      imageUrl: reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
-                                      height: 150,
-                                    ),
-                                  ),
-                                ),
-                              );
-                      });
+                  return MoodReelsWidget(reels: reels, mood: mood, lastDoc: lastDoc,);
                 } else if (provider.isLoadingMoods) {
                   return LoadingWidget();
                 }
                 return SizedBox();
               },
-            ),
+            )
           )
         ],
       ),
     );
+  }
+
+  void _onMoodTap(BuildContext context, String mood){
+    context.push(RouterEnum.moodReelsView.routeName, extra: {'mood' : mood});
+  }
+}
+
+class MoodReelsWidget extends StatelessWidget{
+  final List<ReelModel> _reels;
+  final MoodModel _mood;
+  final DocumentSnapshot? _lastDoc;
+
+  const MoodReelsWidget({super.key, required List<ReelModel> reels, required MoodModel mood, DocumentSnapshot? lastDoc}) : _reels = reels, _mood = mood, _lastDoc = lastDoc;
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _mood.reelsCount > _reels.length ? (_reels.length + 1) : _reels.length,
+        itemBuilder: (ctx, index) {
+          return index == _reels.length
+              ? IconButton(
+              style: ElevatedButton.styleFrom(
+                  shape: CircleBorder(side: BorderSide.none),
+                  backgroundColor: AppColors.yellowAccentColor,
+                  padding: EdgeInsets.all(20)),
+              onPressed: () {
+                _onMoodTap(context, _mood.mood);
+              },
+              icon: Icon(Icons.arrow_forward_rounded, size: 30))
+              : GestureDetector(
+            onTap: () {
+              context.push(
+                RouterEnum.updatedReelsView.routeName,
+                extra: {
+                  'initialReels': _reels,
+                  'selectedIndex': index,
+                  'lastDocument': _lastDoc,
+                  'comingFrom': AppConstants.comingFromMood,
+                  'mood': _mood.mood,
+                },
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: CachedNetworkImage(
+                  placeholder: (context, url) => ReelThumbnailShimmerItem(),
+                  errorWidget: (ctx, val, err)=> CachedNetworkImage(imageUrl: AppIcons.icDefaultThumbnailUrl),
+                  imageUrl:  _reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
+                  height: 150,
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   void _onMoodTap(BuildContext context, String mood){

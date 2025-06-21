@@ -206,12 +206,15 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
                     onTap: (){
                       String? userName = _userModel?.userName;
                       String? userID = _userModel?.userID;
+                      debugPrint("User name: $userName, userID: $userID");
                       showModalBottomSheet(
                           isScrollControlled: true,
                           context: context, builder: (ctx){
                         return FractionallySizedBox(
                             heightFactor: 0.75,
-                            child: SingleChildScrollView(child: RemoteUserProfileInfoWidget(userName: userName, userID: userID!,)));
+                            child: SingleChildScrollView(
+                                child: RemoteUserProfileInfoWidget(
+                                  userName: userName, userID: widget.reel.userID,)));
                       });
                     },
                     child: Container(

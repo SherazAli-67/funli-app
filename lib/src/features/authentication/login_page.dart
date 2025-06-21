@@ -5,6 +5,7 @@ import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/bloc_cubit/auth_states.dart';
 import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
+import 'package:funli_app/src/providers/discover_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -109,6 +110,9 @@ class _LoginPageState extends State<LoginPage> {
                               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Login Failed", message: state.errorMessage, isError: true);
                             }else if(state is SignedIn){
                               SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedInSuccessTitle, message: AppConstants.signedInSuccessMessage);
+
+                              //Initializing the Trending moods and Hashtags so that user don't have to wait
+                              context.read<DiscoverProvider>().loadAll();
                               while(context.canPop()){
                                 context.pop();
                               }

@@ -54,9 +54,7 @@ class _NotificationItemWidgetState extends State<NotificationItemWidget> {
 
       },
       contentPadding: EdgeInsets.only(right: 10),
-      leading: ProfilePictureWidget(
-          profilePicture: (_isLoadingUser || user == null) 
-              ? AppIcons.icDummyImgUrl : user!.profilePicture),
+      leading: ProfilePictureWidget(profilePicture:  user?.profilePicture),
       title: Text((_isLoadingUser || user == null) ?  '' : user!.userName, style: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700),),
       subtitle: Text(widget._notification.notificationDescription, style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.icCommentGreyColor),),
       trailing: widget._notification.notificationType ==

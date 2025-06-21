@@ -127,102 +127,112 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
       return const Center(child: Text("No bookmarks found."));
     }
 
-    return GridView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.all(8.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        mainAxisSpacing: 4.0,
-        crossAxisSpacing: 4.0,
-        childAspectRatio: 9 / 16,
-      ),
-      itemCount: _reels.length + (_hasMore ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index == _reels.length) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return CustomScrollView(
+      key: PageStorageKey('BookmarkedReels'),
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.all(8),
+          sliver: SliverGrid(
+            delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                if (index == _reels.length) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-        ReelModel reel = ReelModel.fromMap( _reels[index]);
-        final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
 
-        return GestureDetector(
-          onTap: () {
-            final initialReels = _reels.map((reel)=> ReelModel.fromMap(reel)).toList();
-            context.push(RouterEnum.updatedReelsView.routeName,  extra: {
-              'initialReels': initialReels,
-              'selectedIndex': index,
-              'lastDocument': _lastDocument,
-              'userID' : widget._userID,
-              'comingFrom':AppConstants.comingFromBookmark
-            },);
-          },
-          child: Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: CachedNetworkImageProvider(thumbnailUrl),
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey[200],
-                ),
-              ),
-              Positioned(
-                  top: 10,
-                  left: 5,
-                  right: 5,
-                  child: FutureBuilder(future: UserService.getUserByID(userID: reel.userID), builder: (ctx, snapshot){
-                    if(snapshot.hasData && snapshot.requireData != null){
-                      UserModel user = snapshot.requireData!;
-                      return Row(
-                        spacing: 5,
-                        children: [
+                ReelModel reel = ReelModel.fromMap( _reels[index]);
+                final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
 
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundColor: AppColors.purpleColor,
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              radius: 19,
-                              backgroundImage: CachedNetworkImageProvider(user.profilePicture ?? AppIcons.icDummyImgUrl),
-                            ),
-                          ),
-                          Expanded(child: Text(user.userName, style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
-                        ],
-                      );
-                    }
-                    return SizedBox();
-                  })),
-              Positioned(
-                  bottom: 10,
-                  left: 10,
-                  right: 0,
-                  child: Row(
-                    spacing: 5,
+                return GestureDetector(
+                  onTap: () {
+                    final initialReels = _reels.map((reel)=> ReelModel.fromMap(reel)).toList();
+                    context.push(RouterEnum.updatedReelsView.routeName,  extra: {
+                      'initialReels': initialReels,
+                      'selectedIndex': index,
+                      'lastDocument': _lastDocument,
+                      'userID' : widget._userID,
+                      'comingFrom':AppConstants.comingFromBookmark
+                    },);
+                  },
+                  child: Stack(
                     children: [
-
-                      CircleAvatar(
-                        radius: 12,
-                        backgroundColor: Colors.white,
-                        child: Center(child: Icon(Icons.play_arrow_rounded, ),),
+                      Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: CachedNetworkImageProvider(thumbnailUrl),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.grey[200],
+                        ),
                       ),
-                      Expanded(
-                          child: FutureBuilder(future: ReelsService.getReelViewsCount(reelID: reel.reelID),
-                              builder: (ctx, snapshot) {
-                                if(snapshot.hasData && snapshot.requireData > 0){
-                                  return ReelLikesCountWidget(count: snapshot.requireData);
-                                }
+                      Positioned(
+                          top: 10,
+                          left: 5,
+                          right: 5,
+                          child: FutureBuilder(future: UserService.getUserByID(userID: reel.userID), builder: (ctx, snapshot){
+                            if(snapshot.hasData && snapshot.requireData != null){
+                              UserModel user = snapshot.requireData!;
+                              return Row(
+                                spacing: 5,
+                                children: [
 
-                                return ReelLikesCountWidget();
-                              }))
+                                  CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: AppColors.purpleColor,
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.white,
+                                      radius: 19,
+                                      backgroundImage: CachedNetworkImageProvider(user.profilePicture ?? AppIcons.icDummyImgUrl),
+                                    ),
+                                  ),
+                                  Expanded(child: Text(user.userName, style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
+                                ],
+                              );
+                            }
+                            return SizedBox();
+                          })),
+                      Positioned(
+                          bottom: 10,
+                          left: 10,
+                          right: 0,
+                          child: Row(
+                            spacing: 5,
+                            children: [
+
+                              CircleAvatar(
+                                radius: 12,
+                                backgroundColor: Colors.white,
+                                child: Center(child: Icon(Icons.play_arrow_rounded, ),),
+                              ),
+                              Expanded(
+                                  child: FutureBuilder(future: ReelsService.getReelViewsCount(reelID: reel.reelID),
+                                      builder: (ctx, snapshot) {
+                                        if(snapshot.hasData && snapshot.requireData > 0){
+                                          return ReelLikesCountWidget(count: snapshot.requireData);
+                                        }
+
+                                        return ReelLikesCountWidget();
+                                      }))
+                            ],
+                          ))
                     ],
-                  ))
-            ],
+                  ),
+                );
+              }, // your grid item
+              childCount: _reels.length + (_hasMore ? 1 : 0),
+            ),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 4.0,
+              crossAxisSpacing: 4.0,
+              childAspectRatio: 9 / 16,
+            ),
           ),
-        );
-      },
+        ),
+      ],
     );
+
   }
 
   @override

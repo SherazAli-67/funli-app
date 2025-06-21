@@ -168,11 +168,6 @@ class ReelsService {
             .toList());
   }
 
-  static Future<List<ReelModel>> getUserReels({required int limit}) async{
-   QuerySnapshot querySnapshot =  await _reelsColRef.limit(limit).get();
-  return querySnapshot.docs.map((doc)=> ReelModel.fromMap(doc.data() as Map<String,dynamic>)).toList();
-  }
-
   static Future<int> getHashtagReelsCount({required String hashtag}) async{
     final countQuery = await FirebaseFirestore.instance
         .collection(FirebaseConstants.hashtagsCollections).doc(hashtag)

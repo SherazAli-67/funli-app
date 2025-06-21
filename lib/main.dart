@@ -44,7 +44,7 @@ void main() async{
         ChangeNotifierProvider(create: (_)=> FeelsSearchProvider()..fetchInitial()),
         ChangeNotifierProvider(create: (_)=> UsersSearchProvider()..fetchInitial()),
         ChangeNotifierProvider(create: (_)=> HashtagSearchProvider()..fetchInitial()),
-        ChangeNotifierProvider(create: (_) => DiscoverProvider()..loadAll()),
+        ChangeNotifierProvider(create: (_) => DiscoverProvider()),
       ],
       child: const MyApp()));
 }
@@ -74,30 +74,6 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white
       ),
       ),
-      /*MaterialApp(
-        title: AppConstants.appTitle,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          fontFamily: AppConstants.appFontFamily,
-          scaffoldBackgroundColor: Colors.white
-        ),
-          home: StreamBuilder<User?>(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (snapshot.hasData) {
-                debugPrint("HasData: ${snapshot.requireData!.uid}");
-                return MainMenuPage();
-              } else {
-                debugPrint("Do not has Data");
-                return WelcomePage();
-              }
-            },
-          )
-      ),*/
     );
   }
 }

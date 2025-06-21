@@ -152,7 +152,9 @@ class AppRouter {
         pageBuilder: (context, state) {
           final extras = state.extra! as Map<String, dynamic>;
           return MaterialPage(
-            child: RemoteUserProfilePage(userID: extras['userID'], userName: extras['userName'], profilePicture: extras['profilePicture'],)
+              child: RemoteUserProfilePage(userID: extras['userID'],
+                userName: extras['userName'],
+                profilePicture: extras['profilePicture'],)
           );
         },
       ),
