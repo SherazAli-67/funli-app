@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/features/main_menu/video_feed_view/bloc_cubit/video_feed_cubit.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
@@ -206,12 +205,24 @@ class _PublishReelPageState extends State<PublishReelPage> {
               ),
             ),
           ),
-          if(provider.isCompressingVideo)
+          if(provider.isCompressingVideo || provider.uploadProgress > 0)
             Container(
               height: size.height*0.9,
               width: double.infinity,
               color: Colors.black54,
-              child: LoadingWidget(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  LoadingWidget(),
+                  SizedBox(height: 16),
+                  Text(
+                    provider.isCompressingVideo 
+                        ? "Preparing video for upload..."
+                        : "Uploading: ${(provider.uploadProgress * 100).toStringAsFixed(0)}%",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ],
+              ),
             )
         ],
       ),
@@ -275,17 +286,18 @@ class _PublishReelPageState extends State<PublishReelPage> {
   }
 
   void navigationCallback()async{
-   await showModalBottomSheet(
+    await showModalBottomSheet(
         backgroundColor: Colors.white,
         context: context, builder: (ctx){
-      return Padding(
+      return SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           spacing: 10,
           children: [
             Lottie.asset(AppIcons.icSuccessAnim, height: 150, repeat: false,),
-            Text("Awesome! You have expressed your feelings☺", textAlign: TextAlign.center, style: AppTextStyles.headingTextStyle3,),
+            Text("Awesome! You  expressed your feelings☺", textAlign: TextAlign.center, style: AppTextStyles.headingTextStyle3,),
+            Text("You can check feel uploading progress in the notification", textAlign: TextAlign.center, style: AppTextStyles.bodyTextStyle,),
 
             const SizedBox(height: 20,),
             Padding(
@@ -299,6 +311,9 @@ class _PublishReelPageState extends State<PublishReelPage> {
         ),
       );
     });
+
+   debugPrint("Comes back in sheet");
+   _navigateBackToMainMenu();
   }
 
   void _onSaveAsDraft(){

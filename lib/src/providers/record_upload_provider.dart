@@ -61,6 +61,9 @@ class RecordUploadProvider extends ChangeNotifier{
     notifyListeners();
   }
 
+  double _uploadProgress = 0.0;
+  double get uploadProgress => _uploadProgress;
+
   Future<void> publishReel({required String caption, required String visibility, required VoidCallback navigationCallback}) async{
     if(recordedPath == null){
       Fluttertoast.showToast(msg: "No video was found to upload");
@@ -68,9 +71,14 @@ class RecordUploadProvider extends ChangeNotifier{
     }
 
     isCompressingVideo = true;
+    _uploadProgress = 0.0;
     await VideoCompress.deleteAllCache();
     notifyListeners();
     debugPrint("Video size before compression: ${await File(_recordedPath!).length()}");
+   /* FirebaseNotificationsService.show(
+      title: "Video Upload",
+      body: "Compressing video... (0%)",
+    );*/
     File? thumbnailPath;
     try{
       thumbnailPath = await VideoCompress.getFileThumbnail(_recordedPath!);
@@ -86,6 +94,12 @@ class RecordUploadProvider extends ChangeNotifier{
         deleteOrigin: false, // Set true to delete original file
       );
        debugPrint("Video size after compression: ${await compressedVideo?.file!.length()}");
+       _uploadProgress = 0.3; // Update progress after compression
+       notifyListeners();
+       FirebaseNotificationsService.show(
+         title: "Uploading Feel Progress",
+         body: "Compression complete. Preparing upload... (30%)",
+       );
     }catch(e){
       debugPrint("Exception while compressing the video: ${e.toString()}");
     }
@@ -99,10 +113,23 @@ class RecordUploadProvider extends ChangeNotifier{
     String? videoUrl;
     if(thumbnailPath != null){
       thumbnailUrl = await PublishReelService.getThumbnailUrl(reelID: reelID, file: thumbnailPath);
+      _uploadProgress = 0.5; // Update progress after thumbnail upload
+      notifyListeners();
+      /*FirebaseNotificationsService.show(
+        title: "Video Upload",
+        body: "Thumbnail uploaded. Starting video upload... (50%)",
+      );*/
     }
 
     if(compressedVideo != null){
-      videoUrl = await PublishReelService.getReelUploadedUrl(reelID: reelID, file: compressedVideo.file!);
+      videoUrl = await PublishReelService.getReelUploadedUrl(reelID: reelID, file: compressedVideo.file!, onProgress: (progress) {
+        _uploadProgress = 0.5 + (progress * 0.5); // Update progress during video upload
+        notifyListeners();
+        FirebaseNotificationsService.show(
+          title: "Uploading Feel Progress",
+          body: "Uploading video: ${(progress * 100).toStringAsFixed(0)}% (${(_uploadProgress * 100).toStringAsFixed(0)}% total)",
+        );
+      });
     }
 
     if(videoUrl != null){
@@ -133,6 +160,7 @@ class RecordUploadProvider extends ChangeNotifier{
           body: 'Your reel has been uploaded successfully.',
         );
       }
+
 
       //Add reel to user collection
       PublishReelService.addReelToUser(reelID: reel.reelID);
@@ -204,6 +232,9 @@ class RecordUploadProvider extends ChangeNotifier{
     isMuted = false;
     _recordedPath = null;
     playbackSpeed = 1;
+    isCompressingVideo = false;
+    _uploadProgress = 0;
+
     notifyListeners();
   }
  /* void publishReels() {

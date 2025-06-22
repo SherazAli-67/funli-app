@@ -22,14 +22,23 @@ class PublishReelService {
     return null;
   }
 
-  static Future<String?> getReelUploadedUrl({required String reelID, required File file})async{
-    try{
+  static Future<String?> getReelUploadedUrl({required String reelID, required File file, Function(double)? onProgress}) async {
+    try {
       String userID = FirebaseAuth.instance.currentUser!.uid;
       final videoRef = FirebaseStorage.instance.ref().child('reels/$userID/$reelID/video.mp4');
-      final videoUploadTask = await videoRef.putFile(file);
-      return videoUploadTask.ref.getDownloadURL();
-    }catch(e){
-      debugPrint("Error while getting thumbnail Url: ${e.toString()}");
+      final videoUploadTask = videoRef.putFile(file);
+      
+      videoUploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+        if (snapshot.state == TaskState.running && onProgress != null) {
+          double progress = snapshot.bytesTransferred / snapshot.totalBytes;
+          onProgress(progress);
+        }
+      });
+      
+      final snapshot = await videoUploadTask;
+      return snapshot.ref.getDownloadURL();
+    } catch (e) {
+      debugPrint("Error while uploading video: ${e.toString()}");
     }
 
     return null;
