@@ -60,153 +60,164 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
   @override
   Widget build(BuildContext context) {
     _provider = Provider.of<RecordUploadProvider>(context);
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
+    return WillPopScope(
+      onWillPop: ()async{
+        // Reset shouldPauseVideo to false when returning to video feed
+        final cubit = context.read<VideoFeedCubit>();
+        cubit.setShouldPauseVideo(false);
+        // Trigger preloading before navigation
+        cubit.preloadNextVideos();
+        context.go(RouterEnum.videoFeedView.routeName);
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
 
-          GestureDetector(
-            onTap: () async {
-              bool playbackState = await _trimmer.videoPlaybackControl(
-                startValue: _startValue,
-                endValue: _endValue,
-              );
-              setState(() => _isPlaying = playbackState);
-            },
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
+            GestureDetector(
+              onTap: () async {
+                bool playbackState = await _trimmer.videoPlaybackControl(
+                  startValue: _startValue,
+                  endValue: _endValue,
+                );
+                setState(() => _isPlaying = playbackState);
+              },
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
 
-                  VideoViewer(trimmer: _trimmer), // fallback
-                PlayPauseWidget(isPlaying: _isPlaying)
-              ],
+                    VideoViewer(trimmer: _trimmer), // fallback
+                  PlayPauseWidget(isPlaying: _isPlaying)
+                ],
+              ),
             ),
-          ),
-          Positioned(
-            top: 65 ,
-            left: 10,
-            right: 10,
-            child: Consumer<RecordUploadProvider>(
-                builder: (ctx, provider, _) {
-                  return Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            // Reset shouldPauseVideo to false when returning to video feed
-                            // Ensure we trigger preloading when returning to feed
-                            final cubit = context.read<VideoFeedCubit>();
-                            cubit.setShouldPauseVideo(false);
-                            // Trigger preloading before navigation
-                            cubit.preloadNextVideos();
-                            context.pop();
-                          },
-                          child: AppBackButton(color: Colors.white),
-                        ),
-                        Text("Create a Feel", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
-                        GestureDetector(
-                            onTap: (){
-                              // Step 3: EditUploadReel -> PublishReel (replace Edit)
-                              context.pushReplacement(
-                                RouterEnum.publishReelView.routeName,
-                              );
-                            }, child: Padding(
-                              padding: const EdgeInsets.only(top: 5.0),
-                              child: Text("Next", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),),
-                            ))
-                      ],
-                    ),
-                  );
-                }
-            ),
-          ),
-
-          // if(_showTrimmer)
             Positioned(
-              bottom: 40,
-              left: 20,
-              right: 20,
-              child:
-              AnimatedOpacity(
-                opacity: _showTrimmer ? 1 : 0,
-                duration: const Duration(milliseconds: 300),
-                child: Container(
+              top: 65 ,
+              left: 10,
+              right: 10,
+              child: Consumer<RecordUploadProvider>(
+                  builder: (ctx, provider, _) {
+                    return Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              // Reset shouldPauseVideo to false when returning to video feed
+                              // Ensure we trigger preloading when returning to feed
+                              final cubit = context.read<VideoFeedCubit>();
+                              cubit.setShouldPauseVideo(false);
+                              // Trigger preloading before navigation
+                              cubit.preloadNextVideos();
+                              context.pop();
+                            },
+                            child: AppBackButton(color: Colors.white),
+                          ),
+                          Text("Create a Feel", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                          GestureDetector(
+                              onTap: (){
+                                // Step 3: EditUploadReel -> PublishReel (replace Edit)
+                                context.pushReplacement(
+                                  RouterEnum.publishReelView.routeName,
+                                );
+                              }, child: Padding(
+                                padding: const EdgeInsets.only(top: 5.0),
+                                child: Text("Next", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white),),
+                              ))
+                        ],
+                      ),
+                    );
+                  }
+              ),
+            ),
+
+            // if(_showTrimmer)
+              Positioned(
+                bottom: 40,
+                left: 20,
+                right: 20,
+                child:
+                AnimatedOpacity(
+                  opacity: _showTrimmer ? 1 : 0,
+                  duration: const Duration(milliseconds: 300),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 29, vertical: 5),
+                    decoration: BoxDecoration(
+                        gradient: AppGradients.primaryGradient,
+                        borderRadius: BorderRadius.circular(24)
+                    ),
+                    child:  _buildTrimmerWidget()
+                  ),
+                ),
+
+              ),
+
+            if(!_showTrimmer)
+              Positioned(
+                bottom: 40,
+                left: 20,
+                right: 20,
+                child:
+                Container(
                   padding: EdgeInsets.symmetric(horizontal: 29, vertical: 5),
                   decoration: BoxDecoration(
                       gradient: AppGradients.primaryGradient,
                       borderRadius: BorderRadius.circular(24)
                   ),
-                  child:  _buildTrimmerWidget()
+                  child: _showPlaybackSpeed
+                      ? _buildPlaybackSpeedWidget()
+                      : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(onPressed: ()=> setState(()=> _showTrimmer = true), icon: Column(
+                        spacing: 4,
+                        children: [
+                          SvgPicture.asset(AppIcons.icTrim),
+                          Text("Trim", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
+                        ],
+                      )),
+                      TextButton(onPressed: ()=> setState(()=> _showPlaybackSpeed = true), child: Column(
+                        spacing: 4,
+                        children: [
+                          Text('${_provider.playbackSpeed.toInt()}x', style: AppTextStyles.headingTextStyle.copyWith(color: Colors.white)),
+                          Text("Speed", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
+                        ],
+                      )),
+                      IconButton(onPressed: (){
+                        if(_isMuted){
+                          _isMuted = false;
+                          _trimmer.videoPlayerController!.setVolume(1.0);
+                          _trimmer.videoPlayerController!.play();
+                          _provider.setMuted(false);
+                          printToastMsg("Video is un muted!");
+                        }else{
+                          _isMuted = true;
+                          _trimmer.videoPlayerController!.setVolume(0.0);
+                          _trimmer.videoPlayerController!.play();
+                          _provider.setMuted(false);
+                          printToastMsg("Video is muted!");
+                        }
+                        setState(() {});
+                      }, icon: Column(
+                        spacing: 4,
+                        children: [
+                          SvgPicture.asset(_isMuted ? AppIcons.icMute : AppIcons.icVolumeUp),
+                          Text(_isMuted ? "Unmute" : "Mute", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
+                        ],
+                      )),
+                    ],
+                  ),
                 ),
-              ),
 
-            ),
+              )
+          ],
+        ),
 
-          if(!_showTrimmer)
-            Positioned(
-              bottom: 40,
-              left: 20,
-              right: 20,
-              child:
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 29, vertical: 5),
-                decoration: BoxDecoration(
-                    gradient: AppGradients.primaryGradient,
-                    borderRadius: BorderRadius.circular(24)
-                ),
-                child: _showPlaybackSpeed
-                    ? _buildPlaybackSpeedWidget()
-                    : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(onPressed: ()=> setState(()=> _showTrimmer = true), icon: Column(
-                      spacing: 4,
-                      children: [
-                        SvgPicture.asset(AppIcons.icTrim),
-                        Text("Trim", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
-                      ],
-                    )),
-                    TextButton(onPressed: ()=> setState(()=> _showPlaybackSpeed = true), child: Column(
-                      spacing: 4,
-                      children: [
-                        Text('${_provider.playbackSpeed.toInt()}x', style: AppTextStyles.headingTextStyle.copyWith(color: Colors.white)),
-                        Text("Speed", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
-                      ],
-                    )),
-                    IconButton(onPressed: (){
-                      if(_isMuted){
-                        _isMuted = false;
-                        _trimmer.videoPlayerController!.setVolume(1.0);
-                        _trimmer.videoPlayerController!.play();
-                        _provider.setMuted(false);
-                        printToastMsg("Video is un muted!");
-                      }else{
-                        _isMuted = true;
-                        _trimmer.videoPlayerController!.setVolume(0.0);
-                        _trimmer.videoPlayerController!.play();
-                        _provider.setMuted(false);
-                        printToastMsg("Video is muted!");
-                      }
-                      setState(() {});
-                    }, icon: Column(
-                      spacing: 4,
-                      children: [
-                        SvgPicture.asset(_isMuted ? AppIcons.icMute : AppIcons.icVolumeUp),
-                        Text(_isMuted ? "Unmute" : "Mute", style: AppTextStyles.captionTextStyle.copyWith(color: Colors.white),)
-                      ],
-                    )),
-                  ],
-                ),
-              ),
-
-            )
-        ],
       ),
-
     );
   }
 
@@ -326,4 +337,5 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
       _trimmer.videoPlayerController!.play();
     }
   }
+
 }

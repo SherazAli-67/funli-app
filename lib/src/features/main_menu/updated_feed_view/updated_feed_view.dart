@@ -96,7 +96,7 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
 
     if (_isAppActive && !wasActive) {
       _cleanupAndReinitializeCurrentVideo();
-    } else if (!_isAppActive && wasActive) {
+    } else if (!_isAppActive && wasActive && _currentlyPlayingVideoId != null) {
       _pauseExceptCurrent(_currentlyPlayingVideoId!);
     }
   }
@@ -394,7 +394,8 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
               setState(() {
                 _showingBackgroundRefresh = true;
               });
-            } else if (_showingBackgroundRefresh && !state.isLoading) {
+            }
+            else if (_showingBackgroundRefresh && !state.isLoading) {
               setState(() {
                 _showingBackgroundRefresh = false;
               });
@@ -411,7 +412,8 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
             }
             if (state.shouldPauseVideo && _currentlyPlayingVideoId != null) {
               await _pauseExceptCurrent(_currentlyPlayingVideoId!); // Ensure current video is paused before moving
-            } else if (!state.shouldPauseVideo && _isAppActive) {
+            }
+            else if (!state.shouldPauseVideo && _isAppActive) {
               await _initAndPlayVideo(_currentPage);
             }
           },

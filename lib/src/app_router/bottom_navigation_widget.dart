@@ -77,7 +77,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                           ),
                           child: IconButton(onPressed: ()async{
                             context.read<VideoFeedCubit>().setShouldPauseVideo(true);
-                            context.push(RouterEnum.createUploadReelView.routeName);
+                            context.go(RouterEnum.createUploadReelView.routeName);
                           }, icon: Icon(Icons.add, color: Colors.white,)),
                         ),
                       ),

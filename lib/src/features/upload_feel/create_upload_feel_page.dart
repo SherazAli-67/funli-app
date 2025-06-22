@@ -99,54 +99,64 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
    if(_isCameraInitialized){
       scale = 1 / (_controller.value.aspectRatio * size.aspectRatio);
    }
-    return Scaffold(
-      body: _isCameraInitialized
+    return WillPopScope(
+      onWillPop: () async {
+        // Reset shouldPauseVideo to false when returning to video feed
+        final cubit = context.read<VideoFeedCubit>();
+        cubit.setShouldPauseVideo(false);
+        // Trigger preloading before navigation
+        cubit.preloadNextVideos();
+        context.go(RouterEnum.videoFeedView.routeName);
+        return false;
+      },
+      child: Scaffold(
+        body: _isCameraInitialized
           ? GestureDetector(
         onDoubleTap: _toggleCamera,
         onScaleStart: _onScaleStart,
         onScaleUpdate: _onScaleUpdate,
-            child: Stack(
-                    alignment: Alignment.bottomCenter,
-                    children: [
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
             // Image.network(AppIcons.icDummyImgUrl,fit: BoxFit.cover, height: size.height,),
-                      Transform.scale(
-                        scale: scale,
-                        alignment: Alignment.topCenter,
-                        child: CameraPreview(_controller),
-                      ),
+            Transform.scale(
+              scale: scale,
+              alignment: Alignment.topCenter,
+              child: CameraPreview(_controller),
+            ),
             Positioned(
               bottom: 0,
               left: 30,
               right: 30,
               child: Consumer<RecordUploadProvider>(
-                builder: (ctx, provider, _) {
-                  return Column(
-                    spacing: 16,
-                    children: [
-                      Row(
-                        spacing: 12,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildVideoDurationWidget(duration: '1m', provider: provider),
-                          _buildVideoDurationWidget(duration: '30s',provider: provider),
-                          _buildVideoDurationWidget(duration: '15s  ',provider: provider),
+                  builder: (ctx, provider, _) {
+                    return Column(
+                      spacing: 16,
+                      children: [
+                        Row(
+                          spacing: 12,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildVideoDurationWidget(duration: '1m', provider: provider),
+                            _buildVideoDurationWidget(duration: '30s',provider: provider),
+                            _buildVideoDurationWidget(duration: '15s  ',provider: provider),
 
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          IconButton(onPressed: ()async{
-                            _toggleCamera();
-                          }, icon: Icon(Icons.change_circle_rounded, color: Colors.white, size: 35,)),
-                          if(_isRecording)
-                            GestureDetector(
-                              onTap: () {
-                                _stopRecording(context: context);
-                              },
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            IconButton(onPressed: ()async{
+                              _toggleCamera();
+                            }, icon: Icon(Icons.change_circle_rounded, color: Colors.white, size: 35,)),
+                            if(_isRecording)
+                              GestureDetector(
+                                onTap: () {
+                                  _stopRecording(context: context);
+                                },
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
                                     TweenAnimationBuilder<double>(
                                       tween: Tween(begin: 0.0, end: 1.0),
                                       duration: Duration(seconds: _getSelectedDurationInSeconds()),
@@ -177,112 +187,112 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                                         style: TextStyle(color: Colors.white, fontSize: 16),
                                       ),
                                     ),
+                                  ],
+                                ),
+                              ),
+
+                            if(!_isRecording)
+                              CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: 40,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: AppGradients.primaryGradient
+                                  ),
+                                  margin: EdgeInsets.all(5),
+                                  padding: EdgeInsets.all(10),
+
+                                  child: IconButton(onPressed: (){
+                                    _startRecording();
+                                  },
+                                      icon: SvgPicture.asset( AppIcons.icRecordVideo,
+                                        colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),)),
+                                ),
+                              ),
+                            IconButton(onPressed: ()async{
+                              String? selectedVideoPath = await _onSelectVideoFromGalleryTap();
+                              if(selectedVideoPath != null){
+                                _navigateToEditFeelPage(context: context, path: selectedVideoPath);
+                              }
+                            }, icon: SvgPicture.asset(AppIcons.icUpload))
+                          ],
+                        )
+                      ],
+                    );
+                  }
+              ),
+            ),
+            Positioned(
+              top: 65 ,
+              left: 30,
+              right: 30,
+              child: Consumer<RecordUploadProvider>(
+                  builder: (ctx, provider, _) {
+                    return Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        spacing: 16,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    // Reset shouldPauseVideo to false when returning to video feed
+                                    // Ensure we trigger preloading when returning to feed
+                                    final cubit = context.read<VideoFeedCubit>();
+                                    cubit.setShouldPauseVideo(false);
+                                    // Trigger preloading before navigation
+                                    cubit.preloadNextVideos();
+                                    GoRouter.of(context).go(RouterEnum.videoFeedView.routeName);
+                                  },
+                                  icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white,)
+                              ),
+                              Text("Record a video", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                              const SizedBox(width: 40,),
+                            ],
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              final result = await showModalBottomSheet(
+                                  isDismissible: false,
+                                  context: context, builder: (_){
+                                return MoodSelectingScrollWheelWidget(selectedMood: provider.currentMood,);
+                              });
+
+                              if(result != null){
+                                provider.setCurrentMood(result);
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 11),
+                              decoration: BoxDecoration(
+                                  color: AppColors.yellowAccentColor,
+                                  borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius)
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                spacing: 10,
+                                children: [
+                                  Text("You seem ${AppData.getEmojiByMood(provider.currentMood)} ${provider.currentMood}", style: AppTextStyles.buttonTextStyle,),
+                                  Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black,)
                                 ],
                               ),
                             ),
-
-                          if(!_isRecording)
-                            CircleAvatar(
-                              backgroundColor: Colors.white,
-                              radius: 40,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: AppGradients.primaryGradient
-                                ),
-                                margin: EdgeInsets.all(5),
-                                padding: EdgeInsets.all(10),
-
-                                child: IconButton(onPressed: (){
-                                  _startRecording();
-                                },
-                                    icon: SvgPicture.asset( AppIcons.icRecordVideo,
-                                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),)),
-                              ),
-                            ),
-                          IconButton(onPressed: ()async{
-                            String? selectedVideoPath = await _onSelectVideoFromGalleryTap();
-                            if(selectedVideoPath != null){
-                              _navigateToEditFeelPage(context: context, path: selectedVideoPath);
-                            }
-                          }, icon: SvgPicture.asset(AppIcons.icUpload))
+                          )
                         ],
-                      )
-                    ],
-                  );
-                }
+                      ),
+                    );
+                  }
               ),
             ),
-                      Positioned(
-                        top: 65 ,
-                        left: 30,
-                        right: 30,
-                        child: Consumer<RecordUploadProvider>(
-                            builder: (ctx, provider, _) {
-                              return Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Column(
-                                  spacing: 16,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        IconButton(
-                                          onPressed: () {
-                                            // Reset shouldPauseVideo to false when returning to video feed
-                                            // Ensure we trigger preloading when returning to feed
-                                            final cubit = context.read<VideoFeedCubit>();
-                                            cubit.setShouldPauseVideo(false);
-                                            // Trigger preloading before navigation
-                                            cubit.preloadNextVideos();
-                                            context.pop();
-                                          }, 
-                                          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white,)
-                                        ),
-                                        Text("Record a video", style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
-                                        const SizedBox(width: 40,),
-                                      ],
-                                    ),
-                                    GestureDetector(
-                                      onTap: () async {
-                                        final result = await showModalBottomSheet(
-                                            isDismissible: false,
-                                            context: context, builder: (_){
-                                          return MoodSelectingScrollWheelWidget(selectedMood: provider.currentMood,);
-                                        });
-
-                                        if(result != null){
-                                          provider.setCurrentMood(result);
-                                        }
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 11),
-                                        decoration: BoxDecoration(
-                                            color: AppColors.yellowAccentColor,
-                                            borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius)
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          spacing: 10,
-                                          children: [
-                                            Text("You seem ${AppData.getEmojiByMood(provider.currentMood)} ${provider.currentMood}", style: AppTextStyles.buttonTextStyle,),
-                                            Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black,)
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              );
-                            }
-                        ),
-                      ),
-                    ],
-                  ),
-          )
+          ],
+        ),
+      )
           : Center(child: CircularProgressIndicator()),
-    );
+    ));
   }
 
   Widget _buildVideoDurationWidget({required String duration, required RecordUploadProvider provider}) {

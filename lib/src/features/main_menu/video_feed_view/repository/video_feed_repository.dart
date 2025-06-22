@@ -17,6 +17,7 @@ class VideoFeedRepository implements IVideoFeedRepository {
   final _reelsColRef = FirebaseFirestore.instance.collection(FirebaseConstants.reelsCollection);
   @override
   Future<List<ReelModel>> fetchVideos({bool isRefresh = false}) async {
+    debugPrint("New reels fetching: $isRefresh");
     try {
       // Reset pagination state for a fresh fetch
       _lastDocument = null;
@@ -42,7 +43,7 @@ class VideoFeedRepository implements IVideoFeedRepository {
       
       // If cache is empty or needs refresh, fetch from network
       final networkReels = await _fetchVideosHelper();
-      
+      debugPrint("Network reels received: ${networkReels.length}");
       // Cache the fetched reels
       if (networkReels.isNotEmpty) {
         await ReelsCacheService.cacheReels(networkReels, mood);

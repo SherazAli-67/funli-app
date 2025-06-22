@@ -169,6 +169,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
           loadingSource: 'network',
         ),
       );
+      debugPrint("New reels found: ${videos.length}");
 
       // Start preloading next videos after initial load
       if (videos.isNotEmpty) {

@@ -19,6 +19,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+import '../../app_router/router_enum.dart';
 import '../../providers/record_upload_provider.dart';
 import '../../res/spacing_constants.dart';
 import '../../testing/social_media/enhanced_social_text_field.dart';
@@ -341,11 +342,10 @@ class _PublishReelPageState extends State<PublishReelPage> {
 
   void _navigateBackToMainMenu(){
     // Reset shouldPauseVideo to false when returning to video feed
-    // Ensure we trigger preloading when returning to feed
     final cubit = context.read<VideoFeedCubit>();
     cubit.setShouldPauseVideo(false);
     // Trigger preloading before navigation
     cubit.preloadNextVideos();
-    context.pop();
+    context.go(RouterEnum.videoFeedView.routeName);
   }
 }
