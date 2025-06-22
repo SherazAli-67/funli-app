@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/profile_analytics_dashboard/reel_views_chart.dart';
+import 'package:funli_app/src/features/profile_analytics_dashboard/user_stats_card.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/services/settings_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
@@ -19,6 +20,7 @@ class AnalyticsCreatorInsightsPage extends StatelessWidget{
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
+        spacing: 16,
         children: [
           FutureBuilder(future: SettingsService.rankCurrentUser(), builder: (ctx, snapshot){
             if(snapshot.hasData){
@@ -32,17 +34,9 @@ class AnalyticsCreatorInsightsPage extends StatelessWidget{
                 bottomText: '');
           }),
 
-
-          const SizedBox(height: 16),
           ReelViewsChart(),
-          const SizedBox(height: 16),
           _buildMostPopularFeels(),
-          const SizedBox(height: 16),
-          _buildTotalEngagements(),
-          const SizedBox(height: 16),
-          _buildStatsGrid(),
-          const SizedBox(height: 16),
-          _buildLovesThisYear(),
+          UserStatsCard(),
         ],
       ),
     );
@@ -57,7 +51,7 @@ class AnalyticsCreatorInsightsPage extends StatelessWidget{
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 3,
             offset: const Offset(0, 1),
@@ -212,72 +206,7 @@ class AnalyticsCreatorInsightsPage extends StatelessWidget{
     );
   }
 
-  Widget _buildStatsGrid() {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      childAspectRatio: 3/2,
-      children: [
-        _buildStatCard('3,456', 'Total Feels', '+2.5%'),
-        _buildStatCard('102,990', 'Total Views', '+0.5%'),
-        _buildStatCard('30,980', 'Total Loves', '-2.5%'),
-        _buildStatCard('230', 'Total Followers', '-5%'),
-      ],
-    );
-  }
 
-  Widget _buildStatCard(String value, String label, String percentage) {
-    final isPositive = percentage.startsWith('+');
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            percentage,
-            style: TextStyle(
-              fontSize: 12,
-              color: isPositive ? Colors.green : Colors.red,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildLovesThisYear() {
     return Container(

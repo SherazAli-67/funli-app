@@ -156,11 +156,23 @@ class UserService {
 
   static Future<List<ReelModel>> getUserPopularReels() async{
     List<ReelModel> reels = [];
+    String userID = FirebaseAuth.instance.currentUser!.uid;
+    QuerySnapshot userReelsSnap = await FirebaseFirestore.instance.collection(
+        FirebaseConstants.userCollection).doc(userID).collection(FirebaseConstants.reelsCollection).get();
+    List<String> reelIDs = userReelsSnap.docs.map((doc)=> doc.id).toList();
 
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection(
-        FirebaseConstants.reelsCollection).orderBy(
-        'viewsCount', descending: true).limit(5).get();
-   reels = querySnapshot.docs.map((doc)=> ReelModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
+    for (var reelID in reelIDs) {
+     DocumentSnapshot docSnap = await FirebaseFirestore.instance.collection(
+          FirebaseConstants.reelsCollection).doc(reelID).get();
+     reels.add(ReelModel.fromMap(docSnap.data() as Map<String,dynamic>));
+    }
+
+    // 3. Sort by views descending
+    reels.sort((a, b) {
+      final int aViews = a.viewsCount ?? 0;
+      final int bViews = b.viewsCount ?? 0;
+      return bViews.compareTo(aViews);
+    });
     return reels;
   }
 
