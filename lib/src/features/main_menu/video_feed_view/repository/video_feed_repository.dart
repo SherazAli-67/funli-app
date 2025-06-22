@@ -90,7 +90,7 @@ class VideoFeedRepository implements IVideoFeedRepository {
 
     try {
       final moreVideos = await _fetchVideosHelper(startAfterDocument: _lastDocument);
-      
+      debugPrint("MoreVideos from VideoFeedRepo: ${moreVideos.length}");
       // Cache the additional videos
       if (moreVideos.isNotEmpty) {
         SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -101,7 +101,7 @@ class VideoFeedRepository implements IVideoFeedRepository {
       return moreVideos;
     } on FirebaseException catch (e) {
       throw Exception(
-        'Failed to fetch more videos from Firestore: ${e.message}',
+        'Failed to fetch more videos from FireStore: ${e.message}',
       );
     } catch (e) {
       throw Exception('Unexpected error while fetching more videos: $e');

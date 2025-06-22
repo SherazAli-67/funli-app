@@ -959,7 +959,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('${AppConstants.appTitle} V2', style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                                Text('${AppConstants.appTitle} V3', style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
                                 Container(
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(

@@ -10,10 +10,13 @@ class PostCommentWidget extends StatelessWidget{
   final Color iconColor;
   final bool isReel;
   final ReelModel reel;
-  const PostCommentWidget({super.key, required this.reel,  this.iconColor = Colors.grey, this.isReel = false});
+  final bool comingFromHome;
+
+  const PostCommentWidget(
+      {super.key, required this.reel, this.iconColor = Colors
+          .grey, this.isReel = false, required this.comingFromHome});
   @override
   Widget build(BuildContext context) {
-
     return StreamBuilder(
       stream: ReelsService.getReelCommentCount(reelID: reel.reelID),
       builder: (context, snapshot) {
@@ -26,6 +29,7 @@ class PostCommentWidget extends StatelessWidget{
   }
 
   Column _buildCommentWidget(BuildContext context, {required int totalComments}) {
+
     return Column(
           children: [
             IconButton(onPressed: (){
@@ -39,7 +43,8 @@ class PostCommentWidget extends StatelessWidget{
                       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                       child: FractionallySizedBox(
                         heightFactor: 0.75,
-                        child: CommentsPage(reel: reel,),
+                        child: CommentsPage(
+                          reel: reel, comingFromHome: comingFromHome,),
                       ));
                 },
               );

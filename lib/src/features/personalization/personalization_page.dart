@@ -63,7 +63,7 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
               height: size.height*0.75,
               child: PageView.builder(
                   controller: _pageController,
-
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: _pages.length,
                   onPageChanged: (index)=> setState(() => _currentPage = index),
                   itemBuilder: (ctx, index){
@@ -98,7 +98,12 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
                         }, isPrefix: true,)),
                         Expanded(child: PrimaryBtn(btnText: "Let’s Go!", icon: AppIcons.icArrowNext, onTap: (){
                           final infoProvider = Provider.of<PersonalInfoProvider>(context, listen: false);
-                          DateTime dob = DateTime(infoProvider.selectedYear, infoProvider.selectedMonth, infoProvider.selectedDay);
+                          int year = 1925 + infoProvider.selectedYear;
+                          int month = infoProvider.selectedMonth+1;
+                          int day = infoProvider.selectedDay+1;
+
+                          DateTime dob = DateTime(year, month, day);
+                          debugPrint("DOB: ${dob.toIso8601String()}");
                           List<String> interests = infoProvider.selectedInterests;
 
                           context.read<AuthCubit>().onCompleteUserSignup(dob: dob, interests: interests, gender: infoProvider.selectedGender);

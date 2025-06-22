@@ -186,19 +186,23 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     if (state.isPaginating || !state.hasMoreVideos) return;
     emit(state.copyWith(isPaginating: true));
 
+    debugPrint("Loading more videos");
     try {
       if (state.videos.isNotEmpty) {
-        final List<ReelModel> moreVideos =
-        await videoRepository.fetchMoreVideos();
+        final List<ReelModel> moreVideos = await videoRepository.fetchMoreVideos();
         final bool hasMoreVideos = moreVideos.length >= 5;
-
+        debugPrint("Loading more videos: hasMoreVideos: $hasMoreVideos");
         // Check for duplicates before adding
         final existingIds = state.videos.map((v) => v.reelID).toSet();
         final newVideos = moreVideos.where((v) => !existingIds.contains(v.reelID)).toList();
+        debugPrint("Loading more videos: newVideos: ${newVideos.length}");
 
         if (newVideos.isNotEmpty) {
+
           final List<ReelModel> updatedVideos = List<ReelModel>.from(state.videos)
             ..addAll(newVideos);
+
+          debugPrint("Updated reels count: updatedReels: ${updatedVideos.length}");
 
           emit(
             state.copyWith(
@@ -210,6 +214,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
 
           // Preload new videos after loading more
           preloadNextVideos();
+          debugPrint("PreLoading next reels");
         } else {
           emit(state.copyWith(isPaginating: false, hasMoreVideos: hasMoreVideos));
         }

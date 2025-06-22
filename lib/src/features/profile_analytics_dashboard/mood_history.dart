@@ -52,9 +52,15 @@ class AnalyticsMoodHistory extends StatelessWidget{
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return const Text('Error loading analytics', style: TextStyle(color: Colors.red));
+            return Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: const Text('Error loading analytics', style: TextStyle(color: Colors.red)),
+            );
           } else if (!snapshot.hasData || snapshot.data!['percentages'].isEmpty) {
-            return const Text('No reel data available', style: TextStyle(fontSize: 16));
+            return Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: const Text('No reel data available', style: TextStyle(fontSize: 16)),
+            );
           } else {
             final rawMoodData = snapshot.data!['percentages'] as Map<String, dynamic>;
             final moodData = rawMoodData.map((key, value) => MapEntry(key, (value as num).toDouble()));

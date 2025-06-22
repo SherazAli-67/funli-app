@@ -235,8 +235,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void _onDOBChangeTap({required int selectedDay, required Function(int) onDayChange, required int selectedMonth, required void Function(int month) onMonthChange, required int selectedYear, required void Function(int year) onYearChange,}) async{
+    debugPrint("Selected Year: $selectedYear, SelectedMonth: $selectedMonth, SelectedDay: $selectedDay");
+
     DateTime? updatedDOB = await showDatePicker(context: context,
-        firstDate: DateTime(1950),
+        firstDate: DateTime(1900),
         lastDate: DateTime.now(),
       initialDate: DateTime(selectedYear, selectedMonth, selectedDay),
     );

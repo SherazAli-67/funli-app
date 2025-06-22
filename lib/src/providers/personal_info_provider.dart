@@ -30,16 +30,19 @@ class PersonalInfoProvider extends ChangeNotifier{
   }
   void setDay(int day){
     _selectedDay = day;
+    debugPrint("Day: $_selectedDay");
     notifyListeners();
   }
 
   void setMonth(int month){
     _selectedMonth = month;
+    debugPrint("Month: $_selectedMonth");
     notifyListeners();
   }
 
   void setYear(int year){
     _selectedYear = year;
+    debugPrint("Year: $_selectedYear");
     notifyListeners();
   }
 

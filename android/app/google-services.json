@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "41844358248-h4uhren6m8nu59hohvp699gnuq4jgo9q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.funtech.funli",
+            "certificate_hash": "53950491415e8d3d2f0f5e57e1bb216c6a4b2ab9"
+          }
+        },
+        {
           "client_id": "41844358248-r405kggl01sgb61b1nbi4v7trtotbiai.apps.googleusercontent.com",
           "client_type": 3
         }

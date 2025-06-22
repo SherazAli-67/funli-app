@@ -7,6 +7,7 @@ import 'package:funli_app/src/models/comment_model.dart';
 import 'package:funli_app/src/models/notification_model.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
+import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/comment_service.dart';
@@ -14,26 +15,46 @@ import 'package:funli_app/src/services/notifications_service.dart';
 import 'package:funli_app/src/services/reels_service.dart';
 
 class CommentsPage extends StatefulWidget{
-  const CommentsPage({super.key, required ReelModel reel}) : _reel = reel;
+  const CommentsPage(
+      {super.key, required ReelModel reel, required bool comingFromHome})
+      : _reel = reel,
+        _comingFromHome = comingFromHome;
   final ReelModel _reel;
-
+  final bool _comingFromHome;
   @override
   State<CommentsPage> createState() => _CommentsPageState();
 }
 
 class _CommentsPageState extends State<CommentsPage> {
-  final TextEditingController _commentController = TextEditingController();
+  late final EmojiTextEditingController _commentController;
+  late final ScrollController _scrollController;
+  late final FocusNode _focusNode;
+  late final TextStyle _textStyle;
+  final bool isApple = [TargetPlatform.iOS, TargetPlatform.macOS]
+      .contains(foundation.defaultTargetPlatform);
   bool _isReplying = false;
   String? _replyingToUserName;
   String? _commentID;
-  final _focusNode = FocusNode();
-  final _scrollController = ScrollController();
   bool _emojiShowing = false;
 
   @override
+  void initState() {
+    final fontSize = 24 * (isApple ? 1.2 : 1.0);
+    // Define Custom Emoji Font & Text Style
+    _textStyle = DefaultEmojiTextStyle.copyWith(
+      fontFamily: AppConstants.appFontFamily,
+      fontSize: fontSize,
+    );
+
+    _commentController = EmojiTextEditingController(emojiTextStyle: _textStyle);
+    _scrollController = ScrollController();
+    _focusNode = FocusNode();
+  super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 23.0, right: 23, bottom: 100, top: 20),
+      padding:  EdgeInsets.only(left: 23.0, right: 23, bottom: widget._comingFromHome ? 100 : 20, top: 20),
       child: Column(
         spacing: 14,
         mainAxisSize: MainAxisSize.min,
@@ -116,6 +137,8 @@ class _CommentsPageState extends State<CommentsPage> {
                           Expanded(child: TextField(
                             controller: _commentController,
                             focusNode: _focusNode,
+                            scrollController: _scrollController,
+
                             onTap: (){
                               if(_emojiShowing){
                                 _emojiShowing = false;
@@ -149,17 +172,17 @@ class _CommentsPageState extends State<CommentsPage> {
                 child: EmojiPicker(
                   textEditingController: _commentController,
                   scrollController: _scrollController,
+
                   config: Config(
                     height: 256,
                     checkPlatformCompatibility: true,
+                    emojiTextStyle: _textStyle,
+
                     viewOrderConfig: const ViewOrderConfig(),
                     emojiViewConfig: EmojiViewConfig(
-                      // Issue: https://github.com/flutter/flutter/issues/28894
-                      emojiSizeMax: 28 *
-                          (foundation.defaultTargetPlatform ==
-                              TargetPlatform.iOS
-                              ? 1.2
-                              : 1.0),
+                      horizontalSpacing: 10,
+                      verticalSpacing: 10,
+
                     ),
                     skinToneConfig: const SkinToneConfig(),
                     categoryViewConfig: const CategoryViewConfig(),
@@ -173,38 +196,6 @@ class _CommentsPageState extends State<CommentsPage> {
                   ),
                 ),
               ),
-              /*Container(
-
-                decoration: BoxDecoration(
-                  color: AppColors.commentTextFieldFillColor,
-                  borderRadius: BorderRadius.circular(13),
-                  border: Border.all(color: AppColors.borderColor)
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(child: TextField(
-                            controller: _commentController,
-                            focusNode: _focusNode,
-
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                hintText: "Say something nice...",
-                                prefixIcon: IconButton(onPressed: (){}, icon: Icon(Icons.emoji_emotions_outlined)),
-                                hintStyle: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.commentHintTextColor)
-                            ),
-                          ))
-                        ],
-                      ),
-                    ),
-                    IconButton(onPressed: _isReplying ? _addReply : _addComment, icon: SvgPicture.asset(AppIcons.icSendBtn))
-                  ],
-                ),
-              ),*/
             ],
           )
         ],
@@ -229,7 +220,7 @@ class _CommentsPageState extends State<CommentsPage> {
     NotificationsService.sendNotificationToUser(
         receiverID: widget._reel.userID,
         reelID: widget._reel.reelID,
-        description: "Wrote a reply on your video" ,
+        description: "Wrote a reply on the feel" ,
         notificationType: NotificationType.reply);
 
 
@@ -242,7 +233,7 @@ class _CommentsPageState extends State<CommentsPage> {
     NotificationsService.sendNotificationToUser(
         receiverID: widget._reel.userID,
         reelID: widget._reel.reelID,
-        description:  "Leave a comment on your video",
+        description:  "Leave a comment on the feel",
         notificationType: NotificationType.comment);
 
     _reset();

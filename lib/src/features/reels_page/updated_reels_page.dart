@@ -202,6 +202,7 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
                       key: ValueKey(reel.reelID),
                       controller: controller,
                       reel: reel,
+                      isComingFromHome: false,
                     ),
                   )
                       : const Center(child: CircularProgressIndicator());

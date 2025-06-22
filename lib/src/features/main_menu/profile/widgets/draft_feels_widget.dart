@@ -2,21 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:funli_app/src/loading_shimmers/reel_thumbnail_shimmer_item.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';
-import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/reel_likes_count.dart';
-import 'package:go_router/go_router.dart';
-
-import '../../../../app_router/router_enum.dart';
-import '../../../../services/reels_cache_service.dart';
 import '../../../../services/reels_service.dart';
 
 class DraftFeelsWidget extends StatefulWidget {
@@ -45,17 +39,17 @@ class _DraftFeelsWidgetState extends State<DraftFeelsWidget> {
 
   void _scrollListener() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 300 && !_isLoading && _hasMore) {
-      _fetchBookmarks();
+      _fetchDrafts();
     }
   }
 
   Future<void> _initializeDrafts() async {
     // Check if we should refresh from network
-    _fetchBookmarks();
+    _fetchDrafts();
 
   }
 
-  Future<void> _fetchBookmarks({bool isFirstTime = false}) async {
+  Future<void> _fetchDrafts({bool isFirstTime = false}) async {
     if (_isLoading) return;
     setState(() {
       _isLoading = true;
@@ -93,11 +87,11 @@ class _DraftFeelsWidgetState extends State<DraftFeelsWidget> {
     }
 
     if (_reels.isEmpty) {
-      return const Center(child: Text("No bookmarks found."));
+      return const Center(child: Text("You have no feel in Drafts"));
     }
 
     return CustomScrollView(
-      key: PageStorageKey('BookmarkedReels'),
+      key: PageStorageKey('DraftReels'),
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.all(8),
