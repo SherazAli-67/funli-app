@@ -248,19 +248,22 @@ class ReelsService {
     required int limit,
     required void Function(DocumentSnapshot?) onLastDoc,
     required void Function(bool) onHasMore,
+    bool comingFromProfile = false
   }) async {
     List<ReelModel> fetchedReels = [];
     Query query = FirebaseFirestore.instance
         .collection(FirebaseConstants.userCollection)
         .doc(userId)
         .collection(FirebaseConstants.reelsCollection)
-        .orderBy("timestamp", descending: true)
-        .limit(limit);
+        .orderBy("timestamp", descending: true);
 
     if (lastDoc != null) {
       query = query.startAfterDocument(lastDoc);
     }
 
+    if(!comingFromProfile){
+      query = query.limit(limit);
+    }
     final querySnapshot = await query.get();
     final docs = querySnapshot.docs;
 

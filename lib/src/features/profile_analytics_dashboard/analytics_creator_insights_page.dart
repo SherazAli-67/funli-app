@@ -7,7 +7,6 @@ import 'package:funli_app/src/services/settings_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
 
 import '../../loading_shimmers/reel_thumbnail_shimmer_item.dart';
-import '../../res/app_gradients.dart';
 import '../../res/app_icons.dart';
 import '../../res/app_textstyles.dart';
 import 'analytics_gradient_info_card.dart';
@@ -105,162 +104,16 @@ class AnalyticsCreatorInsightsPage extends StatelessWidget{
               }else if(snapshot.connectionState == ConnectionState.waiting){
                 return ListView.builder(
                     itemCount: 3,
+                    scrollDirection: Axis.horizontal,
                     itemBuilder: (_, index){
-                  return ReelThumbnailShimmerItem();
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ReelThumbnailShimmerItem(),
+                  );
                 });
               }
               return SizedBox();
             }),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  Widget _buildTotalEngagements() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Your Total Engagements',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildEngagementItem(
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: AppGradients.primaryGradient,
-                  ),
-                  child: const Icon(Icons.favorite, color: Colors.white),
-                ),
-                '250K',
-              ),
-              _buildEngagementItem(
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: AppGradients.primaryGradient,
-                  ),
-                  child: const Icon(Icons.chat_bubble, color: Colors.white),
-                ),
-                '100K',
-              ),
-              _buildEngagementItem(
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: AppGradients.primaryGradient,
-                  ),
-                  child: const Icon(Icons.share, color: Colors.white),
-                ),
-                '132K',
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEngagementItem(Widget icon, String count) {
-    return Column(
-      children: [
-        icon,
-        const SizedBox(height: 8),
-        Text(
-          count,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-
-
-
-  Widget _buildLovesThisYear() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text(
-                '10,254',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '1.5% ↓',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Loves this year',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 40,
-            child: CustomPaint(
-              painter: MiniLineChartPainter(),
-              size: const Size(double.infinity, 40),
-            ),
           ),
         ],
       ),

@@ -62,11 +62,7 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
     }
 
     // Check if we should refresh from network
-    bool shouldRefresh = await ReelsCacheService.shouldRefreshUserBookmarksFromNetwork(widget._userID);
-    String currentUID = FirebaseAuth.instance.currentUser!.uid;
-    if ((shouldRefresh || currentUID != widget._userID) && cachedBookmarks.isEmpty) {
-      _fetchBookmarks();
-    }
+    _fetchBookmarks();
 
   }
 
@@ -76,16 +72,21 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
       _isLoading = true;
     });
 
+    bool isCurrentUser = widget._userID == FirebaseAuth.instance.currentUser!.uid;
+
     Query query = FirebaseFirestore.instance
-        .collection(FirebaseConstants.userCollection).doc(widget._userID)
+        .collection(FirebaseConstants.userCollection)
+        .doc(widget._userID)
         .collection(FirebaseConstants.bookmarksCollection)
-        .orderBy("timestamp", descending: true)
-        .limit(_limit);
+        .orderBy("timestamp", descending: true);
 
     if (_lastDocument != null && !isFirstTime) {
       query = query.startAfterDocument(_lastDocument!);
     }
 
+    if(!isCurrentUser){
+      query = query.limit(_limit);
+    }
     final querySnapshot = await query.get();
     final docs = querySnapshot.docs;
 
@@ -139,9 +140,7 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
           sliver: SliverGrid(
             delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                if (index == _reels.length) {
-                  return ReelThumbnailShimmerItem();
-                }
+
                 
                 ReelModel reel = ReelModel.fromMap( _reels[index]);
                 final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
@@ -223,7 +222,7 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
                   ),
                 );
               }, // your grid item
-              childCount: _reels.length + (_hasMore ? 1 : 0),
+              childCount: _reels.length,
             ),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,

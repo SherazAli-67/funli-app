@@ -40,7 +40,7 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
   bool _hasMore = true;
-  final int _limit = 4;
+  final int _limit = 5;
   DocumentSnapshot? _lastDocument;
 
 
@@ -53,9 +53,8 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
 
   void _scrollListener() {
     if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 300 && !_isLoading &&
-        _hasMore) {
-
+        _scrollController.position.maxScrollExtent - 400 && _hasMore) {
+      debugPrint("fetching new reels");
       _fetchReels();
     }
   }
@@ -63,7 +62,6 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
   Future<void> _initializeReels() async {
     // Check for cached reels first
     List<ReelModel> cachedReels = await ReelsCacheService.getCachedUserReels(widget._userID);
-    debugPrint("Cached reels for: ${widget._userName} found: ${cachedReels.length}");
     if (cachedReels.isNotEmpty) {
       setState(() {
         _reels.clear();
@@ -71,15 +69,10 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
       });
     }
 
-    // Check if we should refresh from network
-    bool shouldRefresh = await ReelsCacheService.shouldRefreshUserReelsFromNetwork(widget._userID);
-    String currentUID = FirebaseAuth.instance.currentUser!.uid;
-    if (shouldRefresh || currentUID != widget._userID) {
-
-      if(cachedReels.isEmpty){
-        _fetchReels();
-      }
-    }
+    // Always attempt to fetch from network to ensure latest data
+    // bool shouldRefresh = await ReelsCacheService.shouldRefreshUserReelsFromNetwork(widget._userID);
+    // String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    _fetchReels();
   }
 
   Future<void> _fetchReels() async {
@@ -87,12 +80,14 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
 
     setState(() => _isLoading = true);
 
+    bool isCurrentUser = widget._userID == FirebaseAuth.instance.currentUser!.uid;
     final newReels = await ReelsService.fetchUserReels(
       userId: widget._userID,
       lastDoc: _lastDocument,
       limit: _limit,
       onLastDoc: (doc) => _lastDocument = doc,
       onHasMore: (has) => _hasMore = has,
+      comingFromProfile: isCurrentUser
     );
 
     if (newReels.isNotEmpty) {
@@ -104,16 +99,10 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
         // Cache only the unique fetched reels
         await ReelsCacheService.cacheUserReels(uniqueNewReels, widget._userID);
       }
-      // If fewer reels than limit are returned or no unique reels added, assume no more data
-      if (newReels.length < _limit || uniqueNewReels.isEmpty) {
-        _hasMore = false;
-      }
-    } else {
-      // If no new reels are fetched, set hasMore to false
-      _hasMore = false;
-    }
 
-    setState(() => _isLoading = false);
+    }
+    _isLoading = false;
+    setState((){});
   }
 
 
@@ -132,13 +121,11 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
       controller: _scrollController,
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 65),
           sliver: SliverGrid(
             delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    if (index == _reels.length && _hasMore) {
-                      return ReelThumbnailShimmerItem();
-                    }
+
                     ReelModel reel = _reels[index];
                     final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
 
@@ -219,7 +206,7 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
                       ),
                     );
                   }, // your grid item
-              childCount: _reels.length + (_hasMore ? 1 : 0),
+              childCount: _reels.length,
             ),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,

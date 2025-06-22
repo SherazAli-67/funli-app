@@ -51,7 +51,7 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
         scrolledUnderElevation: 0,
         elevation: 0,
         title: Text(
-          provider.currentUser?.userName ?? "User not found",
+          provider.currentUser?.userName ?? "",
           style: AppTextStyles.headingTextStyle3,
         ),
         actions: [
@@ -96,6 +96,7 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
                     ),
                     labelColor: Colors.black,
                     unselectedLabelColor: Colors.black54,
+                    onTap: (index)=> provider.onTabChange(index),
                     tabs: [
                       Container(
                         height: 50,
@@ -130,9 +131,7 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
             body: TabBarView(
               controller: _tabController,
               children: [
-                RemoteUserReelsWidget(userID: userID,
-                    userName: userName,
-                    profilePicture: profilePicture),
+                RemoteUserReelsWidget(userID: userID, userName: userName, profilePicture: profilePicture),
                 BookmarkWidget(userID: userID),
                 SizedBox(), // Placeholder
               ],

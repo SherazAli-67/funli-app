@@ -43,7 +43,6 @@ class ProfileProvider extends ChangeNotifier{
   }*/
 
   void initUserProfile() async{
-    debugPrint("Method invoked");
     _isProfileLoading = true;
     notifyListeners();
     _currentUser = await UserService.getUserByID(userID: _currentUID);
