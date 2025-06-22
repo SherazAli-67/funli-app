@@ -19,6 +19,7 @@ import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/discover_provider.dart';
 import '../widgets/primary_btn.dart';
+import '../features/main_menu/video_feed_view/bloc_cubit/video_feed_cubit.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -142,10 +143,21 @@ class WelcomePage extends StatelessWidget {
   }
 
   void _onEmailTap(BuildContext context){
+    _preloadReels(context);
     context.push(RouterEnum.loginView.routeName);
   }
 
   void _onSignInWithGoogleTap(BuildContext context){
     context.read<AuthCubit>().onGoogleSignInTap();
   }
+  
+  void _preloadReels(BuildContext context) {
+    // Preload default reels for new users to reduce loading time
+    Future.microtask(() {
+      context.read<VideoFeedCubit>().initialize();
+    });
+  }
+
 }
+
+

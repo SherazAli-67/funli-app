@@ -34,6 +34,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
 
   /// Initialize videos with optimized loading strategy
   Future<void> _initializeVideos() async {
+    debugPrint("InitialVideos called");
     // First load cached videos immediately
     await _loadCachedVideosFirst();
 
@@ -63,6 +64,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
       // Get cached reels for this mood
       final cachedReels = await ReelsCacheService.getCachedReels(mood);
 
+      debugPrint("Cached reels found: ${cachedReels.length}");
       if (cachedReels.isNotEmpty) {
         // Emit cached reels immediately
         emit(
@@ -643,7 +645,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     try {
       await loadVideos();
       // Cancel the timeout timer since we've successfully loaded from network
-      loadingTimeoutTimer?.cancel();
+      loadingTimeoutTimer.cancel();
     } catch (e) {
       debugPrint('Error loading videos from network: $e');
       // If loading from network fails, ensure we're not stuck in loading state

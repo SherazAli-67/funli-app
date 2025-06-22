@@ -1,3 +1,5 @@
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/main_menu/home_reels_page/comment_item_widget.dart';
@@ -25,6 +27,8 @@ class _CommentsPageState extends State<CommentsPage> {
   String? _replyingToUserName;
   String? _commentID;
   final _focusNode = FocusNode();
+  final _scrollController = ScrollController();
+  bool _emojiShowing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +89,91 @@ class _CommentsPageState extends State<CommentsPage> {
                   child: Text("Replying to $_replyingToUserName"),
                 ),
               Container(
+                height: 48.0,
+                decoration: BoxDecoration(
+                    color: AppColors.commentTextFieldFillColor,
+                    borderRadius: BorderRadius.circular(13),
+                    border: Border.all(color: AppColors.borderColor)
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          IconButton(onPressed: (){
+                            setState(() {
+                              _emojiShowing = !_emojiShowing;
+                              if (!_emojiShowing) {
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  _focusNode.requestFocus();
+                                });
+                              } else {
+                                _focusNode.unfocus();
+                              }
+                            });
+                          }, icon: Icon(Icons.emoji_emotions_outlined)),
+                          Expanded(child: TextField(
+                            controller: _commentController,
+                            focusNode: _focusNode,
+                            onTap: (){
+                              if(_emojiShowing){
+                                _emojiShowing = false;
+                                setState(() {});
+                              }
+                            },
+                            onTapOutside: (val){
+                              if(_emojiShowing){
+                                _emojiShowing = false;
+                                setState(() {});
+                              }
+                            },
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                hintText: "Say something nice...",
+                                hintStyle: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.commentHintTextColor)
+                            ),
+                          ))
+                        ],
+                      ),
+                    ),
+                    IconButton(onPressed: _isReplying ? _addReply : _addComment, icon: SvgPicture.asset(AppIcons.icSendBtn))
+
+                  ],
+                ),
+              ),
+              Offstage(
+                offstage: !_emojiShowing,
+                child: EmojiPicker(
+                  textEditingController: _commentController,
+                  scrollController: _scrollController,
+                  config: Config(
+                    height: 256,
+                    checkPlatformCompatibility: true,
+                    viewOrderConfig: const ViewOrderConfig(),
+                    emojiViewConfig: EmojiViewConfig(
+                      // Issue: https://github.com/flutter/flutter/issues/28894
+                      emojiSizeMax: 28 *
+                          (foundation.defaultTargetPlatform ==
+                              TargetPlatform.iOS
+                              ? 1.2
+                              : 1.0),
+                    ),
+                    skinToneConfig: const SkinToneConfig(),
+                    categoryViewConfig: const CategoryViewConfig(),
+                    bottomActionBarConfig: const BottomActionBarConfig(
+                      backgroundColor: AppColors.purpleColor,
+                      buttonColor: AppColors.purpleColor
+                    ),
+                    searchViewConfig: const SearchViewConfig(
+
+                    ),
+                  ),
+                ),
+              ),
+              /*Container(
 
                 decoration: BoxDecoration(
                   color: AppColors.commentTextFieldFillColor,
@@ -115,7 +204,7 @@ class _CommentsPageState extends State<CommentsPage> {
                     IconButton(onPressed: _isReplying ? _addReply : _addComment, icon: SvgPicture.asset(AppIcons.icSendBtn))
                   ],
                 ),
-              ),
+              ),*/
             ],
           )
         ],
@@ -142,13 +231,9 @@ class _CommentsPageState extends State<CommentsPage> {
         reelID: widget._reel.reelID,
         description: "Wrote a reply on your video" ,
         notificationType: NotificationType.reply);
-    _isReplying = false;
-    _commentID = null;
-    _replyingToUserName = null;
-    _focusNode.unfocus();
-    _commentController.clear();
 
-    setState(() {});
+
+    _reset();
   }
 
   Future<void> _addComment()async{
@@ -159,8 +244,19 @@ class _CommentsPageState extends State<CommentsPage> {
         reelID: widget._reel.reelID,
         description:  "Leave a comment on your video",
         notificationType: NotificationType.comment);
+
+    _reset();
+  }
+
+  void _reset() {
+    _isReplying = false;
+    _commentID = null;
+    _replyingToUserName = null;
     _focusNode.unfocus();
     _commentController.clear();
+    _emojiShowing = false;
+
+    setState(() {});
   }
 }
 

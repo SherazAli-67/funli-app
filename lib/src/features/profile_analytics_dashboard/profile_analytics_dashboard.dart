@@ -47,7 +47,7 @@ class _ProfileAnalyticsDashboardState extends State<ProfileAnalyticsDashboard> w
         centerTitle: false,
         leading: IconButton(onPressed: ()=> context.pop(), icon: Icon(Icons.arrow_back)),
         actions: [
-          TextButton(
+         /* TextButton(
             onPressed: _showTimeRangeDropdown,
             child: Row(
               spacing: 10,
@@ -59,13 +59,15 @@ class _ProfileAnalyticsDashboardState extends State<ProfileAnalyticsDashboard> w
                 const Icon(Icons.keyboard_arrow_down, size: 20),
               ],
             ),
-          ),
+          ),*/
         ],
       ),
       body: SafeArea(
         child: Column(
+          spacing: 20,
           children: [
             _buildTabBar(),
+
             Expanded(
               child: TabBarView(
                 controller: _tabController,

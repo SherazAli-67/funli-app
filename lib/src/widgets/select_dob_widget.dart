@@ -13,7 +13,7 @@ class SelectDOBWidget extends StatefulWidget{
         _onDayChange = onDayChange,
         _onMonthChange = onMonthChange,
         _onYearChange = onYearChange,
-  _isEdit = isEdit
+        _isEdit = isEdit
   ;
   final int _selectedDay;
   final int _selectedMonth;
@@ -79,34 +79,46 @@ class _SelectDOBWidgetState extends State<SelectDOBWidget> {
 
   ListWheelScrollView buildListWheelScrollView(ValueChanged<int> onSelectedItemChanged, int selectedIndex, List<dynamic> items, TextStyle selectedTextStyle, TextStyle unSelectedTextStyle) {
     return ListWheelScrollView.useDelegate(
-          itemExtent: itemExtent,
-          perspective: 0.005,
-          physics: FixedExtentScrollPhysics(),
-          onSelectedItemChanged: onSelectedItemChanged,
-          controller: FixedExtentScrollController(initialItem: selectedIndex),
-          childDelegate: ListWheelChildBuilderDelegate(
-            childCount: items.length,
-            builder: (context, index) {
-              final isSelected = index == selectedIndex;
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8), // 8 top + 8 bottom = 16 total
-                  child: isSelected ? GradientTextWidget(gradient: AppGradients.primaryGradient, text: items[index].toString(), textStyle: selectedTextStyle,) : Text(
-                    items[index].toString(),
-                    style: unSelectedTextStyle,
-                  ),
-                ),
-              );
-            },
-          ),
-        );
+      itemExtent: itemExtent,
+      perspective: 0.005,
+      physics: FixedExtentScrollPhysics(),
+      onSelectedItemChanged: onSelectedItemChanged,
+      controller: FixedExtentScrollController(initialItem: selectedIndex),
+      childDelegate: ListWheelChildBuilderDelegate(
+        childCount: items.length,
+        builder: (context, index) {
+          final isSelected = index == selectedIndex;
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8), // 8 top + 8 bottom = 16 total
+              child: isSelected ? GradientTextWidget(gradient: AppGradients.primaryGradient, text: items[index].toString(), textStyle: selectedTextStyle,) : Text(
+                items[index].toString(),
+                style: unSelectedTextStyle,
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
   @override
   Widget build(BuildContext context) {
     return Column(
         children: [
-          Text("How old are you?", style: AppTextStyles.subHeadingTextStyle.copyWith(fontWeight: FontWeight.w400),),
-           Expanded(child:  Row(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(widget._isEdit ? "Edit your age" : "How old are you?", style: AppTextStyles.subHeadingTextStyle.copyWith(fontWeight: FontWeight.w400),),
+              if(widget._isEdit)
+                IconButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.containerFillGreyColor,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(99)),
+                    ),
+                    onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close))
+            ],
+          ),
+          Expanded(child:  Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               buildPicker<String>(

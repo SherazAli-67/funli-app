@@ -33,9 +33,7 @@ class ProfileSettingsPage extends StatelessWidget{
             Consumer<ProfileProvider>(
               builder: (context, provider, _) {
                 return provider.currentUser != null ? ListTile(
-                  onTap: (){
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_)=> EditProfilePage()));
-                  },
+                  onTap: ()=> context.push(RouterEnum.updateProfileView.routeName),
                   contentPadding: EdgeInsets.zero,
                   leading: ProfilePictureWidget(profilePicture: provider.currentUser!.profilePicture),
                   title: Text(provider.userName, style: AppTextStyles.tileTitleTextStyle,),
@@ -84,7 +82,6 @@ class ProfileSettingsPage extends StatelessWidget{
   int getAgeByDOB(DateTime dob){
     int currentYear = DateTime.now().year;
     int dobYear = dob.year;
-    debugPrint("DOB year: ${dob.toIso8601String()}");
     return currentYear - dobYear;
   }
 

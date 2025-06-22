@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
+import 'package:funli_app/src/features/main_menu/profile/widgets/draft_feels_widget.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
+import 'package:funli_app/src/widgets/gradient_icon.dart';
 import 'package:funli_app/src/widgets/profile_info_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -119,9 +121,12 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
                         height: 50,
                         alignment: Alignment.center,
                         color: Colors.white,
-                        child: SvgPicture.asset(
-                          provider.selectedTab == 2 ? AppIcons.icLikedIcon : AppIcons.icHeartFilledUnSelected,
-                        ),
+                          child: provider.selectedTab == 2 ? GradientIcon(
+                              icon: Icons.video_collection_rounded,
+                              size: 20,
+                              gradient: AppGradients.primaryGradient) : Icon(
+                              Icons.video_collection_rounded)
+
                       ),
                     ],
                   ),
@@ -133,7 +138,8 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
               children: [
                 RemoteUserReelsWidget(userID: userID, userName: userName, profilePicture: profilePicture),
                 BookmarkWidget(userID: userID),
-                SizedBox(), // Placeholder
+                DraftFeelsWidget(),
+
               ],
             ),
           ),

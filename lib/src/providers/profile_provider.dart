@@ -37,10 +37,6 @@ class ProfileProvider extends ChangeNotifier{
 
   int get selectedTab => _selectedTab;
 
- /* ProfileProvider(){
-
-    initUserProfile();
-  }*/
 
   void initUserProfile() async{
     _isProfileLoading = true;
@@ -70,16 +66,20 @@ class ProfileProvider extends ChangeNotifier{
   }
   void setDay(int day){
     _selectedDay = day;
+    debugPrint("Day changed to: $_selectedDay");
     notifyListeners();
   }
 
   void setMonth(int month){
     _selectedMonth = month;
+    debugPrint("Month changed to: $_selectedMonth");
     notifyListeners();
   }
 
   void setYear(int year){
     _selectedYear = year;
+
+    debugPrint("Year changed to: $_selectedYear");
     notifyListeners();
   }
 

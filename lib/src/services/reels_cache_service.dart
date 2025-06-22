@@ -22,6 +22,8 @@ class ReelsCacheService {
   static const String _videoLoadStatsKey = 'video_load_stats_key';
   static const String _userReelsCacheKey = 'cached_user_reels_data';
   static const String _userBookmarksCacheKey = 'cached_user_bookmarks_data';
+  static const String _userDraftsCacheKey = 'drafts_user_bookmarks_data';
+
   static const String _lastUserReelsFetchTimeKey = 'last_user_reels_fetch_time';
   static const String _lastUserBookmarksFetchTimeKey = 'last_user_bookmarks_fetch_time';
   
@@ -768,8 +770,7 @@ class ReelsCacheService {
       // Update last fetch time
       await prefs.setInt(_lastUserBookmarksFetchTimeKey, DateTime.now().millisecondsSinceEpoch);
       
-      debugPrint('Cached ${reels.length} bookmarks for user: $userId');
-      
+
       if (hasNewBookmarks) {
         // Start preloading videos for this user bookmarks in the background
         _preloadVideosForUser(reels, userId);

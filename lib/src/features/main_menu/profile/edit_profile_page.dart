@@ -5,10 +5,10 @@ import 'package:funli_app/src/helpers/formatting_helpers.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
+import 'package:funli_app/src/services/auth_service.dart';
 import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_gradient_btn.dart';
-import 'package:funli_app/src/widgets/select_dob_widget.dart';
 import 'package:funli_app/src/widgets/select_gender_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -226,14 +226,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
         context: context, builder: (ctx){
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 20),
-        child: SelectGenderWidget(title: 'Edit your gender', selectedGender: selectedGender, onSelectGender: onSelectGender, isEdit: true,),
+        child: SelectGenderWidget(title: 'Edit your gender',
+          selectedGender: selectedGender,
+          onSelectGender: onSelectGender,
+          isEdit: true,),
       );
     });
   }
 
-  void _onDOBChangeTap(
-      {required int selectedDay, required Function(int) onDayChange, required int selectedMonth, required void Function(int month) onMonthChange, required int selectedYear, required void Function(int year) onYearChange,}) {
-    showModalBottomSheet(
+  void _onDOBChangeTap({required int selectedDay, required Function(int) onDayChange, required int selectedMonth, required void Function(int month) onMonthChange, required int selectedYear, required void Function(int year) onYearChange,}) async{
+    DateTime? updatedDOB = await showDatePicker(context: context,
+        firstDate: DateTime(1950),
+        lastDate: DateTime.now(),
+      initialDate: DateTime(selectedYear, selectedMonth, selectedDay),
+    );
+   if(updatedDOB != null){
+     onDayChange(updatedDOB.day);
+     onMonthChange(updatedDOB.month);
+     onYearChange(updatedDOB.year);
+     await AuthService.instance.updateUserInfo(updatedMap: {
+       'dob' : updatedDOB.toIso8601String()
+     });
+   }
+    /*showModalBottomSheet(
         backgroundColor: Colors.white,
         context: context, builder: (ctx){
       return Padding(
@@ -243,9 +258,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
               selectedYear: selectedYear,
               onDayChange: onDayChange,
               onMonthChange: onMonthChange,
-              onYearChange: onYearChange)
+              onYearChange: onYearChange,
+            isEdit: true,
+          )
+
       );
-    });
+    });*/
+
+
 
   }
 
