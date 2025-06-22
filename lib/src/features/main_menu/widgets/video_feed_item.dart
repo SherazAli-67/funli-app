@@ -15,7 +15,6 @@ import '../../../widgets/post_comment_widget.dart';
 import '../../../widgets/post_like_widget.dart';
 import '../../../widgets/post_share_widget.dart';
 import '../profile/remote_user_profile.dart';
-import 'optimized_video_player.dart';
 
 class VideoFeedItem extends StatefulWidget {
   const VideoFeedItem({

@@ -179,9 +179,10 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
       } else {
         await controller.setVolume(0.0);
       }
+
       await controller.play();
       // Add a small delay to ensure play command is processed, retry if needed
-      await Future.delayed(const Duration(milliseconds: 50));
+      /*await Future.delayed(const Duration(milliseconds: 50));
       if (!controller.value.isPlaying) {
         await controller.play();
       }
@@ -189,7 +190,7 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
       await Future.delayed(const Duration(milliseconds: 100));
       if (!controller.value.isPlaying) {
         await controller.play();
-      }
+      }*/
     }
 
     if (mounted) {
@@ -263,10 +264,11 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
     if (_videos.isEmpty || _currentPage >= _videos.length) return;
     final targetPage = (_currentPage + 1) % _videos.length;
     _currentlyPlayingVideoId = _videos[targetPage].reelID;
-    await _pauseExceptCurrent(_currentlyPlayingVideoId!);
+    await _pauseExceptCurrent(_currentlyPlayingVideoId!); // Ensure current video is paused before moving
     await _pageController.animateToPage(targetPage, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     if (mounted && targetPage < _videos.length && !context.read<VideoFeedCubit>().state.shouldPauseVideo) {
-      await _initAndPlayVideo(targetPage);
+      // The _handlePageChange will be called by onPageChanged, which will handle playing the video.
+      // No need to call _initAndPlayVideo here directly.
     }
   }
 
@@ -355,7 +357,7 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
       _currentPage = newPage;
       _currentlyPlayingVideoId = _videos[newPage].reelID;
       // Pause all except the target video
-      await _pauseExceptCurrent(_currentlyPlayingVideoId!);
+      await _pauseExceptCurrent(_currentlyPlayingVideoId!); // Ensure current video is paused before moving
       await _manageControllerWindow(newPage);
       if (!context.read<VideoFeedCubit>().state.shouldPauseVideo) {
         await _initAndPlayVideo(newPage);
@@ -382,7 +384,7 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
         color: Colors.black,
         child: BlocListener<VideoFeedCubit, VideoFeedState>(
           listenWhen: (p, c) =>
-              p.videos != c.videos ||
+          p.videos != c.videos ||
               p.isLoading != c.isLoading ||
               p.preloadedVideoUrls != c.preloadedVideoUrls ||
               p.shouldPauseVideo != c.shouldPauseVideo ||
@@ -408,7 +410,7 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
               }
             }
             if (state.shouldPauseVideo && _currentlyPlayingVideoId != null) {
-              await _pauseExceptCurrent(_currentlyPlayingVideoId!);
+              await _pauseExceptCurrent(_currentlyPlayingVideoId!); // Ensure current video is paused before moving
             } else if (!state.shouldPauseVideo && _isAppActive) {
               await _initAndPlayVideo(_currentPage);
             }
@@ -544,3 +546,4 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
     );
   }
 }
+
