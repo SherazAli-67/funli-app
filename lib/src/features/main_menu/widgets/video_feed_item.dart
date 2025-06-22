@@ -79,8 +79,12 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
     return Stack(
       alignment: Alignment.center,
       children: [
+        ReelsOptimizedPlayerWidget(
+            key: _playerKey,
+            controller: widget.controller,
+            reelID: widget.reel.reelID),
         // Use RepaintBoundary to optimize rendering and prevent unnecessary repaints
-       widget.isComingFromHome ? RepaintBoundary(
+       /*widget.isComingFromHome ? RepaintBoundary(
           child: OptimizedVideoPlayer(
             key: _playerKey,
             controller: widget.controller, 
@@ -89,7 +93,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
         ) : ReelsOptimizedPlayerWidget(
            key: _playerKey,
            controller: widget.controller,
-           reelID: widget.reel.reelID),
+           reelID: widget.reel.reelID),*/
 
         _buildUserNameCaptionWidget(),
         _buildLikeCommentsIcon(context),
