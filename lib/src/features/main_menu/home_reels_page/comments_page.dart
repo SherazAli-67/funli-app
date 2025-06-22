@@ -28,6 +28,7 @@ class CommentsPage extends StatefulWidget{
 class _CommentsPageState extends State<CommentsPage> {
   late final EmojiTextEditingController _commentController;
   late final ScrollController _scrollController;
+  late final ScrollController _listScrollController;
   late final FocusNode _focusNode;
   late final TextStyle _textStyle;
   final bool isApple = [TargetPlatform.iOS, TargetPlatform.macOS]
@@ -48,6 +49,7 @@ class _CommentsPageState extends State<CommentsPage> {
 
     _commentController = EmojiTextEditingController(emojiTextStyle: _textStyle);
     _scrollController = ScrollController();
+    _listScrollController = ScrollController();
     _focusNode = FocusNode();
   super.initState();
   }
@@ -79,12 +81,23 @@ class _CommentsPageState extends State<CommentsPage> {
             ],
           ),
 
-          StreamBuilder(stream: ReelsService.getReelsComment(reelID: widget._reel.reelID), builder: (ctx, snapshot){
+          StreamBuilder(
+              stream: ReelsService.getReelsComment(reelID: widget._reel.reelID),
+              builder: (ctx, snapshot) {
             if(snapshot.hasData && snapshot.requireData.isNotEmpty){
+              List<AddCommentModel> comments = snapshot.requireData;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _listScrollController.animateTo(
+                  _listScrollController.position.maxScrollExtent,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                );
+              });
               return Expanded(child: ListView.builder(
-                  itemCount: snapshot.requireData.length,
+                  controller: _listScrollController,
+                  itemCount: comments.length,
                   itemBuilder: (ctx, index){
-                    AddCommentModel comment = snapshot.requireData[index];
+                    AddCommentModel comment = comments[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 24.0),
                       child: CommentItemWidget(comment: comment, reelID:  widget._reel.reelID, onReplyTap:  _onReplyTap,)
@@ -176,7 +189,7 @@ class _CommentsPageState extends State<CommentsPage> {
                   config: Config(
                     height: 256,
                     checkPlatformCompatibility: true,
-                    emojiTextStyle: _textStyle,
+                    emojiTextStyle: TextStyle(fontSize: 15),
 
                     viewOrderConfig: const ViewOrderConfig(),
                     emojiViewConfig: EmojiViewConfig(
@@ -250,4 +263,3 @@ class _CommentsPageState extends State<CommentsPage> {
     setState(() {});
   }
 }
-

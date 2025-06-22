@@ -34,14 +34,16 @@ class SelectGenderWidget extends StatelessWidget{
                 onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close))
           ],
         ): _buildTitleWidget(),
-        Expanded(child: Column(
-          spacing: 13,
-          children: [
-            _buildGenderItem(gender: "Male", icon: AppIcons.icMale, ),
-            _buildGenderItem(gender: "Female", icon: AppIcons.icFemale, ),
-            _buildGenderItem(gender: "Rather not say", icon: AppIcons.icGenderRatherNotToSay,),
-
-          ],
+        Expanded(child: SingleChildScrollView(
+          child: Column(
+            spacing: 13,
+            children: [
+              _buildGenderItem(gender: "Male", icon: AppIcons.icMale, ),
+              _buildGenderItem(gender: "Female", icon: AppIcons.icFemale, ),
+              _buildGenderItem(gender: "Rather not say", icon: AppIcons.icGenderRatherNotToSay,),
+          
+            ],
+          ),
         )),
       ],
     );
