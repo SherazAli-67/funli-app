@@ -1,13 +1,12 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/profile_analytics_dashboard/reel_views_chart.dart';
 import 'package:funli_app/src/features/profile_analytics_dashboard/user_stats_card.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/services/settings_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
+import 'package:funli_app/src/widgets/reel_grid_item_widget.dart';
 
 import '../../loading_shimmers/reel_thumbnail_shimmer_item.dart';
-import '../../res/app_icons.dart';
 import '../../res/app_textstyles.dart';
 import 'analytics_gradient_info_card.dart';
 
@@ -32,7 +31,6 @@ class AnalyticsCreatorInsightsPage extends StatelessWidget{
                 mainText: '...',
                 bottomText: '');
           }),
-
           ReelViewsChart(),
           _buildMostPopularFeels(),
           UserStatsCard(),
@@ -74,31 +72,13 @@ class AnalyticsCreatorInsightsPage extends StatelessWidget{
                     scrollDirection: Axis.horizontal,
                     itemCount:  reels.length,
                     itemBuilder: (ctx, index) {
-                      return  GestureDetector(
-                        onTap: () {
-                          /*context.push(
-                            RouterEnum.updatedReelsView.routeName,
-                            extra: {
-                              'initialReels': _reels,
-                              'selectedIndex': index,
-                              'lastDocument': _lastDoc,
-                              'comingFrom': AppConstants.comingFromMood,
-                              'mood': _mood.mood,
-                            },
-                          );*/
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) => ReelThumbnailShimmerItem(),
-                              errorWidget: (ctx, val, err)=> CachedNetworkImage(imageUrl: AppIcons.icDefaultThumbnailUrl),
-                              imageUrl:  reels[index].thumbnailUrl ?? AppIcons.icDummyImgUrl,
-                              height: 150,
-                            ),
-                          ),
-                        ),
+                      ReelModel reel = reels[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: SizedBox(
+                            height: 150,
+                            width: 120,
+                            child: ReelGridItemWidget(reel: reel, onTap: (){})),
                       );
                     });
               }else if(snapshot.connectionState == ConnectionState.waiting){
@@ -106,15 +86,15 @@ class AnalyticsCreatorInsightsPage extends StatelessWidget{
                     itemCount: 3,
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (_, index){
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: ReelThumbnailShimmerItem(),
-                  );
-                });
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: ReelThumbnailShimmerItem(),
+                      );
+                    });
               }
               return SizedBox();
             }),
-          ),
+          )
         ],
       ),
     );

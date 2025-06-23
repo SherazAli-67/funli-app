@@ -152,29 +152,7 @@ class RecordUploadProvider extends ChangeNotifier{
       );
 
 
-      bool isUploaded = await PublishReelService.uploadReel(reel: reel);
-      _resetData();
-      if(isUploaded){
-        FirebaseNotificationsService.show(
-          title: "Upload Completed",
-          body: 'Your reel has been uploaded successfully.',
-        );
-      }
-
-
-      //Add reel to user collection
-      PublishReelService.addReelToUser(reelID: reel.reelID);
-      List<String> hashtags = HashtagHelper.extractHashtags(reel.caption);
-      for (var hashtag in hashtags) {
-        PublishReelService.addReelToHashtag(hashtag: hashtag, reelID: reelID);
-      }
-
-      // Add to mood
-      PublishReelService.addReelToMood(
-        mood: reel.moodTag,
-        reelID: reel.reelID,
-        userID: reel.userID,
-      );
+      onUploadReelTap(reel: reel);
     }else{
       Fluttertoast.showToast(msg: "Failed to upload reel, Try again!");
       return;
@@ -218,7 +196,6 @@ class RecordUploadProvider extends ChangeNotifier{
         createdAt: createdAt);
 
     bool isUploaded = await PublishReelService.saveToDrafts(reel: reel);
-    _resetData();
     if(isUploaded){
       FirebaseNotificationsService.show(
         title: "Upload Completed",
@@ -249,4 +226,32 @@ class RecordUploadProvider extends ChangeNotifier{
       }
     });
   }*/
+
+
+  Future<void> onUploadReelTap({required ReelModel reel, bool isDraft = false}) async {
+    bool isUploaded = await PublishReelService.uploadReel(reel: reel);
+    _resetData();
+    if(isUploaded){
+      FirebaseNotificationsService.show(
+        title: "Upload Completed",
+        body: 'Your reel has been uploaded successfully.',
+      );
+    }
+
+    //Add reel to user collection
+    PublishReelService.addReelToUser(reelID: reel.reelID, mood: reel.moodTag);
+    List<String> hashtags = HashtagHelper.extractHashtags(reel.caption);
+    for (var hashtag in hashtags) {
+      PublishReelService.addReelToHashtag(hashtag: hashtag, reelID: reel.reelID);
+    }
+
+    // Add to mood
+    PublishReelService.addReelToMood(
+      mood: reel.moodTag,
+      reelID: reel.reelID,
+      userID: reel.userID,
+    );
+    _resetData();
+
+  }
 }

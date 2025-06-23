@@ -19,7 +19,9 @@ import '../../../res/app_textstyles.dart';
 import '../../../services/user_service.dart';
 
 class UpdatedFeedView extends StatefulWidget {
-  const UpdatedFeedView({super.key});
+  final List<ReelModel>? initialReels;
+  final int? selectedIndex;
+  const UpdatedFeedView({super.key, this.initialReels, this.selectedIndex});
 
   @override
   State<UpdatedFeedView> createState() => _UpdatedFeedViewState();
@@ -87,6 +89,21 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
         }
       });
     });
+
+    // Check for passed reels and selected index
+    if (widget.initialReels != null && widget.initialReels!.isNotEmpty && widget.selectedIndex != null) {
+      setState(() {
+        _videos = widget.initialReels!;
+        _currentPage = widget.selectedIndex!;
+        _initialVideosLoaded = true;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_pageController.hasClients) {
+          _pageController.jumpToPage(_currentPage);
+        }
+        _initAndPlayVideo(_currentPage);
+      });
+    }
   }
 
   @override
@@ -548,4 +565,3 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
     );
   }
 }
-

@@ -158,22 +158,28 @@ class UserService {
     List<ReelModel> reels = [];
     String userID = FirebaseAuth.instance.currentUser!.uid;
     QuerySnapshot userReelsSnap = await FirebaseFirestore.instance.collection(
-        FirebaseConstants.userCollection).doc(userID).collection(FirebaseConstants.reelsCollection).get();
-    List<String> reelIDs = userReelsSnap.docs.map((doc)=> doc.id).toList();
-
+        FirebaseConstants.userCollection).doc(userID).collection(
+        FirebaseConstants.reelsCollection).get();
+    List<String> reelIDs = userReelsSnap.docs.map((doc)=> doc['reelID'] as String).toList();
+    // debugPrint("ReelIDs found: ${reelIDs.length}");
     for (var reelID in reelIDs) {
      DocumentSnapshot docSnap = await FirebaseFirestore.instance.collection(
           FirebaseConstants.reelsCollection).doc(reelID).get();
-     reels.add(ReelModel.fromMap(docSnap.data() as Map<String,dynamic>));
+     if(docSnap.exists){
+       reels.add(ReelModel.fromMap(docSnap.data() as Map<String,dynamic>));
+     }
+
     }
 
+    // debugPrint("Reels found: ${reels.length}");
     // 3. Sort by views descending
     reels.sort((a, b) {
       final int aViews = a.viewsCount ?? 0;
       final int bViews = b.viewsCount ?? 0;
       return bViews.compareTo(aViews);
     });
-    return reels;
+    // debugPrint("Reels returned: ${reels.length}");
+    return reels.sublist(0, 5);
   }
 
  /* static Future<UserModel> getUserFollowers() async {

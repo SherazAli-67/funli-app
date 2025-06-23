@@ -332,6 +332,7 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
   }
 
   void _loadVideo() async {
+
     await _trimmer.loadVideo(videoFile: File(widget.videoPath));
     if(_trimmer.videoPlayerController != null){
       _trimmer.videoPlayerController!.play();

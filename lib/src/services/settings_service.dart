@@ -98,18 +98,17 @@ class SettingsService {
 
   static Future<String> getUserMoodAnalytics() async {
     String userID = FirebaseAuth.instance.currentUser!.uid;
-    List<ReelModel> fetchedReels = [];
 
     Query query = FirebaseFirestore.instance
         .collection(FirebaseConstants.userCollection)
         .doc(userID)
-        .collection(FirebaseConstants.bookmarksCollection)
+        .collection(FirebaseConstants.reelsCollection)
         .orderBy("timestamp", descending: true);
 
     final querySnapshot = await query.get();
     final docs = querySnapshot.docs;
-
-    if (docs.isNotEmpty) {
+    final mappedDocs = docs.map((doc)=> doc.data() as Map<String, dynamic>).toList();
+   /* if (docs.isNotEmpty) {
       for (var doc in docs) {
         final reelID = doc.id;
         final reelSnap = await FirebaseFirestore.instance
@@ -121,12 +120,13 @@ class SettingsService {
           fetchedReels.add(ReelModel.fromMap(reelSnap.data()!));
         }
       }
-    }
+    }*/
 
     // Count moodTags
     Map<String, int> moodCount = {};
-    for (var reel in fetchedReels) {
-      moodCount[reel.moodTag] = (moodCount[reel.moodTag] ?? 0) + 1;
+    for (var reel in mappedDocs) {
+      debugPrint("MoodTag: ${reel['moodTag']}");
+      moodCount[reel['moodTag']] = (moodCount[reel['moodTag']] ?? 0) + 1;
     }
 
     // Get mood with highest count
@@ -165,18 +165,11 @@ class SettingsService {
 
     for (var doc in reelsSnapshot.docs) {
       final data = doc.data();
-      String reelID = data['reelID'];
-      DocumentSnapshot documentSnapshot =  await FirebaseFirestore.instance
-          .collection(FirebaseConstants.reelsCollection)
-          .doc(reelID).get();
-      if(documentSnapshot.exists){
-        final map = documentSnapshot.data() as Map<String,dynamic>;
-        final moodTag = map['moodTag'] as String? ?? 'Unknown';
-        final viewsCount = map['viewsCount'] as int? ?? 0;
-        debugPrint("Mood $moodTag viewsCount: $viewsCount");
-        moodViews.update(moodTag, (value) => value + viewsCount, ifAbsent: () => viewsCount);
-        totalViews += viewsCount;
-      }
+      final moodTag = data['moodTag'] as String? ?? 'Unknown';
+      final viewsCount = data['viewsCount'] as int? ?? 0;
+      debugPrint("Mood $moodTag viewsCount: $viewsCount");
+      moodViews.update(moodTag, (value) => value + viewsCount, ifAbsent: () => viewsCount);
+      totalViews += viewsCount;
     }
 
     if (totalViews == 0) {
@@ -203,7 +196,8 @@ class SettingsService {
       return {};
     }
 
-    // List to store all reels with their details
+   List<Map<String,dynamic>> userReels =  reelsSnapshot.docs.map((doc)=> doc.data()).toList();
+   /* // List to store all reels with their details
     List<ReelModel> userReels = [];
 
     // Fetch all reels and their details
@@ -218,15 +212,16 @@ class SettingsService {
         final map = documentSnapshot.data() as Map<String, dynamic>;
         userReels.add(ReelModel.fromMap(map));
       }
-    }
+    }*/
 
     // Sort reels by creation date (newest first)
-    userReels.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    userReels.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
 
     // Group reels by date (day)
-    Map<String, List<ReelModel>> reelsByDate = {};
+    Map<String, List<Map<String, dynamic>>> reelsByDate = {};
     for (var reel in userReels) {
-      final dateKey = '${reel.createdAt.year}-${reel.createdAt.month.toString().padLeft(2, '0')}-${reel.createdAt.day.toString().padLeft(2, '0')}';
+      DateTime date = reel['timestamp'].toDate();
+      final dateKey = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
       
       if (!reelsByDate.containsKey(dateKey)) {
         reelsByDate[dateKey] = [];
@@ -240,7 +235,7 @@ class SettingsService {
       Map<String, int> moodCounts = {};
       
       for (var reel in entry.value) {
-        moodCounts.update(reel.moodTag, (value) => value + 1, ifAbsent: () => 1);
+        moodCounts.update(reel['moodTag'], (value) => value + 1, ifAbsent: () => 1);
       }
       
       // Find the mood with the highest count for this day
@@ -310,6 +305,7 @@ class SettingsService {
       throw Exception('User not logged in');
     }
 
+    debugPrint("Getting reelViews");
     final userId = user.uid;
     
     // Determine date range based on selected time range
@@ -371,67 +367,58 @@ class SettingsService {
     
     for (var doc in reelsSnapshot.docs) {
       final data = doc.data();
-      String reelID = data['reelID'];
-      
-      DocumentSnapshot reelSnapshot = await FirebaseFirestore.instance
+
+   /*   DocumentSnapshot reelSnapshot = await FirebaseFirestore.instance
           .collection(FirebaseConstants.reelsCollection)
-          .doc(reelID).get();
+          .doc(reelID).get();*/
 
+      // Handle different types for timestamp (could be Timestamp or String)
+      DateTime createdAt;
+      if (data['timestamp'] is Timestamp) {
+        createdAt = (data['timestamp'] as Timestamp).toDate();
+      } else if (data['timestamp']is String) {
+        createdAt = DateTime.parse(data['timestamp'] as String);
+      } else {
+        // Skip this reel if createdAt is not in a recognized format
+        debugPrint("Skipping reel with invalid createdAt format: ${data['timestamp']}");
+        continue;
+      }
 
-      if (reelSnapshot.exists) {
-        final reelData = reelSnapshot.data() as Map<String, dynamic>;
-        // debugPrint("Reel found.\nCreatedAt: ${reelData['createdAt']}, and ViewsCount: ${reelData['viewsCount']}");
-        
-        // Handle different types for createdAt (could be Timestamp or String)
-        DateTime createdAt;
-        if (reelData['createdAt'] is Timestamp) {
-          createdAt = (reelData['createdAt'] as Timestamp).toDate();
-        } else if (reelData['createdAt'] is String) {
-          createdAt = DateTime.parse(reelData['createdAt'] as String);
-        } else {
-          // Skip this reel if createdAt is not in a recognized format
-          debugPrint("Skipping reel with invalid createdAt format: ${reelData['createdAt']}");
-          continue;
-        }
-        
-        final viewsCount = reelData['viewsCount'] as int? ?? 0;
-        
-        // Skip reels created before the start date
-        if (createdAt.isBefore(startDate)) {
-          continue;
-        }
-        
-        // Determine which label/period this reel belongs to
-        String label;
-        
-        switch (timeRange) {
-          case TimeRange.weekly:
-            // Day of the week
-            final dayIndex = createdAt.difference(startDate).inDays;
-            if (dayIndex >= 0 && dayIndex < labels.length) {
-              label = labels[dayIndex];
-              aggregatedData[label] = (aggregatedData[label] ?? 0) + viewsCount;
-            }
-            break;
-          case TimeRange.monthly:
-            // Week of the month
-            final dayIndex = createdAt.difference(startDate).inDays ~/ 5;
-            if (dayIndex >= 0 && dayIndex < labels.length) {
-              label = labels[dayIndex];
-              aggregatedData[label] = (aggregatedData[label] ?? 0) + viewsCount;
-            }
-            break;
-          case TimeRange.yearly:
-            // Month of the year
-            final monthIndex = (createdAt.month - startDate.month + 12) % 12;
-            if (monthIndex >= 0 && monthIndex < labels.length) {
-              label = labels[monthIndex];
-              aggregatedData[label] = (aggregatedData[label] ?? 0) + viewsCount;
-            }
-            break;
-        }
-      }else{
-        debugPrint("Reel not found");
+      final viewsCount = data['viewsCount'] as int? ?? 0;
+
+      // Skip reels created before the start date
+      if (createdAt.isBefore(startDate)) {
+        continue;
+      }
+
+      // Determine which label/period this reel belongs to
+      String label;
+
+      switch (timeRange) {
+        case TimeRange.weekly:
+        // Day of the week
+          final dayIndex = createdAt.difference(startDate).inDays;
+          if (dayIndex >= 0 && dayIndex < labels.length) {
+            label = labels[dayIndex];
+            aggregatedData[label] = (aggregatedData[label] ?? 0) + viewsCount;
+          }
+          break;
+        case TimeRange.monthly:
+        // Week of the month
+          final dayIndex = createdAt.difference(startDate).inDays ~/ 5;
+          if (dayIndex >= 0 && dayIndex < labels.length) {
+            label = labels[dayIndex];
+            aggregatedData[label] = (aggregatedData[label] ?? 0) + viewsCount;
+          }
+          break;
+        case TimeRange.yearly:
+        // Month of the year
+          final monthIndex = (createdAt.month - startDate.month + 12) % 12;
+          if (monthIndex >= 0 && monthIndex < labels.length) {
+            label = labels[monthIndex];
+            aggregatedData[label] = (aggregatedData[label] ?? 0) + viewsCount;
+          }
+          break;
       }
     }
     

@@ -36,40 +36,31 @@ class _UserStatsCardState extends State<UserStatsCard> {
         .collection('reels');
 
     final userReelsSnapshot = await userReelsRef.get();
-    final reelIDs = userReelsSnapshot.docs.map((doc) => doc.id).toList();
+    final mappedList = userReelsSnapshot.docs.map((doc) => doc.data()).toList();
 
-    int feels = 0;
+    int feels = mappedList.length;
     int views = 0;
     int loves = 0;
 
-    for (final reelID in reelIDs) {
-      final reelSnap = await FirebaseFirestore.instance
-          .collection('reels')
-          .doc(reelID)
-          .get();
-      if (reelSnap.exists) {
-        final data = reelSnap.data()! ;
-        feels++;
-
-        views += int.parse((data['viewsCount'] ?? 0).toString());
-        loves += int.parse((data['likesCount']?? 0).toString());
-      }
+    for (var userReel in mappedList) {
+      views += int.parse((userReel['viewsCount'] ?? 0).toString());
+      loves += int.parse((userReel['likesCount']?? 0).toString());
     }
 
     final followersSnap = await FirebaseFirestore.instance
         .collection('users')
         .doc(userID)
-        .collection('followers')
+        .collection('followers').count()
         .get();
 
-    final followersCount = followersSnap.docs.length;
+    final followersCount = followersSnap.count;
 
     // Here you would calculate growth percentages based on previous data
     setState(() {
       totalFeels = feels;
       totalViews = views;
       totalLoves = loves;
-      totalFollowers = followersCount;
+      totalFollowers = followersCount ?? 0;
 
       // Dummy growth values
       feelsGrowth = 2.5;
@@ -86,47 +77,45 @@ class _UserStatsCardState extends State<UserStatsCard> {
     final color = isPositive ? Colors.green : Colors.red;
     final icon = isPositive ? Icons.arrow_upward : Icons.arrow_downward;
 
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withValues(alpha: 0.1),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              count.toString(),
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(icon, color: color, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  '${changePercent.abs()}%',
-                  style: TextStyle(color: color, fontSize: 12),
-                ),
-              ],
-            )
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withValues(alpha: 0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            count.toString(),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 14, color: Colors.grey),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(icon, color: color, size: 16),
+              const SizedBox(width: 4),
+              Text(
+                '${changePercent.abs()}%',
+                style: TextStyle(color: color, fontSize: 12),
+              ),
+            ],
+          )
+        ],
       ),
     );
   }

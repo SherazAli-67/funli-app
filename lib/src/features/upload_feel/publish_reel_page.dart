@@ -55,176 +55,180 @@ class _PublishReelPageState extends State<PublishReelPage> {
   Widget build(BuildContext context) {
     final provider = Provider.of<RecordUploadProvider>(context);
     Size size = Provider.of<SizeProvider>(context).size;
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: provider.isCompressingVideo ? Colors.black54 :Colors.white,
-        scrolledUnderElevation: 0,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: GestureDetector(
-            onTap: () {
-              // Reset shouldPauseVideo to false when returning to video feed
-              // Ensure we trigger preloading when returning to feed
-              final cubit = context.read<VideoFeedCubit>();
-              cubit.setShouldPauseVideo(false);
-              // Trigger preloading before navigation
-              cubit.preloadNextVideos();
-              context.pop();
-            },
-            child: AppBackButton(),
-          ),
-        ),
-        centerTitle: false,
-        leadingWidth: 45,
-        title: Text("Create a Feel", style: AppTextStyles.headingTextStyle3,),
-          actions: [
-            PopupMenuButton(
-              position: PopupMenuPosition.under,
-                color: Colors.white,
-                onSelected: (val)=> setState(() =>visibility = val.toString()),
-                icon: Row(
-                  children: [
-                    Text(visibility, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400),),
-                    Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black,)
-                  ],
-                ),
-                itemBuilder: (_){
-              return [
-                PopupMenuItem(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    value: 'Public',
-                    child: Text("Public", style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400),)),
-                PopupMenuItem(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    value: 'Private',
-                    child: Text("Private", style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400),)),
-
-              ];
-            })
-          ],
-      ),
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16.0),
-            child: SizedBox(
-              height: size.height*0.8,
-              child: Column(
-                spacing: 14,
-                children: [
-                  _feelingWidget(() async {
-                    final result = await showModalBottomSheet(
-                        isDismissible: false,
-                        context: context, builder: (_){
-                      return MoodSelectingScrollWheelWidget(selectedMood: provider.currentMood,);
-                    });
-
-                    if(result != null){
-                      provider.setCurrentMood(result);
-                    }
-                  }, provider.currentMood),
-
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child:  EnhancedSocialTextField(
-                          hintText: "Write a caption here, to use hashtags type #hashtag",
-                          maxLines: 5,
-                          minLines: 3,
-
-                          hashtagStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.pinkColor),
-                          mentionStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontWeight: FontWeight.w600),
-                          onChanged: (text) {
-                            captionController.text = text;
-
-                          },
-                        ),),
-                      Expanded(child: _controller != null ? Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          _controller!.value.isInitialized ? Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: AspectRatio(
-                                aspectRatio: _controller!.value.aspectRatio,
-                                child: VideoPlayer(_controller!),
-                              ),
-                            ),
-                          ) : LoadingWidget(),
-                          Container(
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: AppGradients.primaryGradient
-                            ),
-                            child: IconButton(onPressed: (){
-                              bool isPlaying = _controller!.value.isPlaying;
-                              if(isPlaying){
-                                _controller!.pause();
-                              }else{
-                                _controller!.play();
-                              }
-                            }, icon: Icon(_controller!.value.isPlaying ? Icons.pause : Icons.play_arrow_rounded, color: Colors.white,)),
-                          )
-                        ],
-                      ) : LoadingWidget(),)
-                    ],
-                  ),
-                  Image.asset(AppIcons.icComingSoonSpeaker),
-                  const Spacer(),
-                  Column(
-                    spacing: 16,
-                    children: [
-
-
-                      PrimaryBtn(
-                        btnText: "Publish",
-                        icon: "",
-                        onTap: _onPublishReelTap,
-                        bgGradient: AppIcons.primaryBgGradient,
-                        borderRadius: 16,),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              side: BorderSide(color: AppColors.textFieldBorderColor),
-                              elevation: 0,
-                              padding: EdgeInsets.symmetric(vertical: 15),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            ),
-                            onPressed: _onSaveAsDraft, child: Text("Save as draft", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.black),)),
-                      ),
-                    ],
-                  )
-                ],
-              ),
+    return WillPopScope(
+      onWillPop: ()async{
+        // Reset shouldPauseVideo to false when returning to video feed
+        final cubit = context.read<VideoFeedCubit>();
+        cubit.setShouldPauseVideo(false);
+        // Trigger preloading before navigation
+        cubit.preloadNextVideos();
+        context.go(RouterEnum.videoFeedView.routeName);
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: provider.isCompressingVideo ? Colors.black54 :Colors.white,
+          scrolledUnderElevation: 0,
+          elevation: 0,
+          leading: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: GestureDetector(
+              onTap: () {
+                final cubit = context.read<VideoFeedCubit>();
+                cubit.setShouldPauseVideo(false);
+                // Trigger preloading before navigation
+                cubit.preloadNextVideos();
+                context.go(RouterEnum.videoFeedView.routeName);
+              },
+              child: AppBackButton(),
             ),
           ),
-          if(provider.isCompressingVideo || provider.uploadProgress > 0)
-            Container(
-              height: size.height*0.9,
-              width: double.infinity,
-              color: Colors.black54,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  LoadingWidget(),
-                  SizedBox(height: 16),
-                  Text(
-                    provider.isCompressingVideo 
-                        ? "Preparing video for upload..."
-                        : "Uploading: ${(provider.uploadProgress * 100).toStringAsFixed(0)}%",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+          centerTitle: false,
+          leadingWidth: 45,
+          title: Text("Create a Feel", style: AppTextStyles.headingTextStyle3,),
+            actions: [
+              PopupMenuButton(
+                position: PopupMenuPosition.under,
+                  color: Colors.white,
+                  onSelected: (val)=> setState(() =>visibility = val.toString()),
+                  icon: Row(
+                    children: [
+                      Text(visibility, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400),),
+                      Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black,)
+                    ],
                   ),
-                ],
+                  itemBuilder: (_){
+                return [
+                  PopupMenuItem(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      value: 'Public',
+                      child: Text("Public", style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400),)),
+                  PopupMenuItem(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      value: 'Private',
+                      child: Text("Private", style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400),)),
+
+                ];
+              })
+            ],
+        ),
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16.0),
+              child: SizedBox(
+                height: size.height*0.8,
+                child: Column(
+                  spacing: 14,
+                  children: [
+                    _feelingWidget(() async {
+                      final result = await showModalBottomSheet(
+                          isDismissible: false,
+                          context: context, builder: (_){
+                        return MoodSelectingScrollWheelWidget(selectedMood: provider.currentMood,);
+                      });
+
+                      if(result != null){
+                        provider.setCurrentMood(result);
+                      }
+                    }, provider.currentMood),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child:  EnhancedSocialTextField(
+                            hintText: "Write a caption here, to use hashtags type #hashtag",
+                            maxLines: 5,
+                            minLines: 3,
+
+                            hashtagStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.pinkColor),
+                            mentionStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontWeight: FontWeight.w600),
+                            onChanged: (text) {
+                              captionController.text = text;
+
+                            },
+                          ),),
+                        Expanded(child: _controller != null ? Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            _controller!.value.isInitialized ? Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: AspectRatio(
+                                  aspectRatio: _controller!.value.aspectRatio,
+                                  child: VideoPlayer(_controller!),
+                                ),
+                              ),
+                            ) : LoadingWidget(),
+                            Container(
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: AppGradients.primaryGradient
+                              ),
+                              child: IconButton(onPressed: (){
+                                context.push(RouterEnum.videoPlayerView.routeName, extra: {
+                                  'localPath' : provider.recordedPath
+                                });
+                              }, icon: Icon(_controller!.value.isPlaying ? Icons.pause : Icons.play_arrow_rounded, color: Colors.white,)),
+                            )
+                          ],
+                        ) : LoadingWidget(),)
+                      ],
+                    ),
+                    Image.asset(AppIcons.icComingSoonSpeaker),
+                    const Spacer(),
+                    Column(
+                      spacing: 16,
+                      children: [
+                        PrimaryBtn(
+                          btnText: "Publish",
+                          icon: "",
+                          onTap: _onPublishReelTap,
+                          bgGradient: AppIcons.primaryBgGradient,
+                          borderRadius: 16,),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: AppColors.textFieldBorderColor),
+                                elevation: 0,
+                                padding: EdgeInsets.symmetric(vertical: 15),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              ),
+                              onPressed: _onSaveAsDraft, child: Text("Save as draft", style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.black),)),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
               ),
-            )
-        ],
+            ),
+            if(provider.isCompressingVideo || provider.uploadProgress > 0)
+              Container(
+                height: size.height*0.9,
+                width: double.infinity,
+                color: Colors.black54,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    LoadingWidget(),
+                    SizedBox(height: 16),
+                    Text(
+                      provider.isCompressingVideo
+                          ? "Preparing video for upload..."
+                          : "Uploading: ${(provider.uploadProgress * 100).toStringAsFixed(0)}%",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
+                ),
+              )
+          ],
+        ),
       ),
     );
   }

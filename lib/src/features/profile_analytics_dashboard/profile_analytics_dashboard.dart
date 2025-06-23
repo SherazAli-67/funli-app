@@ -84,7 +84,7 @@ class _ProfileAnalyticsDashboardState extends State<ProfileAnalyticsDashboard> w
   }
 
 
-  void _showTimeRangeDropdown() {
+/*  void _showTimeRangeDropdown() {
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -116,7 +116,7 @@ class _ProfileAnalyticsDashboardState extends State<ProfileAnalyticsDashboard> w
       trailing: _selectedTimeRange == option ? const Icon(Icons.check, color: Colors.blue) : null,
     );
   }
-
+*/
   Widget _buildTabBar() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),

@@ -83,8 +83,36 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
         // Then refresh from network in background
         _refreshVideosInBackground();
       } else {
-        // If no cached reels, load from network
-        loadVideos();
+        // If no cached reels, attempt a fast initial fetch for new users
+        emit(
+          state.copyWith(
+            isLoading: true,
+            loadingSource: 'network_initial',
+          ),
+        );
+        try {
+          // Fetch a small batch of reels quickly for new users
+          final initialReels = await videoRepository.fetchVideos(limit: 3);
+          if (initialReels.isNotEmpty) {
+            emit(
+              state.copyWith(
+                isLoading: false,
+                videos: initialReels,
+                hasMoreVideos: true, // Ensure hasMoreVideos is set to true to allow pagination
+                currentVideoIndex: 0,
+                loadingSource: 'network_initial',
+              ),
+            );
+            // Start preloading next videos
+            preloadNextVideos();
+          }
+          // Regardless of initial fetch result, proceed with full background refresh
+          _refreshVideosInBackground();
+        } catch (e) {
+          debugPrint('Error fetching initial reels: $e');
+          // Fall back to full network load if initial fetch fails
+          loadVideos();
+        }
       }
     } catch (e) {
       debugPrint('Error loading cached videos: $e');
@@ -161,7 +189,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
 
     try {
       final videos = await videoRepository.fetchVideos(isRefresh: isRefresh);
-      final hasMoreVideos = videos.length >= 5;
+      final hasMoreVideos = videos.length >= 3; // Adjusted to ensure pagination is triggered even with fewer initial videos
       emit(
         state.copyWith(
           isLoading: false,

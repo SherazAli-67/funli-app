@@ -10,6 +10,8 @@ enum RouterEnum {
 
   searchView('/search_view'),
   updatedReelsView('/reels-view'),
+
+  updatedFeedView('/updateFeed-view'),
   moodReelsView('/moodReels-view'),
   hashtagsReelsView('/hashtagReels-view'),
   filteredReelsView('/filteredReels-view'),
@@ -29,6 +31,10 @@ enum RouterEnum {
   createUploadReelView("/createUploadReel-view"),
   editUploadedReelView('/editUploadedReel-view'),
   publishReelView('/publishReel-view'),
+  publishDraftView('/publishDraft-view'),
+
+  videoPlayerView('/videoPlayer-view'),
+
   //BottomNav
   discoverView('/discover_view'),
   videoFeedView('/video_feed_view'),

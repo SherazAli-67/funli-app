@@ -782,6 +782,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
       _preloadTimer?.cancel();
       _preloadTimer = Timer(const Duration(milliseconds: 100), () {
         if (mounted) {
+          debugPrint("Notifying cubit of page change to index $newPage, total videos: ${_videos.length}");
           context.read<VideoFeedCubit>().onPageChanged(newPage);
         }
       });
@@ -959,7 +960,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('${AppConstants.appTitle} V3', style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
+                                Text('${AppConstants.appTitle} V3.1', style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
                                 Container(
                                   padding: EdgeInsets.all(10),
                                   decoration: BoxDecoration(

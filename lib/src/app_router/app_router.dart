@@ -9,6 +9,7 @@ import 'package:funli_app/src/features/main_menu/notifications/notification_page
 import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart';
+import 'package:funli_app/src/features/main_menu/updated_feed_view/updated_feed_view.dart';
 import 'package:funli_app/src/features/main_menu/video_feed_view/video_feed_view.dart';
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
 import 'package:funli_app/src/features/personalization/personalization_page.dart';
@@ -22,8 +23,10 @@ import 'package:funli_app/src/features/settings/report_problem_page.dart';
 import 'package:funli_app/src/features/settings/terms_privacy_page.dart';
 import 'package:funli_app/src/features/upload_feel/create_upload_feel_page.dart';
 import 'package:funli_app/src/features/upload_feel/edit_uploaded_feel.dart';
+import 'package:funli_app/src/features/upload_feel/publish_draft_page.dart';
 import 'package:funli_app/src/features/upload_feel/publish_reel_page.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
+import 'package:funli_app/src/widgets/video_player_widget.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/authentication/login_page.dart';
@@ -219,6 +222,29 @@ class AppRouter {
         },
       ),
       GoRoute(
+        path: RouterEnum.publishDraftView.routeName,
+        pageBuilder: (context, state) {
+          final extras = state.extra! as Map<String, dynamic>;
+          return MaterialPage(
+            child: PublishDraftPage(
+              reel: extras['reel'],
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouterEnum.videoPlayerView.routeName,
+        pageBuilder: (context, state) {
+          final extras = state.extra! as Map<String, dynamic>;
+          return MaterialPage(
+            child: VideoPlayerWidget(
+              localPath: extras['localPath'],
+              videoUrl: extras['videoUrl'],
+            ),
+          );
+        },
+      ),
+      GoRoute(
         path: RouterEnum.publishReelView.routeName,
         builder: (BuildContext context, GoRouterState state) => const PublishReelPage(),
       ),
@@ -240,6 +266,20 @@ class AppRouter {
           );
         },
       ),
+      GoRoute(
+        path: RouterEnum.updatedFeedView.routeName,
+        pageBuilder: (context, state) {
+          final extras = state.extra! as Map<String, dynamic>;
+
+          return MaterialPage(
+            child: UpdatedFeedView(
+              initialReels: extras['initialReels'],
+              selectedIndex: extras['selectedIndex'],
+            ),
+          );
+        },
+      ),
+
     ],
     redirect: (context, state) {
       final loggedIn = FirebaseAuth.instance.currentUser != null;

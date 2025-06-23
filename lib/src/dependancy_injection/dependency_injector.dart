@@ -17,7 +17,7 @@ void injectionSetup() {
   );
 
   getIt.registerLazySingleton<IVideoFeedRepository>(
-    () => VideoFeedRepository(getIt<FirebaseFirestore>()),
+    () => VideoFeedRepository(),
   );
 
   getIt.registerFactory<VideoFeedCubit>(

@@ -6,7 +6,6 @@ import 'package:funli_app/src/features/reels_page/reel_repository.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
-import 'package:funli_app/src/widgets/app_back_button.dart';
 import 'package:go_router/go_router.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';

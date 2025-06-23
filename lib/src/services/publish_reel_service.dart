@@ -168,7 +168,7 @@ class PublishReelService {
     }
   }
 
-  static Future<void> addReelToUser({required String reelID})async {
+  static Future<void> addReelToUser({required String reelID, required String mood})async {
     String userID = FirebaseAuth.instance.currentUser!.uid;
     await FirebaseFirestore.instance.collection(FirebaseConstants.userCollection).doc(userID).collection(FirebaseConstants.reelsCollection).doc(reelID).set({
       "reelID" : reelID,

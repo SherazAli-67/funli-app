@@ -189,7 +189,7 @@ class _CommentsPageState extends State<CommentsPage> {
                   config: Config(
                     height: 256,
                     checkPlatformCompatibility: true,
-                    emojiTextStyle: TextStyle(fontSize: 15),
+                    emojiTextStyle: TextStyle(fontSize: 18),
 
                     viewOrderConfig: const ViewOrderConfig(),
                     emojiViewConfig: EmojiViewConfig(

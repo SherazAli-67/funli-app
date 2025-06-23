@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/features/reels_page/reels_optimized_player_widget.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
+import 'package:funli_app/src/services/reels_service.dart';
 import 'package:video_player/video_player.dart';
 import '../../../res/app_colors.dart';
 import '../../../res/app_icons.dart';
@@ -44,6 +45,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
   void initState() {
     super.initState();
     _isMuted = widget.reel.isMuted;
+    ReelsService.addViewToReel(reelID: widget.reel.reelID);
   }
   
   @override
@@ -110,7 +112,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
         child: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
             shape: BoxShape.circle,
           ),
           child: Icon(

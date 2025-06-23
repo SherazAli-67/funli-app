@@ -9,14 +9,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'i_video_feed_repository.dart';
 
 class VideoFeedRepository implements IVideoFeedRepository {
-  VideoFeedRepository(this._firestore);
+  VideoFeedRepository();
 
-  final FirebaseFirestore _firestore;
   DocumentSnapshot? _lastDocument;
 
   final _reelsColRef = FirebaseFirestore.instance.collection(FirebaseConstants.reelsCollection);
   @override
-  Future<List<ReelModel>> fetchVideos({bool isRefresh = false}) async {
+  Future<List<ReelModel>> fetchVideos({bool isRefresh = false, int limit = 5}) async {
     debugPrint("New reels fetching: $isRefresh");
     try {
       // Reset pagination state for a fresh fetch
@@ -42,7 +41,7 @@ class VideoFeedRepository implements IVideoFeedRepository {
 
       
       // If cache is empty or needs refresh, fetch from network
-      final networkReels = await _fetchVideosHelper();
+      final networkReels = await _fetchVideosHelper(limit: limit);
       debugPrint("Network reels received: ${networkReels.length}");
       // Cache the fetched reels
       if (networkReels.isNotEmpty) {
@@ -84,7 +83,9 @@ class VideoFeedRepository implements IVideoFeedRepository {
 
   @override
   Future<List<ReelModel>> fetchMoreVideos() async {
+    debugPrint("Fetching more in repo: ${_lastDocument}");
     if (_lastDocument == null) {
+      debugPrint("Last document found null and returning 0");
       return [];
     }
 
@@ -110,16 +111,17 @@ class VideoFeedRepository implements IVideoFeedRepository {
 
   Future<List<ReelModel>> _fetchVideosHelper({
     DocumentSnapshot? startAfterDocument,
+    int limit = 5
   }) async {
     try {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
       String mood = sharedPreferences.getString(LocalStorageConstants.currentMoodKey) ?? 'Happy';
-      debugPrint("Mood received while fetching the reels: $mood");
+      debugPrint("Mood received while fetching the reels: $mood limit: $limit");
       
       // Increase limit to 5 for better initial experience
       Query query =
           _reelsColRef.where("moodTag", isEqualTo: mood)
-          .orderBy('createdAt', descending: true).limit(5);
+          .orderBy('createdAt', descending: true).limit(limit);
 
       if (startAfterDocument != null) {
         query = query.startAfterDocument(startAfterDocument);

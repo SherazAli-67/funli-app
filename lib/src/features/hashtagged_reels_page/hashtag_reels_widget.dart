@@ -1,26 +1,19 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/loading_shimmers/reel_thumbnail_shimmer_item.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
-import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
-import 'package:funli_app/src/services/user_service.dart';
-import 'package:funli_app/src/widgets/reel_likes_count.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/reel_model.dart';
-import '../../res/app_colors.dart';
-import '../../res/app_icons.dart';
-import '../../res/app_textstyles.dart';
-import '../../services/reels_service.dart';
 import '../../services/hashtag_mood_cached_reels.dart';
+import '../../widgets/reel_grid_item_widget.dart';
 
 class HashtagReelsGrid extends StatefulWidget {
   final String tag;
   final bool isComingFromMood;
-  const HashtagReelsGrid({super.key, required this.tag, this.isComingFromMood = false});
+  const   HashtagReelsGrid({super.key, required this.tag, this.isComingFromMood = false});
 
   @override
   State<HashtagReelsGrid> createState() => _HashtagReelsGridState();
@@ -67,87 +60,21 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
           return ReelThumbnailShimmerItem();
         }
         ReelModel reel = ReelModel.fromMap( _reels[index]);
-        final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
 
-        return GestureDetector(
-          onTap: () {
+        return ReelGridItemWidget(
+          onTap: (){
             final reels = _reels.map((map)=> ReelModel.fromMap(map)).toList();
-            context.push(RouterEnum.updatedReelsView.routeName,  extra: {
+            // Navigate to UpdatedFeedView to play the reel instantly
+            context.push(RouterEnum.updatedReelsView.routeName, extra: {
               'initialReels': reels,
               'selectedIndex': index,
               'lastDocument': _lastDoc,
-              'comingFrom':widget.isComingFromMood ? AppConstants.comingFromMood : AppConstants.comingFromHashtag,
+              'comingFrom': widget.isComingFromMood ? AppConstants.comingFromMood : AppConstants.comingFromHashtag,
               'mood': widget.isComingFromMood ? widget.tag : null,
-              'tag':!widget.isComingFromMood ? widget.tag : null,
-            },);
+              'tag': !widget.isComingFromMood ? widget.tag : null,
+            });
           },
-          child: Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: CachedNetworkImageProvider(thumbnailUrl),
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey[200],
-                ),
-              ),
-              Positioned(
-                  top: 10,
-                  left: 5,
-                  right: 5,
-                  child: FutureBuilder(future: UserService.getUserByID(userID: reel.userID), builder: (ctx, snapshot){
-                    if(snapshot.hasData && snapshot.requireData != null){
-                      UserModel user = snapshot.requireData!;
-                      return Row(
-                        spacing: 5,
-                        children: [
-
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundColor: AppColors.purpleColor,
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              radius: 19,
-                              backgroundImage: CachedNetworkImageProvider(user.profilePicture ?? AppIcons.icDummyImgUrl),
-                            ),
-                          ),
-                          Expanded(child: Text(user.userName, style: AppTextStyles.smallTextStyle.copyWith(color: Colors.white),))
-                        ],
-                      );
-                    }
-
-                    return SizedBox();
-                  })),
-              Positioned(
-                  bottom: 10,
-                  left: 10,
-                  right: 0,
-                  child: Row(
-                    spacing: 5,
-                    children: [
-
-                      CircleAvatar(
-                        radius: 12,
-                        backgroundColor: Colors.white,
-                        child: Center(child: Icon(Icons.play_arrow_rounded, ),),
-                      ),
-
-                      Expanded(
-                          child: FutureBuilder(future: ReelsService.getReelViewsCount(reelID: reel.reelID),
-                              builder: (ctx, snapshot) {
-                                if(snapshot.hasData && snapshot.requireData > 0){
-                                  return ReelLikesCountWidget(count: snapshot.requireData);
-                                }
-
-                                return ReelLikesCountWidget();
-                              }))
-                    ],
-                  ))
-            ],
-          ),
-        );
+            reel: reel);
       },
     );
   }
