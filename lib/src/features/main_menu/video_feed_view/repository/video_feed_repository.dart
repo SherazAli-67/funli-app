@@ -18,8 +18,10 @@ class VideoFeedRepository implements IVideoFeedRepository {
   Future<List<ReelModel>> fetchVideos({bool isRefresh = false, int limit = 5}) async {
     debugPrint("New reels fetching: $isRefresh");
     try {
-      // Reset pagination state for a fresh fetch
-      _lastDocument = null;
+      // Reset pagination state only if it's a refresh
+      if (isRefresh) {
+        _lastDocument = null;
+      }
       List<ReelModel> cachedReels = [];
       // Get current mood
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -83,10 +85,11 @@ class VideoFeedRepository implements IVideoFeedRepository {
 
   @override
   Future<List<ReelModel>> fetchMoreVideos() async {
-    debugPrint("Fetching more in repo: ${_lastDocument}");
+    debugPrint("Fetching more in repo: $_lastDocument");
     if (_lastDocument == null) {
-      debugPrint("Last document found null and returning 0");
-      return [];
+      debugPrint("Last document is null, attempting to fetch with default query");
+      // If last document is null, it might be the first pagination attempt after initial load,
+      // so we'll proceed with the fetch using the default query.
     }
 
     try {
