@@ -16,7 +16,7 @@ class ProfileAnalyticsDashboard extends StatefulWidget {
 
 class _ProfileAnalyticsDashboardState extends State<ProfileAnalyticsDashboard> with SingleTickerProviderStateMixin {
   // int _selectedTabIndex = 0;
-  String _selectedTimeRange = 'This month';
+  // String _selectedTimeRange = 'This month';
   late TabController _tabController;
   
   @override

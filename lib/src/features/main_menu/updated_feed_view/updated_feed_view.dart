@@ -9,14 +9,9 @@ import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../app_data.dart';
-import '../../../widgets/mood_selecting_scroll_wheel_widget.dart';
 import '../video_feed_view/bloc_cubit/video_feed_cubit.dart';
 import '../video_feed_view/bloc_cubit/video_feed_state.dart';
 import '../widgets/video_feed_item.dart';
-import '../../../res/app_constants.dart';
-import '../../../res/app_textstyles.dart';
-import '../../../services/user_service.dart';
 
 class UpdatedFeedView extends StatefulWidget {
   final List<ReelModel>? initialReels;

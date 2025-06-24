@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/features/profile_analytics_dashboard/analytics_gradient_info_card.dart';
-import 'package:funli_app/src/features/profile_analytics_dashboard/reel_views_chart.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/mood_analytics_cache_service.dart';
 

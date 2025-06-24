@@ -93,7 +93,7 @@ class _ReelViewsChartState extends State<ReelViewsChart> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha:0.1),
             spreadRadius: 1,
             blurRadius: 3,
             offset: const Offset(0, 1),
@@ -270,9 +270,9 @@ class _ReelViewsChartState extends State<ReelViewsChart> {
               show: true,
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFFFF9800).withOpacity(0.3),
-                  const Color(0xFF8BC34A).withOpacity(0.3),
-                  const Color(0xFF2196F3).withOpacity(0.3),
+                  const Color(0xFFFF9800).withValues(alpha:0.3),
+                  const Color(0xFF8BC34A).withValues(alpha:0.3),
+                  const Color(0xFF2196F3).withValues(alpha:0.3),
                 ],
               ),
             ),
