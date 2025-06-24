@@ -199,7 +199,7 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
 
       await controller.play();
       // Add a small delay to ensure play command is processed, retry if needed
-      /*await Future.delayed(const Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 50));
       if (!controller.value.isPlaying) {
         await controller.play();
       }
@@ -207,7 +207,7 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
       await Future.delayed(const Duration(milliseconds: 100));
       if (!controller.value.isPlaying) {
         await controller.play();
-      }*/
+      }
     }
 
     if (mounted) {
@@ -376,6 +376,7 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
       // Pause all except the target video
       await _pauseExceptCurrent(_currentlyPlayingVideoId!); // Ensure current video is paused before moving
       await _manageControllerWindow(newPage);
+      // Always attempt to play the video on page change unless explicitly paused
       if (!context.read<VideoFeedCubit>().state.shouldPauseVideo) {
         await _initAndPlayVideo(newPage);
       }
@@ -396,169 +397,99 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return RepaintBoundary(
-      child: Container(
-        color: Colors.black,
-        child: BlocListener<VideoFeedCubit, VideoFeedState>(
-          listenWhen: (p, c) =>
-          p.videos != c.videos ||
-              p.isLoading != c.isLoading ||
-              p.preloadedVideoUrls != c.preloadedVideoUrls ||
-              p.shouldPauseVideo != c.shouldPauseVideo ||
-              p.loadingSource != c.loadingSource,
-          listener: (context, state) async {
-            if (state.loadingSource == 'background' && state.isLoading) {
-              setState(() {
-                _showingBackgroundRefresh = true;
-              });
-            }
-            else if (_showingBackgroundRefresh && !state.isLoading) {
-              setState(() {
-                _showingBackgroundRefresh = false;
-              });
-            }
-            if (state.videos != _videos) {
-              setState(() => _videos = state.videos);
-              _manageControllerWindow(_currentPage);
-            }
-            if (state.videos.isNotEmpty && !_initialVideosLoaded) {
-              _initialVideosLoaded = true;
-              if (!state.shouldPauseVideo) {
-                _initAndPlayVideo(0);
+    return Scaffold(
+      body: RepaintBoundary(
+        child: Container(
+          color: Colors.black,
+          child: BlocListener<VideoFeedCubit, VideoFeedState>(
+            listenWhen: (p, c) =>
+            p.videos != c.videos ||
+                p.isLoading != c.isLoading ||
+                p.preloadedVideoUrls != c.preloadedVideoUrls ||
+                p.shouldPauseVideo != c.shouldPauseVideo ||
+                p.loadingSource != c.loadingSource,
+            listener: (context, state) async {
+              if (state.loadingSource == 'background' && state.isLoading) {
+                setState(() {
+                  _showingBackgroundRefresh = true;
+                });
               }
-            }
-            if (state.shouldPauseVideo && _currentlyPlayingVideoId != null) {
-              await _pauseExceptCurrent(_currentlyPlayingVideoId!); // Ensure current video is paused before moving
-            }
-            else if (!state.shouldPauseVideo && _isAppActive) {
-              await _initAndPlayVideo(_currentPage);
-            }
-          },
-          child: Stack(
-            children: [
-              PreloadPageView.builder(
-                scrollDirection: Axis.vertical,
-                controller: _pageController,
-                itemCount: _videos.length,
-                preloadPagesCount: 2,
-                onPageChanged: (index) => _handlePageChange(index),
-                itemBuilder: (context, index) {
-                  return RepaintBoundary(
-                    child: VideoFeedItem(
-                      key: ValueKey(_videos[index].reelID),
-                      controller: _getController(_videos[index].reelID),
-                      reel: _videos[index],
-                      isComingFromHome: true,
-                    ),
-                  );
-                },
-              ),
-              if (_showingBackgroundRefresh)
-                Positioned(
-                  top: 120,
-                  right: 16,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Refreshing',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              StreamBuilder(
-                stream: UserService.getCurrentUserStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    String mood = snapshot.requireData.mood ?? 'Happy';
-                    return Positioned(
-                      top: 60,
-                      left: 20,
-                      right: 20,
-                      child: GestureDetector(
-                        onTap: () async {
-                          final result = await showModalBottomSheet(
-                            isDismissible: false,
-                            context: context,
-                            builder: (_) {
-                              return MoodSelectingScrollWheelWidget(selectedMood: mood);
-                            },
-                          );
-                          if (result != null) {
-                            await _disposeAllControllers();
-                            setState(() {
-                              _currentPage = 0;
-                              _videos = [];
-                              _initialVideosLoaded = false;
-                            });
-                            if (_pageController.hasClients) {
-                              _pageController.jumpToPage(0);
-                            }
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Loading $result reels...'),
-                                duration: const Duration(seconds: 2),
-                              ),
-                            );
-                            context.read<VideoFeedCubit>().onMoodChange(mood: result);
-                          }
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${AppConstants.appTitle} V2',
-                              style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.black54,
-                                borderRadius: BorderRadius.circular(99),
-                              ),
-                              child: Row(
-                                spacing: 20,
-                                children: [
-                                  Text(
-                                    "${AppData.getEmojiByMood(mood)} $mood",
-                                    style: AppTextStyles.bodyTextStyle.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+              else if (_showingBackgroundRefresh && !state.isLoading) {
+                setState(() {
+                  _showingBackgroundRefresh = false;
+                });
+              }
+              if (state.videos != _videos) {
+                setState(() => _videos = state.videos);
+                _manageControllerWindow(_currentPage);
+              }
+              if (state.videos.isNotEmpty && !_initialVideosLoaded) {
+                _initialVideosLoaded = true;
+                if (!state.shouldPauseVideo) {
+                  _initAndPlayVideo(0);
+                }
+              }
+              if (state.shouldPauseVideo && _currentlyPlayingVideoId != null) {
+                await _pauseExceptCurrent(_currentlyPlayingVideoId!); // Ensure current video is paused before moving
+              }
+              else if (!state.shouldPauseVideo && _isAppActive) {
+                await _initAndPlayVideo(_currentPage);
+              }
+            },
+            child: Stack(
+              children: [
+                PreloadPageView.builder(
+                  scrollDirection: Axis.vertical,
+                  controller: _pageController,
+                  itemCount: _videos.length,
+                  preloadPagesCount: 2,
+                  onPageChanged: (index) => _handlePageChange(index),
+                  itemBuilder: (context, index) {
+                    return RepaintBoundary(
+                      child: VideoFeedItem(
+                        key: ValueKey(_videos[index].reelID),
+                        controller: _getController(_videos[index].reelID),
+                        reel: _videos[index],
+                        isComingFromHome: false,
                       ),
                     );
-                  }
-                  return SizedBox();
-                },
-              ),
-            ],
+                  },
+                ),
+                if (_showingBackgroundRefresh)
+                  Positioned(
+                    top: 120,
+                    right: 16,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Refreshing',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

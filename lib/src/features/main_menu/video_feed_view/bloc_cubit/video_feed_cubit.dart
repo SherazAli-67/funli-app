@@ -92,7 +92,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
         );
         try {
           // Fetch a small batch of reels quickly for new users
-          final initialReels = await videoRepository.fetchVideos(limit: 3);
+          final initialReels = await videoRepository.fetchVideos(limit: cachedReels.isEmpty ? 5 : 3);
           if (initialReels.isNotEmpty) {
             emit(
               state.copyWith(

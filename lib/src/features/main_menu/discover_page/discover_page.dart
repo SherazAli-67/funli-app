@@ -300,6 +300,7 @@ class MoodReelsWidget extends StatelessWidget{
               icon: Icon(Icons.arrow_forward_rounded, size: 30))
               : GestureDetector(
             onTap: () {
+
               context.push(
                 RouterEnum.updatedReelsView.routeName,
                 extra: {

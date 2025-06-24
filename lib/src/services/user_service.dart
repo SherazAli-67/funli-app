@@ -182,6 +182,15 @@ class UserService {
     return reels.sublist(0, 5);
   }
 
+  static Stream<List<ReelModel>> getUserDraftsReels() {
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    return _fireStore.collection(FirebaseConstants.userCollection).doc(
+        currentUID).collection(FirebaseConstants.draftsCollection)
+        .snapshots()
+        .map((snapshot) =>
+        snapshot.docs.map((doc) => ReelModel.fromMap(doc.data())).toList());
+  }
+
  /* static Future<UserModel> getUserFollowers() async {
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
     CollectionReference followersColRef = FirebaseFirestore.instance

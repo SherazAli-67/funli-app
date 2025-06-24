@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/main_menu/profile/widgets/draft_feels_widget.dart';
+import 'package:funli_app/src/features/main_menu/profile/widgets/user_drafts_feels.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
@@ -141,7 +142,7 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
               children: [
                 RemoteUserReelsWidget(userID: userID, userName: userName, profilePicture: profilePicture),
                 BookmarkWidget(userID: userID),
-                DraftFeelsWidget(),
+                UserDraftsFeelsWidget(),
 
               ],
             ),

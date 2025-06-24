@@ -11,7 +11,7 @@ enum RouterEnum {
   searchView('/search_view'),
   updatedReelsView('/reels-view'),
 
-  updatedFeedView('/updateFeed-view'),
+  // updatedFeedView('/updateFeed-view'),
   moodReelsView('/moodReels-view'),
   hashtagsReelsView('/hashtagReels-view'),
   filteredReelsView('/filteredReels-view'),

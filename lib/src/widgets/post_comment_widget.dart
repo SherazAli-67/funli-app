@@ -11,10 +11,10 @@ class PostCommentWidget extends StatelessWidget{
   final Color iconColor;
   final bool isReel;
   final ReelModel reel;
-
+  final bool comingFromHome;
   const PostCommentWidget(
       {super.key, required this.reel, this.iconColor = Colors
-          .grey, this.isReel = false,});
+          .grey, this.isReel = false, required this.comingFromHome});
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -33,17 +33,33 @@ class PostCommentWidget extends StatelessWidget{
     return Column(
           children: [
             IconButton(onPressed: (){
-              scaffoldKey.currentState!.showBottomSheet(
 
-                      backgroundColor: Colors.white,
-                      elevation: 1,
-                      (ctx)=> Padding(
-                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                  child: FractionallySizedBox(
-                    heightFactor: 0.75,
-                    child: CommentsPage(
-                      reel: reel, comingFromHome: false),
-                  )));
+              debugPrint("ON comment tap");
+              if(comingFromHome){
+                scaffoldKey.currentState!.showBottomSheet(
+
+                    backgroundColor: Colors.white,
+                    elevation: 1,
+                        (ctx)=> Padding(
+                        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                        child: FractionallySizedBox(
+                          heightFactor: 0.75,
+                          child: CommentsPage(
+                              reel: reel, comingFromHome: false),
+                        )));
+              }else{
+                showBottomSheet(
+                    backgroundColor: Colors.white,
+                    context: context, builder: (ctx){
+                  return Padding(
+                      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                      child: FractionallySizedBox(
+                        heightFactor: 0.75,
+                        child: CommentsPage(
+                            reel: reel, comingFromHome: false),
+                      ));
+                });
+              }
 
 
             }, icon: SvgPicture.asset(AppIcons.icComment,

@@ -221,6 +221,7 @@ class _SearchPageState extends State<SearchPage> {
           final reel =  _feelProvider.reels[index];
           return GestureDetector(
             onTap: () {
+
               context.push(RouterEnum.updatedReelsView.routeName,   extra: {
                 'initialReels': _feelProvider.reels,
                 'selectedIndex': index,

@@ -266,7 +266,7 @@ class AppRouter {
           );
         },
       ),
-      GoRoute(
+     /* GoRoute(
         path: RouterEnum.updatedFeedView.routeName,
         pageBuilder: (context, state) {
           final extras = state.extra! as Map<String, dynamic>;
@@ -278,7 +278,7 @@ class AppRouter {
             ),
           );
         },
-      ),
+      ),*/
 
     ],
     redirect: (context, state) {

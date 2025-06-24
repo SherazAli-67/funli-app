@@ -209,6 +209,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
                 children: [
                   GestureDetector(
                     onTap: (){
+
                       String? userName = _userModel?.userName;
                       String? userID = _userModel?.userID;
                       debugPrint("User name: $userName, userID: $userID");
@@ -265,7 +266,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
               ),
               const SizedBox(height: 10,),
               PostLikeWidget(reel: widget.reel, iconColor: Colors.white, isReel: true,),
-              PostCommentWidget(iconColor: Colors.white, isReel: true, reel: widget.reel,),
+              PostCommentWidget(iconColor: Colors.white, isReel: true, reel: widget.reel,comingFromHome: widget.isComingFromHome,),
               PostBookmarkWidget(reelID: widget.reel.reelID,),
               PostShareWidget( iconColor: Colors.white,),
             ],

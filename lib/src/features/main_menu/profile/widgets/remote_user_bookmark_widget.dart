@@ -148,6 +148,7 @@ class _BookmarkWidgetState extends State<BookmarkWidget> {
                 return GestureDetector(
                   onTap: () {
                     final initialReels = _reels.map((reel)=> ReelModel.fromMap(reel)).toList();
+
                     context.push(RouterEnum.updatedReelsView.routeName,  extra: {
                       'initialReels': initialReels,
                       'selectedIndex': index,

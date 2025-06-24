@@ -131,6 +131,7 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
 
                     return GestureDetector(
                       onTap: () {
+
                         context.push(RouterEnum.updatedReelsView.routeName, extra: {
                           'initialReels': _reels,
                           'selectedIndex': index,

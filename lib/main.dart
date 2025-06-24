@@ -1,4 +1,6 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/app_router/app_router.dart';
@@ -28,7 +30,7 @@ void main() async{
 
   // Initialize dependency injection
   injectionSetup();
-  
+
   // Preload videos for all moods in the background
   // This ensures a smoother experience when switching between moods
   ReelsCacheService.preloadAllMoods();
@@ -65,9 +67,14 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_)=> AuthCubit()),
         BlocProvider(create: (context) => getIt<VideoFeedCubit>(),)
       ],
-      child:  MaterialApp.router(
+      child:
+
+      MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: appRouter.router,
+       /* useInheritedMediaQuery: true,
+        locale: DevicePreview.locale(context),
+        builder: DevicePreview.appBuilder,*/
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           fontFamily: AppConstants.appFontFamily,
