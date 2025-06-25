@@ -81,13 +81,16 @@ class UserService {
         FirebaseConstants.followingCollection).doc(remoteUID).snapshots().map((snapshot)=> snapshot.exists);
   }
 
-  static Future<bool> getIsFollowing(String remoteUID) async{
+  static Future<FollowModel?> getIsFollowing(String remoteUID) async{
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
 
     DocumentSnapshot documentSnapshot = await  _fireStore.collection(
         FirebaseConstants.userCollection).doc(currentUID).collection(
         FirebaseConstants.followingCollection).doc(remoteUID).get();
-    return documentSnapshot.exists;
+    if(documentSnapshot.exists){
+      return FollowModel.fromMap(documentSnapshot.data() as Map<String, dynamic>);
+    }
+    return null;
   }
 
   static Stream<UserModel> getCurrentUserStream() {

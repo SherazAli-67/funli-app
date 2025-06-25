@@ -37,6 +37,7 @@ dependencies:
   firebase_core: ^3.13.0
   firebase_auth: ^5.5.3
   cloud_firestore: ^5.6.7
+  firebase_dynamic_links: ^6.1.6
   flutter_native_splash: ^2.4.6
   carousel_slider: ^5.0.0
   flutter_svg: ^2.1.0
@@ -77,6 +78,8 @@ dependencies:
   fl_chart: ^0.66.2
   emoji_picker_flutter: ^4.3.0
   device_preview: ^1.2.0
+  uni_links: ^0.5.1
+  share_plus: ^11.0.0
 #  visibility_detector: ^0.4.0+2
 
 dev_dependencies:

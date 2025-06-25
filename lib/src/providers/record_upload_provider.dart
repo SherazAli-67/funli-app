@@ -13,7 +13,7 @@ class RecordUploadProvider extends ChangeNotifier{
   bool isRecorded = false;
   String? _recordedPath;
   String _currentMood = 'Happy';
-  String videoRecordingDuration = '30s';
+  String videoRecordingDuration = '60s';
 
   double playbackSpeed = 1;
   bool isMuted = false;

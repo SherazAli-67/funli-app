@@ -31,7 +31,6 @@ class VideoFeedRepository implements IVideoFeedRepository {
       if(!isRefresh){
         // First try to load from cache
        cachedReels = await ReelsCacheService.getCachedReels(mood);
-
         // Check if we need to refresh from network
         final shouldRefresh = await ReelsCacheService.shouldRefreshFromNetwork();
 
@@ -41,7 +40,6 @@ class VideoFeedRepository implements IVideoFeedRepository {
         }
       }
 
-      
       // If cache is empty or needs refresh, fetch from network
       final networkReels = await _fetchVideosHelper(limit: limit);
       debugPrint("Network reels received: ${networkReels.length}");
@@ -119,12 +117,12 @@ class VideoFeedRepository implements IVideoFeedRepository {
     try {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
       String mood = sharedPreferences.getString(LocalStorageConstants.currentMoodKey) ?? 'Happy';
-      debugPrint("Mood received while fetching the reels: $mood limit: $limit");
-      
+
       // Increase limit to 5 for better initial experience
-      Query query =
-          _reelsColRef.where("moodTag", isEqualTo: mood)
-          .orderBy('createdAt', descending: true).limit(limit);
+      Query query = _reelsColRef
+          .where("moodTag", isEqualTo: mood)
+          .orderBy('createdAt', descending: true)
+          .limit(limit);
 
       if (startAfterDocument != null) {
         query = query.startAfterDocument(startAfterDocument);
@@ -139,7 +137,9 @@ class VideoFeedRepository implements IVideoFeedRepository {
 
       _lastDocument = snapshot.docs.last;
       final reels = snapshot.docs.map((doc)=> ReelModel.fromMap(doc.data() as Map<String,dynamic>)).toList();
-      
+
+
+
       // Pre-cache video files in background
       _preCacheVideoFiles(reels);
       
@@ -157,6 +157,7 @@ class VideoFeedRepository implements IVideoFeedRepository {
     for (final reel in reels) {
       ReelsCacheService.preCacheVideo(reel.videoUrl).catchError((e) {
         debugPrint('Error pre-caching video ${reel.reelID}: $e');
+
       });
     }
   }

@@ -11,12 +11,11 @@ class FirebaseConstants {
   static const notificationsCollections = 'notifications';
   static const bookmarksCollection = 'bookmarks';
   static const draftsCollection = 'drafts';
-
   static const reportProblemCollection = 'problemsReported';
-
   static const viewsCollections = 'views';
-
   static const String moodsCollection = 'moods';
+  static const String reportedContentCollection = 'reportedContent';
+  static const String reports = 'reports';
 
 
 }

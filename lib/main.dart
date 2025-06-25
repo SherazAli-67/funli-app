@@ -13,10 +13,12 @@ import 'package:funli_app/src/providers/personal_info_provider.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/providers/reels_provider.dart';
+import 'package:funli_app/src/providers/report_content_provider.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/providers/tab_change_provider.dart';
 import 'package:funli_app/src/providers/users_search_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
+import 'package:funli_app/src/services/deep_link_service.dart';
 import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:provider/provider.dart';
 
@@ -28,6 +30,9 @@ void main() async{
 
   // Initialize dependency injection
   injectionSetup();
+
+  // Initialize deep link service
+  getIt<DeepLinkService>().initDeepLinks();
 
   // Preload videos for all moods in the background
   // This ensures a smoother experience when switching between moods
@@ -45,6 +50,7 @@ void main() async{
         ChangeNotifierProvider(create: (_)=> UsersSearchProvider()..fetchInitial()),
         ChangeNotifierProvider(create: (_)=> HashtagSearchProvider()..fetchInitial()),
         ChangeNotifierProvider(create: (_) => DiscoverProvider()..loadAll()),
+        ChangeNotifierProvider(create: (_) => ReportContentProvider()),
       ],
       child: const MyApp()));
 }

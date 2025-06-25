@@ -19,6 +19,8 @@ class ReelModel {
   final Map<String, dynamic>? location; // e.g., {'lat': 0.0, 'lng': 0.0}
   final int viewsCount;
 
+  /// ✅ New field
+  final List<String> reportedByUsers;
 
   ReelModel({
     required this.reelID,
@@ -37,7 +39,9 @@ class ReelModel {
     this.location,
     this.isMuted = false,
     this.playbackSpeed = 1.0,
-    this.viewsCount = 0
+    this.viewsCount = 0,
+    /// ✅ Default empty list
+    this.reportedByUsers = const [],
   });
 
   factory ReelModel.fromMap(Map<String, dynamic> map) {
@@ -80,7 +84,10 @@ class ReelModel {
       location: map['location'] != null ? Map<String, dynamic>.from(map['location']) : null,
       isMuted: map['isMuted'] ?? false,
       playbackSpeed: map['playbackSpeed'] ?? 1.0,
-      viewsCount: map['viewsCount'] ?? 0
+      viewsCount: map['viewsCount'] ?? 0,
+
+      /// ✅ Map from list or default to []
+      reportedByUsers: List<String>.from(map['reportedByUsers'] ?? []),
     );
   }
 
@@ -102,7 +109,10 @@ class ReelModel {
       if (location != null) 'location': location,
       'isMuted' : isMuted,
       'playbackSpeed' : playbackSpeed,
-      'viewsCount' : viewsCount
+      'viewsCount' : viewsCount,
+
+      /// ✅ Include in toMap
+      'reportedByUsers': reportedByUsers,
     };
   }
 }

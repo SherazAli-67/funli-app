@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -34,7 +35,6 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
 
   /// Initialize videos with optimized loading strategy
   Future<void> _initializeVideos() async {
-    debugPrint("InitialVideos called");
     // First load cached videos immediately
     await _loadCachedVideosFirst();
 
@@ -64,9 +64,10 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
       // Get cached reels for this mood
       final cachedReels = await ReelsCacheService.getCachedReels(mood);
 
-      debugPrint("Cached reels found: ${cachedReels.length}");
       if (cachedReels.isNotEmpty) {
-        // Emit cached reels immediately
+        String currentUID = FirebaseAuth.instance.currentUser!.uid;
+        cachedReels.removeWhere((video)=> video.reportedByUsers.contains(currentUID));
+
         emit(
           state.copyWith(
             isLoading: false,
@@ -132,8 +133,7 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
       if (freshVideos.isNotEmpty) {
         // Only update if we got new videos and they're different from current ones
         final currentVideos = state.videos;
-        final hasNewVideos = freshVideos.any(
-                (video) => !currentVideos.any((v) => v.reelID == video.reelID)
+        final hasNewVideos = freshVideos.any((video) => !currentVideos.any((v) => v.reelID == video.reelID)
         );
 
         if (hasNewVideos) {
@@ -151,6 +151,9 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
               newIndex = matchIndex;
             }
           }
+
+          String currentUID = FirebaseAuth.instance.currentUser!.uid;
+          freshVideos.removeWhere((video)=> video.reportedByUsers.contains(currentUID));
 
           emit(
             state.copyWith(
@@ -181,15 +184,17 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
     _preloadDelayTimer?.cancel();
 
     emit(state.copyWith(
-      isLoading: true,
-      loadingSource: 'network',
-      preloadedVideoUrls: {},
-      currentVideoIndex: 0
+        isLoading: true,
+        loadingSource: 'network',
+        preloadedVideoUrls: {},
+        currentVideoIndex: 0
     ));
 
     try {
       final videos = await videoRepository.fetchVideos(isRefresh: isRefresh);
       final hasMoreVideos = videos.length >= 3; // Adjusted to ensure pagination is triggered even with fewer initial videos
+      String currentUID = FirebaseAuth.instance.currentUser!.uid;
+      videos.removeWhere((video)=> video.reportedByUsers.contains(currentUID));
       emit(
         state.copyWith(
           isLoading: false,
@@ -226,7 +231,8 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
         debugPrint("Loading more videos: newVideos: ${newVideos.length}");
 
         if (newVideos.isNotEmpty) {
-
+          String currentUID = FirebaseAuth.instance.currentUser!.uid;
+          newVideos.removeWhere((video)=> video.reportedByUsers.contains(currentUID));
           final List<ReelModel> updatedVideos = List<ReelModel>.from(state.videos)
             ..addAll(newVideos);
 
@@ -265,6 +271,22 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
       _isPreloadingMore = true;
       await loadMoreVideos();
       _isPreloadingMore = false;
+    }
+  }
+
+  void removeReportedReel(String reelID) {
+
+    
+    // Also remove the reported reel from cache
+    final reportedVideo = state.videos.firstWhere((video) => video.reelID == reelID,);
+    debugPrint("removeReportedReel received in the videoFeedCubit before: ${state.videos.length}");
+    final updatedVideos = state.videos.where((video) => video.reelID != reelID).toList();
+
+    debugPrint("removeReportedReel received in the videoFeedCubit after: ${updatedVideos.length}");
+    emit(state.copyWith(videos: updatedVideos));
+    if (reportedVideo.reelID.isNotEmpty) {
+      ReelsCacheService.removeCachedReel(reportedVideo.videoUrl);
+      debugPrint("Removed reported reel from cache: ${reportedVideo.videoUrl}");
     }
   }
 

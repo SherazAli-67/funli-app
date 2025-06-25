@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/helpers/time_ago_helper.dart';
 import 'package:funli_app/src/models/comment_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
@@ -17,12 +19,19 @@ class CommentItemWidget extends StatefulWidget {
     super.key,
     required AddCommentModel comment,
     required String reelID,
-    required Function(String userName, String commentID) onReplyTap
-  }) : _comment = comment, _reelID = reelID, _onReplyTap = onReplyTap;
+    required String postedByUserID,
+    required Function(String userName, String commentID) onReplyTap,
+  })
+      : _comment = comment,
+        _reelID = reelID,
+        _onReplyTap = onReplyTap,
+        _postUserID = postedByUserID
+  ;
   final AddCommentModel _comment;
   final String _reelID;
-
   final Function(String userName, String commentID) _onReplyTap;
+  final String _postUserID;
+
 
   @override
   State<CommentItemWidget> createState() => _CommentItemWidgetState();
@@ -81,6 +90,7 @@ class _CommentItemWidgetState extends State<CommentItemWidget> {
   }
 
  Widget _buildUserInfoWidget({required String userID, required String commentText,  bool isReply = false}) {
+
     String userName = '';
     return  Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,8 +105,7 @@ class _CommentItemWidgetState extends State<CommentItemWidget> {
                 backgroundImage: CachedNetworkImageProvider(user.profilePicture ?? AppIcons.icDummyImgUrl),
               ),
               title: Text(user.userName, style: AppTextStyles.tileTitleTextStyle,),
-              trailing: IconButton(
-                  onPressed: (){}, icon: SvgPicture.asset(AppIcons.icMore)),
+              trailing: _buildTrailingIcon(),
             );
           }
           return ListTile(
@@ -105,8 +114,7 @@ class _CommentItemWidgetState extends State<CommentItemWidget> {
               backgroundImage: CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
             ),
             title: Text("...", style: AppTextStyles.tileTitleTextStyle,),
-            trailing: IconButton(
-                onPressed: (){}, icon: SvgPicture.asset(AppIcons.icMore)),
+            trailing: _buildTrailingIcon()
           );
         }),
         Text(commentText, style: AppTextStyles.commentTextStyle,),
@@ -115,11 +123,43 @@ class _CommentItemWidgetState extends State<CommentItemWidget> {
             spacing: 20,
             children: [
               CommentLikeWidget(reelID: widget._reelID, commentID: widget._comment.commentID),
+              if(widget._comment.isPinned)
+                Text("📌 Pinned",style: AppTextStyles.smallTextStyle,),
               Text(DateTimeHelper.timeAgo(widget._comment.dateTime), style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),),
               TextButton(onPressed: ()=> widget._onReplyTap(userName, widget._comment.commentID), child: Text("Reply", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),))
             ],
           ),
       ],
     );
+  }
+
+  Widget? _buildTrailingIcon(){
+    bool isOwner = FirebaseAuth.instance.currentUser!.uid == widget._postUserID;
+    return isOwner ? PopupMenuButton(
+      padding: EdgeInsets.zero,
+        position: PopupMenuPosition.under,
+        icon: SvgPicture.asset(AppIcons.icMore),
+        onSelected: (val)=> markCommentAsPinned(),
+        itemBuilder: (ctx){
+          return [
+            PopupMenuItem(
+                value: 1,
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Text(widget._comment.isPinned ? '📌 Un-Pin the comment' : '📌 Pin the comment', style: AppTextStyles.smallTextStyle,))
+          ];
+        }): null;
+  }
+  void markCommentAsPinned()async{
+    try{
+      await CommentService.markCommentAsPinned(reelID: widget._reelID,comment: widget._comment);
+      if(widget._comment.isPinned){
+        Fluttertoast.showToast(msg: "📌  Comment has been pinned to the top ");
+      }else{
+        Fluttertoast.showToast(msg: "📌 Comment removed from pinned list");
+      }
+    }catch(e){
+      debugPrint("Error while marking comment as Pin: ${e.toString()}");
+    }
+
   }
 }

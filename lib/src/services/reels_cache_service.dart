@@ -975,4 +975,40 @@ class ReelsCacheService {
     final total = _videoLoadTimes.values.reduce((a, b) => a + b);
     return total / _videoLoadTimes.length;
   }
+
+  /// Remove a specific reel from cache by its video URL
+  static Future<void> removeCachedReel(String videoUrl) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedReelsJson = prefs.getString(_cacheKey) ?? '{}';
+      final Map<String, dynamic> cachedReelsMap = json.decode(cachedReelsJson);
+
+      // Iterate through all moods to find and remove the reel
+      for (final mood in cachedReelsMap.keys) {
+        final List<dynamic> reels = cachedReelsMap[mood];
+        reels.removeWhere((reel) => reel['videoUrl'] == videoUrl);
+        cachedReelsMap[mood] = reels;
+      }
+
+      // Save updated cache
+      await prefs.setString(_cacheKey, json.encode(cachedReelsMap));
+
+      // Also remove from memory cache if it exists
+      _memoryCache.remove(videoUrl);
+
+      // Remove from active downloads if it exists
+      _activeDownloads.remove(videoUrl);
+
+      // Optionally, remove the file from the cache manager if needed
+      try {
+        await customCacheManager.removeFile(videoUrl);
+      } catch (e) {
+        debugPrint('Error removing file from cache manager: $e');
+      }
+
+      debugPrint('Removed reel from cache: $videoUrl');
+    } catch (e) {
+      debugPrint('Error removing reel from cache: $e');
+    }
+  }
 }

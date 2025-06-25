@@ -51,7 +51,7 @@
 				<string>Editor</string>
 				<key>CFBundleURLSchemes</key>
 				<array>
-					<string>***Something here***</string>
+					<string>funliapp</string>
 				</array>
 			</dict>
 		</array>
@@ -79,6 +79,11 @@
 			<string>UIInterfaceOrientationPortraitUpsideDown</string>
 			<string>UIInterfaceOrientationLandscapeLeft</string>
 			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>FirebaseDynamicLinksCustomDomains</key>
+		<array>
+			<string>https://funliapp.page.link</string>
+			<string>https://funli-web.vercel.app</string>
 		</array>
 	</dict>
 </plist>

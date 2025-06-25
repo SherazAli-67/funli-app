@@ -136,9 +136,9 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                           spacing: 12,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _buildVideoDurationWidget(duration: '1m', provider: provider),
-                            _buildVideoDurationWidget(duration: '30s',provider: provider),
-                            _buildVideoDurationWidget(duration: '15s  ',provider: provider),
+                            _buildVideoDurationWidget(duration: '15s', provider: provider),
+                            _buildVideoDurationWidget(duration: '60s',provider: provider),
+                            _buildVideoDurationWidget(duration: '10m  ',provider: provider),
 
                           ],
                         ),
@@ -312,8 +312,8 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
 
   int _getSelectedDurationInSeconds() {
     final durationStr = _recordUploadProvider.videoRecordingDuration;
-    if (durationStr.contains("1m")) return 60;
-    if (durationStr.contains("30s")) return 30;
+    if (durationStr.contains("10m")) return 600;
+    if (durationStr.contains("60s")) return 60;
     return 15;
   }
   String _recordingDurationText() {

@@ -30,4 +30,5 @@ class AppColors {
   static const redColor = Color(0xffFF1B1B);
   static const darkGreyColor = Color(0xff424242);
   static const unSelectedTabColor = Color(0xff696974);
+  static const reportContentFillColor = Color(0xffF1F1F8);
 }

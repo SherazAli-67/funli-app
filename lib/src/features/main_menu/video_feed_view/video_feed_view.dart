@@ -14,6 +14,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../../app_data.dart';
 import '../../../app_router/router_enum.dart';
+import '../../../providers/report_content_provider.dart';
 import 'bloc_cubit/video_feed_cubit.dart';
 import 'bloc_cubit/video_feed_state.dart';
 import '../../../res/app_constants.dart';
@@ -105,6 +106,23 @@ class _VideoFeedViewState extends State<VideoFeedView>
         }
       });
     });
+
+    // Listen for report events from ReportContentProvider
+    Future.microtask(() {
+      final reportProvider = context.read<ReportContentProvider>();
+      reportProvider.addListener(() {
+        if (!reportProvider.isReporting) {
+          String? reportedReelID;
+          if (reportProvider.lastReportedReelID != null) {
+            reportedReelID = reportProvider.lastReportedReelID;
+
+            debugPrint("_lastReportedReelID received in the videoFeedView: $reportedReelID");
+            context.read<VideoFeedCubit>().removeReportedReel(reportedReelID!);
+          }
+        }
+      });
+    });
+
   }
 
   @override
@@ -125,7 +143,6 @@ class _VideoFeedViewState extends State<VideoFeedView>
   // Called when this route is no longer visible
   @override
   void didPushNext() {
-    debugPrint("VideoFeedView: didPushNext called");
     // Pause all videos when navigating away
     _pauseAllControllers();
 

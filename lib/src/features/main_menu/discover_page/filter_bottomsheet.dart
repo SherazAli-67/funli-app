@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/models/filter_model.dart';
+import 'package:funli_app/src/widgets/sheet_close_icon_widget.dart';
 
 import '../../../res/app_icons.dart';
 import '../../../res/app_textstyles.dart';
@@ -51,13 +52,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               children: [
                 Text("Filters",
                   style: AppTextStyles.headingTextStyle3,),
-                IconButton(
-                    style: IconButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                100))
-                    ),
-                    onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close))
+                SheetCloseIconWidget()
               ],
             ),
             Column(

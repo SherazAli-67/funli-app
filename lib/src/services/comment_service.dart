@@ -59,4 +59,13 @@ class CommentService {
 
     return querySnapshot.docs.map((doc)=> AddCommentModel.fromMap(doc.data() as Map<String,dynamic>)).toList();
   }
+
+  static Future<void> markCommentAsPinned({required String reelID, required AddCommentModel comment})async {
+    await _reelsColRef.doc(reelID)
+        .collection(FirebaseConstants.commentsCollection)
+        .doc(comment.commentID).update({
+      'isPinned' : !comment.isPinned
+    });
+
+  }
 }

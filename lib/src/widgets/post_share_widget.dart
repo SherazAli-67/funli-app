@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../dependancy_injection/dependency_injector.dart';
+import '../services/deep_link_service.dart';
 
 class PostShareWidget extends StatelessWidget{
   final Color iconColor;
-  const PostShareWidget({super.key, this.iconColor = Colors.grey});
+  final ReelModel reel;
+
+  const PostShareWidget({super.key, this.iconColor = Colors.grey, required this.reel});
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        IconButton(onPressed: ()async{
-          Fluttertoast.showToast(msg: "The share feature is in progress");
-        },
-            icon: SvgPicture.asset(
-              AppIcons.icShare,
-              colorFilter:  ColorFilter
-                  .mode(iconColor, BlendMode.srcIn),)),
+        IconButton(
+          onPressed: () async {
+            final deepLink = await getIt<DeepLinkService>().generateDeepLink(reel.reelID, reel.thumbnailUrl!);
+            SharePlus.instance.share(
+                ShareParams(text: 'Check out this reel on FUNLI: $deepLink')
+            );
+          },
+          icon: SvgPicture.asset(
+            AppIcons.icShare,
+            colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+          ),
+        ),
         // if(snapshot.requireData > 0)
         //   Text("132k", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),),
       ],

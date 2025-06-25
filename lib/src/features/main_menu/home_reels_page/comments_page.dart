@@ -86,6 +86,12 @@ class _CommentsPageState extends State<CommentsPage> {
               builder: (ctx, snapshot) {
             if(snapshot.hasData && snapshot.requireData.isNotEmpty){
               List<AddCommentModel> comments = snapshot.requireData;
+              // Sort comments: pinned comments at the top, then by dateTime
+              comments.sort((a, b) {
+                if (a.isPinned && !b.isPinned) return -1;
+                if (!a.isPinned && b.isPinned) return 1;
+                return a.dateTime.compareTo(b.dateTime);
+              });
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 _listScrollController.animateTo(
                   _listScrollController.position.maxScrollExtent,
@@ -100,7 +106,7 @@ class _CommentsPageState extends State<CommentsPage> {
                     AddCommentModel comment = comments[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 24.0),
-                      child: CommentItemWidget(comment: comment, reelID:  widget._reel.reelID, onReplyTap:  _onReplyTap,)
+                      child: CommentItemWidget(comment: comment, reelID:  widget._reel.reelID, onReplyTap:  _onReplyTap, postedByUserID: widget._reel.userID,)
                     );
                   }));
             }

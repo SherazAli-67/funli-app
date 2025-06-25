@@ -176,4 +176,47 @@ class AppData {
       "icon": AppIcons.icInstagram
     },
   ];
+
+  static  List<Map<String, dynamic>> reportReasons = [
+    {
+      "reason": "Misleading Information",
+      "description":
+      "Hi, I want to report this content as it contains misleading or false information."
+    },
+    {
+      "reason": "Hate Speech or Symbols",
+      "description":
+      "Hi, I want to report this content as it promotes hate speech, violence, or offensive symbols."
+    },
+    {
+      "reason": "Harassment or Bullying",
+      "description":
+      "Hi, I want to report this content as it involves harassment, threats, or bullying."
+    },
+    {
+      "reason": "Sexual Content",
+      "description":
+      "Hi, I want to report this content as it includes sexually explicit or inappropriate material."
+    },
+    {
+      "reason": "Violent or Dangerous Acts",
+      "description":
+      "Hi, I want to report this content as it shows or encourages violent or dangerous behavior."
+    },
+    {
+      "reason": "Spam or Scam",
+      "description":
+      "Hi, I want to report this content as it appears to be spam, scam, or misleading promotion."
+    },
+    {
+      "reason": "Harmful or Abusive Content",
+      "description":
+      "Hi, I want to report this content as it may be harmful, abusive, or offensive."
+    },
+    {
+      "reason": "Other",
+      "description":
+      "Hi, I want to report this content for a reason not listed above."
+    },
+  ];
 }

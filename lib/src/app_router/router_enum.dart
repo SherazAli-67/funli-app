@@ -32,9 +32,10 @@ enum RouterEnum {
   editUploadedReelView('/editUploadedReel-view'),
   publishReelView('/publishReel-view'),
   publishDraftView('/publishDraft-view'),
-
   videoPlayerView('/videoPlayer-view'),
 
+  //Other pages
+  reportContentView('/reportContent-view'),
   //BottomNav
   discoverView('/discover_view'),
   videoFeedView('/video_feed_view'),

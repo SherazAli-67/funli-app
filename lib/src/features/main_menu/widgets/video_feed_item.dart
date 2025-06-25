@@ -1,10 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:funli_app/src/app_router/bottom_navigation_widget.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/reels_page/reels_optimized_player_widget.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/services/reels_service.dart';
+import 'package:funli_app/src/widgets/sheet_close_icon_widget.dart';
+import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
 import '../../../res/app_colors.dart';
 import '../../../res/app_icons.dart';
@@ -61,7 +65,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
     }
   }
   
-  void _toggleMute() {
+  /*void _toggleMute() {
     if (widget.controller == null || !widget.controller!.value.isInitialized) return;
     
     setState(() {
@@ -73,7 +77,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
     } else {
       widget.controller!.setVolume(1);
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -98,12 +102,12 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
 
         _buildUserNameCaptionWidget(),
         _buildLikeCommentsIcon(context),
-        _buildMuteButton(),
+        /*_buildMuteButton(),*/
       ],
     );
   }
   
-  Widget _buildMuteButton() {
+ /* Widget _buildMuteButton() {
     return Positioned(
       top: 100,
       right: 16,
@@ -123,7 +127,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
         ),
       ),
     );
-  }
+  }*/
 
   Positioned _buildUserNameCaptionWidget() {
     return Positioned(
@@ -211,8 +215,6 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
                     onTap: (){
 
                       String? userName = _userModel?.userName;
-                      String? userID = _userModel?.userID;
-                      debugPrint("User name: $userName, userID: $userID");
                       showModalBottomSheet(
                           isScrollControlled: true,
                           context: context, builder: (ctx){
@@ -267,10 +269,87 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
               const SizedBox(height: 10,),
               PostLikeWidget(reel: widget.reel, iconColor: Colors.white, isReel: true,),
               PostCommentWidget(iconColor: Colors.white, isReel: true, reel: widget.reel,comingFromHome: widget.isComingFromHome,),
-              PostBookmarkWidget(reelID: widget.reel.reelID,),
-              PostShareWidget( iconColor: Colors.white,),
+              PostShareWidget(iconColor: Colors.white, reel: widget.reel),
+              IconButton(onPressed: _onMoreTap, icon: Icon(Icons.more_horiz, color: Colors.white,))
             ],
           ),
         );
   }
+
+  void _onMoreTap(){
+    if(widget.isComingFromHome){
+      scaffoldKey.currentState!.showBottomSheet((ctx){
+        return ReelMoreItemSheet(reel: widget.reel, controller: widget.controller);
+      });
+    }else{
+      showModalBottomSheet(
+          backgroundColor: AppColors.reportContentFillColor,
+          context: context, builder: (ctx){
+            return ReelMoreItemSheet(reel: widget.reel, controller: widget.controller);
+      });
+    }
+
+  }
+}
+
+
+class ReelMoreItemSheet extends StatelessWidget{
+  final ReelModel _reel;
+  final VideoPlayerController? _controller;
+
+  const ReelMoreItemSheet({super.key, required ReelModel reel, VideoPlayerController? controller})
+      : _reel = reel, _controller = controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return FractionallySizedBox(
+      heightFactor: 0.4,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          spacing: 20,
+          children: [
+            Align(
+              alignment: Alignment.topRight,
+              child: SheetCloseIconWidget()
+            ),
+            PostBookmarkWidget(reelID: _reel.reelID,),
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              child: ListTile(
+                tileColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)
+                ),
+                leading: Icon(Icons.error_outline, color: AppColors.redColor,),
+                title: Text("Report this content", style: AppTextStyles.buttonTextStyle.copyWith(color: AppColors.redColor),),
+                onTap: () async {
+                  context.pop();
+                  if (_controller != null) {
+                    await _controller.pause();
+
+                    debugPrint("Controller found and set to pause");
+                    context.push(RouterEnum.reportContentView.routeName, extra: {
+                      'reel': _reel
+                    }).then((_) {
+                      _controller.play();
+
+                      debugPrint("Come back to page and set it to play");
+                    });
+                  } else {
+
+                    debugPrint("Controller not found and set to pause");
+                    context.push(RouterEnum.reportContentView.routeName, extra: {
+                      'reel': _reel
+                    });
+                  }
+                },
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
 }

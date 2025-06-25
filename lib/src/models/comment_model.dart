@@ -3,12 +3,14 @@ class AddCommentModel {
   final String commentBy;
   final DateTime dateTime;
   final String comment;
+  final bool isPinned;
 
   AddCommentModel({
     required this.commentID,
     required this.commentBy,
     required this.dateTime,
-    required this.comment
+    required this.comment,
+    this.isPinned = false
   });
 
   Map<String, dynamic> toMap() {
@@ -16,7 +18,8 @@ class AddCommentModel {
       'commentID' :  commentID,
       "commentBy" : commentBy,
       'dateTime': dateTime.toIso8601String(),
-      'comment' :  comment
+      'comment' :  comment,
+      'isPinned' : isPinned
     };
   }
 
@@ -25,7 +28,8 @@ class AddCommentModel {
       commentID: map['commentID'],
       commentBy: map['commentBy'],
       dateTime: DateTime.tryParse(map['dateTime'])!,
-      comment: map['comment']
+      comment: map['comment'],
+      isPinned: map['isPinned'] ?? false
     );
   }
 }

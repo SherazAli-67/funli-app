@@ -6,6 +6,7 @@ import '../app_router/app_router.dart';
 import '../features/main_menu/video_feed_view/bloc_cubit/video_feed_cubit.dart';
 import '../features/main_menu/video_feed_view/repository/i_video_feed_repository.dart';
 import '../features/main_menu/video_feed_view/repository/video_feed_repository.dart';
+import '../services/deep_link_service.dart';
 
 final getIt = GetIt.instance;
 
@@ -23,4 +24,6 @@ void injectionSetup() {
   getIt.registerFactory<VideoFeedCubit>(
     () => VideoFeedCubit(getIt<IVideoFeedRepository>()),
   );
+
+  getIt.registerSingleton<DeepLinkService>(DeepLinkService());
 }

@@ -14,6 +14,7 @@ import 'package:funli_app/src/features/main_menu/video_feed_view/video_feed_view
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
 import 'package:funli_app/src/features/personalization/personalization_page.dart';
 import 'package:funli_app/src/features/profile_analytics_dashboard/profile_analytics_dashboard.dart';
+import 'package:funli_app/src/features/report_content/report_content_page.dart';
 import 'package:funli_app/src/features/search_page.dart';
 import 'package:funli_app/src/features/settings/content_preferences_page.dart';
 import 'package:funli_app/src/features/settings/help_center_page.dart';
@@ -262,6 +263,18 @@ class AppRouter {
               userID: extras['userID'],
               mood: extras['mood'],
               tag: extras['tag'],
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouterEnum.reportContentView.routeName,
+        pageBuilder: (context, state) {
+          final extras = state.extra! as Map<String, dynamic>;
+
+          return MaterialPage(
+            child: ReportContentPage(
+              reel: extras['reel'],
             ),
           );
         },
