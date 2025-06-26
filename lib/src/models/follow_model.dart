@@ -21,7 +21,7 @@ class FollowModel {
     return FollowModel(
       userID: map['userID'],
       dateTime: DateTime.tryParse(map['dateTime'])!,
-      isApproved: map['isApproved']
+      isApproved: map['isApproved'] ?? false
     );
   }
 }

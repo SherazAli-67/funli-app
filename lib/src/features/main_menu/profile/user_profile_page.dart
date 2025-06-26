@@ -1,14 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
-import 'package:funli_app/src/features/main_menu/profile/widgets/draft_feels_widget.dart';
 import 'package:funli_app/src/features/main_menu/profile/widgets/user_drafts_feels.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
-import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/widgets/gradient_icon.dart';
 import 'package:funli_app/src/widgets/profile_info_widget.dart';
 import 'package:go_router/go_router.dart';

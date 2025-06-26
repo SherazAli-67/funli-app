@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
+import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import '../app_router/app_router.dart';
@@ -14,7 +16,7 @@ class DeepLinkService {
     _sub = linkStream.listen((String? link) {
       if (link != null) {
         handleDeepLink(link);
-      }
+      }  
     }, onError: (err) {
       print('Error listening to deep links: $err');
     });
@@ -62,7 +64,12 @@ class DeepLinkService {
       if (uri.pathSegments.contains('reels') && uri.pathSegments.length > 1) {
         String reelId = uri.pathSegments.last;
         // Navigate to reel page with reelId
-        navigateToReel(reelId);
+        debugPrint("ReelID in deepLinkService: $reelId");
+        // Delay navigation to ensure app initialization
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _appRouter.router.push(
+              RouterEnum.deepLinkViewer.routeName, extra: {'reelID': reelId});
+        });
       } else if (uri.pathSegments.contains('profile') && uri.pathSegments.length > 1) {
         String userId = uri.pathSegments.last;
         // Navigate to profile page with userId
@@ -71,11 +78,7 @@ class DeepLinkService {
     }
   }
 
-  void navigateToReel(String reelId) {
-    // Implement navigation logic using AppRouter
-    print('Navigating to reel: $reelId');
-    // Example: _appRouter.pushNamed('/reels', extra: reelId);
-  }
+
 
   void navigateToProfile(String userId) {
     // Implement navigation logic

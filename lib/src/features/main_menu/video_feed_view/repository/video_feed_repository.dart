@@ -16,7 +16,7 @@ class VideoFeedRepository implements IVideoFeedRepository {
   final _reelsColRef = FirebaseFirestore.instance.collection(FirebaseConstants.reelsCollection);
   @override
   Future<List<ReelModel>> fetchVideos({bool isRefresh = false, int limit = 5}) async {
-    debugPrint("New reels fetching: $isRefresh");
+
     try {
       // Reset pagination state only if it's a refresh
       if (isRefresh) {

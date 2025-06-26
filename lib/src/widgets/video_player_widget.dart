@@ -141,9 +141,11 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> with TickerProvide
         child: Stack(
           alignment: Alignment.center,
           children: [
-            isPortrait
-                ? SizedBox.expand(child: AspectRatio(aspectRatio: _controller.value.aspectRatio, child: child))
-                : AspectRatio(aspectRatio: _controller.value.aspectRatio, child: child),
+            Center(
+              child: isPortrait
+                  ? SizedBox.expand(child: AspectRatio(aspectRatio: _controller.value.aspectRatio, child: child))
+                  : AspectRatio(aspectRatio: _controller.value.aspectRatio, child: child),
+            ),
             if (_isBuffering)
               LoadingWidget(color: AppColors.purpleColor),
             if (_showPlayPauseOverlay)

@@ -56,6 +56,8 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
   @override
   void initState() {
     super.initState();
+
+    debugPrint("Reels received: ${widget.initialReels.length}");
     WidgetsBinding.instance.addObserver(this);
     _videos = widget.initialReels;
     _currentPage = widget.selectedIndex;

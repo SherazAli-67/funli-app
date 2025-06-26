@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/models/follow_model.dart';
 import 'package:funli_app/src/models/reel_model.dart';
@@ -14,6 +13,7 @@ import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
+import 'package:funli_app/src/widgets/private_account_widget.dart';
 import 'package:funli_app/src/widgets/profile_info_widget.dart';
 import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
 import 'package:go_router/go_router.dart';
@@ -91,27 +91,8 @@ class _RemoteUserProfileInfoWidgetState extends State<RemoteUserProfileInfoWidge
   Widget _buildUserInfoWidget() {
     bool hideProfile = _isPrivateAccount && !_isApproved && !widget._isFromProfilePage;
     return hideProfile
-        ? _buildPrivateAccountWidget()
+        ? PrivateAccountWidget()
         : _buildPublicAccountWidget();
-  }
-
-  Widget _buildPrivateAccountWidget(){
-    return Column(
-      spacing: 10,
-      children: [
-        Divider(),
-        Container(
-          padding: EdgeInsets.all(15),
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.black),
-              shape: BoxShape.circle
-          ),
-          child:  SvgPicture.asset(AppIcons.icPasswordLock, color: Colors.black,),
-        ),
-        Text("This Account is Private", style: AppTextStyles.subHeadingTextStyle,),
-        Text("Follow this account to see their FEELS", style: AppTextStyles.bodyTextStyle, textAlign: TextAlign.center,)
-      ],
-    );
   }
 
   Widget _buildPublicAccountWidget() {
@@ -234,146 +215,3 @@ class _RemoteUserProfileInfoWidgetState extends State<RemoteUserProfileInfoWidge
     );
   }
 }
-
-/*
-*  Column(
-          spacing: 16,
-          children: [
-
-
-
-            if(!widget._isFromProfilePage)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: SizedBox(
-                  height: 45,
-                  child: Row(
-                    spacing: 12,
-                    children: [
-                      Expanded(
-                        child: FutureBuilder(future: UserService.getIsFollowing(widget._userID), builder: (ctx, snapshot){
-                          if(snapshot.hasData){
-                            FollowModel? follow = snapshot.requireData;
-
-                            String text =  follow != null ? (follow.isApproved
-                                ? 'Following'
-                                : 'Request Sent') : 'Follow';
-                            if(follow != null){
-                              _isApproved = follow.isApproved;
-                            }
-                            return PrimaryBtn(
-                              btnText: text,
-                              isPrefix: true,
-                              icon: AppIcons.icAddUser,
-                              onTap: () {
-
-                              },
-                              bgGradient: AppIcons.primaryBgGradient,
-                              iconColor: Colors.white,);
-                          }
-
-                          return  PrimaryBtn(btnText: "",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient,);
-                        }),
-                      ),
-                      Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),
-                    ],
-                  ),
-                ),
-              ),
-
-            if(!widget._isFromProfilePage && !_isPrivateAccount)
-              Column(
-                spacing: 10,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text("Recent Reels", style: AppTextStyles.headingTextStyle3,)),
-                  ),
-                  SizedBox(
-                    height: 200,
-                    child: FutureBuilder(future: ReelsService.fetchUserReels(
-                      userId: widget._userID,
-                      limit: 5,
-                      onLastDoc: (doc){},
-                      onHasMore: (has){}, lastDoc: null,
-                    ), builder: (ctx, snapshot){
-
-                    if(snapshot.hasData){
-                      return ListView.builder(
-                          itemCount: snapshot.requireData.length,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (_, index){
-                            ReelModel reel = snapshot.requireData[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(left: 16.0),
-                              child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(5),
-                                  child: CachedNetworkImage(imageUrl: reel.thumbnailUrl ?? AppIcons.icDummyImgUrl, fit: BoxFit.cover,)),
-                            );
-                          });
-                    }else if(snapshot.connectionState == ConnectionState.waiting){
-                      return ListView.builder(
-                          itemCount: 3,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (_, index){
-                            return Padding(
-                              padding: const EdgeInsets.only(left: 16.0),
-                              child: ReelThumbnailShimmerItem(),
-                            );
-                          });
-                    }
-
-                    return SizedBox();
-                  }),
-                ),
-              ],
-            ),
-
-            if(!widget._isFromProfilePage && !_isPrivateAccount)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 140.0),
-                child: TextButton(onPressed: () {
-                  context.pop();
-                  context.push(RouterEnum.remoteUserProfileView.routeName, extra: {
-                    'userID' : widget._userID,
-                    'userName' : widget._userName,
-                    'profilePicture' : widget._profilePicture
-                  });                  // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_)=> RemoteUserProfilePage(userID: _userID, userName: _userName, profilePicture: _profilePicture,)));
-                },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GradientTextWidget(
-                          gradient: AppGradients.primaryGradient,
-                          text: "View Complete Profile",
-                          textStyle: AppTextStyles.buttonTextStyle.copyWith(
-                              fontWeight: FontWeight.w700),),
-                        Icon(Icons.navigate_next_rounded, color: AppColors.deepPurpleColor, size: 30,)
-                      ],
-                    )),
-              ),
-
-            if(!widget._isFromProfilePage && _isPrivateAccount && !_isApproved)
-              //Show Private account message
-              Column(
-                spacing: 10,
-                children: [
-                  Divider(),
-                  Container(
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black),
-                        shape: BoxShape.circle
-                    ),
-                    child:  SvgPicture.asset(AppIcons.icPasswordLock, color: Colors.black,),
-                  ),
-                  Text("This Account is Private", style: AppTextStyles.subHeadingTextStyle,),
-                  Text("Follow this account to see their FEELS", style: AppTextStyles.bodyTextStyle, textAlign: TextAlign.center,)
-                ],
-              )
-          ],
-        )
-* */

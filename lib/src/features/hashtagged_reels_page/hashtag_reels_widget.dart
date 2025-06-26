@@ -6,6 +6,7 @@ import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_player/video_player.dart';
 import '../../models/reel_model.dart';
 import '../../services/hashtag_mood_cached_reels.dart';
 import '../../widgets/reel_grid_item_widget.dart';
@@ -27,6 +28,13 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
   bool _hasMore = true;
   DocumentSnapshot? _lastDoc;
 
+  // Video controller management for sliding window
+  final Map<String, VideoPlayerController> _controllerCache = {};
+  final List<String> _accessOrder = [];
+  final int _maxCacheSize = 15; // Size of sliding window for controllers
+  int _firstVisibleIndex = 0;
+  int _lastVisibleIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +46,7 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
           _hasMore) {
         _fetchHashtaggedReels();
       }
+      _updateVisibleReels();
     });
   }
 
@@ -62,8 +71,8 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
         ReelModel reel = ReelModel.fromMap( _reels[index]);
 
         return ReelGridItemWidget(
-          onTap: (){
-            final reels = _reels.map((map)=> ReelModel.fromMap(map)).toList();
+          onTap: () {
+            final reels = _reels.map((map) => ReelModel.fromMap(map)).toList();
             // Navigate to UpdatedFeedView to play the reel instantly
             context.push(RouterEnum.updatedReelsView.routeName, extra: {
               'initialReels': reels,
@@ -74,7 +83,8 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
               'tag': !widget.isComingFromMood ? widget.tag : null,
             });
           },
-            reel: reel);
+          reel: reel,
+        );
       },
     );
   }
@@ -82,7 +92,76 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _disposeAllControllers();
     super.dispose();
+  }
+
+  void _disposeAllControllers() {
+    for (final controller in _controllerCache.values) {
+      controller.dispose();
+    }
+    _controllerCache.clear();
+    _accessOrder.clear();
+  }
+
+  void _updateVisibleReels() {
+    // Estimate visible items based on scroll position and grid layout
+    const int itemsPerRow = 3;
+    const double itemHeight = 300; // Approximate height of each grid item
+    final double scrollOffset = _scrollController.position.pixels;
+    final int firstVisibleRow = (scrollOffset / itemHeight).floor();
+    final int firstVisibleIdx = firstVisibleRow * itemsPerRow;
+    final int lastVisibleIdx = firstVisibleIdx + (_maxCacheSize * 2); // Buffer for visibility
+
+    setState(() {
+      _firstVisibleIndex = firstVisibleIdx.clamp(0, _reels.length - 1);
+      _lastVisibleIndex = lastVisibleIdx.clamp(0, _reels.length - 1);
+    });
+
+    // Initialize controllers for visible and nearby reels
+    for (int i = _firstVisibleIndex; i <= _lastVisibleIndex && i < _reels.length; i++) {
+      final reel = ReelModel.fromMap(_reels[i]);
+      _initializeControllerIfNeeded(reel.reelID, reel.videoUrl);
+    }
+
+    // Clean up controllers outside the sliding window
+    _cleanUpControllers();
+  }
+
+  void _initializeControllerIfNeeded(String reelID, String videoUrl, {bool shouldPlay = false}) async {
+    if (_controllerCache.containsKey(reelID)) {
+      _accessOrder.remove(reelID);
+      _accessOrder.insert(0, reelID);
+      return;
+    }
+
+    // TODO: Implement proper video caching and controller initialization.
+    // The method getCachedVideoFile is not available in ReelsRepository.
+    // For now, controller initialization is disabled to prevent errors.
+    debugPrint("Controller initialization for reel $reelID is pending implementation.");
+    // Placeholder for future implementation of video caching and initialization.
+  }
+
+  void _disposeController(String reelID) async {
+    final controller = _controllerCache[reelID];
+    if (controller != null) {
+      await controller.dispose();
+      _controllerCache.remove(reelID);
+    }
+  }
+
+  void _cleanUpControllers() {
+    final List<String> toRemove = [];
+    for (final reelID in _controllerCache.keys) {
+      final index = _reels.indexWhere((r) => ReelModel.fromMap(r).reelID == reelID);
+      if (index < _firstVisibleIndex - _maxCacheSize || index > _lastVisibleIndex + _maxCacheSize) {
+        toRemove.add(reelID);
+      }
+    }
+    for (final reelID in toRemove) {
+      _disposeController(reelID);
+      _accessOrder.remove(reelID);
+    }
   }
 
   Future<void> _initializeReels() async {
@@ -100,6 +179,10 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
     }
     // Proceed to fetch more reels if needed
     _fetchHashtaggedReels();
+    // Initialize controllers for initial visible reels after first build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateVisibleReels();
+    });
   }
 
   Future<void> _fetchHashtaggedReels() async {
@@ -108,12 +191,7 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
     setState(() => _isLoading = true);
 
     try {
-      Query query = FirebaseFirestore.instance
-          .collection(FirebaseConstants.hashtagsCollections)
-          .doc(widget.tag)
-          .collection(FirebaseConstants.reelsCollection)
-          .orderBy("createdAt", descending: true)
-          .limit(10);
+      late Query query;
 
       if (widget.isComingFromMood) {
         query = FirebaseFirestore.instance
@@ -121,7 +199,14 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
             .doc(widget.tag)
             .collection(FirebaseConstants.reelsCollection)
             .orderBy("createdAt", descending: true)
-            .limit(10);
+            .limit(5);
+      }else{
+        query = FirebaseFirestore.instance
+            .collection(FirebaseConstants.hashtagsCollections)
+            .doc(widget.tag)
+            .collection(FirebaseConstants.reelsCollection)
+            .orderBy("createdAt", descending: true)
+            .limit(5);
       }
       final snapshot = _lastDoc == null
           ? await query.get()

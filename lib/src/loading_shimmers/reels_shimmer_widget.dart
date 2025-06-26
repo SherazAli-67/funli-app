@@ -18,7 +18,7 @@ class ReelsShimmerWidget extends StatelessWidget {
 
     return Stack(
       children: [
-        Shimmer.fromColors(baseColor: Colors.black, highlightColor:  highlightColor, child: Container(
+        Shimmer.fromColors(baseColor: Colors.grey, highlightColor: Colors.grey, child: Container(
           height: size.height,
           width: size.width,
           color: Colors.grey,

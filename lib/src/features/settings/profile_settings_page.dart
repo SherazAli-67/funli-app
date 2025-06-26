@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
-import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
 import 'package:funli_app/src/features/settings/widgets/settings_item_widget.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -69,6 +68,7 @@ class ProfileSettingsPage extends StatelessWidget{
                 ],
               ),
             ),
+            Center(child: Text("V1.0.1", style: AppTextStyles.bodyTextStyle,),),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: SettingsItemWidget(title: "Logout", icon: AppIcons.icLogout, isLogout: true, onTap: ()=> _onLogoutTap(context),),

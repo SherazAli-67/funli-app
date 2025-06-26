@@ -311,19 +311,19 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
       }
     }
 
-    // 2. Also preload the previous video for smoother backward navigation
+    // 2. Also preload the previous video for smoother backward navigation with high priority
     if (currentIndex > 0) {
       final prevVideoUrl = state.videos[currentIndex - 1].videoUrl;
       if (!_preloadedFiles.containsKey(prevVideoUrl) &&
           !_preloadQueue.contains(prevVideoUrl)) {
         _preloadQueue.add(prevVideoUrl);
-        // Use medium priority for previous video - don't await to keep UI responsive
-        unawaited(_preloadVideo(prevVideoUrl, highPriority: true, usePriorityCache: true));
+        // Use high priority for previous video to minimize buffering on backward navigation
+        await _preloadVideo(prevVideoUrl, highPriority: true, usePriorityCache: true, useCurrentMoodCache: true);
       }
     }
 
     // Use a slight delay before preloading additional videos to avoid overloading
-    // This ensures the current and next videos are prioritized
+    // This ensures the current, next, and previous videos are prioritized
     _preloadDelayTimer = Timer(const Duration(milliseconds: 100), () {
       if (state.videos.isEmpty) return;
 
@@ -352,8 +352,8 @@ class VideoFeedCubit extends Cubit<VideoFeedState> {
 
         for (final videoUrl in prevVideosToPreload) {
           _preloadQueue.add(videoUrl);
-          // Lower priority for backward videos
-          unawaited(_preloadVideo(videoUrl, highPriority: false, usePriorityCache: false));
+          // Medium priority for additional backward videos
+          unawaited(_preloadVideo(videoUrl, highPriority: true, usePriorityCache: false));
         }
       }
 

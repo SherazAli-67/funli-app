@@ -137,6 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                         ))
                       ],
                     ),
+                    Center(child: Text("V1.0.1", style: AppTextStyles.smallTextStyle,),),
                   ],
                 ),
               ),

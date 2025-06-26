@@ -22,6 +22,7 @@ import '../../../res/app_textstyles.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/mood_selecting_scroll_wheel_widget.dart';
 import '../widgets/video_feed_item.dart';
+import '../../../loading_shimmers/reels_shimmer_widget.dart';
 
 class VideoFeedView extends StatefulWidget {
   const VideoFeedView({super.key});
@@ -533,21 +534,17 @@ class _VideoFeedViewState extends State<VideoFeedView>
   void _onVideoCompleted() async {
     debugPrint("_onVideoCompleted called");
     if (_isHandlingCompletion) {
-      debugPrint("Already handling completion, returning");
       return;
     }
 
     _isHandlingCompletion = true;
-    debugPrint("Starting video completion handling");
 
     try {
       // Calculate the next page index, wrapping around if needed
       final targetPage = (_currentPage + 1) % _videos.length;
-      debugPrint("Target page: $targetPage");
 
       // Pause all videos to ensure clean state
       await _pauseAllControllers();
-      debugPrint("All controllers paused");
 
       if (!mounted) {
         debugPrint("Widget not mounted, aborting");
@@ -569,14 +566,11 @@ class _VideoFeedViewState extends State<VideoFeedView>
         await _pauseAllControllers();
         _currentlyPlayingVideoId = _videos[targetPage].reelID;
         await _initAndPlayVideo(targetPage);
-        debugPrint("Automatically playing next video at index $targetPage after completion");
       }
 
     } catch (e) {
-      debugPrint("Error in _onVideoCompleted: $e");
     } finally {
       _isHandlingCompletion = false;
-      debugPrint("Video completion handling finished");
     }
   }
 
@@ -721,10 +715,10 @@ class _VideoFeedViewState extends State<VideoFeedView>
           unawaited(_getOrCreateController(_videos[currentPage + i], highPriority: i <= 2));
         }
       }
-      // Previous pages - preload but lower priority
+      // Previous pages - preload with higher priority for immediate previous to reduce buffering on backward navigation
       for (int i = 1; i <= 3; i++) {
         if (currentPage - i >= 0) {
-          unawaited(_getOrCreateController(_videos[currentPage - i], highPriority: false));
+          unawaited(_getOrCreateController(_videos[currentPage - i], highPriority: i <= 1));
         }
       }
     }
@@ -733,7 +727,13 @@ class _VideoFeedViewState extends State<VideoFeedView>
 
   /// Handle page changes in the video feed
   Future<void> _handlePageChange(int newPage) async {
-    if (_videos.isEmpty || newPage >= _videos.length) return;
+    if (_videos.isEmpty) return;
+
+    // If the user navigates to the last page (loading page), trigger loading of new reels
+    if (newPage >= _videos.length) {
+      context.read<VideoFeedCubit>().preloadNextVideos();
+      return;
+    }
 
     // Prevent concurrent page change handling which can cause widget tree issues
     if (_isHandlingPageChange) {
@@ -786,12 +786,16 @@ class _VideoFeedViewState extends State<VideoFeedView>
       if (_videos.isNotEmpty && newPage < _videos.length && !context.read<VideoFeedCubit>().state.shouldPauseVideo) {
         // Force a full pause of all controllers to prevent any interference
         await _pauseAllControllers();
-        // Set the current playing video ID to the new page's video
+        // Ensure the current playing video ID is set to the new page's video
         _currentlyPlayingVideoId = _videos[newPage].reelID;
-        // Play immediately for faster response
+        // Play immediately for faster response, even if initialization is delayed
         if (mounted) {
-          await _initAndPlayVideo(newPage);
-          debugPrint("Playing visible reel at index $newPage after manual page change");
+          // Start initialization and playback process, but don't wait for completion here to ensure pause is immediate
+          _initAndPlayVideo(newPage).then((_) {
+            debugPrint("Playing visible reel at index $newPage after manual page change");
+          }).catchError((e) {
+            debugPrint("Error initializing/playing video at index $newPage: $e");
+          });
         }
       }
 
@@ -875,18 +879,26 @@ class _VideoFeedViewState extends State<VideoFeedView>
               PreloadPageView.builder(
                 scrollDirection: Axis.vertical,
                 controller: _pageController,
-                itemCount: _videos.length,
+                physics: ScrollPhysics(),
+                itemCount: _videos.length + 1, // Add an extra page for loading
                 preloadPagesCount: 3,
                 onPageChanged: (index) => _handlePageChange(index),
                 itemBuilder: (context, index) {
-                  return RepaintBoundary(
-                    child: VideoFeedItem(
-                      key: ValueKey(_videos[index].reelID),
-                      controller: _getController(_videos[index].reelID),
-                      reel: _videos[index],
-                      isComingFromHome: true,
-                    ),
-                  );
+                  if (index < _videos.length) {
+                    return RepaintBoundary(
+                      child: VideoFeedItem(
+                        key: ValueKey(_videos[index].reelID),
+                        controller: _getController(_videos[index].reelID),
+                        reel: _videos[index],
+                        isComingFromHome: true,
+                      ),
+                    );
+                  } else {
+                    // Show loading shimmer when at the last page and waiting for new reels
+                    return RepaintBoundary(
+                      child: ReelsShimmerWidget(),
+                    );
+                  }
                 },
               ),
 
@@ -942,7 +954,9 @@ class _VideoFeedViewState extends State<VideoFeedView>
                               });
 
                               if(result != null){
-                                debugPrint("result found: $result");
+                                if(result == mood){
+                                  return;
+                                }
 
                                 // First pause all videos to prevent audio leakage
                                 await _pauseAllControllers();

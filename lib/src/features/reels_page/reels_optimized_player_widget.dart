@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
@@ -126,14 +127,26 @@ class _ReelsOptimizedPlayerWidgetState extends State<ReelsOptimizedPlayerWidget>
     }
 
     if (_isBuffering != shouldShowBuffering || _isPlaying != isPlaying) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          setState(() {
-            _isBuffering = shouldShowBuffering;
-            _isPlaying = isPlaying;
-          });
-        }
-      });
+      if (shouldShowBuffering) {
+        // Add a short delay before showing buffering indicator to avoid flicker for quick loads
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted && controller.value.isBuffering && !controller.value.isPlaying) {
+            setState(() {
+              _isBuffering = true;
+              _isPlaying = isPlaying;
+            });
+          }
+        });
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {
+              _isBuffering = false;
+              _isPlaying = isPlaying;
+            });
+          }
+        });
+      }
     }
   }
 
@@ -191,7 +204,12 @@ class _ReelsOptimizedPlayerWidgetState extends State<ReelsOptimizedPlayerWidget>
 
           // Only show buffering indicator when actually buffering
           if (_isBuffering)
-            LoadingWidget(color: AppColors.purpleColor),
+            Center(
+              child: RotationTransition(
+                turns: Tween(begin: 0.0, end: 1.0).animate(_loadingController),
+                child: const CircularProgressIndicator(color: AppColors.purpleColor),
+              ),
+            ),
 
           // Only show play/pause overlay when needed
           if (_showPlayPauseOverlay)

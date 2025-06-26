@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/authentication/signup_page.dart';
+import 'package:funli_app/src/features/deep_link_handler.dart';
 import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/discover_page.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/filtered_reels_page.dart';
@@ -9,7 +10,6 @@ import 'package:funli_app/src/features/main_menu/notifications/notification_page
 import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart';
-import 'package:funli_app/src/features/main_menu/updated_feed_view/updated_feed_view.dart';
 import 'package:funli_app/src/features/main_menu/video_feed_view/video_feed_view.dart';
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
 import 'package:funli_app/src/features/personalization/personalization_page.dart';
@@ -279,6 +279,19 @@ class AppRouter {
           );
         },
       ),
+      GoRoute(
+        path: RouterEnum.deepLinkViewer.routeName,
+        pageBuilder: (context, state) {
+          final extras = state.extra! as Map<String, dynamic>;
+
+          return MaterialPage(
+            child: DeepLinkHandler(
+              reelID: extras['reelID'],
+            ),
+          );
+        },
+      ),
+
      /* GoRoute(
         path: RouterEnum.updatedFeedView.routeName,
         pageBuilder: (context, state) {

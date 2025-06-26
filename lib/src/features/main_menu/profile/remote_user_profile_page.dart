@@ -3,9 +3,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile.dart';
 import 'package:funli_app/src/features/main_menu/profile/widgets/remote_user_bookmark_widget.dart';
 import 'package:funli_app/src/features/main_menu/profile/widgets/remote_user_reels_widget.dart';
+import 'package:funli_app/src/models/follow_model.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
+import 'package:funli_app/src/widgets/loading_widget.dart';
+import 'package:funli_app/src/widgets/private_account_widget.dart';
+
+import '../../../models/user_model.dart';
+import '../../../services/user_service.dart';
 
 class RemoteUserProfilePage extends StatefulWidget {
   const RemoteUserProfilePage({
@@ -28,15 +34,18 @@ class RemoteUserProfilePage extends StatefulWidget {
 class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with TickerProviderStateMixin {
   late TabController _tabController;
   int selectedTabIndex = 0;
-
+  bool _hideProfile = false;
+  bool _isLoading = false;
   @override
   void initState() {
+
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       if (_tabController.index != selectedTabIndex) {
         setState(() => selectedTabIndex = _tabController.index);
       }
     });
+    _initUser();
     super.initState();
   }
 
@@ -85,7 +94,7 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
           )
         ],
       ),
-      body: DefaultTabController(
+      body: _isLoading ? LoadingWidget() : _hideProfile ? _buildPrivateAccountProfileWidget() :  DefaultTabController(
         length: 2,
         child: NestedScrollView(
           headerSliverBuilder: (context, _) => [
@@ -96,14 +105,14 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
                 profilePicture: widget._profilePicture,
                 isFromProfilePage: true,
               ),
-            ),
-            SliverPersistentHeader(
+            ), SliverPersistentHeader(
               pinned: true,
               delegate: _SliverTabBarDelegate(
                 TabBar(
                   controller: _tabController,
                   indicatorWeight: 4.0,
-                  labelPadding: EdgeInsets.only(left: 0.0, right: 0.0, top: 0, bottom: 0),
+                  labelPadding: EdgeInsets.only(
+                      left: 0.0, right: 0.0, top: 0, bottom: 0),
 
                   indicatorSize: TabBarIndicatorSize.tab,
                   indicator: ShapeDecoration(
@@ -124,7 +133,9 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
                       alignment: Alignment.center,
                       color: Colors.white,
                       child: SvgPicture.asset(
-                        selectedTabIndex == 0 ? AppIcons.icSelectedCategory : AppIcons.icCategory,
+                        selectedTabIndex == 0
+                            ? AppIcons.icSelectedCategory
+                            : AppIcons.icCategory,
                       ),
                     ),
                     Container(
@@ -132,7 +143,9 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
                       alignment: Alignment.center,
                       color: Colors.white,
                       child: SvgPicture.asset(
-                        selectedTabIndex == 1 ? AppIcons.icSelectedBookMark : AppIcons.icBookMark,
+                        selectedTabIndex == 1
+                            ? AppIcons.icSelectedBookMark
+                            : AppIcons.icBookMark,
                       ),
                     ),
                   ],
@@ -140,18 +153,71 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
               ),
             ),
           ],
-          body: TabBarView(
-            controller: _tabController,
-            children: [
-              RemoteUserReelsWidget(
-                userID: widget._userID,
-                userName: widget._userName,
-              ),
-              BookmarkWidget(userID: widget._userID),
-            ],
-          ),
+          body: _isLoading
+              ? LoadingWidget()
+              : _buildUserInfoWidget(),
         ),
       ),
+    );
+  }
+
+  void _initUser() async{
+    setState(() => _isLoading = true);
+    bool isPrivateAccount = false;
+    bool isApproved = false;
+    try{
+
+
+      UserModel? user = await UserService.getUserByID(userID: widget._userID);
+      if(user != null){
+        debugPrint('Visibility: ${user.visibility.name}');
+        isPrivateAccount = user.visibility == ProfileVisibility.followersOnly;
+      }
+      _isLoading = false;
+    }catch(e){
+      debugPrint("Error while getting isPrivateProfile: ${e.toString()}");
+    }
+
+    try{
+      FollowModel? follow = await UserService.getIsFollowing(widget._userID);
+      debugPrint("Follow model: ${follow?.toMap()}");
+      if(follow != null){
+        isApproved = follow.isApproved;
+      }
+    }catch(e){
+      debugPrint("Error while getting getIsFollowing: ${e.toString()}");
+    }
+
+    _hideProfile =  isPrivateAccount && !isApproved;
+    setState(() {});
+  }
+
+  Widget _buildUserInfoWidget() {
+
+    return  TabBarView(
+      controller: _tabController,
+      children: [
+        RemoteUserReelsWidget(
+          userID: widget._userID,
+          userName: widget._userName,
+        ),
+        BookmarkWidget(userID: widget._userID),
+      ],
+    );
+  }
+
+  _buildPrivateAccountProfileWidget() {
+    return Column(
+      spacing: 20,
+      children: [
+        RemoteUserProfileInfoWidget(
+          userID: widget._userID,
+          userName: widget._userName,
+          profilePicture: widget._profilePicture,
+          isFromProfilePage: true,
+        ),
+        PrivateAccountWidget()
+      ],
     );
   }
 }
