@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/bloc_cubit/auth_states.dart';
+import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/models/onboarding_model.dart';
 import 'package:funli_app/src/providers/personal_info_provider.dart';
@@ -19,7 +20,6 @@ import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/discover_provider.dart';
 import '../widgets/primary_btn.dart';
-import '../features/main_menu/video_feed_view/bloc_cubit/video_feed_cubit.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -38,7 +38,7 @@ class _WelcomePageState extends State<WelcomePage> {
 
   void _preloadReels() {
     WidgetsBinding.instance.addPostFrameCallback((_){
-      context.read<VideoFeedCubit>().initialize();
+      context.read<UpdatedFeedCubit>().initialize();
     });
   }
 

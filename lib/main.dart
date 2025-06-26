@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/app_router/app_router.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
+import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import 'package:funli_app/src/features/main_menu/video_feed_view/bloc_cubit/video_feed_cubit.dart';
 import 'package:funli_app/src/dependancy_injection/dependency_injector.dart';
 import 'package:funli_app/src/providers/discover_provider.dart';
@@ -69,7 +70,8 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_)=> AuthCubit()),
-        BlocProvider(create: (context) => getIt<VideoFeedCubit>(),)
+        BlocProvider(create: (context) => getIt<VideoFeedCubit>(),),
+        BlocProvider(create: (context) => getIt<UpdatedFeedCubit>(),)
       ],
       child:
 

@@ -73,18 +73,17 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
       ),
     );
 
-    // Initialize controller for the selected reel immediately
-    _initializeControllerIfNeeded(
-      _videos[_currentPage].reelID,
-      _videos[_currentPage].videoUrl,
-      shouldPlay: true,
-    );
-    
-    // Defer jumpToPage until after first layout
+    // Defer jumpToPage and initial controller setup until after first layout
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_pageController.hasClients) {
         _pageController.jumpToPage(_currentPage);
       }
+      // Initialize controller for the selected reel immediately after layout
+      _initializeControllerIfNeeded(
+        _videos[_currentPage].reelID,
+        _videos[_currentPage].videoUrl,
+        shouldPlay: true,
+      );
     });
   }
 
@@ -186,8 +185,8 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
                   _initializeControllerIfNeeded(_videos[index].reelID, _videos[index].videoUrl, shouldPlay: true);
                   _playController(_videos[index].reelID);
               
-                  // Preload controllers for previous 2 and next 2 reels
-                  for (int i = index - 2; i <= index + 2; i++) {
+                  // Preload controllers for previous 1 and next 1 reel only to reduce initial load
+                  for (int i = index - 1; i <= index + 1; i++) {
                     if (i >= 0 && i < _videos.length && i != index) {
                       _initializeControllerIfNeeded(_videos[i].reelID, _videos[i].videoUrl, shouldPlay: false);
                     }
@@ -198,15 +197,13 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
                   final controller = _controllerCache[reel.reelID];
               
                   return controller != null && controller.value.isInitialized
-                      ? RepaintBoundary(
-                    child: VideoFeedItem(
-                      key: ValueKey(reel.reelID),
-                      controller: controller,
-                      reel: reel,
-                      isComingFromHome: false,
-                    ),
-                  )
-                      : const Center(child: CircularProgressIndicator());
+                      ? VideoFeedItem(
+                          key: ValueKey(reel.reelID),
+                          controller: controller,
+                          reel: reel,
+                          isComingFromHome: false,
+                        )
+                      : const Center(child: CircularProgressIndicator(color: Colors.white));
                 },
               ),
               Positioned(

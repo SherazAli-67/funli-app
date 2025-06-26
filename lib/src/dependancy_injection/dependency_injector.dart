@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 
 import 'package:get_it/get_it.dart';
 
@@ -25,5 +26,8 @@ void injectionSetup() {
     () => VideoFeedCubit(getIt<IVideoFeedRepository>()),
   );
 
+  getIt.registerFactory<UpdatedFeedCubit>(
+        () => UpdatedFeedCubit(getIt<IVideoFeedRepository>()),
+  );
   getIt.registerSingleton<DeepLinkService>(DeepLinkService());
 }

@@ -20,6 +20,7 @@ import '../../../widgets/post_comment_widget.dart';
 import '../../../widgets/post_like_widget.dart';
 import '../../../widgets/post_share_widget.dart';
 import '../profile/remote_user_profile.dart';
+import '../updated_feed_view/widgets/updated_reels_player_widget.dart';
 
 class VideoFeedItem extends StatefulWidget {
   const VideoFeedItem({
@@ -43,12 +44,10 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
   // Use a key to force rebuild when controller changes
   Key _playerKey = UniqueKey();
   String? _lastReelId;
-  bool _isMuted = false;
-  
+
   @override
   void initState() {
     super.initState();
-    _isMuted = widget.reel.isMuted;
     ReelsService.addViewToReel(reelID: widget.reel.reelID);
   }
   
@@ -61,73 +60,30 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
         widget.controller != oldWidget.controller) {
       _playerKey = UniqueKey();
       _lastReelId = widget.reel.reelID;
-      _isMuted = widget.reel.isMuted;
     }
   }
-  
-  /*void _toggleMute() {
-    if (widget.controller == null || !widget.controller!.value.isInitialized) return;
-    
-    setState(() {
-      _isMuted = !_isMuted;
-    });
-    
-    if (_isMuted) {
-      widget.controller!.setVolume(0);
-    } else {
-      widget.controller!.setVolume(1);
-    }
-  }*/
+
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.center,
       children: [
-        ReelsOptimizedPlayerWidget(
+        UpdatedReelsPlayerWidget(
+
+        controller: widget.controller,
+        reelID: widget.reel.reelID),
+       /* ReelsOptimizedPlayerWidget(
             key: _playerKey,
             controller: widget.controller,
-            reelID: widget.reel.reelID),
-        // Use RepaintBoundary to optimize rendering and prevent unnecessary repaints
-       /*widget.isComingFromHome ? RepaintBoundary(
-          child: OptimizedVideoPlayer(
-            key: _playerKey,
-            controller: widget.controller, 
-            reelID: widget.reel.reelID
-          ),
-        ) : ReelsOptimizedPlayerWidget(
-           key: _playerKey,
-           controller: widget.controller,
-           reelID: widget.reel.reelID),*/
+            reelID: widget.reel.reelID),*/
 
         _buildUserNameCaptionWidget(),
         _buildLikeCommentsIcon(context),
-        /*_buildMuteButton(),*/
       ],
     );
   }
-  
- /* Widget _buildMuteButton() {
-    return Positioned(
-      top: 100,
-      right: 16,
-      child: GestureDetector(
-        onTap: _toggleMute,
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.5),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            _isMuted ? Icons.volume_off : Icons.volume_up,
-            color: Colors.white,
-            size: 20,
-          ),
-        ),
-      ),
-    );
-  }*/
+
 
   Positioned _buildUserNameCaptionWidget() {
     return Positioned(
