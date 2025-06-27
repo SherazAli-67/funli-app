@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import 'package:funli_app/src/features/reels_page/reel_repository.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -176,7 +177,7 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
             if(widget.comingFrom == AppConstants.comingFromDeepLink){
               debugPrint("Coming from deepLink found");
               // Reset shouldPauseVideo to false when returning to video feed
-              final cubit = context.read<VideoFeedCubit>();
+              final cubit = context.read<UpdatedFeedCubit>();
               cubit.setShouldPauseVideo(false);
               // Trigger preloading before navigation
               cubit.preloadNextVideos();

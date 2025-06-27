@@ -81,18 +81,6 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
   /// Timer for delayed preloading to avoid overloading during fast scrolling
   Timer? _preloadTimer;
 
-  /// Focus node to detect when widget regains focus
-  final FocusNode _focusNode = FocusNode();
-
-  /// Flag to track if we need to reinitialize after navigation
-  bool _needsReinitialization = false;
-
-  /// Timer to check if widget is visible and needs reinitialization
-  Timer? _visibilityCheckTimer;
-
-  /// Flag to track if widget was recently navigated away from
-  bool _wasNavigatedAway = false;
-
   @override
   bool get wantKeepAlive => true; // Keep state when widget is not visible
 
@@ -100,13 +88,6 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
-    // Add focus listener to detect when widget regains focus
-    _focusNode.addListener(_onFocusChange);
-    
-    // Start visibility check timer
-    _startVisibilityCheckTimer();
-    
     // Initialize the UpdatedFeedCubit first
     Future.microtask(() {
       context.read<UpdatedFeedCubit>().initialize().then((_) {
@@ -145,70 +126,36 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
   void didChangeDependencies() {
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context)!);
+    // Add GoRouter listener for route changes
+    GoRouter.of(context).routerDelegate.addListener(_onGoRouterChange);
+  }
+
+  void _onGoRouterChange() {
+    final currentRoute = GoRouter.of(context).routerDelegate.currentConfiguration.uri.toString();
+    final isMainFeedRoute = currentRoute == RouterEnum.videoFeedView.routeName;
+    if (isMainFeedRoute && mounted) {
+      // Resume video playback if paused
+      context.read<UpdatedFeedCubit>().setShouldPauseVideo(false);
+      _manageControllerWindow(_currentPage);
+      _initAndPlayVideo(_currentPage);
+      context.read<UpdatedFeedCubit>().preloadNextVideos();
+    }
   }
 
   @override
   void dispose() {
     routeObserver.unsubscribe(this);
     WidgetsBinding.instance.removeObserver(this);
-    _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
-    _visibilityCheckTimer?.cancel();
+    // Remove GoRouter listener
+    GoRouter.of(context).routerDelegate.removeListener(_onGoRouterChange);
     _disposeAllControllers();
     super.dispose();
-  }
-
-  /// Start a timer to periodically check if the widget needs reinitialization
-  void _startVisibilityCheckTimer() {
-    _visibilityCheckTimer?.cancel();
-    _visibilityCheckTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      if (mounted && _wasNavigatedAway) {
-        final currentRoute = GoRouter.of(context).routerDelegate.currentConfiguration.uri.toString();
-        final isMainFeedRoute = currentRoute == RouterEnum.videoFeedView.routeName;
-        
-        if (isMainFeedRoute) {
-          debugPrint("UpdatedFeedView: Detected return to main feed, reinitializing");
-          _wasNavigatedAway = false;
-          _needsReinitialization = true;
-          
-          // Reset shouldPauseVideo to false
-          context.read<UpdatedFeedCubit>().setShouldPauseVideo(false);
-          
-          // Reinitialize the current video
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              _cleanupAndReinitializeCurrentVideo();
-            }
-          });
-        }
-      }
-    });
-  }
-
-  /// Handle focus changes to detect when widget regains focus after navigation
-  void _onFocusChange() {
-    if (_focusNode.hasFocus && _needsReinitialization) {
-      debugPrint("UpdatedFeedView: Widget regained focus, reinitializing videos");
-      _needsReinitialization = false;
-      
-      // Reset shouldPauseVideo to false
-      context.read<UpdatedFeedCubit>().setShouldPauseVideo(false);
-      
-      // Reinitialize the current video
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _cleanupAndReinitializeCurrentVideo();
-        }
-      });
-    }
   }
 
   @override
   void didPushNext() {
     _pauseAllControllers();
     context.read<UpdatedFeedCubit>().setShouldPauseVideo(true);
-    _needsReinitialization = true;
-    _wasNavigatedAway = true;
     super.didPushNext();
   }
 
@@ -220,7 +167,6 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
     final isMainFeedRoute = currentRoute == RouterEnum.videoFeedView.routeName;
 
     if (isMainFeedRoute) {
-      _wasNavigatedAway = false;
       context.read<UpdatedFeedCubit>().setShouldPauseVideo(false);
       _manageControllerWindow(_currentPage);
       if (mounted) {
@@ -288,33 +234,17 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
 
   Future<void> _cleanupAndReinitializeCurrentVideo() async {
     if (_videos.isEmpty || _currentPage >= _videos.length) return;
-    
-    debugPrint("Cleaning up and reinitializing current video at index $_currentPage");
-    
     await _pauseAllControllers();
     final videoId = _videos[_currentPage].reelID;
     final controller = _getController(videoId);
 
-    // Force dispose and recreate the controller if it has issues
     if (controller != null && (controller.value.hasError || !controller.value.isInitialized)) {
-      debugPrint("Controller has issues, disposing and recreating: $videoId");
       await _removeController(videoId);
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-
-    // Also check if the controller is stuck in buffering state
-    if (controller != null && controller.value.isInitialized && !controller.value.isPlaying && controller.value.position == Duration.zero) {
-      debugPrint("Controller seems stuck, recreating: $videoId");
-      await _removeController(videoId);
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 50));
     }
 
     await _manageControllerWindow(_currentPage);
-    
-    // Only play if we're not supposed to pause
-    if (!context.read<UpdatedFeedCubit>().state.shouldPauseVideo) {
-      await _initAndPlayVideo(_currentPage);
-    }
+    await _initAndPlayVideo(_currentPage);
   }
 
   Future<void> _initAndPlayVideo(int index) async {
@@ -732,225 +662,192 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
     }
   }
 
-  void _onManualPlayPause() {
-    debugPrint("Manual play/pause triggered, checking if reinitialization is needed");
-    if (_needsReinitialization || _wasNavigatedAway) {
-      debugPrint("Reinitialization needed, cleaning up and reinitializing");
-      _needsReinitialization = false;
-      _wasNavigatedAway = false;
-      
-      // Reset shouldPauseVideo to false
-      context.read<UpdatedFeedCubit>().setShouldPauseVideo(false);
-      
-      // Reinitialize the current video
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _cleanupAndReinitializeCurrentVideo();
-        }
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     debugPrint("UpdatedFeedView");
     super.build(context);
     return RepaintBoundary(
-      child: Focus(
-        focusNode: _focusNode,
-        child: Container(
-          color: Colors.black,
-          child: BlocListener<UpdatedFeedCubit, UpdatedFeedState>(
-            listenWhen: (p, c) =>
-                p.videos != c.videos ||
-                p.isLoading != c.isLoading ||
-                p.preloadedVideoUrls != c.preloadedVideoUrls ||
-                p.shouldPauseVideo != c.shouldPauseVideo ||
-                p.loadingSource != c.loadingSource,
-            listener: (context, state) {
-              if (state.loadingSource == 'background' && state.isLoading) {
-                setState(() {
-                  _showingBackgroundRefresh = true;
-                });
-              } else if (_showingBackgroundRefresh && !state.isLoading) {
-                setState(() {
-                  _showingBackgroundRefresh = false;
-                });
+      child: Container(
+        color: Colors.black,
+        child: BlocListener<UpdatedFeedCubit, UpdatedFeedState>(
+          listenWhen: (p, c) =>
+          p.videos != c.videos ||
+              p.isLoading != c.isLoading ||
+              p.preloadedVideoUrls != c.preloadedVideoUrls ||
+              p.shouldPauseVideo != c.shouldPauseVideo ||
+              p.loadingSource != c.loadingSource,
+          listener: (context, state) {
+            if (state.loadingSource == 'background' && state.isLoading) {
+              setState(() {
+                _showingBackgroundRefresh = true;
+              });
+            } else if (_showingBackgroundRefresh && !state.isLoading) {
+              setState(() {
+                _showingBackgroundRefresh = false;
+              });
+            }
+
+            if (state.videos != _videos) {
+              setState(() => _videos = state.videos);
+              _manageControllerWindow(_currentPage);
+            }
+
+            if (state.videos.isNotEmpty && !_initialVideosLoaded) {
+              _initialVideosLoaded = true;
+              if (!state.shouldPauseVideo) {
+                _initAndPlayVideo(0);
               }
+            }
 
-              if (state.videos != _videos) {
-                setState(() => _videos = state.videos);
-                _manageControllerWindow(_currentPage);
+            if (state.shouldPauseVideo) {
+              debugPrint("shouldPauseVideo received in build: ${state.shouldPauseVideo}");
+              _pauseAllControllers();
+            } else if (!state.shouldPauseVideo && _isAppActive) {
+              final currentRoute = GoRouter.of(context).routerDelegate.currentConfiguration.uri.toString();
+              final isMainFeedRoute = currentRoute == RouterEnum.videoFeedView.routeName;
+
+              if (isMainFeedRoute && _currentlyPlayingVideoId == null) {
+                _initAndPlayVideo(_currentPage);
               }
-
-              if (state.videos.isNotEmpty && !_initialVideosLoaded) {
-                _initialVideosLoaded = true;
-                if (!state.shouldPauseVideo) {
-                  _initAndPlayVideo(0);
-                }
-              }
-
-              // Handle shouldPauseVideo changes
-              if (state.shouldPauseVideo) {
-                debugPrint("shouldPauseVideo received in build: ${state.shouldPauseVideo}");
-                _pauseAllControllers();
-              } else if (!state.shouldPauseVideo && _isAppActive) {
-                final currentRoute = GoRouter.of(context).routerDelegate.currentConfiguration.uri.toString();
-                final isMainFeedRoute = currentRoute == RouterEnum.videoFeedView.routeName;
-
-                if (isMainFeedRoute) {
-                  // If shouldPauseVideo changed from true to false, reinitialize
-                  if (_currentlyPlayingVideoId == null || _needsReinitialization) {
-                    debugPrint("shouldPauseVideo changed to false, reinitializing videos");
-                    _needsReinitialization = false;
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted) {
-                        _cleanupAndReinitializeCurrentVideo();
-                      }
-                    });
+            }
+          },
+          child: Stack(
+            children: [
+              PreloadPageView.builder(
+                scrollDirection: Axis.vertical,
+                controller: _pageController,
+                physics: ScrollPhysics(),
+                itemCount: _videos.length + 1,
+                preloadPagesCount: 2,
+                onPageChanged: (index) => _handlePageChange(index),
+                itemBuilder: (context, index) {
+                  if (index < _videos.length) {
+                    return RepaintBoundary(
+                      child: VideoFeedItem(
+                        key: ValueKey(_videos[index].reelID),
+                        controller: _getController(_videos[index].reelID),
+                        reel: _videos[index],
+                        isComingFromHome: true,
+                      ),
+                    );
+                  } else {
+                    return RepaintBoundary(
+                      child: ReelsShimmerWidget(),
+                    );
                   }
-                }
-              }
-            },
-            child: Stack(
-              children: [
-                PreloadPageView.builder(
-                  scrollDirection: Axis.vertical,
-                  controller: _pageController,
-                  physics: ScrollPhysics(),
-                  itemCount: _videos.length + 1,
-                  preloadPagesCount: 2,
-                  onPageChanged: (index) => _handlePageChange(index),
-                  itemBuilder: (context, index) {
-                    if (index < _videos.length) {
-                      return RepaintBoundary(
-                        child: VideoFeedItem(
-                          key: ValueKey(_videos[index].reelID),
-                          controller: _getController(_videos[index].reelID),
-                          reel: _videos[index],
-                          isComingFromHome: true,
-                          onManualPlayPause: _onManualPlayPause,
+                },
+              ),
+              if (_showingBackgroundRefresh)
+                Positioned(
+                  top: 120,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
                         ),
-                      );
-                    } else {
-                      return RepaintBoundary(
-                        child: ReelsShimmerWidget(),
-                      );
-                    }
-                  },
-                ),
-                if (_showingBackgroundRefresh)
-                  Positioned(
-                    top: 120,
-                    right: 16,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Refreshing',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Refreshing',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                StreamBuilder(
-                  stream: UserService.getCurrentUserStream(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      String mood = snapshot.requireData.mood ?? 'Happy';
-                      return Positioned(
-                        top: 60,
-                        left: 20,
-                        right: 20,
-                        child: GestureDetector(
-                          onTap: () async {
-                            final result = await showModalBottomSheet(
-                              isDismissible: false,
-                              context: context,
-                              builder: (_) {
-                                return MoodSelectingScrollWheelWidget(selectedMood: mood);
-                              },
-                            );
-
-                            if (result != null) {
-                              if (result == mood) {
-                                return;
-                              }
-                              await _pauseAllControllers();
-                              await _disposeAllControllers();
-                              setState(() {
-                                _currentPage = 0;
-                                _videos = [];
-                                _initialVideosLoaded = false;
-                              });
-                              if (_pageController.hasClients) {
-                                _pageController.jumpToPage(0);
-                              }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Loading $result reels...'),
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                              context.read<UpdatedFeedCubit>().onMoodChange(mood: result);
-                            }
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${AppConstants.appTitle} V3.3',
-                                style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.black54,
-                                  borderRadius: BorderRadius.circular(99),
-                                ),
-                                child: Row(
-                                  spacing: 20,
-                                  children: [
-                                    Text(
-                                      "${AppData.getEmojiByMood(mood)} $mood",
-                                      style: AppTextStyles.bodyTextStyle.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                    return SizedBox();
-                  },
                 ),
-              ],
-            ),
+              StreamBuilder(
+                stream: UserService.getCurrentUserStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    String mood = snapshot.requireData.mood ?? 'Happy';
+                    return Positioned(
+                      top: 60,
+                      left: 20,
+                      right: 20,
+                      child: GestureDetector(
+                        onTap: () async {
+                          final result = await showModalBottomSheet(
+                            isDismissible: false,
+                            context: context,
+                            builder: (_) {
+                              return MoodSelectingScrollWheelWidget(selectedMood: mood);
+                            },
+                          );
+
+                          if (result != null) {
+                            if (result == mood) {
+                              return;
+                            }
+                            await _pauseAllControllers();
+                            await _disposeAllControllers();
+                            setState(() {
+                              _currentPage = 0;
+                              _videos = [];
+                              _initialVideosLoaded = false;
+                            });
+                            if (_pageController.hasClients) {
+                              _pageController.jumpToPage(0);
+                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Loading $result reels...'),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                            context.read<UpdatedFeedCubit>().onMoodChange(mood: result);
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${AppConstants.appTitle} V3.3',
+                              style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(99),
+                              ),
+                              child: Row(
+                                spacing: 20,
+                                children: [
+                                  Text(
+                                    "${AppData.getEmojiByMood(mood)} $mood",
+                                    style: AppTextStyles.bodyTextStyle.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  return SizedBox();
+                },
+              ),
+            ],
           ),
         ),
       ),
