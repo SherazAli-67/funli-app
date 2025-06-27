@@ -47,7 +47,7 @@ class UpdatedFeedCubit extends Cubit<UpdatedFeedState> {
     _backgroundRefreshTimer?.cancel();
     _backgroundRefreshTimer = Timer.periodic(
       const Duration(minutes: 2), // Further reduced for fresher content
-      (_) => _refreshVideosInBackground(),
+          (_) => _refreshVideosInBackground(),
     );
   }
 
@@ -325,7 +325,7 @@ class UpdatedFeedCubit extends Cubit<UpdatedFeedState> {
         emit(state.copyWith(preloadedVideoUrls: currentPreloaded));
       } else {
         getCachedVideoFile(videoUrl,
-                usePriorityCache: usePriorityCache, useCurrentMoodCache: useCurrentMoodCache)
+            usePriorityCache: usePriorityCache, useCurrentMoodCache: useCurrentMoodCache)
             .then((file) {
           _preloadedFiles[videoUrl] = file;
 

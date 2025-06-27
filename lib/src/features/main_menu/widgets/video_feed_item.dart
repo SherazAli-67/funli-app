@@ -42,7 +42,7 @@ class VideoFeedItem extends StatefulWidget {
 
 class _VideoFeedItemState extends State<VideoFeedItem> {
   UserModel? _userModel;
-  
+
   // Use a key to force rebuild when controller changes
   Key _playerKey = UniqueKey();
   String? _lastReelId;
@@ -52,13 +52,13 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
     super.initState();
     ReelsService.addViewToReel(reelID: widget.reel.reelID);
   }
-  
+
   @override
   void didUpdateWidget(VideoFeedItem oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // If the reel ID changed or controller changed, update the key to force a rebuild
-    if (widget.reel.reelID != _lastReelId || 
+    if (widget.reel.reelID != _lastReelId ||
         widget.controller != oldWidget.controller) {
       _playerKey = UniqueKey();
       _lastReelId = widget.reel.reelID;
@@ -78,13 +78,8 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
         UpdatedReelsPlayerWidget(
           controller: widget.controller,
           reelID: widget.reel.reelID,
-          onManualPlayPause: _onManualPlayPause,
+          // onManualPlayPause: _onManualPlayPause,
         ),
-       /* ReelsOptimizedPlayerWidget(
-            key: _playerKey,
-            controller: widget.controller,
-            reelID: widget.reel.reelID),*/
-
         _buildUserNameCaptionWidget(),
         _buildLikeCommentsIcon(context),
       ],
@@ -94,149 +89,149 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
 
   Positioned _buildUserNameCaptionWidget() {
     return Positioned(
-          bottom: widget.isComingFromHome ? 80 : 0,
-          left: 0,
-          right: 0,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              StatefulBuilder(
-                builder: (context, setState) {
-                  return GestureDetector(
-                    onTap: () {
-                      // setState(() => isReadMore = !isReadMore);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withValues(alpha: 0.0),
-                            Colors.black.withValues(alpha: 0.2),
-                            Colors.black.withValues(alpha: 0.5),
-                          ],
+      bottom: widget.isComingFromHome ? 80 : 0,
+      left: 0,
+      right: 0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          StatefulBuilder(
+            builder: (context, setState) {
+              return GestureDetector(
+                onTap: () {
+                  // setState(() => isReadMore = !isReadMore);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.0),
+                        Colors.black.withValues(alpha: 0.2),
+                        Colors.black.withValues(alpha: 0.5),
+                      ],
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        constraints: const BoxConstraints(
+                          maxHeight: 300,
+                        ),
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding:
+                            const EdgeInsets.only(right: 50, left: 10,bottom: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                FutureBuilder(future: UserService.getUserByID(userID: widget.reel.userID), builder: (ctx, snap){
+                                  if(snap.hasData && snap.requireData != null){
+                                    _userModel = snap.requireData!;
+                                    return Text(
+                                      _userModel!.userName,
+                                      style: AppTextStyles
+                                          .buttonTextStyle
+                                          .copyWith(
+                                          color: Colors.white, fontWeight: FontWeight.w700),);
+                                  }
+
+                                  return const SizedBox();
+                                }),
+                                AppTextWidget(text: widget.reel.caption,),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            constraints: const BoxConstraints(
-                              maxHeight: 300,
-                            ),
-                            child: SingleChildScrollView(
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(right: 50, left: 10,bottom: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    FutureBuilder(future: UserService.getUserByID(userID: widget.reel.userID), builder: (ctx, snap){
-                                      if(snap.hasData && snap.requireData != null){
-                                        _userModel = snap.requireData!;
-                                        return Text(
-                                          _userModel!.userName,
-                                          style: AppTextStyles
-                                              .buttonTextStyle
-                                              .copyWith(
-                                              color: Colors.white, fontWeight: FontWeight.w700),);
-                                      }
-
-                                      return const SizedBox();
-                                    }),
-                                    AppTextWidget(text: widget.reel.caption,),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 30,
-                          ),
-                        ],
+                      const SizedBox(
+                        height: 30,
                       ),
-                    ),
-                  );
-                },
-              ),
-            ],
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
-        );
+        ],
+      ),
+    );
   }
 
   Positioned _buildLikeCommentsIcon(BuildContext context) {
     return Positioned(
-          bottom: widget.isComingFromHome ? 85 : 0,
-          right: 5,
-          child: Column(
+      bottom: widget.isComingFromHome ? 85 : 0,
+      right: 5,
+      child: Column(
+        children: [
+          Stack(
             children: [
-              Stack(
-                children: [
-                  GestureDetector(
-                    onTap: (){
+              GestureDetector(
+                onTap: (){
 
-                      String? userName = _userModel?.userName;
-                      showModalBottomSheet(
-                          isScrollControlled: true,
-                          context: context, builder: (ctx){
-                        return FractionallySizedBox(
-                            heightFactor: 0.75,
-                            child: SingleChildScrollView(
-                                child: RemoteUserProfileInfoWidget(
-                                  userName: userName, userID: widget.reel.userID,)));
-                      });
-                    },
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: 20),
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 2),
-                          shape: BoxShape.circle
-                      ),
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundImage: CachedNetworkImageProvider( _userModel != null ? _userModel!.profilePicture ?? AppIcons.icDummyImgUrl: AppIcons.icDummyImgUrl),
-                      ),
-                    ),
+                  String? userName = _userModel?.userName;
+                  showModalBottomSheet(
+                      isScrollControlled: true,
+                      context: context, builder: (ctx){
+                    return FractionallySizedBox(
+                        heightFactor: 0.75,
+                        child: SingleChildScrollView(
+                            child: RemoteUserProfileInfoWidget(
+                              userName: userName, userID: widget.reel.userID,)));
+                  });
+                },
+                child: Container(
+                  margin: EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 2),
+                      shape: BoxShape.circle
                   ),
-                  Positioned(
-                      bottom: 0,
-                      right: 0,
-                      left: 0,
-                      child: StreamBuilder(stream: UserService.getIsFollowingStream(widget.reel.userID), builder: (ctx, snapshot){
-
-                        if(snapshot.hasData && !snapshot.requireData){
-                          return Container(
-                              decoration: BoxDecoration(
-                                  color: AppColors.deepPurpleColor,
-                                  shape: BoxShape.circle
-                              ),
-                              child: IconButton(
-                                  padding: EdgeInsets.zero,
-                                  style: const ButtonStyle(
-                                    tapTargetSize: MaterialTapTargetSize
-                                        .shrinkWrap,
-                                  ),
-                                  onPressed: () => UserService.onFollowTap(remoteUID: widget.reel.userID, userName: _userModel != null ? _userModel!.userName : ''),
-                                  icon: SvgPicture.asset(
-                                    AppIcons.icAdd, height: 20,))
-                          );
-                        }
-
-                        return SizedBox();
-                      })
+                  child: CircleAvatar(
+                    radius: 30,
+                    backgroundImage: CachedNetworkImageProvider( _userModel != null ? _userModel!.profilePicture ?? AppIcons.icDummyImgUrl: AppIcons.icDummyImgUrl),
                   ),
-                ],
+                ),
               ),
-              const SizedBox(height: 10,),
-              PostLikeWidget(reel: widget.reel, iconColor: Colors.white, isReel: true,),
-              PostCommentWidget(iconColor: Colors.white, isReel: true, reel: widget.reel,comingFromHome: widget.isComingFromHome,),
-              PostShareWidget(iconColor: Colors.white, reel: widget.reel),
-              IconButton(onPressed: _onMoreTap, icon: Icon(Icons.more_horiz, color: Colors.white,))
+              Positioned(
+                  bottom: 0,
+                  right: 0,
+                  left: 0,
+                  child: StreamBuilder(stream: UserService.getIsFollowingStream(widget.reel.userID), builder: (ctx, snapshot){
+
+                    if(snapshot.hasData && !snapshot.requireData){
+                      return Container(
+                          decoration: BoxDecoration(
+                              color: AppColors.deepPurpleColor,
+                              shape: BoxShape.circle
+                          ),
+                          child: IconButton(
+                              padding: EdgeInsets.zero,
+                              style: const ButtonStyle(
+                                tapTargetSize: MaterialTapTargetSize
+                                    .shrinkWrap,
+                              ),
+                              onPressed: () => UserService.onFollowTap(remoteUID: widget.reel.userID, userName: _userModel != null ? _userModel!.userName : ''),
+                              icon: SvgPicture.asset(
+                                AppIcons.icAdd, height: 20,))
+                      );
+                    }
+
+                    return SizedBox();
+                  })
+              ),
             ],
           ),
-        );
+          const SizedBox(height: 10,),
+          PostLikeWidget(reel: widget.reel, iconColor: Colors.white, isReel: true,),
+          PostCommentWidget(iconColor: Colors.white, isReel: true, reel: widget.reel,comingFromHome: widget.isComingFromHome,),
+          PostShareWidget(iconColor: Colors.white, reel: widget.reel),
+          IconButton(onPressed: _onMoreTap, icon: Icon(Icons.more_horiz, color: Colors.white,))
+        ],
+      ),
+    );
   }
 
   void _onMoreTap(){
@@ -248,7 +243,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
       showModalBottomSheet(
           backgroundColor: AppColors.reportContentFillColor,
           context: context, builder: (ctx){
-            return ReelMoreItemSheet(reel: widget.reel, controller: widget.controller);
+        return ReelMoreItemSheet(reel: widget.reel, controller: widget.controller);
       });
     }
 
@@ -273,8 +268,8 @@ class ReelMoreItemSheet extends StatelessWidget{
           spacing: 20,
           children: [
             Align(
-              alignment: Alignment.topRight,
-              child: SheetCloseIconWidget()
+                alignment: Alignment.topRight,
+                child: SheetCloseIconWidget()
             ),
             PostBookmarkWidget(reelID: _reel.reelID,),
             Card(

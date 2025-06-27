@@ -38,9 +38,7 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 
   void _preloadReels() {
-    WidgetsBinding.instance.addPostFrameCallback((_){
-      context.read<VideoFeedCubit>().initialize();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_)=> context.read<UpdatedFeedCubit>().initialize());
   }
 
   @override
