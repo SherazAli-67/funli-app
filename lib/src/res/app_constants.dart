@@ -22,4 +22,5 @@ class AppConstants {
   static const comingFromBookmark = 'bookmark';
 
   static const comingFromSearch = 'comingFromSearch';
+  static const comingFromDeepLink ='deeplink';
 }

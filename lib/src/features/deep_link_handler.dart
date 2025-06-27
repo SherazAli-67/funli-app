@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
+import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,7 +24,6 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler> {
   }
   @override
   Widget build(BuildContext context) {
-    debugPrint("ReelID found: ${widget.reelID}");
     return Scaffold(
       body: SafeArea(child: Center(child: LoadingWidget(),)),
     );
@@ -32,26 +34,49 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler> {
       // Fetch the reel by ID
       final reel = await ReelsService.getReelByID(widget.reelID);
 
+      // Pause any playing videos in VideoFeedView before navigating
+      try {
+        context.read<UpdatedFeedCubit>().setShouldPauseVideo(true);
+        debugPrint("VideoFeed set playing true");
+      } catch (e) {
+        debugPrint('Error pausing videos: $e');
+      }
+
       if (reel != null) {
-        debugPrint("Navigating to reels page: ${reel.caption}");
         // Ensure navigation happens after the widget is fully mounted
         WidgetsBinding.instance.addPostFrameCallback((_) {
           // Navigate to the UpdatedReelsPage with the fetched reel
-          context.push(
+          context.pushReplacement(
             RouterEnum.updatedReelsView.routeName,
             extra: {
               'initialReels': [reel],
               'selectedIndex': 0,
               'lastDocument': null,
-              'comingFrom': 'deeplink',
+              'comingFrom': AppConstants.comingFromDeepLink,
             },
           );
         });
       } else {
-        print('Reel not found: ${widget.reelID}');
+        debugPrint('Reel not found: ${widget.reelID}');
+        // Show a user-friendly error message if reel is not found
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Reel not found. Please try another link.')),
+          );
+          // Navigate to a default page if needed
+          context.go(RouterEnum.videoFeedView.routeName);
+        });
       }
     } catch (e) {
-      print('Error navigating to reel: $e');
+      debugPrint('Error navigating to reel: $e');
+      // Show error message to user
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading reel. Please try again later.')),
+        );
+        // Navigate to a default page
+        context.go(RouterEnum.videoFeedView.routeName);
+      });
     }
   }
 }

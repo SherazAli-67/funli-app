@@ -9,10 +9,12 @@ class UpdatedReelsPlayerWidget extends StatefulWidget {
     super.key,
     required this.controller,
     required this.reelID,
+    this.onManualPlayPause,
   });
 
   final VideoPlayerController? controller;
   final String reelID;
+  final VoidCallback? onManualPlayPause;
 
   @override
   State<UpdatedReelsPlayerWidget> createState() => _UpdatedReelsPlayerWidgetState();
@@ -24,6 +26,7 @@ class _UpdatedReelsPlayerWidgetState extends State<UpdatedReelsPlayerWidget> wit
   bool _isBuffering = false;
   bool _isPlaying = false;
   bool _showPlayPauseOverlay = false;
+  bool _hasError = false;
 
   VideoPlayerController? _oldController;
   String? _currentVideoId;
@@ -55,6 +58,7 @@ class _UpdatedReelsPlayerWidgetState extends State<UpdatedReelsPlayerWidget> wit
       _oldController = widget.controller;
       _currentVideoId = widget.reelID;
       _playerKey = UniqueKey();
+      _hasError = false;
       _addControllerListener();
 
       final shouldBuffer = widget.controller?.value.isBuffering ?? false;
@@ -83,6 +87,7 @@ class _UpdatedReelsPlayerWidgetState extends State<UpdatedReelsPlayerWidget> wit
     if (controller != null) {
       _isBuffering = controller.value.isBuffering;
       _isPlaying = controller.value.isPlaying;
+      _hasError = controller.value.hasError;
       controller.addListener(_onControllerUpdate);
     }
   }
@@ -96,6 +101,7 @@ class _UpdatedReelsPlayerWidgetState extends State<UpdatedReelsPlayerWidget> wit
     if (widget.reelID != _currentVideoId) return;
 
     if (controller.value.hasError) {
+      _hasError = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) setState(() => _isBuffering = false);
       });
@@ -105,27 +111,47 @@ class _UpdatedReelsPlayerWidgetState extends State<UpdatedReelsPlayerWidget> wit
     final isBuffering = controller.value.isBuffering;
     final isPlaying = controller.value.isPlaying;
 
-    // Optimized buffering detection to minimize visibility
-    bool shouldShowBuffering = isBuffering && !isPlaying;
+    // Improved buffering detection logic
+    bool shouldShowBuffering = false;
+    
+    // Only show buffering if:
+    // 1. Controller is buffering AND not playing
+    // 2. Controller is initialized but not playing and position is at 0
+    // 3. Controller has been buffering for more than 500ms
+    if (isBuffering && !isPlaying) {
+      shouldShowBuffering = true;
+    } else if (!isPlaying && 
+               controller.value.isInitialized && 
+               controller.value.position == Duration.zero &&
+               controller.value.duration > Duration.zero) {
+      // Show buffering briefly when video is at start and not playing
+      shouldShowBuffering = true;
+    }
 
+    // Hide buffering if video is playing and has progressed
     if (isPlaying && controller.value.position > Duration.zero) {
       shouldShowBuffering = false;
     }
 
-    if (!isPlaying &&
-        controller.value.position > Duration.zero &&
+    // Hide buffering if video has loaded and is paused
+    if (!isPlaying && 
+        controller.value.position > Duration.zero && 
         controller.value.duration.inMilliseconds > 0) {
       shouldShowBuffering = false;
     }
 
-    if (_isBuffering != shouldShowBuffering || _isPlaying != isPlaying) {
+    if (_isBuffering != shouldShowBuffering || _isPlaying != isPlaying || _hasError != controller.value.hasError) {
       if (shouldShowBuffering) {
         // Increased delay before showing buffering indicator to avoid flicker
         Future.delayed(const Duration(milliseconds: 300), () {
-          if (mounted && controller.value.isBuffering && !controller.value.isPlaying) {
+          if (mounted && 
+              controller.value.isBuffering && 
+              !controller.value.isPlaying && 
+              !controller.value.hasError) {
             setState(() {
               _isBuffering = true;
               _isPlaying = isPlaying;
+              _hasError = controller.value.hasError;
             });
           }
         });
@@ -135,6 +161,7 @@ class _UpdatedReelsPlayerWidgetState extends State<UpdatedReelsPlayerWidget> wit
             setState(() {
               _isBuffering = false;
               _isPlaying = isPlaying;
+              _hasError = controller.value.hasError;
             });
           }
         });
@@ -144,14 +171,22 @@ class _UpdatedReelsPlayerWidgetState extends State<UpdatedReelsPlayerWidget> wit
 
   void _togglePlayPause() async {
     final controller = widget.controller;
-    if (controller == null || !controller.value.isInitialized) return;
+    if (controller == null || !controller.value.isInitialized || controller.value.hasError) return;
 
     setState(() => _showPlayPauseOverlay = true);
 
-    if (controller.value.isPlaying) {
-      await controller.pause();
-    } else {
-      await controller.play();
+    try {
+      if (controller.value.isPlaying) {
+        await controller.pause();
+      } else {
+        await controller.setVolume(1.0); // Ensure volume is set to full when playing
+        await controller.play();
+      }
+      
+      // Notify parent about manual play/pause
+      widget.onManualPlayPause?.call();
+    } catch (e) {
+      debugPrint('Error toggling play/pause: $e');
     }
 
     Future.delayed(const Duration(seconds: 1), () {
@@ -165,7 +200,7 @@ class _UpdatedReelsPlayerWidgetState extends State<UpdatedReelsPlayerWidget> wit
   Widget build(BuildContext context) {
     final controller = widget.controller;
 
-    if (controller == null || !controller.value.isInitialized) {
+    if (controller == null || !controller.value.isInitialized || _hasError) {
       return Center(
         child: RotationTransition(
           turns: Tween(begin: 0.0, end: 1.0).animate(_loadingController),
@@ -189,7 +224,7 @@ class _UpdatedReelsPlayerWidgetState extends State<UpdatedReelsPlayerWidget> wit
           isPortrait
               ? SizedBox.expand(child: AspectRatio(aspectRatio: controller.value.aspectRatio, child: child))
               : AspectRatio(aspectRatio: controller.value.aspectRatio, child: child),
-          if (_isBuffering)
+          if (_isBuffering && !_hasError)
             Center(
               child: RotationTransition(
                 turns: Tween(begin: 0.0, end: 1.0).animate(_loadingController),

@@ -23,6 +23,7 @@ import 'package:funli_app/src/services/deep_link_service.dart';
 import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:provider/provider.dart';
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 
 void main() async{
@@ -68,6 +69,7 @@ class MyApp extends StatelessWidget {
     });
     final appRouter = getIt<AppRouter>();
     return MultiBlocProvider(
+
       providers: [
         BlocProvider(create: (_)=> AuthCubit()),
         BlocProvider(create: (context) => getIt<VideoFeedCubit>(),),
@@ -78,7 +80,8 @@ class MyApp extends StatelessWidget {
       MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: appRouter.router,
-       /* useInheritedMediaQuery: true,
+
+        /* useInheritedMediaQuery: true,
         locale: DevicePreview.locale(context),
         builder: DevicePreview.appBuilder,*/
         theme: ThemeData(

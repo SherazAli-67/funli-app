@@ -859,8 +859,8 @@ class _VideoFeedViewState extends State<VideoFeedView>
               }
             }
 
-            // Handle video pausing only if no video is currently playing or intended to play
-            if (state.shouldPauseVideo && _currentlyPlayingVideoId == null) {
+            // Handle video pausing - pause immediately if shouldPauseVideo is true
+            if (state.shouldPauseVideo) {
               debugPrint("shouldPauseVideo received in build: ${state.shouldPauseVideo}");
               _pauseAllControllers();
             } else if (!state.shouldPauseVideo && _isAppActive) {

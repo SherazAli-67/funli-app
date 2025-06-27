@@ -28,11 +28,13 @@ class VideoFeedItem extends StatefulWidget {
     this.isComingFromHome = false,
     required this.reel,
     required this.controller,
+    this.onManualPlayPause,
   });
 
   final ReelModel reel;
   final VideoPlayerController? controller;
   final bool isComingFromHome;
+  final VoidCallback? onManualPlayPause;
 
   @override
   State<VideoFeedItem> createState() => _VideoFeedItemState();
@@ -63,6 +65,10 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
     }
   }
 
+  void _onManualPlayPause() {
+    // Notify parent widget about manual play/pause
+    widget.onManualPlayPause?.call();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +76,10 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
       alignment: Alignment.center,
       children: [
         UpdatedReelsPlayerWidget(
-
-        controller: widget.controller,
-        reelID: widget.reel.reelID),
+          controller: widget.controller,
+          reelID: widget.reel.reelID,
+          onManualPlayPause: _onManualPlayPause,
+        ),
        /* ReelsOptimizedPlayerWidget(
             key: _playerKey,
             controller: widget.controller,

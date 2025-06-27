@@ -15,15 +15,17 @@ class DeepLinkService {
     // Listen for incoming links from uni_links
     _sub = linkStream.listen((String? link) {
       if (link != null) {
+        debugPrint('Received deep link via uni_links: $link');
         handleDeepLink(link);
       }  
     }, onError: (err) {
-      print('Error listening to deep links: $err');
+      debugPrint('Error listening to deep links: $err');
     });
 
     // Check for initial link if app was opened via deep link
     getInitialLink().then((String? initialLink) {
       if (initialLink != null) {
+        debugPrint('Initial deep link received: $initialLink');
         handleDeepLink(initialLink);
       }
     });
@@ -36,16 +38,18 @@ class DeepLinkService {
     // Handle links that open the app
     final PendingDynamicLinkData? initialLink = await _dynamicLinks.getInitialLink();
     if (initialLink != null) {
+      debugPrint('Initial dynamic link received: ${initialLink.link.toString()}');
       _handleDynamicLink(initialLink);
     }
 
     // Handle links that open the app in the foreground
     _dynamicLinks.onLink.listen(
       (dynamicLinkData) {
+        debugPrint('Foreground dynamic link received: ${dynamicLinkData.link.toString()}');
         _handleDynamicLink(dynamicLinkData);
       },
       onError: (error) {
-        print('Error handling dynamic link: $error');
+        debugPrint('Error handling dynamic link: $error');
       },
     );
   }
@@ -65,11 +69,8 @@ class DeepLinkService {
         String reelId = uri.pathSegments.last;
         // Navigate to reel page with reelId
         debugPrint("ReelID in deepLinkService: $reelId");
-        // Delay navigation to ensure app initialization
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _appRouter.router.push(
-              RouterEnum.deepLinkViewer.routeName, extra: {'reelID': reelId});
-        });
+        // Use a more robust way to ensure navigation after app initialization
+        _appRouter.router.push(RouterEnum.deepLinkViewer.routeName, extra: {'reelID': reelId});
       } else if (uri.pathSegments.contains('profile') && uri.pathSegments.length > 1) {
         String userId = uri.pathSegments.last;
         // Navigate to profile page with userId
@@ -96,13 +97,13 @@ class DeepLinkService {
         minimumVersion: 0,
       ),
       iosParameters: IOSParameters(
-        bundleId: 'com.funtech.funlip',
+        bundleId: 'com.funtech.funli',
         minimumVersion: '0',
       ),
       socialMetaTagParameters: SocialMetaTagParameters(
         title: 'Check out this FUNLI reel!',
         description: 'Watch this amazing reel on FUNLI app',
-        imageUrl: Uri.parse('https://funli-web.vercel.app/assets/preview_image.jpg'),
+        imageUrl: Uri.parse(thumbnailUrl),
       ),
     );
 

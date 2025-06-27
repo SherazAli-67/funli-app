@@ -10,10 +10,13 @@ import 'package:go_router/go_router.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../app_router/router_enum.dart';
 import '../../models/reel_model.dart';
+import '../main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import '../main_menu/widgets/video_feed_item.dart';
 import 'bloc_cubit/reels_cubit.dart';
 import 'bloc_cubit/reels_state.dart';
+import 'package:get_it/get_it.dart';
 
 class UpdatedReelsPage extends StatefulWidget {
   final List<ReelModel> initialReels;
@@ -57,7 +60,6 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
   void initState() {
     super.initState();
 
-    debugPrint("Reels received: ${widget.initialReels.length}");
     WidgetsBinding.instance.addObserver(this);
     _videos = widget.initialReels;
     _currentPage = widget.selectedIndex;
@@ -170,57 +172,78 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
       builder: (context, state) {
         _videos = state.videos;
 
-        return Scaffold(
-          backgroundColor: Colors.black,
-          body: Stack(
-            children: [
-              PreloadPageView.builder(
-                scrollDirection: Axis.vertical,
-                controller: _pageController,
-                itemCount: _videos.length,
-                onPageChanged: (index) {
-                  setState(() => _currentPage = index);
-                  _cubit.onPageChanged(index);
-              
-                  _initializeControllerIfNeeded(_videos[index].reelID, _videos[index].videoUrl, shouldPlay: true);
-                  _playController(_videos[index].reelID);
-              
-                  // Preload controllers for previous 1 and next 1 reel only to reduce initial load
-                  for (int i = index - 1; i <= index + 1; i++) {
-                    if (i >= 0 && i < _videos.length && i != index) {
-                      _initializeControllerIfNeeded(_videos[i].reelID, _videos[i].videoUrl, shouldPlay: false);
+        return WillPopScope(
+          onWillPop: ()async{
+            if(widget.comingFrom == AppConstants.comingFromDeepLink){
+              debugPrint("Coming from deepLink found");
+              // Reset shouldPauseVideo to false when returning to video feed
+              // Use UpdatedFeedCubit instead of VideoFeedCubit
+              try {
+                final cubit = context.read<UpdatedFeedCubit>();
+                cubit.setShouldPauseVideo(false);
+                // Trigger preloading before navigation
+                cubit.preloadNextVideos();
+              } catch (e) {
+                debugPrint('Error accessing UpdatedFeedCubit: $e');
+              }
+              context.go(RouterEnum.videoFeedView.routeName);
+              return false;
+            }
+
+            return false;
+          },
+          child: Scaffold(
+            backgroundColor: Colors.black,
+            body: Stack(
+              children: [
+                PreloadPageView.builder(
+                  scrollDirection: Axis.vertical,
+                  controller: _pageController,
+                  itemCount: _videos.length,
+                  onPageChanged: (index) {
+                    setState(() => _currentPage = index);
+                    _cubit.onPageChanged(index);
+
+                    _initializeControllerIfNeeded(_videos[index].reelID, _videos[index].videoUrl, shouldPlay: true);
+                    _playController(_videos[index].reelID);
+
+                    // Preload controllers for previous 1 and next 1 reel only to reduce initial load
+                    for (int i = index - 1; i <= index + 1; i++) {
+                      if (i >= 0 && i < _videos.length && i != index) {
+                        _initializeControllerIfNeeded(_videos[i].reelID, _videos[i].videoUrl, shouldPlay: false);
+                      }
                     }
-                  }
-                },
-                itemBuilder: (context, index) {
-                  final reel = _videos[index];
-                  final controller = _controllerCache[reel.reelID];
-              
-                  return controller != null && controller.value.isInitialized
-                      ? VideoFeedItem(
-                          key: ValueKey(reel.reelID),
-                          controller: controller,
-                          reel: reel,
-                          isComingFromHome: false,
-                        )
-                      : const Center(child: CircularProgressIndicator(color: Colors.white));
-                },
-              ),
-              Positioned(
-                top: 55,
-                left: 10,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 10,
-                  children: [
-                    IconButton(onPressed: (){
-                      context.pop();
-                    }, icon:SvgPicture.asset(AppIcons.icArrowBack, colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),)),
-                    Text(AppConstants.appTitle, style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),)
-                  ],
+                  },
+                  itemBuilder: (context, index) {
+                    final reel = _videos[index];
+                    final controller = _controllerCache[reel.reelID];
+
+                    return controller != null && controller.value.isInitialized
+                        ? VideoFeedItem(
+                      key: ValueKey(reel.reelID),
+                      controller: controller,
+                      reel: reel,
+                      isComingFromHome: false,
+                    )
+                        : const Center(child: CircularProgressIndicator(color: Colors.white));
+                  },
                 ),
-              )
-            ],
+                Positioned(
+                  top: 55,
+                  left: 10,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10,
+                    children: [
+                      IconButton(onPressed: (){
+                        context.pop();
+                      }, icon:SvgPicture.asset(AppIcons.icArrowBack, colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),)),
+                      Text(AppConstants.appTitle, style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),)
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         );
       },
