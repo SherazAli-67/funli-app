@@ -14,7 +14,22 @@ class PostBookmarkWidget extends StatelessWidget{
         builder: (ctx, snapshot) {
           if(snapshot.hasData){
             bool isBookmarked = snapshot.requireData;
-            return Card(
+            return ListTile(
+              contentPadding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)
+              ),
+              leading: isBookmarked ? GradientIcon(icon: Icons.bookmark_rounded,
+                  size: 30,
+                  gradient: AppGradients.primaryGradient) : Icon(
+                Icons.bookmark_border_rounded, color: Colors.black, size: 30,),
+              title: Text(isBookmarked ? 'Saved Feel' : "Save Feel", style: AppTextStyles.buttonTextStyle,),
+              onTap: (){
+                ReelsService.toggleBookmark(reelID: reelID, isRemoval: isBookmarked);
+                Navigator.of(context).pop();
+              },
+            );
+            /*return Card(
               color: Colors.white,
               child: ListTile(
                 shape: RoundedRectangleBorder(
@@ -30,7 +45,7 @@ class PostBookmarkWidget extends StatelessWidget{
                   Navigator.of(context).pop();
                 },
               ),
-            );
+            );*/
           }
           return const SizedBox();
         });

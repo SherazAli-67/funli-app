@@ -126,28 +126,12 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
   void didChangeDependencies() {
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context)!);
-    // Add GoRouter listener for route changes
-    GoRouter.of(context).routerDelegate.addListener(_onGoRouterChange);
-  }
-
-  void _onGoRouterChange() {
-    final currentRoute = GoRouter.of(context).routerDelegate.currentConfiguration.uri.toString();
-    final isMainFeedRoute = currentRoute == RouterEnum.videoFeedView.routeName;
-    if (isMainFeedRoute && mounted) {
-      // Resume video playback if paused
-      context.read<UpdatedFeedCubit>().setShouldPauseVideo(false);
-      _manageControllerWindow(_currentPage);
-      _initAndPlayVideo(_currentPage);
-      context.read<UpdatedFeedCubit>().preloadNextVideos();
-    }
   }
 
   @override
   void dispose() {
     routeObserver.unsubscribe(this);
     WidgetsBinding.instance.removeObserver(this);
-    // Remove GoRouter listener
-    GoRouter.of(context).routerDelegate.removeListener(_onGoRouterChange);
     _disposeAllControllers();
     super.dispose();
   }

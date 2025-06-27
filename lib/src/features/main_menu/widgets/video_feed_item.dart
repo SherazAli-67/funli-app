@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/app_router/bottom_navigation_widget.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
-import 'package:funli_app/src/features/reels_page/reels_optimized_player_widget.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/services/reels_service.dart';
@@ -236,11 +235,14 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
 
   void _onMoreTap(){
     if(widget.isComingFromHome){
-      scaffoldKey.currentState!.showBottomSheet((ctx){
+      scaffoldKey.currentState!.showBottomSheet(
+              backgroundColor: Colors.white,
+              (ctx){
         return ReelMoreItemSheet(reel: widget.reel, controller: widget.controller);
       });
     }else{
       showModalBottomSheet(
+        barrierColor: Colors.white,
           backgroundColor: AppColors.reportContentFillColor,
           context: context, builder: (ctx){
         return ReelMoreItemSheet(reel: widget.reel, controller: widget.controller);
@@ -261,48 +263,52 @@ class ReelMoreItemSheet extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return FractionallySizedBox(
-      heightFactor: 0.4,
+      heightFactor: 0.35,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          spacing: 20,
           children: [
-            Align(
-                alignment: Alignment.topRight,
-                child: SheetCloseIconWidget()
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Select One", style: AppTextStyles.subHeadingTextStyle,),
+                Align(
+                    alignment: Alignment.topRight,
+                    child: SheetCloseIconWidget()
+                ),
+              ],
             ),
             PostBookmarkWidget(reelID: _reel.reelID,),
-            Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              child: ListTile(
-                tileColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)
-                ),
-                leading: Icon(Icons.error_outline, color: AppColors.redColor,),
-                title: Text("Report this content", style: AppTextStyles.buttonTextStyle.copyWith(color: AppColors.redColor),),
-                onTap: () async {
-                  context.pop();
-                  if (_controller != null) {
-                    await _controller.pause();
-
-                    debugPrint("Controller found and set to pause");
-                    context.push(RouterEnum.reportContentView.routeName, extra: {
-                      'reel': _reel
-                    }).then((_) {
-                      _controller.play();
-
-                      debugPrint("Come back to page and set it to play");
-                    });
-                  } else {
-
-                    debugPrint("Controller not found and set to pause");
-                    context.push(RouterEnum.reportContentView.routeName, extra: {
-                      'reel': _reel
-                    });
-                  }
-                },
+            Divider(),
+            ListTile(
+              tileColor: Colors.white,
+              contentPadding: EdgeInsets.zero,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)
               ),
+              leading: Icon(Icons.error_outline, color: AppColors.redColor,),
+              title: Text("Report this content", style: AppTextStyles.buttonTextStyle.copyWith(color: AppColors.redColor),),
+              onTap: () async {
+                context.pop();
+                if (_controller != null) {
+                  await _controller.pause();
+
+                  debugPrint("Controller found and set to pause");
+                  context.push(RouterEnum.reportContentView.routeName, extra: {
+                    'reel': _reel
+                  }).then((_) {
+                    _controller.play();
+
+                    debugPrint("Come back to page and set it to play");
+                  });
+                } else {
+
+                  debugPrint("Controller not found and set to pause");
+                  context.push(RouterEnum.reportContentView.routeName, extra: {
+                    'reel': _reel
+                  });
+                }
+              },
             )
           ],
         ),
