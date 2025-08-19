@@ -13,7 +13,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../app_router/router_enum.dart';
 import '../../models/reel_model.dart';
-import '../main_menu/widgets/video_feed_item.dart';
+import '../main_menu/updated_feed_view/widgets/video_feed_item.dart';
 import 'bloc_cubit/reels_cubit.dart';
 import 'bloc_cubit/reels_state.dart';
 

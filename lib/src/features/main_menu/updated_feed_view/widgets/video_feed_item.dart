@@ -9,17 +9,17 @@ import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/widgets/sheet_close_icon_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
-import '../../../res/app_colors.dart';
-import '../../../res/app_icons.dart';
-import '../../../res/app_textstyles.dart';
-import '../../../services/user_service.dart';
-import '../../../widgets/app_text_widget.dart';
-import '../../../widgets/post_bookmark_widget.dart';
-import '../../../widgets/post_comment_widget.dart';
-import '../../../widgets/post_like_widget.dart';
-import '../../../widgets/post_share_widget.dart';
-import '../profile/remote_user_profile.dart';
-import '../updated_feed_view/widgets/updated_reels_player_widget.dart';
+import '../../../../res/app_colors.dart';
+import '../../../../res/app_icons.dart';
+import '../../../../res/app_textstyles.dart';
+import '../../../../services/user_service.dart';
+import '../../../../widgets/app_text_widget.dart';
+import '../../../../widgets/post_bookmark_widget.dart';
+import '../../../../widgets/post_comment_widget.dart';
+import '../../../../widgets/post_like_widget.dart';
+import '../../../../widgets/post_share_widget.dart';
+import '../../profile/remote_user_profile.dart';
+import 'updated_reels_player_widget.dart';
 
 class VideoFeedItem extends StatefulWidget {
   const VideoFeedItem({
@@ -43,7 +43,7 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
   UserModel? _userModel;
 
   // Use a key to force rebuild when controller changes
-  Key _playerKey = UniqueKey();
+  // Key _playerKey = UniqueKey();
   String? _lastReelId;
 
   @override
@@ -59,15 +59,11 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
     // If the reel ID changed or controller changed, update the key to force a rebuild
     if (widget.reel.reelID != _lastReelId ||
         widget.controller != oldWidget.controller) {
-      _playerKey = UniqueKey();
+      // _playerKey = UniqueKey();
       _lastReelId = widget.reel.reelID;
     }
   }
 
-  void _onManualPlayPause() {
-    // Notify parent widget about manual play/pause
-    widget.onManualPlayPause?.call();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -238,12 +234,13 @@ class _VideoFeedItemState extends State<VideoFeedItem> {
       scaffoldKey.currentState!.showBottomSheet(
               backgroundColor: Colors.white,
               (ctx){
-        return ReelMoreItemSheet(reel: widget.reel, controller: widget.controller);
+        return FractionallySizedBox(
+            heightFactor: 0.35,
+            child: ReelMoreItemSheet(reel: widget.reel, controller: widget.controller));
       });
     }else{
       showModalBottomSheet(
-        barrierColor: Colors.white,
-          backgroundColor: AppColors.reportContentFillColor,
+        backgroundColor: Colors.white,
           context: context, builder: (ctx){
         return ReelMoreItemSheet(reel: widget.reel, controller: widget.controller);
       });
@@ -262,56 +259,54 @@ class ReelMoreItemSheet extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return FractionallySizedBox(
-      heightFactor: 0.35,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Select One", style: AppTextStyles.subHeadingTextStyle,),
-                Align(
-                    alignment: Alignment.topRight,
-                    child: SheetCloseIconWidget()
-                ),
-              ],
-            ),
-            PostBookmarkWidget(reelID: _reel.reelID,),
-            Divider(),
-            ListTile(
-              tileColor: Colors.white,
-              contentPadding: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)
+    return  Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Select One", style: AppTextStyles.subHeadingTextStyle,),
+              Align(
+                  alignment: Alignment.topRight,
+                  child: SheetCloseIconWidget()
               ),
-              leading: Icon(Icons.error_outline, color: AppColors.redColor,),
-              title: Text("Report this content", style: AppTextStyles.buttonTextStyle.copyWith(color: AppColors.redColor),),
-              onTap: () async {
-                context.pop();
-                if (_controller != null) {
-                  await _controller.pause();
+            ],
+          ),
+          PostBookmarkWidget(reelID: _reel.reelID,),
+          Divider(),
+          ListTile(
+            tileColor: Colors.white,
+            contentPadding: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10)
+            ),
+            leading: Icon(Icons.error_outline, color: AppColors.redColor,),
+            title: Text("Report this content", style: AppTextStyles.buttonTextStyle.copyWith(color: AppColors.redColor),),
+            onTap: () async {
+              context.pop();
+              if (_controller != null) {
+                await _controller.pause();
 
-                  debugPrint("Controller found and set to pause");
-                  context.push(RouterEnum.reportContentView.routeName, extra: {
-                    'reel': _reel
-                  }).then((_) {
-                    _controller.play();
+                debugPrint("Controller found and set to pause");
+                context.push(RouterEnum.reportContentView.routeName, extra: {
+                  'reel': _reel
+                }).then((_) {
+                  _controller.play();
 
-                    debugPrint("Come back to page and set it to play");
-                  });
-                } else {
+                  debugPrint("Come back to page and set it to play");
+                });
+              } else {
 
-                  debugPrint("Controller not found and set to pause");
-                  context.push(RouterEnum.reportContentView.routeName, extra: {
-                    'reel': _reel
-                  });
-                }
-              },
-            )
-          ],
-        ),
+                debugPrint("Controller not found and set to pause");
+                context.push(RouterEnum.reportContentView.routeName, extra: {
+                  'reel': _reel
+                });
+              }
+            },
+          )
+        ],
       ),
     );
   }

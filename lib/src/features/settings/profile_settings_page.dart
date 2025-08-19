@@ -56,9 +56,9 @@ class ProfileSettingsPage extends StatelessWidget{
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("App Settings", style: AppTextStyles.subHeadingTextStyle,),
-                  SettingsItemWidget(icon: AppIcons.icVisibility, title: 'Dark Mode',  isSwitch: true, onTap: (){
+                 /* SettingsItemWidget(icon: AppIcons.icVisibility, title: 'Dark Mode',  isSwitch: true, onTap: (){
                     Fluttertoast.showToast(msg: "Dark mode development in-progress");
-                  },),
+                  },),*/
                   SettingsItemWidget(icon: AppIcons.icSecurity, title: 'Security & Privacy', onTap: ()=> _onSecurityPrivacyTap(context),),
                   SettingsItemWidget(icon: AppIcons.icVideo, title: 'Content Preferences', onTap: ()=> _onContentPreferencesTap(context),),
                   SettingsItemWidget(icon: AppIcons.icEdit, title: 'Report a Problem', onTap: ()=> _onReportProblemTap(context),),

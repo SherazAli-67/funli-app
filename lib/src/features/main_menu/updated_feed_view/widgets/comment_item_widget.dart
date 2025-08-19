@@ -10,9 +10,9 @@ import 'package:funli_app/src/services/comment_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/comment_like_widget.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
-import '../../../res/app_colors.dart';
-import '../../../res/app_icons.dart';
-import '../../../res/app_textstyles.dart';
+import '../../../../res/app_colors.dart';
+import '../../../../res/app_icons.dart';
+import '../../../../res/app_textstyles.dart';
 
 class CommentItemWidget extends StatefulWidget {
   const CommentItemWidget({
@@ -153,7 +153,7 @@ class _CommentItemWidgetState extends State<CommentItemWidget> {
     try{
       await CommentService.markCommentAsPinned(reelID: widget._reelID,comment: widget._comment);
       if(widget._comment.isPinned){
-        Fluttertoast.showToast(msg: "📌  Comment has been pinned to the top ");
+        Fluttertoast.showToast(msg: "📌 Comment has been pinned to the top ");
       }else{
         Fluttertoast.showToast(msg: "📌 Comment removed from pinned list");
       }

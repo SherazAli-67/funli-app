@@ -15,7 +15,7 @@ import 'package:funli_app/src/services/user_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../video_feed_view/repository/i_video_feed_repository.dart';
+import '../repo/i_video_feed_repository.dart';
 
 
 class UpdatedFeedCubit extends Cubit<UpdatedFeedState> {
@@ -82,7 +82,7 @@ class UpdatedFeedCubit extends Cubit<UpdatedFeedState> {
           ),
         );
         try {
-          final initialReels = await videoRepository.fetchVideos(limit: cachedReels.isEmpty ? 3 : 2);
+          final initialReels = await videoRepository.fetchVideos(limit: cachedReels.isEmpty ? 5 : 3);
           if (initialReels.isNotEmpty) {
             emit(
               state.copyWith(

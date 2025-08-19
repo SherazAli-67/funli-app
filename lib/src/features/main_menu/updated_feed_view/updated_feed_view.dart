@@ -21,7 +21,7 @@ import '../../../res/app_constants.dart';
 import '../../../res/app_textstyles.dart';
 import '../../../services/user_service.dart';
 import '../../../widgets/mood_selecting_scroll_wheel_widget.dart';
-import '../widgets/video_feed_item.dart';
+import 'widgets/video_feed_item.dart';
 import '../../../loading_shimmers/reels_shimmer_widget.dart';
 
 class UpdatedFeedView extends StatefulWidget {
@@ -591,7 +591,7 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
     try {
       final previousPage = _currentPage;
       _currentPage = newPage;
-      final isFastScroll = (newPage - previousPage).abs() > 1;
+      // final isFastScroll = (newPage - previousPage).abs() > 1;
 
       await _pauseAllControllers();
 
@@ -800,7 +800,7 @@ class _UpdatedFeedViewState extends State<UpdatedFeedView>
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${AppConstants.appTitle} V3.3',
+                              AppConstants.appTitle,
                               style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),
                             ),
                             Container(

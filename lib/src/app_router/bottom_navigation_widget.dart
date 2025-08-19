@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
+import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:go_router/go_router.dart';
-import '../features/main_menu/video_feed_view/bloc_cubit/video_feed_cubit.dart';
 import '../notification_service/notification_service.dart';
 import '../providers/size_provider.dart';
 import '../res/app_gradients.dart';
@@ -41,6 +41,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
 
   @override
   Widget build(BuildContext context) {
+    int selectedIndex = _calculateSelectedIndex(context);
     return Scaffold(
       key: scaffoldKey,
       body: Scaffold(
@@ -55,7 +56,8 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                 child: Container(
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-                      gradient: AppGradients.primaryGradient
+                      gradient: AppGradients.bottomNavGradient
+                    // color: Colors.black
                   ),
                   child: Padding(
                     // padding: const EdgeInsets.only(left: 10.0, bottom: 25,top: 10, right: 10),
@@ -63,11 +65,11 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildBottomNavigationItemWidget(icon: AppIcons.icHome, isSelected: _calculateSelectedIndex(context) == 0, onTap: ()=> _onItemTapped(0, context)),
+                        _buildBottomNavigationItemWidget(icon: selectedIndex == 0 ? AppIcons.icSelectedHome : AppIcons.icHome, isSelected: _calculateSelectedIndex(context) == 0, onTap: ()=> _onItemTapped(0, context)),
                         _buildBottomNavigationItemWidget(icon: AppIcons.icSearch, isSelected: _calculateSelectedIndex(context) == 1, onTap: ()=> _onItemTapped(1, context)),
 
                         Container(
-                          width: 50,
+                          width: 45,
                           height: 65,
                           padding: EdgeInsets.all(3),
                           decoration: BoxDecoration(
@@ -80,7 +82,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                                 borderRadius: BorderRadius.circular(35)
                             ),
                             child: IconButton(onPressed: ()async{
-                              context.read<VideoFeedCubit>().setShouldPauseVideo(true);
+                              context.read<UpdatedFeedCubit>().setShouldPauseVideo(true);
                               context.go(RouterEnum.createUploadReelView.routeName);
                             }, icon: Icon(Icons.add, color: Colors.white,)),
                           ),
@@ -101,7 +103,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   }
 
   Widget _buildBottomNavigationItemWidget({required String icon, required bool isSelected, required VoidCallback onTap}) =>
-      IconButton(onPressed: onTap, icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(isSelected ? Colors.black : Colors.white, BlendMode.srcIn),));
+      IconButton(onPressed: onTap, icon: SvgPicture.asset(icon,));
 
   void _initNotificationService()async{
     //Get notification permission then
@@ -149,9 +151,9 @@ void _onItemTapped(int index, BuildContext context) {
   
   // First set the pause state based on which tab is selected
   if (index == 0) { // VideoFeedView is at index 0
-    context.read<VideoFeedCubit>().setShouldPauseVideo(false);
+    context.read<UpdatedFeedCubit>().setShouldPauseVideo(false);
   } else {
-    context.read<VideoFeedCubit>().setShouldPauseVideo(true);
+    context.read<UpdatedFeedCubit>().setShouldPauseVideo(true);
   }
   
   // Check if user is already on VideoFeedView and taps home icon again
@@ -159,7 +161,7 @@ void _onItemTapped(int index, BuildContext context) {
     // User is already on VideoFeedView and tapped home icon again
     // Refresh the feed by calling loadVideos
 
-    context.read<VideoFeedCubit>().loadVideos(isRefresh: true);
+    context.read<UpdatedFeedCubit>().loadVideos(isRefresh: true);
     return; // Don't navigate since we're already on the correct page
   }
   

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_data.dart';
-import 'package:funli_app/src/features/main_menu/video_feed_view/bloc_cubit/video_feed_cubit.dart';
+import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -58,7 +58,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
     return WillPopScope(
       onWillPop: ()async{
         // Reset shouldPauseVideo to false when returning to video feed
-        final cubit = context.read<VideoFeedCubit>();
+        final cubit = context.read<UpdatedFeedCubit>();
         cubit.setShouldPauseVideo(false);
         // Trigger preloading before navigation
         cubit.preloadNextVideos();
@@ -74,7 +74,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: GestureDetector(
               onTap: () {
-                final cubit = context.read<VideoFeedCubit>();
+                final cubit = context.read<UpdatedFeedCubit>();
                 cubit.setShouldPauseVideo(false);
                 // Trigger preloading before navigation
                 cubit.preloadNextVideos();
@@ -361,7 +361,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
 
   void _navigateBackToMainMenu(){
     // Reset shouldPauseVideo to false when returning to video feed
-    final cubit = context.read<VideoFeedCubit>();
+    final cubit = context.read<UpdatedFeedCubit>();
     cubit.setShouldPauseVideo(false);
     // Trigger preloading before navigation
     cubit.preloadNextVideos();

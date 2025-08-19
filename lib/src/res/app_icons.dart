@@ -14,6 +14,7 @@ class AppIcons {
   static const String icGenderRatherNotToSay = 'assets/icons/ic_gender_nottosay.svg';
 
   static const icHome = 'assets/icons/ic_home.svg';
+  static const icSelectedHome = 'assets/icons/ic_selected_home.svg';
   static const icSearch = 'assets/icons/ic_search.svg';
   static const icNotification = 'assets/icons/ic_notification.svg';
   static const icUserProfile = 'assets/icons/ic_user_profile.svg';

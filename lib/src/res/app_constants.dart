@@ -1,6 +1,7 @@
 class AppConstants {
   static const appTitle = 'FUNLI';
-  static const appFontFamily = 'Poppins';
+  // static const appFontFamily = 'Poppins';
+  static const appFontFamily = 'Montserrat';
 
   static const signedUpSuccessTitle = 'You’re In! 🎉';
   static const signedUpSuccessMessage = 'Account created—let the magic begin!';

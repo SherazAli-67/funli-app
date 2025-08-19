@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/app_router/bottom_navigation_widget.dart';
-import 'package:funli_app/src/features/main_menu/home_reels_page/comments_page.dart';
+import 'package:funli_app/src/features/main_menu/updated_feed_view/widgets/comments_page.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';

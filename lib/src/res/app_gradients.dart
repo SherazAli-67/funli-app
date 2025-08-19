@@ -29,6 +29,30 @@ class AppGradients {
 
   static final LinearGradient primaryGradient = LinearGradient(
     colors: [
+      Color.fromRGBO(255, 215, 0, 1),
+      Color.fromRGBO(127, 255, 212, 1),
+      Color.fromRGBO(255, 204, 0, 1),
+      // Color.fromRGBO(255, 204, 0, 1),
+      Color.fromRGBO(191, 244, 80, 1),
+      Color.fromRGBO(138, 43, 226, 1),
+      Color.fromRGBO(100, 149, 237, 1),
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static final LinearGradient bottomNavGradient = LinearGradient(
+    colors: [
+      Color.fromRGBO(0, 0, 0, 1),
+      Color.fromRGBO(34, 34, 34, 1),
+      Color.fromRGBO(34, 34, 34, 1),
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /*static final LinearGradient primaryGradient = LinearGradient(
+    colors: [
       Color.fromRGBO(255, 59, 48, 1),
       Color.fromRGBO(255, 149, 0, 1),
       Color.fromRGBO(255, 204, 0, 1),
@@ -40,7 +64,7 @@ class AppGradients {
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-  );
+  );*/
   static final LinearGradient btnOuterGradient = LinearGradient(
     colors: [
       Color.fromRGBO(255, 215, 0, 1),
@@ -80,7 +104,7 @@ class AppGradients {
 
 
 
-  static final LinearGradient bottomNavigationBarGradient = LinearGradient(
+ /* static final LinearGradient bottomNavigationBarGradient = LinearGradient(
     colors: [
       Color.fromRGBO(0, 0, 0, 1),
       Color.fromRGBO(34, 34, 34, 1),
@@ -88,5 +112,5 @@ class AppGradients {
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-  );
+  );*/
 }

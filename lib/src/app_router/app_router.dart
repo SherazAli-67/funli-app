@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
+import 'package:funli_app/src/features/authentication/forget_password_page.dart';
 import 'package:funli_app/src/features/authentication/signup_page.dart';
 import 'package:funli_app/src/features/deep_link_handler.dart';
 import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.dart';
@@ -11,7 +12,6 @@ import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart'
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/user_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/updated_feed_view/updated_feed_view.dart';
-import 'package:funli_app/src/features/main_menu/video_feed_view/video_feed_view.dart';
 import 'package:funli_app/src/features/mood_reels_page/mood_reels_page.dart';
 import 'package:funli_app/src/features/personalization/personalization_page.dart';
 import 'package:funli_app/src/features/profile_analytics_dashboard/profile_analytics_dashboard.dart';
@@ -110,6 +110,11 @@ class AppRouter {
         path: RouterEnum.loginView.routeName,
         builder: (BuildContext context, GoRouterState state) =>
         const LoginPage(),
+      ),
+      GoRoute(
+        path: RouterEnum.forgetPassView.routeName,
+        builder: (BuildContext context, GoRouterState state) =>
+        const ForgetPasswordPage(),
       ),
       GoRoute(
         path: RouterEnum.signupView.routeName,

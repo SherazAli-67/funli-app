@@ -39,14 +39,15 @@ class PrimaryBtn extends StatelessWidget {
       onTap: _onTap,
       child: Container(
         decoration: BoxDecoration(
-          gradient: AppGradients.btnOuterGradient,
-           /* boxShadow: [
+          color: Colors.black,
+          // gradient: AppGradients.btnOuterGradient,
+            boxShadow: [
               BoxShadow(
-                  color: Color(0xffC9BAFF),
+                  color: Color.fromRGBO(201, 186, 255, 1),
                   blurRadius: 17.6,
                   offset: Offset(0, 6)
               )
-            ],*/
+            ],
           borderRadius: BorderRadius.circular(_borderRadius),
         ),
         // padding: EdgeInsets.all(2),
@@ -56,24 +57,15 @@ class PrimaryBtn extends StatelessWidget {
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(_borderRadius),
           ),
-          child: Stack(
-            alignment: Alignment.center,
+          child: _isLoading ? LoadingWidget() : Row(
+            spacing: _icon.isNotEmpty ? 10 : 0,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(_borderRadius),
-                child: Image.asset(_bgGradient, fit: BoxFit.cover, width: double.infinity, height: SpacingConstants.buttonHeight,),
-              ),
-              _isLoading ? LoadingWidget() : Row(
-                spacing: _icon.isNotEmpty ? 10 : 0,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if(_isPrefix && _icon.isNotEmpty)
-                    SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,),
-                  Text(_text, style: _textStyle.copyWith(color: Colors.white),),
-                  if(!_isPrefix && _icon.isNotEmpty)
-                    SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,)
-                ],
-              ),
+              if(_isPrefix && _icon.isNotEmpty)
+                SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,),
+              Text(_text, style: _textStyle.copyWith(color: Colors.white),),
+              if(!_isPrefix && _icon.isNotEmpty)
+                SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,)
             ],
           ),
         ),

@@ -7,7 +7,6 @@ import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
 import 'package:funli_app/src/bloc_cubit/auth_states.dart';
 import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
-import 'package:funli_app/src/features/main_menu/video_feed_view/bloc_cubit/video_feed_cubit.dart';
 import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/models/onboarding_model.dart';
 import 'package:funli_app/src/providers/personal_info_provider.dart';
@@ -62,8 +61,8 @@ class _WelcomePageState extends State<WelcomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 14,
                         children: [
-                          Text(item.title, style: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),),
-                          Text(item.subTitle, style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),),
+                          Text(item.title, style: AppTextStyles.headingTextStyle3),
+                          Text(item.subTitle, style: AppTextStyles.bodyTextStyle),
                           Expanded(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(20),
