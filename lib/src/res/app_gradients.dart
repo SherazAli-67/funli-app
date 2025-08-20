@@ -1,17 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
 class AppGradients {
-  /*static final LinearGradient primaryGradient = LinearGradient(
-    colors: [
-      Color.fromRGBO(255, 251, 235, 1),
-      Color.fromRGBO(204, 255, 236, 1),
-      Color.fromRGBO(223, 255, 186, 1),
-      Color.fromRGBO(229, 204, 255, 1),
-      Color.fromRGBO(204, 229, 255, 1),
-    ],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );*/
   static final LinearGradient interestItemGradient = LinearGradient(
     colors: [
       // Color.fromRGBO(255, 59, 48, 0),
@@ -102,15 +91,4 @@ class AppGradients {
     end: Alignment.bottomRight,
   );
 
-
-
- /* static final LinearGradient bottomNavigationBarGradient = LinearGradient(
-    colors: [
-      Color.fromRGBO(0, 0, 0, 1),
-      Color.fromRGBO(34, 34, 34, 1),
-      Color.fromRGBO(0, 0, 0, 1),
-    ],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );*/
 }

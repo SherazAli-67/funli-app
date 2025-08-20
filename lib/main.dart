@@ -18,9 +18,9 @@ import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/providers/tab_change_provider.dart';
 import 'package:funli_app/src/providers/users_search_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
-import 'package:funli_app/src/services/deep_link_service.dart';
 import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
@@ -28,16 +28,9 @@ final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
   // Initialize dependency injection
   injectionSetup();
 
-  // Initialize deep link service
-  getIt<DeepLinkService>().initDeepLinks();
-
-  // Preload videos for all moods in the background
-  // This ensures a smoother experience when switching between moods
-  ReelsCacheService.preloadAllMoods();
   runApp(MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_)=> PersonalInfoProvider()),
@@ -59,24 +52,16 @@ void main() async{
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // Clean up memory cache periodically to prevent memory leaks
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ReelsCacheService.cleanupMemoryCache();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_)=> ReelsCacheService.cleanupMemoryCache());
     final appRouter = getIt<AppRouter>();
     return MultiBlocProvider(
-
       providers: [
         BlocProvider(create: (_)=> AuthCubit()),
-        // BlocProvider(create: (context) => getIt<VideoFeedCubit>(),),
-        BlocProvider(create: (context) => getIt<UpdatedFeedCubit>(),)
+        BlocProvider(create: (_) => getIt<UpdatedFeedCubit>(),)
       ],
-      child:
-
-      MaterialApp.router(
+      child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: appRouter.router,
 

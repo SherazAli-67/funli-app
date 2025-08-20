@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import '../res/app_icons.dart';
 import '../res/spacing_constants.dart';
 
 class AuthPagesHeaderTextWidget extends StatelessWidget {
@@ -10,14 +8,14 @@ class AuthPagesHeaderTextWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.only(
-        top: 30,
+        top: 75,
         left: SpacingConstants.screenHorizontalPadding,
         right: SpacingConstants.screenHorizontalPadding,
+        bottom: 45
       ),
-      child: SvgPicture.asset(AppIcons.icFunliHeaderLogo, height: size.height*0.25,),
+      child: Text("FEELz", style: TextStyle(fontSize: 75, fontWeight: FontWeight.w700),)
     );
   }
 }

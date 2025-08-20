@@ -37,8 +37,8 @@ class _InterestPageState extends State<InterestPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
                       border: Border.all(color: AppColors.borderColor),
-                      color: !isSelected ? Colors.white : null,
-                      gradient: isSelected ? AppGradients.interestItemGradient : null
+                      color: !isSelected ? Colors.white : AppColors.purpleColor,
+                      // gradient: isSelected ? AppGradients.interestItemGradient : null
                     ),
                     child: Stack(
                       alignment: Alignment.center,

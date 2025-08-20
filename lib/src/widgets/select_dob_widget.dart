@@ -91,7 +91,7 @@ class _SelectDOBWidgetState extends State<SelectDOBWidget> {
           return Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8), // 8 top + 8 bottom = 16 total
-              child: isSelected ? GradientTextWidget(gradient: AppGradients.primaryGradient, text: items[index].toString(), textStyle: selectedTextStyle,) : Text(
+              child: isSelected ? GradientTextWidget(gradient: AppGradients.interestItemGradient, text: items[index].toString(), textStyle: selectedTextStyle,) : Text(
                 items[index].toString(),
                 style: unSelectedTextStyle,
               ),

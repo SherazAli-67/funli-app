@@ -1,5 +1,5 @@
 class AppConstants {
-  static const appTitle = 'FUNLI';
+  static const appTitle = 'FEELz';
   // static const appFontFamily = 'Poppins';
   static const appFontFamily = 'Montserrat';
 

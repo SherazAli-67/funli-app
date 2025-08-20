@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:funli_app/src/res/app_gradients.dart';
+import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import '../res/app_textstyles.dart';
@@ -39,7 +39,7 @@ class PrimaryBtn extends StatelessWidget {
       onTap: _onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: AppColors.purpleColor,
           // gradient: AppGradients.btnOuterGradient,
             boxShadow: [
               BoxShadow(

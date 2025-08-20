@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:funli_app/src/res/app_gradients.dart';
 
 import '../res/app_colors.dart';
 import '../res/app_icons.dart';
@@ -54,8 +55,8 @@ class SelectGenderWidget extends StatelessWidget{
 
   Widget _buildGenderItem({required String gender, required String icon,}) {
     bool isSelected = _selectedGender == gender;
-    Color txtIconColor = isSelected ? Colors.white : AppColors.lightBlackColor;
-    return GestureDetector(
+    // Color txtIconColor = isSelected ? Colors.white : AppColors.lightBlackColor;
+    /*return GestureDetector(
       onTap: ()=> _onSelectGender(gender),
       child: Container(
         height: 65,
@@ -63,59 +64,52 @@ class SelectGenderWidget extends StatelessWidget{
           borderRadius: BorderRadius.circular(9),
           border: Border.all(color: AppColors.borderColor),
           color: !isSelected ? Colors.white : null,
+          // gradient: isSelected ? AppGradients.uploadBtnGradient : null
         ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            if(isSelected)
-              ClipRRect(
-                  borderRadius: BorderRadius.circular(9),
-                  child: Image.asset(AppIcons.primaryBgGradient, width: double.infinity, fit: BoxFit.cover, height: 65,)),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 21, vertical: 20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Row(
-                      spacing: 11,
-                      children: [
-                        SvgPicture.asset(icon, colorFilter: ColorFilter.mode(txtIconColor, BlendMode.srcIn),),
-                        Text(gender, style: AppTextStyles.bodyTextStyle.copyWith(color: txtIconColor),)
-                      ],
-                    ),
-                  ),
-                  if(isSelected)
-                    CircleAvatar(
-                      radius: 13,
-                      backgroundColor: Colors.white,
-                      child: Center(child: Icon(Icons.done, color: Colors.black, size: 15,),),
-                    )
-                ],
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 21, vertical: 20),
+          child: Row(
+            children: [
+              Expanded(
+                child: Row(
+                  spacing: 11,
+                  children: [
+                    SvgPicture.asset(icon, ),
+                    Text(gender, style: AppTextStyles.bodyTextStyle)
+                  ],
+                ),
               ),
-            ),
-          ],
+              if(isSelected)
+                CircleAvatar(
+                  radius: 13,
+                  backgroundColor: Colors.white,
+                  child: Center(child: Icon(Icons.done, color: Colors.black, size: 15,),),
+                )
+            ],
+          ),
         ),
       ),
-    );
-    /*return CheckboxListTile(
+    );*/
+    Color txtIconColor = isSelected ? Colors.black : AppColors.genderBorderColor;
+    return CheckboxListTile(
       tileColor: Colors.white,
-
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(9),
         side: BorderSide(
-          color: selectedGender == title ? AppColors.purpleColor : AppColors.borderColor
+          color: isSelected ? AppColors.purpleColor : AppColors.genderBorderColor
         )
       ),
-      value: selectedGender == title,
+      value: isSelected,
       onChanged: (val) {
         if (val!) {
-          provider.setGender(title);
+          _onSelectGender(gender);
         }
       },
-      title: Text(title, style: AppTextStyles.bodyTextStyle,),
-      secondary: SvgPicture.asset(icon),
+      title: Text(gender, style: AppTextStyles.bodyTextStyle.copyWith(color: txtIconColor),),
+      secondary: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(txtIconColor, BlendMode.srcIn),),
       checkboxShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(99)),
-    );*/
+          borderRadius: BorderRadius.circular(99),side: BorderSide(color: txtIconColor)
+      ),
+    );
   }
 }

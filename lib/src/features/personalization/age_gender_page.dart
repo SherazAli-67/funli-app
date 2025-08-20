@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/providers/personal_info_provider.dart';
-import 'package:funli_app/src/res/app_colors.dart';
-import 'package:funli_app/src/res/app_icons.dart';
-import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/select_dob_widget.dart';
 import 'package:funli_app/src/widgets/select_gender_widget.dart';
 import 'package:provider/provider.dart';
