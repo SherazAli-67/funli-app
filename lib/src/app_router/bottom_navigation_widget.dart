@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
-import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:go_router/go_router.dart';
 import '../notification_service/notification_service.dart';
@@ -82,7 +81,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
                                 borderRadius: BorderRadius.circular(35)
                             ),
                             child: IconButton(onPressed: ()async{
-                              context.read<UpdatedFeedCubit>().setShouldPauseVideo(true);
+                              // context.read<UpdatedFeedCubit>().setShouldPauseVideo(true);
                               context.go(RouterEnum.createUploadReelView.routeName);
                             }, icon: Icon(Icons.add, color: Colors.white,)),
                           ),
@@ -149,19 +148,19 @@ void _onItemTapped(int index, BuildContext context) {
   // Get the current location
   final String currentLocation = GoRouterState.of(context).uri.toString();
   
-  // First set the pause state based on which tab is selected
+  /*// First set the pause state based on which tab is selected
   if (index == 0) { // VideoFeedView is at index 0
     context.read<UpdatedFeedCubit>().setShouldPauseVideo(false);
   } else {
     context.read<UpdatedFeedCubit>().setShouldPauseVideo(true);
-  }
+  }*/
   
   // Check if user is already on VideoFeedView and taps home icon again
   if (index == 0 && currentLocation == RouterEnum.videoFeedView.routeName) {
     // User is already on VideoFeedView and tapped home icon again
     // Refresh the feed by calling loadVideos
 
-    context.read<UpdatedFeedCubit>().loadVideos(isRefresh: true);
+    // context.read<UpdatedFeedCubit>().loadVideos(isRefresh: true);
     return; // Don't navigate since we're already on the correct page
   }
   

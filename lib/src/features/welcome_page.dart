@@ -29,16 +29,7 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  @override
-  void initState() {
-    super.initState();
-    // Preload reels as soon as the page is initialized
-    _preloadReels();
-  }
 
-  void _preloadReels() {
-    WidgetsBinding.instance.addPostFrameCallback((_)=> context.read<UpdatedFeedCubit>().initialize());
-  }
 
   @override
   Widget build(BuildContext context) {

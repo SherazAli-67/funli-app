@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
+// import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import 'package:funli_app/src/features/reels_page/reel_repository.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_icons.dart';
@@ -13,7 +13,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../app_router/router_enum.dart';
 import '../../models/reel_model.dart';
-import '../main_menu/updated_feed_view/widgets/video_feed_item.dart';
+// import '../main_menu/updated_feed_view/widgets/video_feed_view.dart';
 import 'bloc_cubit/reels_cubit.dart';
 import 'bloc_cubit/reels_state.dart';
 
@@ -176,10 +176,10 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
             if(widget.comingFrom == AppConstants.comingFromDeepLink){
               debugPrint("Coming from deepLink found");
               // Reset shouldPauseVideo to false when returning to video feed
-              final cubit = context.read<UpdatedFeedCubit>();
+             /* final cubit = context.read<UpdatedFeedCubit>();
               cubit.setShouldPauseVideo(false);
               // Trigger preloading before navigation
-              cubit.preloadNextVideos();
+              cubit.preloadNextVideos();*/
               context.go(RouterEnum.videoFeedView.routeName);
               return false;
             }
@@ -213,12 +213,13 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage> with WidgetsBinding
                       final controller = _controllerCache[reel.reelID];
 
                       return controller != null && controller.value.isInitialized
-                          ? VideoFeedItem(
-                              key: ValueKey(reel.reelID),
-                              controller: controller,
-                              reel: reel,
-                              isComingFromHome: false,
-                            )
+                          ? SizedBox()
+                          // ? VideoFeedItem(
+                          //     key: ValueKey(reel.reelID),
+                          //     controller: controller,
+                          //     reel: reel,
+                          //     isComingFromHome: false,
+                          //   )
                           : const Center(child: CircularProgressIndicator(color: Colors.white));
                     },
                   ),

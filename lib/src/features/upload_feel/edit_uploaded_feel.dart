@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
-import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:go_router/go_router.dart';
@@ -62,11 +61,11 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
     return WillPopScope(
       onWillPop: ()async{
         // Reset shouldPauseVideo to false when returning to video feed
-        final cubit = context.read<UpdatedFeedCubit>();
+      /*  final cubit = context.read<UpdatedFeedCubit>();
         cubit.setShouldPauseVideo(false);
         // Trigger preloading before navigation
         cubit.preloadNextVideos();
-        context.go(RouterEnum.videoFeedView.routeName);
+        context.go(RouterEnum.videoFeedView.routeName);*/
         return false;
       },
       child: Scaffold(
@@ -106,13 +105,13 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              // Reset shouldPauseVideo to false when returning to video feed
+                              /*// Reset shouldPauseVideo to false when returning to video feed
                               // Ensure we trigger preloading when returning to feed
                               final cubit = context.read<UpdatedFeedCubit>();
                               cubit.setShouldPauseVideo(false);
                               // Trigger preloading before navigation
                               cubit.preloadNextVideos();
-                              context.pop();
+                              context.pop();*/
                             },
                             child: AppBackButton(color: Colors.white),
                           ),

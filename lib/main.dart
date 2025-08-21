@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/app_router/app_router.dart';
 import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
-import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import 'package:funli_app/src/dependancy_injection/dependency_injector.dart';
 import 'package:funli_app/src/providers/discover_provider.dart';
 import 'package:funli_app/src/providers/feels_search_provider.dart';
@@ -19,6 +18,7 @@ import 'package:funli_app/src/providers/tab_change_provider.dart';
 import 'package:funli_app/src/providers/users_search_provider.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/services/reels_cache_service.dart';
+import 'package:funli_app/src/services/enhanced_video_feed_service.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -30,6 +30,14 @@ void main() async{
   await Firebase.initializeApp();
   // Initialize dependency injection
   injectionSetup();
+  
+  // Initialize enhanced video feed service for optimal performance
+  try {
+    await EnhancedVideoFeedService().initialize();
+    debugPrint('Enhanced video feed service initialized successfully');
+  } catch (e) {
+    debugPrint('Failed to initialize enhanced video feed service: $e');
+  }
 
   runApp(MultiProvider(
       providers: [
@@ -59,7 +67,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_)=> AuthCubit()),
-        BlocProvider(create: (_) => getIt<UpdatedFeedCubit>(),)
+        // BlocProvider(create: (_) => getIt<UpdatedFeedCubit>(),)
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

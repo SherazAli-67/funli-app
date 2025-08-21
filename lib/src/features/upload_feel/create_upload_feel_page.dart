@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
-import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
@@ -392,11 +391,11 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
   }
 
   void _onBackPress(BuildContext context) {
-
+/*
     final cubit = context.read<UpdatedFeedCubit>();
     cubit.setShouldPauseVideo(false);
     // Trigger preloading before navigation
-    cubit.preloadNextVideos();
+    cubit.preloadNextVideos();*/
   }
 
 }

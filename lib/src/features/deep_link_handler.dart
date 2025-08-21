@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:go_router/go_router.dart';
@@ -36,7 +35,7 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler> {
 
       // Pause any playing videos in VideoFeedView before navigating
       try {
-        context.read<UpdatedFeedCubit>().setShouldPauseVideo(true);
+        // context.read<UpdatedFeedCubit>().setShouldPauseVideo(true);
         debugPrint("VideoFeed set playing true");
       } catch (e) {
         debugPrint('Error pausing videos: $e');
