@@ -56,8 +56,9 @@ class _CommentsPageState extends State<CommentsPage> {
   }
   @override
   Widget build(BuildContext context) {
+    debugPrint("Coming from home: ${widget._comingFromHome}");
     return Padding(
-      padding:  EdgeInsets.only(left: 23.0, right: 23, bottom: widget._comingFromHome ? 100 : 20, top: 20),
+      padding:  EdgeInsets.only(left: 23.0, right: 23, bottom: 45, top: 20),
       child: Column(
         spacing: 14,
         mainAxisSize: MainAxisSize.min,

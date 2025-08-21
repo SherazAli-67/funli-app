@@ -438,7 +438,7 @@ class ReelInteractionColumn extends StatelessWidget {
       children: [
         PostLikeWidget(reel: reel),
        PostCommentWidget(reel: reel, comingFromHome: false),
-       PostShareWidget(reel: reel),
+       PostShareWidget(reel: reel, onShareTap: (){},),
        // PostBookmarkWidget(reelID: reel.reelID),
        /* _buildInteractionButton(
           Icons.favorite_outline,

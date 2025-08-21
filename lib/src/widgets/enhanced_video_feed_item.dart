@@ -7,6 +7,7 @@ import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/widgets/post_comment_widget.dart';
 import 'package:funli_app/src/widgets/post_like_widget.dart';
 import 'package:funli_app/src/widgets/post_share_widget.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:video_player/video_player.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/services/enhanced_video_feed_service.dart';
@@ -14,8 +15,10 @@ import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/play_pause_widget.dart';
+import '../dependancy_injection/dependency_injector.dart';
 import '../features/main_menu/profile/remote_user_profile.dart';
 import '../res/app_icons.dart';
+import '../services/deep_link_service.dart';
 import '../services/user_service.dart';
 import 'app_text_widget.dart';
 
@@ -26,10 +29,11 @@ class EnhancedVideoFeedItem extends StatefulWidget {
   final bool isCurrentItem;
   final VoidCallback? onTap;
   final Function(bool isPlaying)? onPlayStateChanged;
-
+  final bool comingFromHome;
   const EnhancedVideoFeedItem({
     super.key,
     required this.reel,
+     this.comingFromHome = false,
     this.shouldAutoPlay = false,
     this.isCurrentItem = false,
     this.onTap,
@@ -62,6 +66,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
   DateTime? _bufferStartTime;
 
   UserModel? _userModel;
+  bool _reelShareableLinkGenerating = false;
   @override
   bool get wantKeepAlive => widget.isCurrentItem;
 
@@ -465,7 +470,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.7),
+          color: Colors.black.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Column(
@@ -591,7 +596,6 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
             children: [
               GestureDetector(
                 onTap: (){
-
                   String? userName = _userModel?.userName;
                   showModalBottomSheet(
                       isScrollControlled: true,
@@ -599,8 +603,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
                     return FractionallySizedBox(
                         heightFactor: 0.75,
                         child: SingleChildScrollView(
-                            child: RemoteUserProfileInfoWidget(
-                              userName: userName, userID: widget.reel.userID,)));
+                            child: RemoteUserProfileInfoWidget(userName: userName, userID: widget.reel.userID,)));
                   });
                 },
                 child: Container(
@@ -646,8 +649,8 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
           ),
           const SizedBox(height: 10,),
           PostLikeWidget(reel: widget.reel, iconColor: Colors.white, isReel: true,),
-          PostCommentWidget(iconColor: Colors.white, isReel: true, reel: widget.reel,comingFromHome: false,),
-          PostShareWidget(iconColor: Colors.white, reel: widget.reel),
+          PostCommentWidget(iconColor: Colors.white, isReel: true, reel: widget.reel,comingFromHome: widget.comingFromHome,),
+          PostShareWidget(iconColor: Colors.white, reel: widget.reel, onShareTap: _onShareTap),
           // IconButton(onPressed: _onMoreTap, icon: Icon(Icons.more_horiz, color: Colors.white,))
         ],
       ),
@@ -657,16 +660,31 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
-    return GestureDetector(
-      onTap: _togglePlayPause,
-      child: Container(
-        color: Colors.black,
-        child: _buildVideoPlayer(),
-      ),
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: _togglePlayPause,
+          child: Container(
+            color: Colors.black,
+            child: _buildVideoPlayer(),
+          ),
+        ),
+        if(_reelShareableLinkGenerating)
+          Container(
+              color: Colors.black45,
+              child: LoadingWidget())
+      ],
     );
   }
 
+  void _onShareTap()async{
+    setState(() => _reelShareableLinkGenerating = true);
+    final deepLink = await getIt<DeepLinkService>().generateDeepLink(widget.reel.reelID, widget.reel.thumbnailUrl!);
+    SharePlus.instance.share(
+        ShareParams(text: 'Check out this reel on FUNLI: $deepLink')
+    );
+    setState(() => _reelShareableLinkGenerating = false);
+  }
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);

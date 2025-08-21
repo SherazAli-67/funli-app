@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:funli_app/src/models/comment_model.dart';
 import 'package:funli_app/src/models/like_model.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
@@ -15,8 +16,9 @@ import '../services/user_service.dart';
 import 'loading_widget.dart';
 
 class ReelLikedUsersWidget extends StatefulWidget {
-  const ReelLikedUsersWidget({super.key, required String reelID}): _reelID = reelID;
+  const ReelLikedUsersWidget({super.key, required String reelID, bool comingForComment = false}): _reelID = reelID, _comingForComment = comingForComment;
   final String _reelID;
+  final bool _comingForComment;
   @override
   State<ReelLikedUsersWidget> createState() => _ReelLikedUsersWidgetState();
 }
@@ -46,30 +48,49 @@ class _ReelLikedUsersWidgetState extends State<ReelLikedUsersWidget> {
 
   Future<void> _loadFollowers() async {
     _isLoading = true;
-    final Query colRef = FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection)
-        .doc(widget._reelID)
-        .collection(FirebaseConstants.likesCollection)
-        .orderBy('dateTime', descending: true)
-        .limit(_limit);
+
+    late Query colRef;
+
+
+    List<String> userIDs = [];
+    if(widget._comingForComment){
+      colRef = FirebaseFirestore.instance
+          .collection(FirebaseConstants.reelsCollection)
+          .doc(widget._reelID)
+          .collection(FirebaseConstants.commentsCollection)
+          .orderBy('dateTime', descending: true)
+          .limit(_limit);
+    }else{
+      colRef = FirebaseFirestore.instance
+          .collection(FirebaseConstants.reelsCollection)
+          .doc(widget._reelID)
+          .collection(FirebaseConstants.likesCollection)
+          .orderBy('dateTime', descending: true)
+          .limit(_limit);
+    }
 
     QuerySnapshot snapshot = _lastDoc == null
         ? await colRef.get()
         : await colRef.startAfterDocument(_lastDoc!).get();
+
+    if(widget._comingForComment){
+      List<AddCommentModel> comments = snapshot.docs
+          .map((doc) => AddCommentModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+      userIDs = comments.map((commentBy) => commentBy.commentBy).toList();
+    }else{
+      List<LikeModel> likes = snapshot.docs
+          .map((doc) => LikeModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+      userIDs = likes.map((like) => like.likedBy).toList();
+    }
 
     if (snapshot.docs.isEmpty) {
       setState(() => _hasMore = false);
       _isLoading = false;
       return;
     }
-
     _lastDoc = snapshot.docs.last;
-
-    List<LikeModel> followModels = snapshot.docs
-        .map((doc) => LikeModel.fromMap(doc.data() as Map<String, dynamic>))
-        .toList();
-
-    final userIDs = followModels.map((like) => like.likedBy).toList();
 
     final userSnapshot = await FirebaseFirestore.instance
         .collection(FirebaseConstants.userCollection)

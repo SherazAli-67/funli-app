@@ -13,8 +13,6 @@ import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/reel_liked_users_widget.dart';
 import 'package:like_button/like_button.dart';
 
-import 'followers_widget.dart';
-
 class PostLikeWidget extends StatelessWidget{
   final Color iconColor;
   final bool isReel;

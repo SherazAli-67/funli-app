@@ -308,6 +308,7 @@ class VideoFeedViewState extends State<VideoFeedView>
         return EnhancedVideoFeedItem(
           key: ValueKey(reel.reelID),
           reel: reel,
+          comingFromHome: true,
           shouldAutoPlay: isCurrentItem,
           isCurrentItem: isCurrentItem,
           onTap: () => _onVideoTap(index),

@@ -44,8 +44,6 @@ class UserService {
         //remove from following
         result = true;
       }else{
-        //adding the remote user to the following list
-        debugPrint("Not found");
 
         FollowModel remoteUserFollowingModel = FollowModel(userID: remoteUID, dateTime: DateTime.now());
         await currentUserFollowingColRef.doc(remoteUID).set(remoteUserFollowingModel.toMap());
@@ -79,6 +77,18 @@ class UserService {
     return _fireStore.collection(
         FirebaseConstants.userCollection).doc(currentUID).collection(
         FirebaseConstants.followingCollection).doc(remoteUID).snapshots().map((snapshot)=> snapshot.exists);
+  }
+
+  static Stream<FollowModel?> getIsFollowingStreamInModel(String remoteUID) {
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+
+    return  _fireStore.collection(
+        FirebaseConstants.userCollection).doc(currentUID).collection(
+        FirebaseConstants.followingCollection).doc(remoteUID).snapshots().map((snapshot)=> FollowModel.fromMap(snapshot.data() as Map<String, dynamic>));
+   /* if(documentSnapshot.exists){
+      return FollowModel.fromMap(documentSnapshot.data() as Map<String, dynamic>);
+    }
+    return null;*/
   }
 
   static Future<FollowModel?> getIsFollowing(String remoteUID) async{

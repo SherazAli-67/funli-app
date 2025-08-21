@@ -5,6 +5,7 @@ import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/reels_service.dart';
+import 'package:funli_app/src/widgets/reel_liked_users_widget.dart';
 
 import '../features/main_menu/video_feed_view/comments_page.dart';
 
@@ -30,15 +31,11 @@ class PostCommentWidget extends StatelessWidget{
   }
 
   Column _buildCommentWidget(BuildContext context, {required int totalComments}) {
-
     return Column(
           children: [
-            IconButton(onPressed: (){
-
-              debugPrint("ON comment tap");
+            GestureDetector(onTap: (){
               if(comingFromHome){
                 scaffoldKey.currentState!.showBottomSheet(
-
                     backgroundColor: Colors.white,
                     elevation: 1,
                         (ctx)=> Padding(
@@ -46,7 +43,7 @@ class PostCommentWidget extends StatelessWidget{
                         child: FractionallySizedBox(
                           heightFactor: 0.75,
                           child: CommentsPage(
-                              reel: reel, comingFromHome: false),
+                              reel: reel, comingFromHome: comingFromHome),
                         )));
               }else{
                 showBottomSheet(
@@ -56,21 +53,30 @@ class PostCommentWidget extends StatelessWidget{
                       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                       child: FractionallySizedBox(
                         heightFactor: 0.75,
-                        child: CommentsPage(
-                            reel: reel, comingFromHome: false),
+                        child: CommentsPage(reel: reel, comingFromHome: comingFromHome),
                       ));
                 });
               }
 
 
-            }, icon: SvgPicture.asset(AppIcons.icComment,
+            },
+              child: SvgPicture.asset(AppIcons.icComment,
               colorFilter:  ColorFilter
                   .mode(
                   iconColor, BlendMode.srcIn),),
 
             ),
             if(totalComments != 0)
-              Text( "$totalComments", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),)
+              IconButton(
+                  onPressed: (){
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => ReelLikedUsersWidget(reelID: reel.reelID, comingForComment: true,),
+                    );
+                  },
+                  icon: Text( "$totalComments", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),))
           ],
         );
   }

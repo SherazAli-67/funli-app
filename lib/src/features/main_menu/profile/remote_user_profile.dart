@@ -15,7 +15,6 @@ import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/private_account_widget.dart';
 import 'package:funli_app/src/widgets/profile_info_widget.dart';
-import 'package:funli_app/src/widgets/secondary_gradient_btn.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../loading_shimmers/reel_thumbnail_shimmer_item.dart';
@@ -50,6 +49,7 @@ class _RemoteUserProfileInfoWidgetState extends State<RemoteUserProfileInfoWidge
   @override
   Widget build(BuildContext context) {
     return Column(
+      spacing: 20,
       children: [
        if(!widget._isFromProfilePage)
          Align(
@@ -100,18 +100,17 @@ class _RemoteUserProfileInfoWidgetState extends State<RemoteUserProfileInfoWidge
       children: [
         if(!widget._isFromProfilePage)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
             child: SizedBox(
               height: 45,
               child: Row(
                 spacing: 12,
                 children: [
                   Expanded(
-                    child: FutureBuilder(future: UserService.getIsFollowing(widget._userID), builder: (ctx, snapshot){
+                    child: StreamBuilder(stream: UserService.getIsFollowingStreamInModel(widget._userID), builder: (ctx, snapshot){
                       if(snapshot.hasData){
                         FollowModel? follow = snapshot.requireData;
-
-                        String text =  follow != null ? (follow.isApproved
+                        String text = follow != null ? (follow.isApproved
                             ? 'Following'
                             : 'Request Sent') : 'Follow';
                         if(follow != null){
@@ -121,17 +120,15 @@ class _RemoteUserProfileInfoWidgetState extends State<RemoteUserProfileInfoWidge
                           btnText: text,
                           isPrefix: true,
                           icon: AppIcons.icAddUser,
-                          onTap: () {
-
-                          },
+                          onTap: () => UserService.onFollowTap(remoteUID: widget._userID, userName: widget._userName ?? ''),
                           bgGradient: AppIcons.primaryBgGradient,
                           iconColor: Colors.white,);
                       }
 
-                      return  PrimaryBtn(btnText: "",isPrefix: true, icon: AppIcons.icAddUser, onTap: (){}, bgGradient: AppIcons.primaryBgGradient,);
+                      return PrimaryBtn(btnText: "Follow",isPrefix: true, icon: AppIcons.icAddUser, onTap: ()=> UserService.onFollowTap(remoteUID: widget._userID, userName: widget._userName ?? ''), bgGradient: AppIcons.primaryBgGradient,);
                     }),
                   ),
-                  Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),
+                  // Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),
                 ],
               ),
             ),
