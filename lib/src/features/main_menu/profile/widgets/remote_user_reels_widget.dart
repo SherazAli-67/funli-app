@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
-import 'package:funli_app/src/loading_shimmers/reel_thumbnail_shimmer_item.dart';
 import 'package:funli_app/src/loading_shimmers/reels_gridview_shimmer.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_colors.dart';

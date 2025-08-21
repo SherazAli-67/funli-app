@@ -14,7 +14,7 @@ import '../../widgets/reel_grid_item_widget.dart';
 class HashtagReelsGrid extends StatefulWidget {
   final String tag;
   final bool isComingFromMood;
-  const   HashtagReelsGrid({super.key, required this.tag, this.isComingFromMood = false});
+  const HashtagReelsGrid({super.key, required this.tag, this.isComingFromMood = false});
 
   @override
   State<HashtagReelsGrid> createState() => _HashtagReelsGridState();

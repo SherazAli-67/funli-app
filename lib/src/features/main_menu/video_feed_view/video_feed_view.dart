@@ -25,10 +25,13 @@ class VideoFeedView extends StatefulWidget {
   });
 
   @override
-  State<VideoFeedView> createState() => _VideoFeedViewState();
+  State<VideoFeedView> createState() => VideoFeedViewState();
 }
 
-class _VideoFeedViewState extends State<VideoFeedView>
+// Global key to access VideoFeedView from outside
+final GlobalKey<VideoFeedViewState> videoFeedViewKey = GlobalKey<VideoFeedViewState>();
+
+class VideoFeedViewState extends State<VideoFeedView>
     with WidgetsBindingObserver, AutomaticKeepAliveClientMixin {
   
   // Controllers and services
@@ -42,6 +45,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
   String _currentMood = 'Happy';
   bool _isInitialized = false;
   bool _isLoading = false;
+    bool _isRefreshing = false;
   
   // Performance tracking
   final Completer<void> _initCompleter = Completer<void>();
@@ -59,6 +63,75 @@ class _VideoFeedViewState extends State<VideoFeedView>
     _videoService = EnhancedVideoFeedService();
     
     _initializeVideoFeed();
+  }
+
+  /// Public method to refresh the video feed
+  Future<void> refreshVideoFeed() async {
+    if (_isRefreshing || _isLoading) return;
+
+    setState(() => _isRefreshing = true);
+
+    try {
+      // Pause all videos and clear controllers
+      await _videoService.pauseAll();
+      
+      // Animate to first position smoothly
+      if (_pageController.hasClients && _currentIndex != 0) {
+        await _pageController.animateToPage(
+          0,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+
+      // Clear cache and fetch fresh reels
+      await ReelsCacheService.clearCachedReels(_currentMood);
+      
+      // Fetch fresh reels from Firebase (for now using AppData as fallback)
+      final freshReels = await _fetchFreshReelsFromFirebase();
+      
+      setState(() {
+        _reels = freshReels;
+        _currentIndex = 0;
+        _isRefreshing = false;
+      });
+
+      // Cache the fresh reels
+      await ReelsCacheService.cacheReels(_reels, _currentMood);
+
+      // Restart smart preloading for fresh content
+      await _startSmartPreloading();
+
+      debugPrint('Video feed refreshed with ${freshReels.length} fresh reels');
+
+    } catch (e) {
+      debugPrint('Failed to refresh video feed: $e');
+      
+      // Fallback to existing reels if refresh fails
+      if (_reels.isEmpty) {
+        _reels = AppData.getReels().take(10).toList();
+      }
+    } finally {
+      setState(() => _isRefreshing = false);
+    }
+  }
+
+  /// Fetch fresh reels from Firebase
+  Future<List<ReelModel>> _fetchFreshReelsFromFirebase() async {
+    try {
+      // TODO: Replace with actual Firebase call
+      // For now, return fresh data from AppData with some delay to simulate network call
+      await Future.delayed(const Duration(milliseconds: 800));
+      
+      // In a real implementation, this would be:
+      // return await ReelsService.getFreshReels(mood: _currentMood, limit: 20);
+      
+      return AppData.getReels(); // This simulates fresh data
+    } catch (e) {
+      debugPrint('Failed to fetch from Firebase: $e');
+      // Fallback to cached or default data
+      return AppData.getReels().take(10).toList();
+    }
   }
 
   Future<void> _initializeVideoFeed() async {
@@ -333,7 +406,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
         
         final stats = snapshot.data!;
         final avgLoadTime = stats['averageLoadTime'];
-        final bufferEvents = stats['totalBufferEvents'] as int;
+        // final bufferEvents = stats['totalBufferEvents'] as int;
         
         Color indicatorColor = Colors.green;
         if (avgLoadTime > 1000) {
@@ -345,7 +418,7 @@ class _VideoFeedViewState extends State<VideoFeedView>
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.7),
+            color: Colors.black.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -387,14 +460,29 @@ class _VideoFeedViewState extends State<VideoFeedView>
           
           // Header with title and performance indicator
           _buildHeader(),
-          
+
+
           // Loading overlay
-          if (_isLoading)
+          if (_isLoading || _isRefreshing)
             Container(
               color: Colors.black.withValues(alpha: 0.5),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.purpleColor,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(
+                      color: AppColors.purpleColor,
+                    ),
+                    if (_isRefreshing) ...[ 
+                      const SizedBox(height: 16),
+                      Text(
+                        'Refreshing feed...',
+                        style: AppTextStyles.bodyTextStyle.copyWith(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ),

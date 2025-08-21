@@ -166,9 +166,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
               discoverProvider.isLoadingMoods
                   ? TrendingFeelsShimmerWidget()
                   : Column(
-                children: discoverProvider.trendingMoods.map((mood) {
-                  return MoodCard(mood: mood); // 🔄 Move this logic to a reusable widget
-                }).toList(),
+                children: discoverProvider.trendingMoods.map((mood) => MoodCard(mood: mood)).toList(),
               ),
             ],
           ),
@@ -225,17 +223,19 @@ class MoodCard extends StatelessWidget {
             trailing: GestureDetector(
               onTap: () => _onMoodTap(context, mood.mood),
               child: SizedBox(
-                  width: 100,
+                  width: 120,
                   child: Row(
                     children: [
-                      GradientTextWidget(
-                        gradient: AppGradients
-                            .primaryGradient,
-                        text: "SEE ALL",
-                        textStyle: AppTextStyles
-                            .buttonTextStyle.copyWith(
-                            fontWeight: FontWeight
-                                .w700),),
+                      Expanded(
+                        child: GradientTextWidget(
+                          gradient: AppGradients
+                              .primaryGradient,
+                          text: "SEE ALL",
+                          textStyle: AppTextStyles
+                              .buttonTextStyle.copyWith(
+                              fontWeight: FontWeight
+                                  .w700),),
+                      ),
                       GradientIcon(
                           icon: Icons.navigate_next_sharp,
                           size: 30,

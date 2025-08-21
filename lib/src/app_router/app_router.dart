@@ -71,7 +71,7 @@ class AppRouter {
             pageBuilder: (context, state) => customPageBuilderWidget(
               context,
               state,
-              SizedBox.expand(child: const VideoFeedView()),
+              SizedBox.expand(child: VideoFeedView(key: videoFeedViewKey)),
             ),
           ),
           GoRoute(
@@ -269,6 +269,7 @@ class AppRouter {
               userID: extras['userID'],
               mood: extras['mood'],
               tag: extras['tag'],
+              filterContext: extras['filterContext'],
             ),
           );
         },
@@ -338,5 +339,3 @@ class AppRouter {
     },
   );
 }
-
-

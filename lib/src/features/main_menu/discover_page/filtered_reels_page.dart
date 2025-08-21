@@ -51,9 +51,7 @@ class _FilteredReelsPageState extends State<FilteredReelsPage> {
   Future<void> _fetchReels() async {
     if (_isLoading) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(()=> _isLoading = true);
 
     Query query = _firestore.collection(FirebaseConstants.reelsCollection).limit(10);
 
@@ -94,7 +92,6 @@ class _FilteredReelsPageState extends State<FilteredReelsPage> {
 
     final snapshot = await query.get();
 
-    debugPrint("Reels found: ${snapshot.size}");
     if (snapshot.docs.isNotEmpty) {
       _lastDocument = snapshot.docs.last;
       _reels = snapshot.docs.map((doc)=> ReelModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
@@ -115,7 +112,6 @@ class _FilteredReelsPageState extends State<FilteredReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Selected mood: ${widget.filter.selectedMood?.name}");
     return Scaffold(
       appBar: AppBar(
         title: Text("Search Results", style: AppTextStyles.headingTextStyle3,),

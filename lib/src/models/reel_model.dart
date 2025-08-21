@@ -18,6 +18,7 @@ class ReelModel {
   final double playbackSpeed;
   final Map<String, dynamic>? location; // e.g., {'lat': 0.0, 'lng': 0.0}
   final int viewsCount;
+  final int likesCount;
 
   /// ✅ New field
   final List<String> reportedByUsers;
@@ -40,6 +41,7 @@ class ReelModel {
     this.isMuted = false,
     this.playbackSpeed = 1.0,
     this.viewsCount = 0,
+    this.likesCount = 0,
     /// ✅ Default empty list
     this.reportedByUsers = const [],
   });
@@ -85,6 +87,7 @@ class ReelModel {
       isMuted: map['isMuted'] ?? false,
       playbackSpeed: map['playbackSpeed'] ?? 1.0,
       viewsCount: map['viewsCount'] ?? 0,
+      likesCount: map['likesCount'] ?? 0,
 
       /// ✅ Map from list or default to []
       reportedByUsers: List<String>.from(map['reportedByUsers'] ?? []),
@@ -110,6 +113,7 @@ class ReelModel {
       'isMuted' : isMuted,
       'playbackSpeed' : playbackSpeed,
       'viewsCount' : viewsCount,
+      'likesCount' : likesCount,
 
       /// ✅ Include in toMap
       'reportedByUsers': reportedByUsers,

@@ -1011,4 +1011,67 @@ class ReelsCacheService {
       debugPrint('Error removing reel from cache: $e');
     }
   }
+
+  /// Clear cached reels for a specific mood to force refresh
+  static Future<void> clearCachedReels(String mood) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedReelsJson = prefs.getString(_cacheKey) ?? '{}';
+      final Map<String, dynamic> cachedReelsMap = json.decode(cachedReelsJson);
+
+      // Get the reels for this mood to clear their video cache
+      if (cachedReelsMap.containsKey(mood)) {
+        final List<dynamic> reelsToRemove = cachedReelsMap[mood];
+        
+        // Clear video files from cache managers for this mood's reels
+        for (final reelData in reelsToRemove) {
+          final videoUrl = reelData['videoUrl'] as String?;
+          if (videoUrl != null) {
+            // Remove from memory cache
+            _memoryCache.remove(videoUrl);
+            
+            // Remove from active downloads
+            _activeDownloads.remove(videoUrl);
+            
+            // Remove from all cache managers
+            try {
+              await customCacheManager.removeFile(videoUrl);
+            } catch (e) {
+              // Ignore errors - file might not exist in this cache
+            }
+            
+            try {
+              await priorityCacheManager.removeFile(videoUrl);
+            } catch (e) {
+              // Ignore errors - file might not exist in this cache
+            }
+            
+            try {
+              await currentMoodCacheManager.removeFile(videoUrl);
+            } catch (e) {
+              // Ignore errors - file might not exist in this cache
+            }
+          }
+        }
+      }
+
+      // Remove this mood from cached reels
+      cachedReelsMap.remove(mood);
+
+      // Save updated cache
+      await prefs.setString(_cacheKey, json.encode(cachedReelsMap));
+
+      // Remove from preloaded moods
+      final preloadedMoods = prefs.getStringList(_preloadedMoodsKey) ?? [];
+      preloadedMoods.remove(mood);
+      await prefs.setStringList(_preloadedMoodsKey, preloadedMoods);
+
+      // Remove from memory set
+      _preloadedMoodsInMemory.remove(mood);
+
+      debugPrint('Cleared cached reels for mood: $mood');
+    } catch (e) {
+      debugPrint('Error clearing cached reels for mood $mood: $e');
+    }
+  }
 }

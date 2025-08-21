@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:go_router/go_router.dart';
+import '../features/main_menu/video_feed_view/video_feed_view.dart';
 import '../notification_service/notification_service.dart';
 import '../providers/size_provider.dart';
 import '../res/app_gradients.dart';
@@ -148,19 +149,11 @@ void _onItemTapped(int index, BuildContext context) {
   // Get the current location
   final String currentLocation = GoRouterState.of(context).uri.toString();
   
-  /*// First set the pause state based on which tab is selected
-  if (index == 0) { // VideoFeedView is at index 0
-    context.read<UpdatedFeedCubit>().setShouldPauseVideo(false);
-  } else {
-    context.read<UpdatedFeedCubit>().setShouldPauseVideo(true);
-  }*/
-  
   // Check if user is already on VideoFeedView and taps home icon again
   if (index == 0 && currentLocation == RouterEnum.videoFeedView.routeName) {
     // User is already on VideoFeedView and tapped home icon again
-    // Refresh the feed by calling loadVideos
-
-    // context.read<UpdatedFeedCubit>().loadVideos(isRefresh: true);
+    // Trigger refresh functionality
+    _refreshVideoFeed();
     return; // Don't navigate since we're already on the correct page
   }
   
@@ -178,5 +171,21 @@ void _onItemTapped(int index, BuildContext context) {
     case 3:
       GoRouter.of(context).go(RouterEnum.profileView.routeName);
       break;
+  }
+}
+
+/// Refresh the video feed when user taps the video feed tab again
+void _refreshVideoFeed() {
+  try {
+    // Access the VideoFeedView through its global key and call refresh
+    final videoFeedState = videoFeedViewKey.currentState;
+    if (videoFeedState != null) {
+      videoFeedState.refreshVideoFeed();
+      debugPrint('Video feed refresh triggered from bottom navigation');
+    } else {
+      debugPrint('VideoFeedView state not available for refresh');
+    }
+  } catch (e) {
+    debugPrint('Error triggering video feed refresh: $e');
   }
 }

@@ -10,7 +10,10 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/notifications_service.dart';
 import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/widgets/gradient_text_widget.dart';
+import 'package:funli_app/src/widgets/reel_liked_users_widget.dart';
 import 'package:like_button/like_button.dart';
+
+import 'followers_widget.dart';
 
 class PostLikeWidget extends StatelessWidget{
   final Color iconColor;
@@ -25,35 +28,17 @@ class PostLikeWidget extends StatelessWidget{
       builder: (context, snapshot) {
         if(snapshot.hasData){
           // debugPrint("Count found: ${snapshot.requireData.length}");
-          return _buildLikeButton(snapshot.requireData);
+          return _buildLikeButton(context, snapshot.requireData);
         }
         
-        return _buildLikeButton([]);
+        return _buildLikeButton(context, []);
       }
     );
   }
 
-  Widget _buildLikeButton(List<String> likedUsers) {
+  Widget _buildLikeButton(BuildContext context, List<String> likedUsers) {
     String reelID = reel.reelID;
     bool isLiked = likedUsers.contains(FirebaseAuth.instance.currentUser!.uid);
-    /*return GestureDetector(
-        onTap: ()async{
-      await ReelsService.addLikeToReel(reelID: reelID, isRemove: isLiked);
-    }, child: Column(
-      children: [
-        SvgPicture.asset(isLiked ? AppIcons.icLikedIcon : AppIcons.icLike, height: 35,),
-        likedUsers.isEmpty ? const SizedBox(): isLiked
-            ? GradientTextWidget(
-          gradient: AppGradients.primaryGradient,
-          text: likedUsers.length.toString(),
-          textStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
-        )
-            : Text(
-          likedUsers.length.toString(),
-          style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
-        )
-      ],
-    ));*/
     return LikeButton(
           size: 30,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -80,15 +65,25 @@ class PostLikeWidget extends StatelessWidget{
             );
           },
           countBuilder: (_, isSelected, text){
-            return text == '0' ? const SizedBox():  isSelected
-                ? GradientTextWidget(
-              gradient: AppGradients.primaryGradient,
-              text: likedUsers.length.toString(),
-              textStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
-            )
-                : Text(
-              text,
-              style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
+            return likedUsers.isEmpty ? const SizedBox():  IconButton(
+              onPressed: (){
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => ReelLikedUsersWidget(reelID: reelID,),
+                );
+              },
+              icon: isSelected
+                  ? GradientTextWidget(
+                gradient: AppGradients.primaryGradient,
+                text: likedUsers.length.toString(),
+                textStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
+              )
+                  : Text(
+                text,
+                style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
+              ),
             );
           },
         );
