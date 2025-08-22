@@ -15,10 +15,12 @@ class ReelGridItemWidget extends StatelessWidget {
     super.key,
     required this.reel,
     required VoidCallback onTap,
-  }) : _onTap = onTap;
+    bool showUserName = false
+  }) : _onTap = onTap, _showUserName = showUserName;
 
   final ReelModel reel;
   final VoidCallback _onTap;
+  final bool _showUserName;    //if the user coming from drafts then don't show the profile picture and username
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class ReelGridItemWidget extends StatelessWidget {
               color: Colors.grey[200],
             ),
           ),
+          if(_showUserName)
           Positioned(
               top: 10,
               left: 5,

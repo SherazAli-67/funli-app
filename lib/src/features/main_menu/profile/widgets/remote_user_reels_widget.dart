@@ -130,7 +130,6 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
 
                     return GestureDetector(
                       onTap: () {
-
                         context.push(RouterEnum.updatedReelsView.routeName, extra: {
                           'initialReels': _reels,
                           'selectedIndex': index,
@@ -151,6 +150,7 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
                               color: Colors.grey[200],
                             ),
                           ),
+                          if(widget._userID != FirebaseAuth.instance.currentUser!.uid)
                           Positioned(
                               top: 10,
                               left: 5,

@@ -53,10 +53,10 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
         elevation: 0,
-        title: Text(
+        /*title: Text(
           provider.currentUser?.userName ?? "",
           style: AppTextStyles.headingTextStyle3,
-        ),
+        ),*/
         actions: [
           IconButton(
             onPressed: () =>
