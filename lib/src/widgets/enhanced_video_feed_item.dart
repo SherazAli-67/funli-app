@@ -11,6 +11,7 @@ import 'package:funli_app/src/widgets/like_animation_widget.dart';
 import 'package:funli_app/src/widgets/post_comment_widget.dart';
 import 'package:funli_app/src/widgets/post_like_widget.dart';
 import 'package:funli_app/src/widgets/post_share_widget.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:video_player/video_player.dart';
 import 'package:funli_app/src/models/reel_model.dart';
@@ -19,6 +20,7 @@ import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/play_pause_widget.dart';
+import '../app_router/router_enum.dart';
 import '../dependancy_injection/dependency_injector.dart';
 import '../features/main_menu/profile/remote_user_profile.dart';
 import '../res/app_icons.dart';
@@ -692,6 +694,14 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
               GestureDetector(
                 onTap: (){
                   String? userName = _userModel?.userName;
+                  if(widget.reel.userID == FirebaseAuth.instance.currentUser!.uid){
+                    context.push(RouterEnum.remoteUserProfileView.routeName, extra: {
+                      'userID' : widget.reel.userID,
+                      'userName' : userName,
+                      'profilePicture' : _userModel?.profilePicture
+                    });
+                    return;
+                  }
                   showModalBottomSheet(
                       isScrollControlled: true,
                       context: context, builder: (ctx){

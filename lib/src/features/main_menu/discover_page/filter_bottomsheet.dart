@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/models/filter_model.dart';
 import 'package:funli_app/src/widgets/sheet_close_icon_widget.dart';
-
 import '../../../res/app_icons.dart';
 import '../../../res/app_textstyles.dart';
-import '../../../widgets/app_textfield.dart';
 import '../../../widgets/primary_btn.dart';
 import '../../../widgets/secondary_btn.dart';
 import '../../../widgets/secondary_gradient_btn.dart';
@@ -118,7 +116,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 ),
               ],
             ),
-            AppTextField(
+            /*AppTextField(
                 textController: locController,
                 prefixIcon: AppIcons.icLocation,
                 hintText: 'Abu Dahbi, UAE',
@@ -127,7 +125,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 textController: langController,
                 prefixIcon: AppIcons.icLanguage,
                 hintText: 'Urdu',
-                titleText: 'Language'),
+                titleText: 'Language'),*/
 
             Row(
               spacing: 20,

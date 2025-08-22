@@ -40,7 +40,6 @@ class _RemoteUserProfileInfoWidgetState extends State<RemoteUserProfileInfoWidge
   bool _isPrivateAccount = false;
   bool _isLoading = false;
   bool _isApproved = false;
-
   @override
   void initState() {
     _initUser();
@@ -202,8 +201,7 @@ class _RemoteUserProfileInfoWidgetState extends State<RemoteUserProfileInfoWidge
                     GradientTextWidget(
                       gradient: AppGradients.primaryGradient,
                       text: "View Complete Profile",
-                      textStyle: AppTextStyles.buttonTextStyle.copyWith(
-                          fontWeight: FontWeight.w700),),
+                      textStyle: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),),
                     Icon(Icons.navigate_next_rounded, color: AppColors.deepPurpleColor, size: 30,)
                   ],
                 )),

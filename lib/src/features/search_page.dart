@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
@@ -8,7 +9,6 @@ import 'package:funli_app/src/providers/feels_search_provider.dart';
 import 'package:funli_app/src/providers/hashtag_search_provider.dart';
 import 'package:funli_app/src/providers/users_search_provider.dart';
 import 'package:funli_app/src/res/app_icons.dart';
-import 'package:funli_app/src/services/search_service.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 import 'package:funli_app/src/widgets/secondary_btn.dart';
@@ -41,7 +41,14 @@ class _SearchPageState extends State<SearchPage> {
   late UsersSearchProvider _userProvider;
   late HashtagSearchProvider _hashtagProvider;
   final TextEditingController _searchController = TextEditingController();
+  Timer? _debounceTimer;
 
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -366,19 +373,25 @@ class _SearchPageState extends State<SearchPage> {
 
 
   void _performSearch(String searchQuery) {
-    switch (selectedIndex) {
-      case 0:
-        searchQuery.isEmpty 
-          ? _feelProvider.fetchInitial(query: searchQuery) 
-          : _feelProvider.fetchReelsByQuery(query: searchQuery);
-        break;
-      case 1:
-        _userProvider.fetchInitial(query: searchQuery);
-        break;
-      case 2:
-        _hashtagProvider.fetchInitial(query: searchQuery);
-        break;
-    }
+    // Cancel previous debounce timer
+    _debounceTimer?.cancel();
+    
+    // Set new debounce timer
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      switch (selectedIndex) {
+        case 0:
+          searchQuery.isEmpty 
+            ? _feelProvider.fetchInitial(query: searchQuery) 
+            : _feelProvider.fetchReelsByQuery(query: searchQuery);
+          break;
+        case 1:
+          _userProvider.fetchInitial(query: searchQuery);
+          break;
+        case 2:
+          _hashtagProvider.fetchInitial(query: searchQuery);
+          break;
+      }
+    });
   }
 
   void _onSelectFilterTypeTap(int index) {
