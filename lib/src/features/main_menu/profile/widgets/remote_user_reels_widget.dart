@@ -38,6 +38,7 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
   final List<ReelModel> _reels = [];
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
+  bool _isRefreshing = false;
   bool _hasMore = true;
   final int _limit = 5;
   DocumentSnapshot? _lastDocument;
@@ -104,119 +105,171 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
     setState((){});
   }
 
+  Future<void> _handleRefresh() async {
+    if (_isRefreshing) return;
+    setState(() {
+      _isRefreshing = true;
+      _lastDocument = null;
+      _hasMore = true;
+    });
+
+    try {
+      bool isCurrentUser = widget._userID == FirebaseAuth.instance.currentUser!.uid;
+      DocumentSnapshot? freshLastDoc;
+      bool freshHasMore = true;
+      final freshReels = await ReelsService.fetchUserReels(
+          userId: widget._userID,
+          lastDoc: null,
+          limit: _limit,
+          onLastDoc: (doc) => freshLastDoc = doc,
+          onHasMore: (has) => freshHasMore = has,
+          comingFromProfile: isCurrentUser);
+
+      if (freshReels.isNotEmpty) {
+        final freshIds = freshReels.map((r) => r.reelID).toSet();
+        final uniqueFresh = freshReels.where((r) => freshIds.contains(r.reelID)).toList();
+        setState(() {
+          _reels
+            ..clear()
+            ..addAll(uniqueFresh);
+          _lastDocument = freshLastDoc;
+          _hasMore = freshHasMore;
+        });
+        await ReelsCacheService.cacheUserReels(uniqueFresh, widget._userID);
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRefreshing = false;
+        });
+      }
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    if (_reels.isEmpty && _isLoading) {
-      return ReelsGridShimmer();
-    }
+    return RefreshIndicator(
+      onRefresh: _handleRefresh,
+      child: CustomScrollView(
+        key: PageStorageKey('RemoteUserReels'),
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          if (_reels.isEmpty && _isLoading)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 24),
+                child: ReelsGridShimmer(),
+              ),
+            ),
+          if (_reels.isEmpty && !_isLoading)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(top: 48),
+                child: Center(child: Text("No reels found.")),
+              ),
+            ),
+          if (_reels.isNotEmpty)
+            SliverPadding(
+              padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 65),
+              sliver: SliverGrid(
+                delegate: SliverChildBuilderDelegate(
+                      (context, index) {
 
-    if (_reels.isEmpty) {
-      return const Center(child: Text("No reels found."));
-    }
+                        ReelModel reel = _reels[index];
+                        final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
 
-    return CustomScrollView(
-      key: PageStorageKey('RemoteUserReels'),
-      controller: _scrollController,
-      slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 65),
-          sliver: SliverGrid(
-            delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-
-                    ReelModel reel = _reels[index];
-                    final thumbnailUrl = reel.thumbnailUrl ?? AppIcons.icDummyImgUrl;
-
-                    return GestureDetector(
-                      onTap: () {
-                        context.push(RouterEnum.updatedReelsView.routeName, extra: {
-                          'initialReels': _reels,
-                          'selectedIndex': index,
-                          'lastDocument': _lastDocument,
-                          'comingFrom': AppConstants.comingFromUserProfile,
-                          'userID': FirebaseAuth.instance.currentUser!.uid,
-                        },);
-                      },
-                      child: Stack(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: CachedNetworkImageProvider(thumbnailUrl),
-                                fit: BoxFit.cover,
+                        return GestureDetector(
+                          onTap: () {
+                            context.push(RouterEnum.updatedReelsView.routeName, extra: {
+                              'initialReels': _reels,
+                              'selectedIndex': index,
+                              'lastDocument': _lastDocument,
+                              'comingFrom': AppConstants.comingFromUserProfile,
+                              'userID': FirebaseAuth.instance.currentUser!.uid,
+                            },);
+                          },
+                          child: Stack(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: CachedNetworkImageProvider(thumbnailUrl),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.grey[200],
+                                ),
                               ),
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.grey[200],
-                            ),
+                              if(widget._userID != FirebaseAuth.instance.currentUser!.uid)
+                              Positioned(
+                                  top: 10,
+                                  left: 5,
+                                  right: 5,
+                                  child: Row(
+                                    spacing: 5,
+                                    children: [
+
+                                      CircleAvatar(
+                                        radius: 20,
+                                        backgroundColor: AppColors.purpleColor,
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.white,
+                                          radius: 19,
+                                          backgroundImage: CachedNetworkImageProvider(
+                                              widget._profilePicture ?? AppIcons.icDummyImgUrl),
+                                        ),
+                                      ),
+                                      Expanded(child: Text(widget._userName ?? '',
+                                        style: AppTextStyles.smallTextStyle.copyWith(
+                                            color: Colors.white),))
+                                    ],
+                                  )),
+                              Positioned(
+                                  bottom: 10,
+                                  left: 10,
+                                  right: 0,
+                                  child: Row(
+                                    spacing: 5,
+                                    children: [
+
+                                      CircleAvatar(
+                                        radius: 12,
+                                        backgroundColor: Colors.white,
+                                        child: Center(child: Icon(Icons.play_arrow_rounded,),),
+                                      ),
+                                      Expanded(
+                                          child: FutureBuilder(
+                                              future: ReelsService.getReelViewsCount(
+                                                  reelID: reel.reelID),
+                                              builder: (ctx, snapshot) {
+                                                if (snapshot.hasData &&
+                                                    snapshot.requireData > 0) {
+                                                  return ReelLikesCountWidget(
+                                                      count: snapshot.requireData);
+                                                }
+
+                                                return ReelLikesCountWidget();
+                                              }))
+                                    ],
+                                  ))
+                            ],
                           ),
-                          if(widget._userID != FirebaseAuth.instance.currentUser!.uid)
-                          Positioned(
-                              top: 10,
-                              left: 5,
-                              right: 5,
-                              child: Row(
-                                spacing: 5,
-                                children: [
-
-                                  CircleAvatar(
-                                    radius: 20,
-                                    backgroundColor: AppColors.purpleColor,
-                                    child: CircleAvatar(
-                                      backgroundColor: Colors.white,
-                                      radius: 19,
-                                      backgroundImage: CachedNetworkImageProvider(
-                                          widget._profilePicture ?? AppIcons.icDummyImgUrl),
-                                    ),
-                                  ),
-                                  Expanded(child: Text(widget._userName ?? '',
-                                    style: AppTextStyles.smallTextStyle.copyWith(
-                                        color: Colors.white),))
-                                ],
-                              )),
-                          Positioned(
-                              bottom: 10,
-                              left: 10,
-                              right: 0,
-                              child: Row(
-                                spacing: 5,
-                                children: [
-
-                                  CircleAvatar(
-                                    radius: 12,
-                                    backgroundColor: Colors.white,
-                                    child: Center(child: Icon(Icons.play_arrow_rounded,),),
-                                  ),
-                                  Expanded(
-                                      child: FutureBuilder(
-                                          future: ReelsService.getReelViewsCount(
-                                              reelID: reel.reelID),
-                                          builder: (ctx, snapshot) {
-                                            if (snapshot.hasData &&
-                                                snapshot.requireData > 0) {
-                                              return ReelLikesCountWidget(
-                                                  count: snapshot.requireData);
-                                            }
-
-                                            return ReelLikesCountWidget();
-                                          }))
-                                ],
-                              ))
-                        ],
-                      ),
-                    );
-                  }, // your grid item
-              childCount: _reels.length,
+                        );
+                      }, // your grid item
+                  childCount: _reels.length,
+                ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 4.0,
+                  crossAxisSpacing: 4.0,
+                  childAspectRatio: 9 / 16,
+                ),
+              ),
             ),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 4.0,
-              crossAxisSpacing: 4.0,
-              childAspectRatio: 9 / 16,
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
 
   }

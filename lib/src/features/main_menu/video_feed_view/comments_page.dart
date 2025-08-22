@@ -56,7 +56,6 @@ class _CommentsPageState extends State<CommentsPage> {
   }
   @override
   Widget build(BuildContext context) {
-    debugPrint("Coming from home: ${widget._comingFromHome}");
     return Padding(
       padding:  EdgeInsets.only(left: 23.0, right: 23, bottom: 45, top: 20),
       child: Column(
@@ -107,7 +106,7 @@ class _CommentsPageState extends State<CommentsPage> {
                   itemBuilder: (ctx, index){
                     AddCommentModel comment = comments[index];
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 24.0),
+                      padding: const EdgeInsets.only(bottom: 15.0),
                       child: CommentItemWidget(comment: comment, reelID:  widget._reel.reelID, onReplyTap:  _onReplyTap, postedByUserID: widget._reel.userID,)
                     );
                   }));

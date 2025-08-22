@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:funli_app/src/models/notification_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
+import 'package:funli_app/src/services/notifications_service.dart';
+import 'package:funli_app/src/services/reels_service.dart';
+import 'package:funli_app/src/widgets/like_animation_widget.dart';
 import 'package:funli_app/src/widgets/post_comment_widget.dart';
 import 'package:funli_app/src/widgets/post_like_widget.dart';
 import 'package:funli_app/src/widgets/post_share_widget.dart';
@@ -65,6 +69,11 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
   Duration? _totalBufferTime;
   DateTime? _bufferStartTime;
 
+  // Double-tap detection and like animation
+  Timer? _tapTimer;
+  bool _showLikeAnimation = false;
+
+
   UserModel? _userModel;
   bool _reelShareableLinkGenerating = false;
   @override
@@ -80,6 +89,8 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
     if (widget.isCurrentItem) {
       _initializeController();
     }
+
+    _initUserInfo();
   }
 
   @override
@@ -341,6 +352,89 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
     }
   }
 
+  /// Handle tap detection for both single and double tap
+  void _handleTap() {
+    final now = DateTime.now();
+    
+    // Check if this is a potential double tap
+    if (_tapTimer?.isActive ?? false) {
+      // Double tap detected
+      _tapTimer?.cancel();
+      _onDoubleTap();
+    } else {
+      // Start timer for single tap detection
+      _tapTimer = Timer(const Duration(milliseconds: 300), () {
+        // Single tap confirmed - toggle play/pause
+        _togglePlayPause();
+      });
+    }
+    
+    // _lastTapTime = now;
+  }
+
+  /// Handle double tap - trigger like animation and like the reel
+  void _onDoubleTap() async {
+    debugPrint('Double tap detected - liking reel ${widget.reel.reelID}');
+    
+    // Trigger like animation
+    _triggerLikeAnimation();
+    
+    // Like the reel using the same logic as PostLikeWidget
+    await _likeReel();
+  }
+
+  /// Trigger the like animation
+  void _triggerLikeAnimation() {
+    if (!mounted) return;
+    
+    setState(() {
+      _showLikeAnimation = true;
+    });
+    
+    // Hide animation after duration
+    Timer(const Duration(milliseconds: 1000), () {
+      if (mounted) {
+        setState(() {
+          _showLikeAnimation = false;
+        });
+      }
+    });
+  }
+
+  /// Like the reel using the existing service
+  Future<void> _likeReel() async {
+    try {
+      // Get current like status
+      final likedUsers = await ReelsService.getReelLikes(reelID: widget.reel.reelID).first;
+      final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+      
+      if (currentUserId == null) return;
+      
+      final isCurrentlyLiked = likedUsers.contains(currentUserId);
+      
+      // Only like if not already liked (prevent double-liking)
+      if (!isCurrentlyLiked) {
+        await ReelsService.addLikeToReel(reelID: widget.reel.reelID, isRemove: false);
+        
+        // Send notification if it's not the user's own reel
+        if (widget.reel.userID != currentUserId) {
+          await NotificationsService.sendNotificationToUser(
+            receiverID: widget.reel.userID,
+            reelID: widget.reel.reelID,
+            description: "Liked your video",
+            notificationType: NotificationType.like,
+          );
+        }
+        
+        debugPrint('Reel liked successfully via double tap');
+      } else {
+        debugPrint('Reel already liked - skipping');
+      }
+    } catch (e) {
+      debugPrint('Error liking reel: $e');
+    }
+  }
+
   void _togglePlayPause() async {
     if (_controller == null || !_controller!.value.isInitialized) {
       return;
@@ -408,9 +502,15 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
             child: PlayPauseWidget(isPlaying: _isPlaying),
           ),
 
+        // Like animation overlay
+        if (_showLikeAnimation)
+          Center(
+            child: LikeAnimationWidget(),
+          ),
+
         // Performance debug overlay (only in debug mode)
-        if (kDebugMode)
-          _buildDebugOverlay(),
+        /*if (kDebugMode)
+          _buildDebugOverlay(),*/
 
         _buildUserNameCaptionWidget(),
         _buildLikeCommentsIcon(context),
@@ -463,7 +563,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
     );
   }
 
-  Widget _buildDebugOverlay() {
+  /*Widget _buildDebugOverlay() {
     return Positioned(
       top: 40,
       right: 10,
@@ -510,7 +610,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
         ),
       ),
     );
-  }
+  }*/
 
   Positioned _buildUserNameCaptionWidget() {
     return Positioned(
@@ -553,19 +653,13 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                FutureBuilder(future: UserService.getUserByID(userID: widget.reel.userID), builder: (ctx, snap){
-                                  if(snap.hasData && snap.requireData != null){
-                                    _userModel = snap.requireData!;
-                                    return Text(
-                                      snap.requireData!.userName,
-                                      style: AppTextStyles
-                                          .buttonTextStyle
-                                          .copyWith(
-                                          color: Colors.white, fontWeight: FontWeight.w700),);
-                                  }
-
-                                  return const SizedBox();
-                                }),
+                                if(_userModel != null)
+                                  Text(
+                                    _userModel!.userName,
+                                    style: AppTextStyles
+                                        .buttonTextStyle
+                                        .copyWith(
+                                        color: Colors.white, fontWeight: FontWeight.w700),),
                                 AppTextWidget(text: widget.reel.caption,),
                               ],
                             ),
@@ -591,6 +685,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
       bottom: 85,
       right: 5,
       child: Column(
+        spacing: 7,
         children: [
           Stack(
             children: [
@@ -614,7 +709,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
                   ),
                   child: CircleAvatar(
                     radius: 30,
-                    backgroundImage: CachedNetworkImageProvider( _userModel != null ? _userModel!.profilePicture ?? AppIcons.icDummyImgUrl: AppIcons.icDummyImgUrl),
+                    backgroundImage: CachedNetworkImageProvider(_userModel != null ? _userModel!.profilePicture ?? AppIcons.icDummyImgUrl: AppIcons.icDummyImgUrl),
                   ),
                 ),
               ),
@@ -623,22 +718,30 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
                   right: 0,
                   left: 0,
                   child: StreamBuilder(stream: UserService.getIsFollowingStream(widget.reel.userID), builder: (ctx, snapshot){
-
-                    if(snapshot.hasData && !snapshot.requireData){
+                    if(snapshot.hasData){
+                      bool isFollowing = snapshot.requireData;
                       return Container(
                           decoration: BoxDecoration(
                               color: AppColors.deepPurpleColor,
                               shape: BoxShape.circle
                           ),
-                          child: IconButton(
-                              padding: EdgeInsets.zero,
-                              style: const ButtonStyle(
-                                tapTargetSize: MaterialTapTargetSize
-                                    .shrinkWrap,
-                              ),
-                              onPressed: () => UserService.onFollowTap(remoteUID: widget.reel.userID, userName: _userModel != null ? _userModel!.userName : ''),
-                              icon: SvgPicture.asset(
-                                AppIcons.icAdd, height: 20,))
+                          child: GestureDetector(
+                              // padding: EdgeInsets.zero,
+                              // style: const ButtonStyle(
+                              //   tapTargetSize: MaterialTapTargetSize.shrinkWrap,),
+                              onTap: () {
+                                bool isPrivateAccount = false;
+                                String userName = '';
+                                if(_userModel != null){
+                                  isPrivateAccount = _userModel!.visibility  == ProfileVisibility.followersOnly;
+                                  userName = _userModel!.userName;
+                                }
+                                UserService.onFollowTap(remoteUID: widget.reel.userID, userName: userName, isPrivateAccount: isPrivateAccount);
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.all(8),
+                                child: isFollowing ? Icon(Icons.done_rounded, color: Colors.white, size: 20,) :  SvgPicture.asset(AppIcons.icAdd, height: 15,),
+                              ))
                       );
                     }
 
@@ -647,7 +750,6 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
               ),
             ],
           ),
-          const SizedBox(height: 10,),
           PostLikeWidget(reel: widget.reel, iconColor: Colors.white, isReel: true,),
           PostCommentWidget(iconColor: Colors.white, isReel: true, reel: widget.reel,comingFromHome: widget.comingFromHome,),
           PostShareWidget(iconColor: Colors.white, reel: widget.reel, onShareTap: _onShareTap),
@@ -663,7 +765,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
     return Stack(
       children: [
         GestureDetector(
-          onTap: _togglePlayPause,
+          onTap: _handleTap,
           child: Container(
             color: Colors.black,
             child: _buildVideoPlayer(),
@@ -690,6 +792,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
     WidgetsBinding.instance.removeObserver(this);
     _overlayTimer?.cancel();
     _performanceTimer?.cancel();
+    _tapTimer?.cancel(); // Clean up double-tap timer
 
     // Remove controller listener and release controller reference through service
     if (_controller != null) {
@@ -699,5 +802,13 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
     }
 
     super.dispose();
+  }
+
+  void _initUserInfo() async{
+   _userModel = await UserService.getUserByID(userID: widget.reel.userID);
+   if(_userModel != null){
+     debugPrint("User found not null and profile: ${_userModel!.profilePicture}");
+     setState(() {});
+   }
   }
 }

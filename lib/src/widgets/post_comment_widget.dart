@@ -73,7 +73,7 @@ class PostCommentWidget extends StatelessWidget{
                       context: context,
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
-                      builder: (_) => ReelLikedUsersWidget(reelID: reel.reelID, comingForComment: true,),
+                      builder: (_) => ReelLikedCommentUsersWidget(reelID: reel.reelID, comingForComment: true,),
                     );
                   },
                   icon: Text( "$totalComments", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),))

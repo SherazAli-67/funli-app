@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:funli_app/src/models/comment_model.dart';
@@ -15,15 +16,15 @@ import '../res/firebase_constants.dart';
 import '../services/user_service.dart';
 import 'loading_widget.dart';
 
-class ReelLikedUsersWidget extends StatefulWidget {
-  const ReelLikedUsersWidget({super.key, required String reelID, bool comingForComment = false}): _reelID = reelID, _comingForComment = comingForComment;
+class ReelLikedCommentUsersWidget extends StatefulWidget {
+  const ReelLikedCommentUsersWidget({super.key, required String reelID, bool comingForComment = false}): _reelID = reelID, _comingForComment = comingForComment;
   final String _reelID;
   final bool _comingForComment;
   @override
-  State<ReelLikedUsersWidget> createState() => _ReelLikedUsersWidgetState();
+  State<ReelLikedCommentUsersWidget> createState() => _ReelLikedCommentUsersWidgetState();
 }
 
-class _ReelLikedUsersWidgetState extends State<ReelLikedUsersWidget> {
+class _ReelLikedCommentUsersWidgetState extends State<ReelLikedCommentUsersWidget> {
   final List<UserModel> _likedUsers = [];
   DocumentSnapshot? _lastDoc;
   bool _isLoading = false;
@@ -53,18 +54,19 @@ class _ReelLikedUsersWidgetState extends State<ReelLikedUsersWidget> {
 
 
     List<String> userIDs = [];
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
     if(widget._comingForComment){
       colRef = FirebaseFirestore.instance
           .collection(FirebaseConstants.reelsCollection)
           .doc(widget._reelID)
-          .collection(FirebaseConstants.commentsCollection)
+          .collection(FirebaseConstants.commentsCollection).where('commentBy', isNotEqualTo: currentUID)
           .orderBy('dateTime', descending: true)
           .limit(_limit);
     }else{
       colRef = FirebaseFirestore.instance
           .collection(FirebaseConstants.reelsCollection)
           .doc(widget._reelID)
-          .collection(FirebaseConstants.likesCollection)
+          .collection(FirebaseConstants.likesCollection).where('likedBy', isNotEqualTo: currentUID)
           .orderBy('dateTime', descending: true)
           .limit(_limit);
     }
@@ -126,7 +128,7 @@ class _ReelLikedUsersWidgetState extends State<ReelLikedUsersWidget> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Likes", style: AppTextStyles.headingTextStyle3,),
+                    Text(widget._comingForComment ? "Comments" : "Likes", style: AppTextStyles.headingTextStyle3,),
                     IconButton(
                         style: IconButton.styleFrom(
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),

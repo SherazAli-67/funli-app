@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_data.dart';
@@ -11,6 +12,7 @@ import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/enhanced_video_feed_service.dart';
 import 'package:funli_app/src/services/reels_cache_service.dart';
+import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/widgets/enhanced_video_feed_item.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 
@@ -45,11 +47,17 @@ class VideoFeedViewState extends State<VideoFeedView>
   String _currentMood = 'Happy';
   bool _isInitialized = false;
   bool _isLoading = false;
-    bool _isRefreshing = false;
+  bool _isRefreshing = false;
+  
+  // Firebase pagination
+  DocumentSnapshot? _lastDocument;
+  bool _hasMoreReels = true;
+  bool _isLoadingMore = false;
   
   // Performance tracking
   final Completer<void> _initCompleter = Completer<void>();
   Timer? _preloadTimer;
+  Timer? _backgroundRefreshTimer;
 
   @override
   bool get wantKeepAlive => true;
@@ -61,7 +69,7 @@ class VideoFeedViewState extends State<VideoFeedView>
     
     _pageController = PreloadPageController(initialPage: 0);
     _videoService = EnhancedVideoFeedService();
-    
+
     _initializeVideoFeed();
   }
 
@@ -119,25 +127,51 @@ class VideoFeedViewState extends State<VideoFeedView>
   /// Fetch fresh reels from Firebase
   Future<List<ReelModel>> _fetchFreshReelsFromFirebase() async {
     try {
-      // TODO: Replace with actual Firebase call
-      // For now, return fresh data from AppData with some delay to simulate network call
-      await Future.delayed(const Duration(milliseconds: 800));
+      debugPrint('Fetching fresh reels from Firebase for mood: $_currentMood');
       
-      // In a real implementation, this would be:
-      // return await ReelsService.getFreshReels(mood: _currentMood, limit: 20);
+      // Reset pagination for fresh fetch
+      _lastDocument = null;
+      _hasMoreReels = true;
       
-      return AppData.getReels(); // This simulates fresh data
+      final freshReels = await ReelsService.fetchReelsByMood(
+        mood: _currentMood,
+        lastDoc: null, // Start fresh
+        limit: 5, // Load first batch
+        onLastDoc: (doc) => _lastDocument = doc,
+        onHasMore: (hasMore) => _hasMoreReels = hasMore,
+      );
+      
+      debugPrint('Fetched ${freshReels.length} fresh reels from Firebase');
+      return freshReels;
+      
     } catch (e) {
       debugPrint('Failed to fetch from Firebase: $e');
-      // Fallback to cached or default data
-      return AppData.getReels().take(10).toList();
+      
+      // Try to get from main reels collection as fallback
+      try {
+        debugPrint('Attempting fallback fetch from main reels collection');
+        final fallbackReels = await ReelsService.fetchMoreReels(
+          lastDoc: null,
+          limit: 10,
+          onLastDoc: (doc) => _lastDocument = doc,
+          onHasMore: (hasMore) => _hasMoreReels = hasMore,
+        );
+        debugPrint('Fallback fetch successful: ${fallbackReels.length} reels');
+        return fallbackReels;
+      } catch (fallbackError) {
+        debugPrint('Fallback fetch also failed: $fallbackError');
+        // Only use dummy data in debug mode, return empty in production
+        if (kDebugMode) {
+          debugPrint('Debug mode: returning dummy data as last resort');
+          return AppData.getReels().take(5).toList();
+        }
+        return []; // Return empty list in production
+      }
     }
   }
 
   Future<void> _initializeVideoFeed() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(()=>  _isLoading = true);
 
     try {
       // Initialize the enhanced video service
@@ -152,12 +186,16 @@ class VideoFeedViewState extends State<VideoFeedView>
       } else {
         // Try to get cached reels first
         _reels = await ReelsCacheService.getCachedReels(_currentMood);
-        
-        // If no cached reels, use app data reels
+        debugPrint("Cached reels: ${_reels.length}");
+        // If no cached reels, fetch from Firebase
         if (_reels.isEmpty) {
-          _reels = AppData.getReels();
-          // Cache the reels for future use
-          await ReelsCacheService.cacheReels(_reels, _currentMood);
+          debugPrint('No cached reels found, fetching from Firebase');
+          _reels = await _fetchFreshReelsFromFirebase();
+          
+          // Cache the fetched reels for future use
+          if (_reels.isNotEmpty) {
+            await ReelsCacheService.cacheReels(_reels, _currentMood);
+          }
         }
       }
       
@@ -189,8 +227,23 @@ class VideoFeedViewState extends State<VideoFeedView>
         _isLoading = false;
       });
       
-      // Fallback to basic reels
-      _reels = AppData.getReels().take(10).toList();
+      // In production, try one more time to get reels from Firebase
+      try {
+        debugPrint('Initialization failed, attempting emergency Firebase fetch');
+        _reels = await _fetchFreshReelsFromFirebase();
+        
+        if (_reels.isNotEmpty) {
+          await ReelsCacheService.cacheReels(_reels, _currentMood);
+        }
+      } catch (emergencyError) {
+        debugPrint('Emergency fetch failed: $emergencyError');
+        // Only use dummy data in debug mode
+        if (kDebugMode) {
+          _reels = AppData.getReels().take(5).toList();
+        }
+        // In production, _reels remains empty and will show empty state
+      }
+      
       setState(() {
         _isInitialized = true;
       });
@@ -224,6 +277,54 @@ class VideoFeedViewState extends State<VideoFeedView>
         currentMood: _currentMood,
       );
     });
+
+    // Start background refresh timer (check every 5 minutes)
+    _backgroundRefreshTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      
+      _checkAndRefreshStaleData();
+    });
+  }
+
+  /// Check if cached data is stale and refresh in background
+  Future<void> _checkAndRefreshStaleData() async {
+    try {
+      // Check if we should refresh from network (based on ReelsCacheService logic)
+      final shouldRefresh = await ReelsCacheService.shouldRefreshFromNetwork();
+      
+      if (shouldRefresh && !_isLoading && !_isRefreshing) {
+        debugPrint('Background refresh: Cached data is stale, fetching fresh reels');
+        
+        // Fetch fresh reels in background without showing loading UI
+        final freshReels = await _fetchFreshReelsFromFirebase();
+        
+        if (freshReels.isNotEmpty && freshReels.length != _reels.length) {
+          // Cache the fresh reels
+          await ReelsCacheService.cacheReels(freshReels, _currentMood);
+          
+          // Update reels silently if user is at the beginning of the feed
+          if (_currentIndex <= 2) {
+            setState(() {
+              _reels = freshReels;
+              _lastDocument = null; // Reset pagination
+              _hasMoreReels = true;
+            });
+            
+            // Restart preloading for fresh content
+            await _startSmartPreloading();
+            debugPrint('Background refresh: Updated feed with ${freshReels.length} fresh reels');
+          } else {
+            debugPrint('Background refresh: Fresh reels cached, will be available on next refresh');
+          }
+        }
+      }
+    } catch (e) {
+      // Silently handle background refresh errors
+      debugPrint('Background refresh failed: $e');
+    }
   }
 
   @override
@@ -268,20 +369,57 @@ class VideoFeedViewState extends State<VideoFeedView>
   }
 
   Future<void> _loadMoreReels() async {
+    if (_isLoadingMore || !_hasMoreReels) return;
+    
+    setState(() => _isLoadingMore = true);
+    
     try {
-      // This would typically fetch from Firebase
-      // For now, we'll generate more reels
-      final newReels = AppData.getReels();
+      debugPrint('Loading more reels from Firebase, current count: ${_reels.length}');
       
-      setState(() {
-        _reels.addAll(newReels);
-      });
+      final moreReels = await ReelsService.fetchReelsByMood(
+        mood: _currentMood,
+        lastDoc: _lastDocument,
+        limit: 10, // Load 10 more reels
+        onLastDoc: (doc) => _lastDocument = doc,
+        onHasMore: (hasMore) => _hasMoreReels = hasMore,
+      );
       
-      // Cache the new reels
-      await ReelsCacheService.cacheReels(_reels, _currentMood);
+      if (moreReels.isNotEmpty) {
+        setState(() => _reels.addAll(moreReels));
+        
+        // Cache the updated reels
+        await ReelsCacheService.cacheReels(_reels, _currentMood);
+        debugPrint('Loaded ${moreReels.length} more reels, total: ${_reels.length}');
+      } else {
+        debugPrint('No more reels available for mood: $_currentMood');
+      }
       
     } catch (e) {
       debugPrint('Failed to load more reels: $e');
+      
+      // Try fallback method
+      try {
+        final fallbackReels = await ReelsService.fetchMoreReels(
+          lastDoc: _lastDocument,
+          limit: 5,
+          onLastDoc: (doc) => _lastDocument = doc,
+          onHasMore: (hasMore) => _hasMoreReels = hasMore,
+        );
+        
+        if (fallbackReels.isNotEmpty) {
+          setState(() {
+            _reels.addAll(fallbackReels);
+          });
+          await ReelsCacheService.cacheReels(_reels, _currentMood);
+          debugPrint('Fallback loaded ${fallbackReels.length} reels');
+        }
+      } catch (fallbackError) {
+        debugPrint('Fallback load more also failed: $fallbackError');
+      }
+    } finally {
+      setState(() {
+        _isLoadingMore = false;
+      });
     }
   }
 
@@ -304,7 +442,6 @@ class VideoFeedViewState extends State<VideoFeedView>
       itemBuilder: (context, index) {
         final reel = _reels[index];
         final isCurrentItem = index == _currentIndex;
-        
         return EnhancedVideoFeedItem(
           key: ValueKey(reel.reelID),
           reel: reel,
@@ -360,9 +497,21 @@ class VideoFeedViewState extends State<VideoFeedView>
             ),
             const SizedBox(height: 8),
             Text(
-              'Pull down to refresh',
+              'Check your connection and try again',
               style: AppTextStyles.smallTextStyle.copyWith(
                 color: Colors.white54,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => _initializeVideoFeed(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.purpleColor,
+                foregroundColor: Colors.white,
+              ),
+              child: Text(
+                'Retry',
+                style: AppTextStyles.buttonTextStyle,
               ),
             ),
           ],
@@ -391,15 +540,15 @@ class VideoFeedViewState extends State<VideoFeedView>
             ),
             
             // Performance indicator (debug mode only)
-            if (kDebugMode)
-              _buildPerformanceIndicator(),
+            /*if (kDebugMode)
+              _buildPerformanceIndicator(),*/
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPerformanceIndicator() {
+ /* Widget _buildPerformanceIndicator() {
     return FutureBuilder<Map<String, dynamic>>(
       future: Future.value(_videoService.getPerformanceStats()),
       builder: (context, snapshot) {
@@ -446,7 +595,7 @@ class VideoFeedViewState extends State<VideoFeedView>
         );
       },
     );
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -496,6 +645,7 @@ class VideoFeedViewState extends State<VideoFeedView>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _preloadTimer?.cancel();
+    _backgroundRefreshTimer?.cancel();
     _pageController.dispose();
     _videoService.dispose();
     super.dispose();

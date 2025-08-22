@@ -26,7 +26,7 @@ class UserService {
     return null;
   }
 
-   static Future<bool> onFollowTap({required String remoteUID, required String userName})async{
+   static Future<bool> onFollowTap({required String remoteUID, required String userName, required bool isPrivateAccount})async{
     bool result = false;
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
     try{
@@ -45,23 +45,23 @@ class UserService {
         result = true;
       }else{
 
-        FollowModel remoteUserFollowingModel = FollowModel(userID: remoteUID, dateTime: DateTime.now());
+        FollowModel remoteUserFollowingModel = FollowModel(userID: remoteUID, dateTime: DateTime.now(), isApproved: !isPrivateAccount);
         await currentUserFollowingColRef.doc(remoteUID).set(remoteUserFollowingModel.toMap());
         debugPrint("added to following list");
 
         //adding me to remote user followers list
-        FollowModel currentUserFollowerModel = FollowModel(userID: currentUID, dateTime: DateTime.now());
+        FollowModel currentUserFollowerModel = FollowModel(userID: currentUID, dateTime: DateTime.now(), isApproved: !isPrivateAccount);
         remoteUserFollowerColRef.doc(currentUID).set(currentUserFollowerModel.toMap());
         debugPrint("added to follower list");
 
         NotificationsService.sendNotificationToUser(
             receiverID: remoteUID,
-            description: 'Started following you',
+            description: isPrivateAccount ? "t" : 'Started following you',
             notificationType: NotificationType.follow);
         debugPrint("Follow notification sent");
         result = true;
 
-        Fluttertoast.showToast(msg: "You're now following $userName");
+        Fluttertoast.showToast(msg: isPrivateAccount ? "Your follow request has been sent $userName" : "You're now following $userName");
       }
     }catch(e){
       debugPrint("Error while adding to followers list: ${e.toString()}");
@@ -187,8 +187,8 @@ class UserService {
     // debugPrint("Reels found: ${reels.length}");
     // 3. Sort by views descending
     reels.sort((a, b) {
-      final int aViews = a.viewsCount ?? 0;
-      final int bViews = b.viewsCount ?? 0;
+      final int aViews = a.viewsCount;
+      final int bViews = b.viewsCount;
       return bViews.compareTo(aViews);
     });
     // debugPrint("Reels returned: ${reels.length}");

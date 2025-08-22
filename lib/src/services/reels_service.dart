@@ -74,6 +74,14 @@ class ReelsService {
     return likeDocRef.snapshots().map((snapshot)=> snapshot.docs.map((doc)=> doc.id).toList());
   }
 
+  static Stream<List<String>> getReplyLikes({required String reelID, required String commentID, required String replyID}) {
+    final likeDocRef =  _reelsColRef.doc(reelID)
+        .collection(FirebaseConstants.commentsCollection)
+        .doc(commentID)
+        .collection(FirebaseConstants.repliesCollection).doc(replyID).collection(FirebaseConstants.likesCollection);
+
+    return likeDocRef.snapshots().map((snapshot)=> snapshot.docs.map((doc)=> doc.id).toList());
+  }
   static Stream<int> getReelCommentCount({required String reelID}) {
     return  _reelsColRef
         .doc(reelID)
@@ -131,7 +139,7 @@ class ReelsService {
   }
 
 
-  static Future<bool> addLikeToComment({required String reelID, required String commentID, required bool isRemove})async{
+  static Future<bool> addLikeToComment({required String reelID, required String commentID, required bool isRemove,})async{
     bool isLiked = false;
 
     try {
@@ -157,6 +165,32 @@ class ReelsService {
     return isLiked;
   }
 
+  static Future<bool> addLikeToReply({required String reelID, required String commentID, required String replyID, required bool isRemove,})async{
+    bool isLiked = false;
+
+    try {
+      String currentUID = FirebaseAuth.instance.currentUser!.uid;
+      final replyColRef =  _reelsColRef.doc(reelID)
+          .collection(FirebaseConstants.commentsCollection)
+          .doc(commentID)
+          .collection(FirebaseConstants.repliesCollection).doc(replyID).collection(
+          FirebaseConstants.likesCollection).doc(currentUID);
+
+      if (isRemove) {
+        //removing like from likes collection
+        await replyColRef.delete();
+        isLiked = true;
+      } else {
+        DateTime dateTime = DateTime.now();
+        LikeModel like = LikeModel(likedBy: currentUID, dateTime: dateTime);
+        await replyColRef.set(like.toMap());
+        isLiked = true;
+      }
+    } catch (e) {
+      debugPrint("Exception while adding author to Favorites: ${e.toString()}");
+    }
+    return isLiked;
+  }
 
 
   static Stream<List<AddCommentModel>> getReelsComment({required String reelID}) {

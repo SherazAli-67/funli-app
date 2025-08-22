@@ -12,6 +12,7 @@ import 'package:funli_app/src/widgets/private_account_widget.dart';
 
 import '../../../models/user_model.dart';
 import '../../../services/user_service.dart';
+import '../../../widgets/primary_btn.dart';
 
 class RemoteUserProfilePage extends StatefulWidget {
   const RemoteUserProfilePage({
@@ -36,6 +37,8 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
   int selectedTabIndex = 0;
   bool _hideProfile = false;
   bool _isLoading = false;
+
+  bool _isPrivateAccount = false;
   @override
   void initState() {
 
@@ -94,7 +97,9 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
           )
         ],
       ),
-      body: _isLoading ? LoadingWidget() : _hideProfile ? _buildPrivateAccountProfileWidget() :  DefaultTabController(
+      body:  _isLoading ? LoadingWidget() : _hideProfile
+          ? _buildPrivateAccountProfileWidget()
+          : DefaultTabController(
         length: 2,
         child: NestedScrollView(
           headerSliverBuilder: (context, _) => [
@@ -104,8 +109,42 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
                 userName: widget._userName,
                 profilePicture: widget._profilePicture,
                 isFromProfilePage: true,
-              ),
-            ), SliverPersistentHeader(
+              ),),
+
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
+                child: SizedBox(
+                  height: 45,
+                  child: Row(
+                    spacing: 12,
+                    children: [
+                      Expanded(
+                        child: StreamBuilder(stream: UserService.getIsFollowingStreamInModel(widget._userID), builder: (ctx, snapshot){
+                          if(snapshot.hasData){
+                            FollowModel? follow = snapshot.requireData;
+                            String text = follow != null ? (follow.isApproved
+                                ? 'Following'
+                                : 'Request Sent') : 'Follow';
+
+                            return PrimaryBtn(
+                              btnText: text,
+                              isPrefix: true,
+                              icon: AppIcons.icAddUser,
+                              onTap: () => UserService.onFollowTap(remoteUID: widget._userID, userName: widget._userName ?? '', isPrivateAccount: _isPrivateAccount),
+                              bgGradient: AppIcons.primaryBgGradient,
+                              iconColor: Colors.white,);
+                          }
+
+                          return PrimaryBtn(btnText: "Follow",isPrefix: true, icon: AppIcons.icAddUser, onTap: ()=> UserService.onFollowTap(remoteUID: widget._userID, userName: widget._userName ?? '', isPrivateAccount: _isPrivateAccount), bgGradient: AppIcons.primaryBgGradient,);
+                        }),
+                      ),
+                      // Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),
+                    ],
+                  ),
+                ),
+              ),),
+            SliverPersistentHeader(
               pinned: true,
               delegate: _SliverTabBarDelegate(
                 TabBar(
@@ -163,7 +202,6 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
 
   void _initUser() async{
     setState(() => _isLoading = true);
-    bool isPrivateAccount = false;
     bool isApproved = false;
     try{
 
@@ -171,7 +209,7 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
       UserModel? user = await UserService.getUserByID(userID: widget._userID);
       if(user != null){
         debugPrint('Visibility: ${user.visibility.name}');
-        isPrivateAccount = user.visibility == ProfileVisibility.followersOnly;
+        _isPrivateAccount = user.visibility == ProfileVisibility.followersOnly;
       }
       _isLoading = false;
     }catch(e){
@@ -188,7 +226,7 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
       debugPrint("Error while getting getIsFollowing: ${e.toString()}");
     }
 
-    _hideProfile =  isPrivateAccount && !isApproved;
+    _hideProfile =  _isPrivateAccount && !isApproved;
     setState(() {});
   }
 

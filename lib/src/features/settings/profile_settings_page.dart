@@ -10,6 +10,7 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileSettingsPage extends StatelessWidget{
   const ProfileSettingsPage({super.key, });
@@ -90,6 +91,8 @@ class ProfileSettingsPage extends StatelessWidget{
     final provider = Provider.of<ProfileProvider>(context, listen: false);
     await FirebaseAuth.instance.signOut();
     provider.clear();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
     // Use `go` to replace the entire stack and leave ShellRoute
     context.go(RouterEnum.welcomeView.routeName);
   }

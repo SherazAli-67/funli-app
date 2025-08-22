@@ -153,7 +153,7 @@ class ProfileInfoWidget extends StatelessWidget{
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => FollowingAndFollowersBottomSheet(isFollowing: isFollowing,),
+      builder: (_) => FollowingAndFollowersBottomSheet(isFollowing: isFollowing, userID: _userID,),
     );
   }
 }

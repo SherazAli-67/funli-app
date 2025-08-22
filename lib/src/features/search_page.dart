@@ -40,6 +40,7 @@ class _SearchPageState extends State<SearchPage> {
   late FeelsSearchProvider _feelProvider;
   late UsersSearchProvider _userProvider;
   late HashtagSearchProvider _hashtagProvider;
+  final TextEditingController _searchController = TextEditingController();
 
   
   @override
@@ -66,20 +67,14 @@ class _SearchPageState extends State<SearchPage> {
                 SizedBox(
                   height: 48,
                   child: TextField(
+                    controller: _searchController,
                     onChanged: (val){
-                      if(selectedIndex == 0){
-                        val.isEmpty ? _feelProvider.fetchInitial(query: val) : _feelProvider.fetchReelsByQuery(query: val);
-                      }else if(selectedIndex == 1){
-                        _userProvider.fetchInitial(query: val);
-                      }
-
+                      setState(() => query = val);
+                      _performSearch(val);
                     },
                     onSubmitted: (val){
-                      if(selectedIndex == 0){
-                        val.isEmpty ? _feelProvider.fetchInitial(query: val) : _feelProvider.fetchReelsByQuery(query: val);
-                      }else if(selectedIndex == 1){
-                        _userProvider.fetchInitial(query: val);
-                      }
+                      setState(() => query = val);
+                      _performSearch(val);
                     },
                     textCapitalization: TextCapitalization.words,
                     onTapOutside: (val)=> FocusManager.instance.primaryFocus!.unfocus(),
@@ -183,11 +178,11 @@ class _SearchPageState extends State<SearchPage> {
               trailing: ConstrainedBox(constraints: BoxConstraints(maxWidth: 120, minWidth: 80), child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
                 if(snapshot.hasData){
                   return snapshot.requireData
-                      ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 38,)
+                      ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> UserService.onFollowTap(remoteUID: user.userID, userName: user.userName, isPrivateAccount: user.visibility == ProfileVisibility.followersOnly), buttonHeight: 38,)
                       : SizedBox(
                     height: 38,
                     width: 75,
-                    child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallBoldTextStyle,),
+                    child: PrimaryBtn(btnText: "Follow", icon: '',  onTap: ()=> UserService.onFollowTap(remoteUID: user.userID, userName: user.userName, isPrivateAccount: user.visibility == ProfileVisibility.followersOnly), bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallBoldTextStyle,),
                   );
                 }else if(snapshot.connectionState == ConnectionState.waiting){
                   return LoadingWidget();
@@ -302,63 +297,56 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildHashtagSearchWidget() {
-    return StreamBuilder(stream: SearchService.getTags(query), builder: (ctx,snapshot){
-      if(snapshot.hasData){
-        List<HashtagModel> tags = snapshot.requireData;
-        return ListView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: tags.length,
-          itemBuilder: (context, index) {
-            if (index >= tags.length) {
-              return LoadingWidget();
-            }
-            HashtagModel hashtag = tags[index];
+    return _hashtagProvider.isLoading && _hashtagProvider.tags.isEmpty 
+        ? LoadingWidget() 
+        : ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: _hashtagProvider.tags.length,
+            itemBuilder: (context, index) {
+              if (index >= _hashtagProvider.tags.length) {
+                return LoadingWidget();
+              }
+              HashtagModel hashtag = _hashtagProvider.tags[index];
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: (){
-                        context.push(RouterEnum.hashtagsReelsView.routeName, extra: {
-                          'tag' : hashtag.tag
-                        });
-                      },
-                      child: RichText(text: TextSpan(
-                        children: [
-                          TextSpan(text: "#${hashtag.tag}  ", style: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700, fontFamily: AppConstants.appFontFamily, color: Colors.black),),
-                          TextSpan(text: "${FormatingHelpers.formatNumber(hashtag.reelsCount)} feels ", style: AppTextStyles.smallTextStyle.copyWith(fontFamily: AppConstants.appFontFamily, color: AppColors.hashtagCountGreyColor),),
-                        ],
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: (){
+                          context.push(RouterEnum.hashtagsReelsView.routeName, extra: {
+                            'tag' : hashtag.tag
+                          });
+                        },
+                        child: RichText(text: TextSpan(
+                          children: [
+                            TextSpan(text: "#${hashtag.tag}  ", style: AppTextStyles.smallTextStyle.copyWith(fontWeight: FontWeight.w700, fontFamily: AppConstants.appFontFamily, color: Colors.black),),
+                            TextSpan(text: "${FormatingHelpers.formatNumber(hashtag.reelsCount)} feels ", style: AppTextStyles.smallTextStyle.copyWith(fontFamily: AppConstants.appFontFamily, color: AppColors.hashtagCountGreyColor),),
+                          ],
 
-                      )),
+                        )),
+                      ),
                     ),
-                  ),
-                  StreamBuilder(stream: HashtagService.getIsFollowing(hashtag: hashtag.tag), builder: (ctx, snapshot){
-                    if(snapshot.hasData){
-                      bool isFollowing = snapshot.requireData;
-                      return isFollowing
-                          ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> HashtagService.oddToFollow(hashtag: hashtag.tag, isUnfollowRequest: true), buttonHeight: 40,)
-                          : SizedBox(
-                          height: 40,
-                          width: 100,
-                          child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.oddToFollow(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
-                    }
+                    StreamBuilder(stream: HashtagService.getIsFollowing(hashtag: hashtag.tag), builder: (ctx, snapshot){
+                      if(snapshot.hasData){
+                        bool isFollowing = snapshot.requireData;
+                        return isFollowing
+                            ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> HashtagService.oddToFollow(hashtag: hashtag.tag, isUnfollowRequest: true), buttonHeight: 40,)
+                            : SizedBox(
+                            height: 40,
+                            width: 100,
+                            child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.oddToFollow(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
+                      }
 
-                    return SizedBox();
-                  })
-                ],
-              ),
-            );
-          },
-        );
-      }else if(snapshot.connectionState == ConnectionState.waiting){
-        return LoadingWidget();
-      }
-
-      return SizedBox();
-    });
+                      return SizedBox();
+                    })
+                  ],
+                ),
+              );
+            },
+          );
   }
 
 
@@ -376,6 +364,22 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
+
+  void _performSearch(String searchQuery) {
+    switch (selectedIndex) {
+      case 0:
+        searchQuery.isEmpty 
+          ? _feelProvider.fetchInitial(query: searchQuery) 
+          : _feelProvider.fetchReelsByQuery(query: searchQuery);
+        break;
+      case 1:
+        _userProvider.fetchInitial(query: searchQuery);
+        break;
+      case 2:
+        _hashtagProvider.fetchInitial(query: searchQuery);
+        break;
+    }
+  }
 
   void _onSelectFilterTypeTap(int index) {
     setState(()=> selectedIndex = index);

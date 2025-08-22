@@ -95,8 +95,8 @@ class _NotificationItemWidgetState extends State<NotificationItemWidget> {
         return SizedBox(
           width: 120,
           height: 38,
-          child: PrimaryBtn(btnText: "Follow Back", icon: '', onTap: (){
-            UserService.onFollowTap(remoteUID: widget._notification.userID, userName: user != null ? user!.userName : '');
+          child: PrimaryBtn(btnText: "Follow Back", icon: '', onTap: () async {
+            UserService.onFollowTap(remoteUID: widget._notification.userID, userName: user != null ? user!.userName : '',isPrivateAccount:user!.visibility == ProfileVisibility.followersOnly);
           }, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallTextStyle,),
         );
       }

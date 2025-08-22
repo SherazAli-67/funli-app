@@ -69,7 +69,7 @@ class PostLikeWidget extends StatelessWidget{
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
-                  builder: (_) => ReelLikedUsersWidget(reelID: reelID,),
+                  builder: (_) => ReelLikedCommentUsersWidget(reelID: reelID,),
                 );
               },
               icon: isSelected

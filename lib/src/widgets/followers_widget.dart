@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
@@ -16,8 +15,9 @@ import '../services/user_service.dart';
 import 'loading_widget.dart';
 
 class FollowingAndFollowersBottomSheet extends StatefulWidget {
-  const FollowingAndFollowersBottomSheet({super.key, required this.isFollowing});
+  const FollowingAndFollowersBottomSheet({super.key, required this.isFollowing, required this.userID});
   final bool isFollowing;
+  final String userID;
   @override
   State<FollowingAndFollowersBottomSheet> createState() => _FollowingAndFollowersBottomSheetState();
 }
@@ -30,7 +30,7 @@ class _FollowingAndFollowersBottomSheetState extends State<FollowingAndFollowers
   final ScrollController _scrollController = ScrollController();
   final int _limit = 10;
 
-  String currentUID = FirebaseAuth.instance.currentUser!.uid;
+  // String currentUID = FirebaseAuth.instance.currentUser!.uid;
   @override
   void initState() {
     super.initState();
@@ -53,14 +53,14 @@ class _FollowingAndFollowersBottomSheetState extends State<FollowingAndFollowers
     if(widget.isFollowing){
       colRef = FirebaseFirestore.instance
           .collection(FirebaseConstants.userCollection)
-          .doc(currentUID)
+          .doc(widget.userID)
           .collection(FirebaseConstants.followingCollection)
           .orderBy('dateTime', descending: true)
           .limit(_limit);
     }else{
       colRef = FirebaseFirestore.instance
           .collection(FirebaseConstants.userCollection)
-          .doc(currentUID)
+          .doc(widget.userID)
           .collection(FirebaseConstants.followersCollection)
           .orderBy('dateTime', descending: true)
           .limit(_limit);
@@ -154,11 +154,11 @@ class _FollowingAndFollowersBottomSheetState extends State<FollowingAndFollowers
                         trailing: ConstrainedBox(constraints: BoxConstraints(maxWidth: 120, minWidth: 80), child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
                           if(snapshot.hasData){
                             return snapshot.requireData
-                                ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 38,)
+                                ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> UserService.onFollowTap(remoteUID: user.userID, userName: user.userName, isPrivateAccount: user.visibility == ProfileVisibility.followersOnly), buttonHeight: 38,)
                                 : SizedBox(
                               height: 38,
                               width: 75,
-                              child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallBoldTextStyle,),
+                              child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=> UserService.onFollowTap(remoteUID: user.userID, userName: user.userName, isPrivateAccount: user.visibility == ProfileVisibility.followersOnly), bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallBoldTextStyle,),
                             );
                           }else if(snapshot.connectionState == ConnectionState.waiting){
                             return LoadingWidget();

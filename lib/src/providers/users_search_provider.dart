@@ -29,35 +29,65 @@ class UsersSearchProvider extends ChangeNotifier {
   }
 
   Future<void> _fetchUsers() async {
-
-    debugPrint("Getting users: ");
+    debugPrint("Getting users for query: $_query");
     _isLoading = true;
     notifyListeners();
 
-    Query queryRef = FirebaseFirestore.instance
-        .collection(FirebaseConstants.userCollection)
-        .limit(10);
+    try {
+      if (_query != null && _query!.isNotEmpty) {
+        // For search queries, use case-insensitive client-side filtering
+        String lowerQuery = _query!.toLowerCase();
+        
+        // Get all users first (or a reasonable batch)
+        Query queryRef = FirebaseFirestore.instance
+            .collection(FirebaseConstants.userCollection)
+            .limit(50); // Get more to filter client-side
+            
+        if (_lastDoc != null) {
+          queryRef = queryRef.startAfterDocument(_lastDoc!);
+        }
 
-    if (_query != null && _query!.isNotEmpty) {
-      queryRef =
-          queryRef.where('userName', isGreaterThanOrEqualTo: _query!).where(
-              'userName', isLessThanOrEqualTo: '${_query!}\uf8ff');
+        final snapshot = await queryRef.get();
+        
+        // Filter client-side for case-insensitive matching
+        final filteredUsers = snapshot.docs.where((doc) {
+          final userData = doc.data() as Map<String, dynamic>;
+          final userName = userData['userName']?.toString().toLowerCase() ?? '';
+          return userName.contains(lowerQuery);
+        }).take(10).toList(); // Take only 10 matching results
+
+        if (filteredUsers.isNotEmpty) {
+          _lastDoc = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
+          _users.addAll(filteredUsers.map((e) => UserModel.fromMap(e.data() as Map<String, dynamic>)));
+        }
+
+        if (filteredUsers.length < 10) {
+          _hasMore = false;
+        }
+      } else {
+        // For empty query, get all users normally
+        Query queryRef = FirebaseFirestore.instance
+            .collection(FirebaseConstants.userCollection)
+            .limit(10);
+
+        if (_lastDoc != null) {
+          queryRef = queryRef.startAfterDocument(_lastDoc!);
+        }
+
+        final snapshot = await queryRef.get();
+        if (snapshot.docs.isNotEmpty) {
+          _lastDoc = snapshot.docs.last;
+          _users.addAll(snapshot.docs.map((e) => UserModel.fromMap(e.data() as Map<String, dynamic>)));
+        }
+
+        if (snapshot.docs.length < 10) {
+          _hasMore = false;
+        }
+      }
+    } catch (e) {
+      debugPrint("Error in _fetchUsers: $e");
     }
 
-    if (_lastDoc != null ) {
-      queryRef = queryRef.startAfterDocument(_lastDoc!);
-    }
-
-    final snapshot = await queryRef.get();
-    if (snapshot.docs.isNotEmpty) {
-      _lastDoc = snapshot.docs.last;
-      _users.addAll(snapshot.docs.map((e) => UserModel.fromMap(e.data() as Map<String, dynamic>)));
-      notifyListeners();
-    }
-
-    if (snapshot.docs.length < 10) {
-      _hasMore = false;
-    }
     debugPrint("users received: ${_users.length}");
     _isLoading = false;
     notifyListeners();

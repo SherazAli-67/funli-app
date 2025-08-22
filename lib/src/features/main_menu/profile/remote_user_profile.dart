@@ -120,12 +120,12 @@ class _RemoteUserProfileInfoWidgetState extends State<RemoteUserProfileInfoWidge
                           btnText: text,
                           isPrefix: true,
                           icon: AppIcons.icAddUser,
-                          onTap: () => UserService.onFollowTap(remoteUID: widget._userID, userName: widget._userName ?? ''),
+                          onTap: () => UserService.onFollowTap(remoteUID: widget._userID, userName: widget._userName ?? '', isPrivateAccount: _isPrivateAccount),
                           bgGradient: AppIcons.primaryBgGradient,
                           iconColor: Colors.white,);
                       }
 
-                      return PrimaryBtn(btnText: "Follow",isPrefix: true, icon: AppIcons.icAddUser, onTap: ()=> UserService.onFollowTap(remoteUID: widget._userID, userName: widget._userName ?? ''), bgGradient: AppIcons.primaryBgGradient,);
+                      return PrimaryBtn(btnText: "Follow",isPrefix: true, icon: AppIcons.icAddUser, onTap: ()=> UserService.onFollowTap(remoteUID: widget._userID, userName: widget._userName ?? '', isPrivateAccount: _isPrivateAccount), bgGradient: AppIcons.primaryBgGradient,);
                     }),
                   ),
                   // Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),

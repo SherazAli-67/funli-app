@@ -46,52 +46,55 @@ class _CommentItemWidgetState extends State<CommentItemWidget> {
       spacing: 10,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildUserInfoWidget(userID: widget._comment.commentBy, commentText: widget._comment.comment),
-
-        StreamBuilder(stream: CommentService.getCommentsReplyCount(reelID: widget._reelID, commentID: widget._comment.commentID), builder: (ctx, snapshot){
-          if(snapshot.hasData && snapshot.requireData > 0){
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if(!_showReplies)
-                TextButton(onPressed: (){
-                  _showReplies = true;
-                  setState(() { });
-                }, child: Text("View ${snapshot.requireData} replies", style: AppTextStyles.bodyTextStyle,)),
-
-                if(_showReplies)
-                  Container(
-                    height: 300,
-                    margin: EdgeInsets.only(left: 20),
-                    child: FutureBuilder(future: CommentService.getCommentsReply(reelID: widget._reelID, commentID: widget._comment.commentID), builder: (ctx, snapshot){
-                      if(snapshot.hasData){
-                        return ListView.builder(
-                            itemCount: snapshot.requireData.length,
-                            itemBuilder: (ctx, index){
-                              AddCommentModel reply = snapshot.requireData[index];
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 15.0),
-                                child: _buildUserInfoWidget(userID: reply.commentBy, commentText: reply.comment, isReply: true),
-                              );
-                            });
-                      }else if(snapshot.connectionState == ConnectionState.waiting){
-                        return LoadingWidget(color: AppColors.purpleColor,);
-                      }
-
-                      return SizedBox();
-                    }),
-                  )
-              ],
-            );
-          }
-          return SizedBox();
-        })
+        _buildCommentWidget(userID: widget._comment.commentBy, commentText: widget._comment.comment),
+        _buildReplyWidget()
       ],
     );
   }
 
- Widget _buildUserInfoWidget({required String userID, required String commentText,  bool isReply = false}) {
+  StreamBuilder<int> _buildReplyWidget() {
+    return StreamBuilder(stream: CommentService.getCommentsReplyCount(reelID: widget._reelID, commentID: widget._comment.commentID), builder: (ctx, snapshot){
+        if(snapshot.hasData && snapshot.requireData > 0){
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if(!_showReplies)
+              GestureDetector(onTap: (){
+                _showReplies = true;
+                setState(() { });
+              }, child: Text(snapshot.requireData > 1 ?  "View ${snapshot.requireData} replies" : "View ${snapshot.requireData} reply", style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.purpleColor, fontWeight: FontWeight.w600),)),
 
+              //Replies widget
+              if(_showReplies)
+                Container(
+                  height: 300,
+                  margin: EdgeInsets.only(left: 20),
+                  child: FutureBuilder(future: CommentService.getCommentsReply(reelID: widget._reelID, commentID: widget._comment.commentID), builder: (ctx, snapshot){
+                    if(snapshot.hasData){
+                      return ListView.builder(
+                          itemCount: snapshot.requireData.length,
+                          itemBuilder: (ctx, index){
+                            AddCommentModel reply = snapshot.requireData[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 15.0),
+                              child: _buildCommentWidget(userID: reply.commentBy, commentText: reply.comment, replyID: reply.commentID),
+                            );
+                          });
+                    }else if(snapshot.connectionState == ConnectionState.waiting){
+                      return LoadingWidget(color: AppColors.purpleColor,);
+                    }
+
+                    return SizedBox();
+                  }),
+                )
+            ],
+          );
+        }
+        return SizedBox();
+      });
+  }
+
+ Widget _buildCommentWidget({required String userID, required String commentText,  String? replyID}) {
     String userName = '';
     return  Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,12 +122,12 @@ class _CommentItemWidgetState extends State<CommentItemWidget> {
           );
         }),
         Text(commentText, style: AppTextStyles.commentTextStyle,),
-        if(!isReply)
+        // if(replyID != null)
           Row(
             spacing: 20,
             children: [
-              CommentLikeWidget(reelID: widget._reelID, commentID: widget._comment.commentID),
-              if(widget._comment.isPinned)
+              CommentLikeWidget(reelID: widget._reelID, commentID: widget._comment.commentID, replyID: replyID,),
+              if(widget._comment.isPinned && replyID == null)
                 Text("📌 Pinned",style: AppTextStyles.smallTextStyle,),
               Text(DateTimeHelper.timeAgo(widget._comment.dateTime), style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),),
               TextButton(onPressed: ()=> widget._onReplyTap(userName, widget._comment.commentID), child: Text("Reply", style: AppTextStyles.captionTextStyle.copyWith(color: AppColors.commentTextColor),))

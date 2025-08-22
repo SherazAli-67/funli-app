@@ -12,12 +12,12 @@ class CommentLikeWidget extends StatelessWidget{
   final String icon;
   final String commentID;
   final String reelID;
-
-  const CommentLikeWidget({super.key, required this.reelID, required this.commentID, this.icon = AppIcons.icLike, this.iconColor = Colors.grey,});
+  final String? replyID;
+  const CommentLikeWidget({super.key, required this.reelID, required this.commentID, this.replyID, this.icon = AppIcons.icLike, this.iconColor = Colors.grey,});
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: ReelsService.getCommentLikes(reelID: reelID, commentID: commentID),
+      stream: replyID != null ? ReelsService.getReplyLikes(reelID: reelID, commentID: commentID ,replyID: replyID!) : ReelsService.getCommentLikes(reelID: reelID, commentID: commentID),
       builder: (context, snapshot) {
         if(snapshot.hasData){
           // debugPrint("Count found: ${snapshot.requireData.length}");
@@ -32,14 +32,18 @@ class CommentLikeWidget extends StatelessWidget{
   Widget _buildLikeButton(List<String> likedUsers) {
     bool isLiked = likedUsers.contains(FirebaseAuth.instance.currentUser!.uid);
     return LikeButton(
-          size: 35,
+          size: 25,
           mainAxisAlignment: MainAxisAlignment.start,
           circleSize: 24,
           isLiked: isLiked,
           padding: EdgeInsets.zero,
           likeCount: likedUsers.length,
           onTap: (isLiked)async{
-            await ReelsService.addLikeToComment(reelID: reelID, commentID: commentID, isRemove: isLiked);
+            if(replyID != null){
+              await ReelsService.addLikeToReply(reelID: reelID, commentID: commentID, replyID: replyID!, isRemove: isLiked);
+            }else{
+              await ReelsService.addLikeToComment(reelID: reelID, commentID: commentID, isRemove: isLiked);
+            }
             return !isLiked;
           },
           countPostion: CountPostion.right,
@@ -50,17 +54,14 @@ class CommentLikeWidget extends StatelessWidget{
             );
           },
           countBuilder: (_, isSelected, text){
-            return text == '0' ? const SizedBox(): IconButton(
-              onPressed: (){},
-              icon: isSelected
-                  ? Text(
-                text,
-                style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
-              )
-                  : Text(
-                text,
-                style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
-              ),
+            return text == '0' ? const SizedBox(): isSelected
+                ? Text(
+              text,
+              style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
+            )
+                : Text(
+              text,
+              style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
             );
           },
         );

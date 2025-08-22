@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
+import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:go_router/go_router.dart';
 import '../features/main_menu/video_feed_view/video_feed_view.dart';
@@ -103,7 +104,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   }
 
   Widget _buildBottomNavigationItemWidget({required String icon, required bool isSelected, required VoidCallback onTap}) =>
-      IconButton(onPressed: onTap, icon: SvgPicture.asset(icon,));
+      IconButton(onPressed: onTap, icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode( isSelected ? AppColors.purpleColor : Colors.white, BlendMode.srcIn)));
 
   void _initNotificationService()async{
     //Get notification permission then

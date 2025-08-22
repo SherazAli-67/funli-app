@@ -17,50 +17,83 @@ class FeelsSearchProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> fetchReelsByQuery({required String query}) async {
-
     _query = query;
     _reels.clear();
     lastDoc = null;
     _hasMore = true;
+    
     if (!_hasMore || _isLoading) return;
 
     _isLoading = true;
     notifyListeners();
 
-    debugPrint("Fetching reels by query");
-    final userQuerySnap = await FirebaseFirestore.instance
-        .collection(FirebaseConstants.userCollection)
-        .where('userName', isGreaterThanOrEqualTo: query)
-        .where('userName', isLessThan: '${query}z')
-        .get();
+    debugPrint("Fetching reels by query: $query");
+    
+    try {
+      // Search for users with case-insensitive approach
+      String lowerQuery = query.toLowerCase();
+      String upperQuery = query.toUpperCase();
+      
+      // First, get users that match the query (case-insensitive)
+      final userQuerySnap = await FirebaseFirestore.instance
+          .collection(FirebaseConstants.userCollection)
+          .get();
+      
+      // Filter users client-side for better case-insensitive matching
+      final matchingUsers = userQuerySnap.docs.where((doc) {
+        final userData = doc.data() as Map<String, dynamic>;
+        final userName = userData['userName']?.toString().toLowerCase() ?? '';
+        return userName.contains(lowerQuery);
+      }).toList();
 
-    final userIDs = userQuerySnap.docs.map((doc) => doc.id).toList();
+      final userIDs = matchingUsers.map((doc) => doc.id).toList();
 
-    Query<Map<String, dynamic>> queryRef = FirebaseFirestore.instance
-        .collection(FirebaseConstants.reelsCollection);
+      if (userIDs.isEmpty) {
+        debugPrint("No matching users found for query: $query");
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
 
-// Search by caption
-//     if (query.isNotEmpty) {
-//       queryRef = queryRef
-//           .where('caption', isGreaterThanOrEqualTo: query)
-//           .where('caption', isLessThan: '${query}z');
-//     }
+      // Search reels by matching userIDs
+      Query<Map<String, dynamic>> queryRef = FirebaseFirestore.instance
+          .collection(FirebaseConstants.reelsCollection)
+          .orderBy('createdAt', descending: true);
 
-// Additionally filter by matching userIDs (if any found)
-    if (userIDs.isNotEmpty) {
-      queryRef = queryRef.where('userID', whereIn: userIDs.take(5).toList()); // Firestore limit
-    }
+      // Split userIDs into chunks of 10 (Firestore whereIn limit)
+      List<List<String>> userIDChunks = [];
+      for (int i = 0; i < userIDs.length; i += 10) {
+        userIDChunks.add(userIDs.skip(i).take(10).toList());
+      }
 
-// Fetch
-    final snapshot = await queryRef.get();
-    if (snapshot.docs.isNotEmpty) {
-      lastDoc = snapshot.docs.last;
-      _reels.addAll(snapshot.docs.map((e) => ReelModel.fromMap(e.data())));
-    }
+      List<ReelModel> allReels = [];
+      
+      // Fetch reels for each chunk of userIDs
+      for (List<String> chunk in userIDChunks) {
+        final snapshot = await queryRef
+            .where('userID', whereIn: chunk)
+            .limit(20)
+            .get();
+            
+        if (snapshot.docs.isNotEmpty) {
+          allReels.addAll(snapshot.docs.map((e) => ReelModel.fromMap(e.data())));
+        }
+      }
 
-    debugPrint("Queried reels received: ${_reels.length}");
-    if (snapshot.docs.length < 10) {
-      _hasMore = false;
+      // Sort by creation date and take first 20
+      allReels.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
+      _reels.addAll(allReels.take(20));
+
+      if (allReels.isNotEmpty) {
+        lastDoc = null; // Reset for this search approach
+      }
+
+      debugPrint("Queried reels received: ${_reels.length}");
+      if (_reels.length < 10) {
+        _hasMore = false;
+      }
+    } catch (e) {
+      debugPrint("Error in fetchReelsByQuery: $e");
     }
 
     _isLoading = false;

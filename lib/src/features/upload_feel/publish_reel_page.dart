@@ -86,7 +86,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
           leadingWidth: 45,
           title: Text("Create a Feel", style: AppTextStyles.headingTextStyle3,),
             actions: [
-              PopupMenuButton(
+             /* PopupMenuButton(
                 position: PopupMenuPosition.under,
                   color: Colors.white,
                   onSelected: (val)=> setState(() =>visibility = val.toString()),
@@ -108,7 +108,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
                       child: Text("Private", style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400),)),
 
                 ];
-              })
+              })*/
             ],
         ),
         body: Stack(
