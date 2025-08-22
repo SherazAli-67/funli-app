@@ -7,6 +7,7 @@ import '../helpers/formatting_helpers.dart';
 import '../res/app_textstyles.dart';
 import 'followers_widget.dart';
 import 'loading_widget.dart';
+import 'full_screen_image_page.dart';
 
 class ProfileInfoWidget extends StatelessWidget{
   final String _userID;
@@ -23,7 +24,25 @@ class ProfileInfoWidget extends StatelessWidget{
             return Column(
               spacing: 16,
               children: [
-                ProfilePictureWidget(profilePicture: user.profilePicture),
+                ProfilePictureWidget(
+                  profilePicture: user.profilePicture,
+                  heroTag: 'profile_pic_${user.userID}',
+                  onTap: () {
+                    final String imageUrl = user.profilePicture ?? '';
+                    if (imageUrl.isEmpty) return;
+                    Navigator.of(context).push(
+                      PageRouteBuilder(
+                        pageBuilder: (_, __, ___) => FullScreenImagePage(
+                          imageUrl: imageUrl,
+                          heroTag: 'profile_pic_${user.userID}',
+                        ),
+                        transitionsBuilder: (_, animation, __, child) {
+                          return FadeTransition(opacity: animation, child: child);
+                        },
+                      ),
+                    );
+                  },
+                ),
                 Column(
                   spacing: 8,
                   children: [

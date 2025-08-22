@@ -7,13 +7,17 @@ class ProfilePictureWidget extends StatelessWidget {
   const ProfilePictureWidget({
     super.key,
     required String? profilePicture,
+    this.onTap,
+    this.heroTag,
   }) : _profilePicture = profilePicture;
 
   final String? _profilePicture;
+  final VoidCallback? onTap;
+  final String? heroTag;
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
+    Widget avatar = CircleAvatar(
       radius: 35,
       backgroundColor: AppColors.amberYellowColor,
       child: CircleAvatar(
@@ -24,5 +28,15 @@ class ProfilePictureWidget extends StatelessWidget {
             : CachedNetworkImageProvider(AppIcons.icDummyImgUrl),
       ),
     );
+
+    if (heroTag != null && heroTag!.isNotEmpty) {
+      avatar = Hero(tag: heroTag!, child: avatar);
+    }
+
+    if (onTap != null) {
+      avatar = GestureDetector(onTap: onTap, child: avatar);
+    }
+
+    return avatar;
   }
 }
