@@ -3,8 +3,11 @@ import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_widge
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
+import 'package:funli_app/src/services/hashtag_service.dart';
 import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
+
+import '../../widgets/secondary_gradient_btn.dart';
 
 class HashtagReelsPage extends StatelessWidget{
   const HashtagReelsPage({super.key, required String hashtag}): _hashtag = hashtag;
@@ -35,7 +38,19 @@ class HashtagReelsPage extends StatelessWidget{
            trailing: SizedBox(
                width: 100,
                height: 45,
-               child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient,)),
+               child: StreamBuilder(stream: HashtagService.getIsFollowing(hashtag: _hashtag), builder: (ctx, snapshot){
+                 if(snapshot.hasData){
+                   bool isFollowing = snapshot.requireData;
+                   return isFollowing
+                       ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> HashtagService.onFollowTap(hashtag: _hashtag, isUnfollowRequest: true), buttonHeight: 40,)
+                       : SizedBox(
+                       height: 40,
+                       width: 100,
+                       child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.onFollowTap(hashtag: _hashtag), bgGradient: AppIcons.primaryBgGradient,));
+                 }
+
+                 return SizedBox();
+               })),
          ),
           Expanded(child: HashtagReelsGrid(tag: _hashtag,))
         ],

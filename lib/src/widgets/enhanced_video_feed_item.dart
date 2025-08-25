@@ -656,12 +656,12 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 if(_userModel != null)
-                                  Text(
+                                  TextButton(onPressed: _onUserProfileTap, child: Text(
                                     _userModel!.userName,
                                     style: AppTextStyles
                                         .buttonTextStyle
                                         .copyWith(
-                                        color: Colors.white, fontWeight: FontWeight.w700),),
+                                        color: Colors.white, fontWeight: FontWeight.w700),),),
                                 AppTextWidget(text: widget.reel.caption,),
                               ],
                             ),
@@ -692,25 +692,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
           Stack(
             children: [
               GestureDetector(
-                onTap: (){
-                  String? userName = _userModel?.userName;
-                  if(widget.reel.userID == FirebaseAuth.instance.currentUser!.uid){
-                    context.push(RouterEnum.remoteUserProfileView.routeName, extra: {
-                      'userID' : widget.reel.userID,
-                      'userName' : userName,
-                      'profilePicture' : _userModel?.profilePicture
-                    });
-                    return;
-                  }
-                  showModalBottomSheet(
-                      isScrollControlled: true,
-                      context: context, builder: (ctx){
-                    return FractionallySizedBox(
-                        heightFactor: 0.75,
-                        child: SingleChildScrollView(
-                            child: RemoteUserProfileInfoWidget(userName: userName, userID: widget.reel.userID,)));
-                  });
-                },
+                onTap: _onUserProfileTap,
                 child: Container(
                   margin: EdgeInsets.only(bottom: 20),
                   decoration: BoxDecoration(
@@ -820,5 +802,18 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
      debugPrint("User found not null and profile: ${_userModel!.profilePicture}");
      setState(() {});
    }
+  }
+
+  void _onUserProfileTap() {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: Colors.white,
+        elevation: 1,
+        context: context, builder: (ctx){
+      return FractionallySizedBox(
+          heightFactor: 0.75,
+          child: SingleChildScrollView(
+              child: RemoteUserProfileInfoWidget(userName: _userModel?.userName, userID: widget.reel.userID,)));
+    });
   }
 }

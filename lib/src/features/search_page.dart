@@ -340,11 +340,11 @@ class _SearchPageState extends State<SearchPage> {
                       if(snapshot.hasData){
                         bool isFollowing = snapshot.requireData;
                         return isFollowing
-                            ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> HashtagService.oddToFollow(hashtag: hashtag.tag, isUnfollowRequest: true), buttonHeight: 40,)
+                            ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> HashtagService.onFollowTap(hashtag: hashtag.tag, isUnfollowRequest: true), buttonHeight: 40,)
                             : SizedBox(
                             height: 40,
                             width: 100,
-                            child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.oddToFollow(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
+                            child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.onFollowTap(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
                       }
 
                       return SizedBox();

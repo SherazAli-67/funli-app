@@ -19,7 +19,7 @@ class HashtagService {
   }
 
 
-  static Future<bool> oddToFollow({required String hashtag, bool isUnfollowRequest = false})async{
+  static Future<bool> onFollowTap({required String hashtag, bool isUnfollowRequest = false})async{
     bool result = false;
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
 

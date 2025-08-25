@@ -138,7 +138,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                 bool isFollowing = snapshot.requireData;
                                 return isFollowing
                                     ? SecondaryGradientBtn(btnText: "Following", icon: '',
-                                  onTap: () => HashtagService.oddToFollow(hashtag: hashtag.tag, isUnfollowRequest: true), buttonHeight: 35, )
+                                  onTap: () => HashtagService.onFollowTap(hashtag: hashtag.tag, isUnfollowRequest: true), buttonHeight: 35, )
                                     : SizedBox(
                                     height: 35,
                                     width: 80,
@@ -146,7 +146,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                       btnText: "Follow",
                                       icon: '',
                                       textStyle: AppTextStyles.smallBoldTextStyle,
-                                      onTap: () => HashtagService.oddToFollow(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
+                                      onTap: () => HashtagService.onFollowTap(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
                               }
 
                               return SizedBox();

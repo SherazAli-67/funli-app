@@ -54,19 +54,19 @@ class _ReelLikedCommentUsersWidgetState extends State<ReelLikedCommentUsersWidge
 
 
     List<String> userIDs = [];
-    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    // String currentUID = FirebaseAuth.instance.currentUser!.uid;
     if(widget._comingForComment){
       colRef = FirebaseFirestore.instance
           .collection(FirebaseConstants.reelsCollection)
           .doc(widget._reelID)
-          .collection(FirebaseConstants.commentsCollection).where('commentBy', isNotEqualTo: currentUID)
+          .collection(FirebaseConstants.commentsCollection)
           .orderBy('dateTime', descending: true)
           .limit(_limit);
     }else{
       colRef = FirebaseFirestore.instance
           .collection(FirebaseConstants.reelsCollection)
           .doc(widget._reelID)
-          .collection(FirebaseConstants.likesCollection).where('likedBy', isNotEqualTo: currentUID)
+          .collection(FirebaseConstants.likesCollection)
           .orderBy('dateTime', descending: true)
           .limit(_limit);
     }
@@ -146,6 +146,7 @@ class _ReelLikedCommentUsersWidgetState extends State<ReelLikedCommentUsersWidge
                   itemBuilder: (context, index) {
                     if (index < _likedUsers.length) {
                       final user = _likedUsers[index];
+                      String currentUID = FirebaseAuth.instance.currentUser!.uid;
                       return ListTile(
                         onTap: (){
                           context.push(RouterEnum.remoteUserProfileView.routeName, extra: {
@@ -160,21 +161,21 @@ class _ReelLikedCommentUsersWidgetState extends State<ReelLikedCommentUsersWidge
                         contentPadding: EdgeInsets.symmetric(vertical: 12),
                         leading: ProfilePictureWidget(profilePicture: user.profilePicture),
                         title: Text(user.userName, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w700),),
-                        trailing: ConstrainedBox(constraints: BoxConstraints(maxWidth: 120, minWidth: 80), child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
+                        trailing: user.userID != currentUID ? ConstrainedBox(constraints: BoxConstraints(maxWidth: 120, minWidth: 80), child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
                           if(snapshot.hasData){
                             return snapshot.requireData
-                                ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: (){}, buttonHeight: 38,)
+                                ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> UserService.onFollowTap(remoteUID: user.userID, userName: user.userName, isPrivateAccount: user.visibility == ProfileVisibility.followersOnly), buttonHeight: 38,)
                                 : SizedBox(
                               height: 38,
                               width: 75,
-                              child: PrimaryBtn(btnText: "Follow", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallBoldTextStyle,),
+                              child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=> UserService.onFollowTap(remoteUID: user.userID, userName: user.userName, isPrivateAccount: user.visibility == ProfileVisibility.followersOnly), bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallBoldTextStyle,),
                             );
                           }else if(snapshot.connectionState == ConnectionState.waiting){
                             return LoadingWidget();
                           }
 
                           return LoadingWidget();
-                        }),),
+                        }),) : null,
                       );
 
                     } else {

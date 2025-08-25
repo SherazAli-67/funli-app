@@ -51,16 +51,19 @@ class _RemoteUserProfileInfoWidgetState extends State<RemoteUserProfileInfoWidge
       spacing: 20,
       children: [
        if(!widget._isFromProfilePage)
-         Align(
-           alignment: Alignment.topRight,
-           child: IconButton(
-               style: IconButton.styleFrom(
-                   backgroundColor: AppColors.lightGreyColor,
-                   shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(99)
-                   )
-               ),
-               onPressed: ()=> context.pop(), icon: Icon(Icons.close)),
+         Padding(
+           padding: const EdgeInsets.all(10.0),
+           child: Align(
+             alignment: Alignment.topRight,
+             child: IconButton(
+                 style: IconButton.styleFrom(
+                     backgroundColor: AppColors.lightGreyColor,
+                     shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(99)
+                     )
+                 ),
+                 onPressed: ()=> context.pop(), icon: Icon(Icons.close)),
+           ),
          ),
 
         ProfileInfoWidget(userID: widget._userID),
