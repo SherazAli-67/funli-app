@@ -68,14 +68,7 @@ class PostCommentWidget extends StatelessWidget{
             ),
             if(totalComments != 0)
               IconButton(
-                  onPressed: (){
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (_) => ReelLikedCommentUsersWidget(reelID: reel.reelID, comingForComment: true,),
-                    );
-                  },
+                  onPressed: null,
                   icon: Text( "$totalComments", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),))
           ],
         );

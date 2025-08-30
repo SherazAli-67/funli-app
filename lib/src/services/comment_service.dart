@@ -8,7 +8,6 @@ class CommentService {
   static final _reelsColRef = FirebaseFirestore.instance.collection(FirebaseConstants.reelsCollection);
 
   static Future<void> addCommentToReel({required String reelID, required String commentText})async{
-
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
     DateTime now = DateTime.now();
     String commentID = now.microsecondsSinceEpoch.toString();

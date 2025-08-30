@@ -3,6 +3,7 @@ class FirebaseConstants {
   static const reelsCollection = 'reels';
   static const likesCollection = 'likes';
   static const commentsCollection = 'comments';
+  static const sharesCollection = 'shares';
   static const repliesCollection = 'replies';
   static const followersCollection = 'followers';
   static const followingCollection = 'following';

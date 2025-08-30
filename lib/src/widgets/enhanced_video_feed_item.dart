@@ -11,7 +11,6 @@ import 'package:funli_app/src/widgets/like_animation_widget.dart';
 import 'package:funli_app/src/widgets/post_comment_widget.dart';
 import 'package:funli_app/src/widgets/post_like_widget.dart';
 import 'package:funli_app/src/widgets/post_share_widget.dart';
-import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:video_player/video_player.dart';
 import 'package:funli_app/src/models/reel_model.dart';
@@ -20,7 +19,6 @@ import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/play_pause_widget.dart';
-import '../app_router/router_enum.dart';
 import '../dependancy_injection/dependency_injector.dart';
 import '../features/main_menu/profile/remote_user_profile.dart';
 import '../res/app_icons.dart';
@@ -356,7 +354,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
 
   /// Handle tap detection for both single and double tap
   void _handleTap() {
-    final now = DateTime.now();
+    // final now = DateTime.now();
     
     // Check if this is a potential double tap
     if (_tapTimer?.isActive ?? false) {
@@ -774,11 +772,14 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
   void _onShareTap()async{
     setState(() => _reelShareableLinkGenerating = true);
     final deepLink = await getIt<DeepLinkService>().generateDeepLink(widget.reel.reelID, widget.reel.thumbnailUrl!);
-    SharePlus.instance.share(
-        ShareParams(text: 'Check out this reel on FUNLI: $deepLink')
-    );
+    final result = await SharePlus.instance.share(ShareParams(text: 'Check out this reel on FUNLI: $deepLink'));
+    if(result.status == ShareResultStatus.success){
+      //The link has been shared, add it to share count
+      ReelsService.addShareToReel(widget.reel.reelID);
+    }
     setState(() => _reelShareableLinkGenerating = false);
   }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);

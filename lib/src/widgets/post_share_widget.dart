@@ -3,6 +3,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 
+import '../res/app_textstyles.dart';
+import '../services/reels_service.dart';
+
 class PostShareWidget extends StatelessWidget{
   final Color iconColor;
   final ReelModel reel;
@@ -11,7 +14,16 @@ class PostShareWidget extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return StreamBuilder(
+        stream: ReelsService.getReelShareCount(reelID: reel.reelID),
+        builder: (context, snapshot) {
+          if(snapshot.hasData){
+            return _buildCommentWidget(context, totalShares: snapshot.requireData);
+          }
+          return _buildCommentWidget(context, totalShares: 0);
+        }
+    );
+    /*return Column(
       children: [
         GestureDetector(
           onTap: onShareTap,
@@ -21,7 +33,24 @@ class PostShareWidget extends StatelessWidget{
           ),
         ),
       ],
-    );
+    );*/
   }
 
+  Column _buildCommentWidget(BuildContext context, {required int totalShares}) {
+    return Column(
+      children: [
+        GestureDetector(onTap: (){},
+          child: SvgPicture.asset(AppIcons.icShare,
+            colorFilter:  ColorFilter
+                .mode(
+                iconColor, BlendMode.srcIn),),
+
+        ),
+        if(totalShares != 0)
+          IconButton(
+              onPressed: null,
+              icon: Text( "$totalShares", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),))
+      ],
+    );
+  }
 }

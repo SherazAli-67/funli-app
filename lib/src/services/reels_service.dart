@@ -6,6 +6,7 @@ import 'package:funli_app/src/models/like_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 
 import '../models/reel_model.dart';
+import '../models/share_model.dart' show ShareReelModel;
 
 class ReelsService {
   static final _reelsColRef = FirebaseFirestore.instance
@@ -484,5 +485,26 @@ class ReelsService {
     }
 
     return fetchedReels;
+  }
+
+  static Future<void> addShareToReel(String reelID)async {
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    DateTime now = DateTime.now();
+    String shareID = now.microsecondsSinceEpoch.toString();
+
+    ShareReelModel shareModel = ShareReelModel(shareID: shareID,reelID: reelID, sharedByUID: currentUID, dateTime: now);
+    await _reelsColRef
+        .doc(reelID)
+        .collection(FirebaseConstants.sharesCollection)
+        .doc(shareID).set(shareModel.toMap());
+  }
+
+  static Stream<int> getReelShareCount({required String reelID}) {
+    return  _reelsColRef
+        .doc(reelID)
+        .collection(FirebaseConstants.sharesCollection)
+        .snapshots()
+        .map((snapshot) =>
+    snapshot.docs.length);
   }
 }
