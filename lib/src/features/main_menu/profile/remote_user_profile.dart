@@ -67,39 +67,6 @@ class _RemoteUserProfileInfoWidgetState extends State<RemoteUserProfileInfoWidge
          ),
 
         ProfileInfoWidget(userID: widget._userID),
-        _isLoading
-            ? LoadingWidget()
-            : _buildUserInfoWidget(),
-
-      ],
-    );
-  }
-
-  void _initUser() async{
-    setState(() => _isLoading = true);
-    try{
-      UserModel? user = await UserService.getUserByID(userID: widget._userID);
-      if(user != null){
-        _isPrivateAccount = user.visibility == ProfileVisibility.followersOnly;
-      }
-      _isLoading = false;
-    }catch(e){
-      debugPrint("Error while getting isPrivateProfile: ${e.toString()}");
-    }
-
-    setState(() {});
-  }
-
-  Widget _buildUserInfoWidget() {
-    bool hideProfile = _isPrivateAccount && !_isApproved && !widget._isFromProfilePage;
-    return hideProfile
-        ? PrivateAccountWidget()
-        : _buildPublicAccountWidget();
-  }
-
-  Widget _buildPublicAccountWidget() {
-    return Column(
-      children: [
         if(!widget._isFromProfilePage)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
@@ -135,6 +102,40 @@ class _RemoteUserProfileInfoWidgetState extends State<RemoteUserProfileInfoWidge
               ),
             ),
           ),
+        _isLoading
+            ? LoadingWidget()
+            : _buildUserInfoWidget(),
+
+      ],
+    );
+  }
+
+  void _initUser() async{
+    setState(() => _isLoading = true);
+    try{
+      UserModel? user = await UserService.getUserByID(userID: widget._userID);
+      if(user != null){
+        _isPrivateAccount = user.visibility == ProfileVisibility.followersOnly;
+      }
+      _isLoading = false;
+    }catch(e){
+      debugPrint("Error while getting isPrivateProfile: ${e.toString()}");
+    }
+
+    setState(() {});
+  }
+
+  Widget _buildUserInfoWidget() {
+    bool hideProfile = _isPrivateAccount && !_isApproved && !widget._isFromProfilePage;
+    return hideProfile
+        ? PrivateAccountWidget()
+        : _buildPublicAccountWidget();
+  }
+
+  Widget _buildPublicAccountWidget() {
+    return Column(
+      children: [
+
 
         if(!widget._isFromProfilePage && !_isPrivateAccount)
           Column(
