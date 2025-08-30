@@ -25,33 +25,33 @@ class HashtagReelsPage extends StatelessWidget{
       body: SafeArea(child: Column(
         spacing: 20,
         children: [
-         ListTile(
-           contentPadding: EdgeInsets.symmetric(horizontal: 20),
-           title: Text('#$_hashtag', style: AppTextStyles.buttonTextStyle,),
-           subtitle: FutureBuilder(future: ReelsService.getHashtagReelsCount(hashtag: _hashtag), builder: (ctx, snapshot){
-             if(snapshot.hasData){
-               return Text('${snapshot.requireData} feels', style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.hashtagCountGreyColor),);
-             }
+          ListTile(
+            contentPadding: EdgeInsets.symmetric(horizontal: 20),
+            title: Text('#$_hashtag', style: AppTextStyles.buttonTextStyle,),
+            subtitle: FutureBuilder(future: ReelsService.getHashtagReelsCount(hashtag: _hashtag), builder: (ctx, snapshot){
+              if(snapshot.hasData){
+                return Text('${snapshot.requireData} feels', style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.hashtagCountGreyColor),);
+              }
 
-             return Text('$_hashtag feels', style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.hashtagCountGreyColor),);
-           }),
-           trailing: SizedBox(
-               width: 100,
-               height: 45,
-               child: StreamBuilder(stream: HashtagService.getIsFollowing(hashtag: _hashtag), builder: (ctx, snapshot){
-                 if(snapshot.hasData){
-                   bool isFollowing = snapshot.requireData;
-                   return isFollowing
-                       ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> HashtagService.onFollowTap(hashtag: _hashtag, isUnfollowRequest: true), buttonHeight: 40,)
-                       : SizedBox(
-                       height: 40,
-                       width: 100,
-                       child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.onFollowTap(hashtag: _hashtag), bgGradient: AppIcons.primaryBgGradient,));
-                 }
+              return Text('$_hashtag feels', style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.hashtagCountGreyColor),);
+            }),
+            trailing: SizedBox(
+                width: 100,
+                height: 45,
+                child: StreamBuilder(stream: HashtagService.getIsFollowing(hashtag: _hashtag), builder: (ctx, snapshot){
+                  if(snapshot.hasData){
+                    bool isFollowing = snapshot.requireData;
+                    return isFollowing
+                        ? SecondaryGradientBtn(btnText: "Following", icon: '', onTap: ()=> HashtagService.onFollowTap(hashtag: _hashtag, isUnfollowRequest: true), buttonHeight: 40,)
+                        : SizedBox(
+                        height: 40,
+                        width: 100,
+                        child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.onFollowTap(hashtag: _hashtag), bgGradient: AppIcons.primaryBgGradient,));
+                  }
 
-                 return SizedBox();
-               })),
-         ),
+                  return SizedBox();
+                })),
+          ),
           Expanded(child: HashtagReelsGrid(tag: _hashtag,))
         ],
       )),
