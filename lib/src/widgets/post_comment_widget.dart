@@ -5,7 +5,6 @@ import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/reels_service.dart';
-import 'package:funli_app/src/widgets/reel_liked_users_widget.dart';
 
 import '../features/main_menu/video_feed_view/comments_page.dart';
 
@@ -34,27 +33,53 @@ class PostCommentWidget extends StatelessWidget{
     return Column(
           children: [
             GestureDetector(onTap: (){
+              // Use conditional logic based on comment count
+              bool useDraggableSheet = totalComments > 5;
+              
               if(comingFromHome){
                 scaffoldKey.currentState!.showBottomSheet(
                     backgroundColor: Colors.white,
                     elevation: 1,
-                        (ctx)=> Padding(
-                        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                        child: FractionallySizedBox(
-                          heightFactor: 0.75,
+                        (ctx)=> useDraggableSheet 
+                        ? DraggableScrollableSheet(
+                          initialChildSize: 0.7,
+                          minChildSize: 0.5,
+                          maxChildSize: 0.9,
+                          builder: (context, scrollController) => CommentsPage(
+                            reel: reel, 
+                            comingFromHome: comingFromHome,
+                            scrollController: scrollController,
+                          ),
+                        )
+                        : Padding(
+                          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                           child: CommentsPage(
-                              reel: reel, comingFromHome: comingFromHome),
-                        )));
+                            reel: reel, 
+                            comingFromHome: comingFromHome,
+                          ),
+                        ));
               }else{
                 showBottomSheet(
                     backgroundColor: Colors.white,
                     context: context, builder: (ctx){
-                  return Padding(
-                      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                      child: FractionallySizedBox(
-                        heightFactor: 0.75,
-                        child: CommentsPage(reel: reel, comingFromHome: comingFromHome),
-                      ));
+                  return useDraggableSheet 
+                  ? DraggableScrollableSheet(
+                    initialChildSize: 0.75,
+                    minChildSize: 0.5,
+                    maxChildSize: 0.9,
+                    builder: (context, scrollController) => CommentsPage(
+                      reel: reel, 
+                      comingFromHome: comingFromHome,
+                      scrollController: scrollController,
+                    ),
+                  )
+                  : Padding(
+                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                    child: CommentsPage(
+                      reel: reel, 
+                      comingFromHome: comingFromHome,
+                    ),
+                  );
                 });
               }
 

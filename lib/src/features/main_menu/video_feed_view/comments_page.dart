@@ -17,11 +17,10 @@ import 'comment_item_widget.dart';
 
 class CommentsPage extends StatefulWidget{
   const CommentsPage(
-      {super.key, required ReelModel reel, required bool comingFromHome})
-      : _reel = reel,
-        _comingFromHome = comingFromHome;
+      {super.key, required ReelModel reel, required bool comingFromHome, this.scrollController})
+      : _reel = reel;
   final ReelModel _reel;
-  final bool _comingFromHome;
+  final ScrollController? scrollController;
   @override
   State<CommentsPage> createState() => _CommentsPageState();
 }
@@ -56,12 +55,216 @@ class _CommentsPageState extends State<CommentsPage> {
   }
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding:  EdgeInsets.only(left: 23.0, right: 23, bottom: 45, top: 20),
-      child: Column(
-        spacing: 14,
-        mainAxisSize: MainAxisSize.min,
+    // If no scroll controller is provided, don't use SingleChildScrollView
+    // This allows the content to size naturally for few comments
+    if (widget.scrollController == null) {
+      return SingleChildScrollView(
+        padding: EdgeInsets.only(left: 23.0, right: 23, bottom: 45, top: 20),
+        child: Column(
+          spacing: 14,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildHeaderSection(context),
+            _buildCommentsSection(context),
+            _buildInputSection(),
+          ],
+        ),
+      );
+    }
+    
+    // For draggable sheet with scroll controller
+    return SingleChildScrollView(
+      controller: widget.scrollController,
+      child: Padding(
+        padding: EdgeInsets.only(left: 23.0, right: 23, bottom: 45, top: 20),
+        child: Column(
+          spacing: 14,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildHeaderSection(context),
+            _buildCommentsSection(context),
+            _buildInputSection(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderSection(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        StreamBuilder(
+            stream: ReelsService.getReelCommentCount(reelID: widget._reel.reelID),
+            builder: (ctx, snapshot) {
+              if(snapshot.hasData && snapshot.requireData > 0){
+                return Text('Comments (${snapshot.requireData})', style: AppTextStyles.headingTextStyle3,);
+              }
+              return Text('Comments ', style: AppTextStyles.headingTextStyle3,);
+            }),
+        IconButton(
+            style: IconButton.styleFrom(
+                backgroundColor: AppColors.lightGreyColor,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(99))
+            ),
+            onPressed: ()=> Navigator.of(context).pop(), icon: Icon(Icons.close))
+      ],
+    );
+  }
+
+  Widget _buildCommentsSection(BuildContext context) {
+    return StreamBuilder(
+        stream: ReelsService.getReelsComment(reelID: widget._reel.reelID),
+        builder: (ctx, snapshot) {
+      if(snapshot.hasData && snapshot.requireData.isNotEmpty){
+        List<AddCommentModel> comments = snapshot.requireData;
+        // Sort comments: pinned comments at the top, then by dateTime
+        comments.sort((a, b) {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return a.dateTime.compareTo(b.dateTime);
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_listScrollController.hasClients) {
+            _listScrollController.animateTo(
+              _listScrollController.position.maxScrollExtent,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            );
+          }
+        });
+        return ListView.builder(
+            controller: _listScrollController,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: comments.length,
+            itemBuilder: (ctx, index){
+              AddCommentModel comment = comments[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 15.0),
+                child: CommentItemWidget(comment: comment, reelID:  widget._reel.reelID, onReplyTap:  _onReplyTap, postedByUserID: widget._reel.userID,)
+              );
+            });
+      }
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 10,
         children: [
+          SizedBox(height: 50), // Reduced spacing for better sizing
+          Text("No Comments Yet", style: AppTextStyles.headingTextStyle3,),
+          Text("Be the first to comment on the reel", style: AppTextStyles.bodyTextStyle,),
+          SizedBox(height: 50), // Reduced spacing for better sizing
+        ],
+      );
+    });
+  }
+
+  Widget _buildInputSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start ,
+      children: [
+        if(_isReplying )
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text("Replying to $_replyingToUserName"),
+          ),
+        Container(
+          height: 48.0,
+          decoration: BoxDecoration(
+              color: AppColors.commentTextFieldFillColor,
+              borderRadius: BorderRadius.circular(13),
+              border: Border.all(color: AppColors.borderColor)
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    IconButton(onPressed: (){
+                      setState(() {
+                        _emojiShowing = !_emojiShowing;
+                        if (!_emojiShowing) {
+                          WidgetsBinding.instance
+                              .addPostFrameCallback((_) {
+                            _focusNode.requestFocus();
+                          });
+                        } else {
+                          _focusNode.unfocus();
+                        }
+                      });
+                    }, icon: Icon(Icons.emoji_emotions_outlined)),
+                    Expanded(child: TextField(
+                      controller: _commentController,
+                      focusNode: _focusNode,
+                      scrollController: _scrollController,
+
+                      onTap: (){
+                        if(_emojiShowing){
+                          _emojiShowing = false;
+                          setState(() {});
+                        }
+                      },
+                      onTapOutside: (val){
+                        if(_emojiShowing){
+                          _emojiShowing = false;
+                          setState(() {});
+                        }
+                      },
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          hintText: "Say something nice...",
+                          hintStyle: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.commentHintTextColor)
+                      ),
+                    ))
+                  ],
+                ),
+              ),
+              IconButton(onPressed: _isReplying ? _addReply : _addComment, icon: SvgPicture.asset(AppIcons.icSendBtn))
+
+            ],
+          ),
+        ),
+        Offstage(
+          offstage: !_emojiShowing,
+          child: EmojiPicker(
+            textEditingController: _commentController,
+            scrollController: _scrollController,
+
+            config: Config(
+              height: 256,
+              checkPlatformCompatibility: true,
+              emojiTextStyle: TextStyle(fontSize: 18),
+
+              viewOrderConfig: const ViewOrderConfig(),
+              emojiViewConfig: EmojiViewConfig(
+                horizontalSpacing: 10,
+                verticalSpacing: 10,
+
+              ),
+              skinToneConfig: const SkinToneConfig(),
+              categoryViewConfig: const CategoryViewConfig(),
+              bottomActionBarConfig: const BottomActionBarConfig(
+                backgroundColor: AppColors.purpleColor,
+                buttonColor: AppColors.purpleColor
+              ),
+              searchViewConfig: const SearchViewConfig(
+
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Keep the old structure as fallback
+  Widget _buildLegacyContent() {
+    return Column(
+      spacing: 14,
+      mainAxisSize: MainAxisSize.min,
+      children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -100,8 +303,10 @@ class _CommentsPageState extends State<CommentsPage> {
                   curve: Curves.easeOut,
                 );
               });
-              return Expanded(child: ListView.builder(
+              return ListView.builder(
                   controller: _listScrollController,
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: comments.length,
                   itemBuilder: (ctx, index){
                     AddCommentModel comment = comments[index];
@@ -109,16 +314,18 @@ class _CommentsPageState extends State<CommentsPage> {
                       padding: const EdgeInsets.only(bottom: 15.0),
                       child: CommentItemWidget(comment: comment, reelID:  widget._reel.reelID, onReplyTap:  _onReplyTap, postedByUserID: widget._reel.userID,)
                     );
-                  }));
+                  });
             }
-            return Expanded(child: Column(
+            return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               spacing: 10,
               children: [
+                SizedBox(height: 100), // Add some spacing for empty state
                 Text("No Comments Yet", style: AppTextStyles.headingTextStyle3,),
                 Text("Be the first to comment on the reel", style: AppTextStyles.bodyTextStyle,),
+                SizedBox(height: 100), // Add some spacing for empty state
               ],
-            ));
+            );
           }),
 
           Column(
@@ -219,8 +426,7 @@ class _CommentsPageState extends State<CommentsPage> {
             ],
           )
         ],
-      ),
-    );
+      );
   }
 
   void _onReplyTap(String userName, String commentID){

@@ -63,15 +63,22 @@ class _CommentItemWidgetState extends State<CommentItemWidget> {
                 _showReplies = true;
                 setState(() { });
               }, child: Text(snapshot.requireData > 1 ?  "View ${snapshot.requireData} replies" : "View ${snapshot.requireData} reply", style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.purpleColor, fontWeight: FontWeight.w600),)),
+              
+              if(_showReplies)
+              GestureDetector(onTap: (){
+                _showReplies = false;
+                setState(() { });
+              }, child: Text("Hide replies", style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.purpleColor, fontWeight: FontWeight.w600),)),
 
               //Replies widget
               if(_showReplies)
                 Container(
-                  height: 300,
                   margin: EdgeInsets.only(left: 20),
                   child: FutureBuilder(future: CommentService.getCommentsReply(reelID: widget._reelID, commentID: widget._comment.commentID), builder: (ctx, snapshot){
                     if(snapshot.hasData){
                       return ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
                           itemCount: snapshot.requireData.length,
                           itemBuilder: (ctx, index){
                             AddCommentModel reply = snapshot.requireData[index];
