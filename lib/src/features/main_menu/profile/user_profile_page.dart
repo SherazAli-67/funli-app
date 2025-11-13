@@ -58,12 +58,12 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
           style: AppTextStyles.headingTextStyle3,
         ),*/
         actions: [
-          IconButton(
+          /*IconButton(
             onPressed: () =>
                 context.push(
                     RouterEnum.profileAnalyticsView.routeName),
             icon: SvgPicture.asset(AppIcons.icAnalytics),
-          ),
+          ),*/
           IconButton(
             onPressed: () =>
                 context.push(

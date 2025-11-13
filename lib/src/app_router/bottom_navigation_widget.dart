@@ -12,8 +12,6 @@ import '../res/app_gradients.dart';
 
 final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
 
-
-
 class BottomNavigationWidget extends StatefulWidget {
   const BottomNavigationWidget({
     super.key,
