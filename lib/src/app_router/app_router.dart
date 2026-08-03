@@ -30,21 +30,24 @@ import 'package:funli_app/src/features/upload_feel/edit_uploaded_feel.dart';
 import 'package:funli_app/src/features/upload_feel/publish_draft_page.dart';
 import 'package:funli_app/src/features/upload_feel/publish_reel_page.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
+import 'package:funli_app/src/providers/feels_search_provider.dart';
+import 'package:funli_app/src/providers/hashtag_search_provider.dart';
+import 'package:funli_app/src/providers/users_search_provider.dart';
 import 'package:funli_app/src/widgets/video_player_widget.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../features/authentication/login_page.dart';
 import '../features/reels_page/updated_reels_page.dart';
-import 'bottom_navigation_widget.dart';
-import 'custom_page_builder_widget.dart';
+
 
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
 );
-final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
+/*final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'shell',
-);
+);*/
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
 class AppRouter {
@@ -141,8 +144,14 @@ class AppRouter {
       ),
       GoRoute(
         path: RouterEnum.searchView.routeName,
-        builder: (BuildContext context, GoRouterState state) =>
-        const SearchPage(),
+        builder: (BuildContext context, GoRouterState state) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => FeelsSearchProvider()..fetchInitial()),
+            ChangeNotifierProvider(create: (_) => UsersSearchProvider()..fetchInitial()),
+            ChangeNotifierProvider(create: (_) => HashtagSearchProvider()..fetchInitial()),
+          ],
+          child: const SearchPage(),
+        ),
       ),
       GoRoute(
         path: RouterEnum.moodReelsView.routeName,

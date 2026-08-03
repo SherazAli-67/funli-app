@@ -6,10 +6,16 @@ class Homepage extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: .all(16), child: Column(
-      children: [
-        UserProfileWidget()
-      ],
-    ),);
+    return Padding(
+      padding: .all(16),
+      child: Column(
+        crossAxisAlignment: .start,
+        spacing: 16,
+        children: [
+          UserProfileWidget(),
+          // Expanded(child: Carous)
+        ],
+      ),
+    );
   }
 }

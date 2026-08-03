@@ -37,9 +37,6 @@ class _SearchPageState extends State<SearchPage> {
 
   int selectedIndex = 0;
   String query = '';
-  late FeelsSearchProvider _feelProvider;
-  late UsersSearchProvider _userProvider;
-  late HashtagSearchProvider _hashtagProvider;
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounceTimer;
 
@@ -52,9 +49,6 @@ class _SearchPageState extends State<SearchPage> {
   
   @override
   Widget build(BuildContext context) {
-     _userProvider = Provider.of<UsersSearchProvider>(context); // listen: true by default
-     _feelProvider = Provider.of<FeelsSearchProvider>(context);
-     _hashtagProvider = Provider.of<HashtagSearchProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Search Results", style: AppTextStyles.headingTextStyle3,),
@@ -138,36 +132,41 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
 
-          if(selectedIndex == 0)
-            Expanded(child: _buildFeelsSearchWidget()),
-
-          if(selectedIndex == 1)
-            Expanded(child: _buildUsersSearchWidget()),
-
-          if(selectedIndex == 2)
-            Expanded(child:   _buildHashtagSearchWidget() )
+          Expanded(
+            child: selectedIndex == 0
+                ? Consumer<FeelsSearchProvider>(
+                    builder: (ctx, provider, _) => _buildFeelsSearchWidget(provider),
+                  )
+                : selectedIndex == 1
+                    ? Consumer<UsersSearchProvider>(
+                        builder: (ctx, provider, _) => _buildUsersSearchWidget(provider),
+                      )
+                    : Consumer<HashtagSearchProvider>(
+                        builder: (ctx, provider, _) => _buildHashtagSearchWidget(provider),
+                      ),
+          ),
         ],
       )),
     );
   }
 
-  Widget _buildUsersSearchWidget() {
+  Widget _buildUsersSearchWidget(UsersSearchProvider provider) {
     return NotificationListener<ScrollNotification>(
         onNotification: (scrollInfo) {
           if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-            _userProvider.fetchMore();
+            provider.fetchMore();
           }
           return false;
         },
         child: ListView.builder(
           padding: const EdgeInsets.all(8),
-          itemCount: _userProvider.users.length,
+          itemCount: provider.users.length,
 
           itemBuilder: (context, index) {
-            if (index >= _userProvider.users.length) {
+            if (index >= provider.users.length) {
               return LoadingWidget();
             }
-            UserModel user = _userProvider.users[index];
+            UserModel user = provider.users[index];
             return ListTile(
               onTap: (){
                 context.push(RouterEnum.remoteUserProfileView.routeName, extra: {
@@ -202,15 +201,15 @@ class _SearchPageState extends State<SearchPage> {
         ));
   }
 
-  Widget _buildFeelsSearchWidget() {
+  Widget _buildFeelsSearchWidget(FeelsSearchProvider provider) {
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
         if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-          _feelProvider.fetchMore();
+          provider.fetchMore();
         }
         return false;
       },
-      child: _feelProvider.isLoading && _feelProvider.reels.isEmpty ? ReelsGridShimmer() : GridView.builder(
+      child: provider.isLoading && provider.reels.isEmpty ? ReelsGridShimmer() : GridView.builder(
         padding: const EdgeInsets.all(10),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
@@ -218,16 +217,16 @@ class _SearchPageState extends State<SearchPage> {
             crossAxisSpacing: 10,
             mainAxisSpacing: 10
         ),
-        itemCount: _feelProvider.reels.length,
+        itemCount: provider.reels.length,
         itemBuilder: (ctx, index) {
-          final reel =  _feelProvider.reels[index];
+          final reel =  provider.reels[index];
           return GestureDetector(
             onTap: () {
 
               context.push(RouterEnum.updatedReelsView.routeName,   extra: {
-                'initialReels': _feelProvider.reels,
+                'initialReels': provider.reels,
                 'selectedIndex': index,
-                'lastDocument': _feelProvider.lastDoc,
+                'lastDocument': provider.lastDoc,
                 'comingFrom':  AppConstants.comingFromSearch,
               },);
             },
@@ -303,17 +302,17 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildHashtagSearchWidget() {
-    return _hashtagProvider.isLoading && _hashtagProvider.tags.isEmpty 
+  Widget _buildHashtagSearchWidget(HashtagSearchProvider provider) {
+    return provider.isLoading && provider.tags.isEmpty 
         ? LoadingWidget() 
         : ListView.builder(
             padding: const EdgeInsets.all(8),
-            itemCount: _hashtagProvider.tags.length,
+            itemCount: provider.tags.length,
             itemBuilder: (context, index) {
-              if (index >= _hashtagProvider.tags.length) {
+              if (index >= provider.tags.length) {
                 return LoadingWidget();
               }
-              HashtagModel hashtag = _hashtagProvider.tags[index];
+              HashtagModel hashtag = provider.tags[index];
 
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
@@ -360,35 +359,35 @@ class _SearchPageState extends State<SearchPage> {
   void _loadInitialData() {
     switch (selectedIndex) {
       case 0:
-        _feelProvider.fetchInitial();
+        context.read<FeelsSearchProvider>().fetchInitial();
         break;
       case 1:
-        _userProvider.fetchInitial(query: query);
+        context.read<UsersSearchProvider>().fetchInitial(query: query);
         break;
       case 2:
-        _hashtagProvider.fetchInitial();
+        context.read<HashtagSearchProvider>().fetchInitial();
         break;
     }
   }
 
 
   void _performSearch(String searchQuery) {
-    // Cancel previous debounce timer
     _debounceTimer?.cancel();
     
-    // Set new debounce timer
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
       switch (selectedIndex) {
         case 0:
+          final feelProvider = context.read<FeelsSearchProvider>();
           searchQuery.isEmpty 
-            ? _feelProvider.fetchInitial(query: searchQuery) 
-            : _feelProvider.fetchReelsByQuery(query: searchQuery);
+            ? feelProvider.fetchInitial(query: searchQuery)
+            : feelProvider.fetchReelsByQuery(query: searchQuery);
           break;
         case 1:
-          _userProvider.fetchInitial(query: searchQuery);
+          context.read<UsersSearchProvider>().fetchInitial(query: searchQuery);
           break;
         case 2:
-          _hashtagProvider.fetchInitial(query: searchQuery);
+          context.read<HashtagSearchProvider>().fetchInitial(query: searchQuery);
           break;
       }
     });
