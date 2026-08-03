@@ -49,7 +49,7 @@ class PostShareWidget extends StatelessWidget{
         if(totalShares != 0)
           IconButton(
               onPressed: null,
-              icon: Text( "$totalShares", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),))
+              icon: Text( "$totalShares", style: AppTextStyles.regularTextStyle.copyWith(color: Colors.white),))
       ],
     );
   }

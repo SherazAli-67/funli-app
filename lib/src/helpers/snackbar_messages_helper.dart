@@ -13,7 +13,7 @@ class SnackbarMessagesHelper {
         title: title,
         message: message,
         titleTextStyle: AppTextStyles.headingTextStyle3.copyWith(color: Colors.white),
-        messageTextStyle: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),
+        messageTextStyle: AppTextStyles.regularTextStyle.copyWith(color: Colors.white),
         contentType: isError ? ContentType.failure : ContentType.success,
       ),
     );

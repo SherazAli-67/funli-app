@@ -1,25 +1,10 @@
-import 'dart:io';
-
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
-import 'package:funli_app/src/bloc_cubit/auth_cubit.dart';
-import 'package:funli_app/src/bloc_cubit/auth_states.dart';
-// import 'package:funli_app/src/features/main_menu/updated_feed_view/bloc_cubit/updated_feed_cubit.dart';
-import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
-import 'package:funli_app/src/models/onboarding_model.dart';
-import 'package:funli_app/src/providers/personal_info_provider.dart';
-import 'package:funli_app/src/res/app_constants.dart';
+import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
-import 'package:funli_app/src/widgets/loading_widget.dart';
-import 'package:funli_app/src/widgets/primary_gradient_background.dart';
-import 'package:funli_app/src/widgets/secondary_btn.dart';
 import 'package:go_router/go_router.dart';
-import '../providers/discover_provider.dart';
-import '../widgets/primary_btn.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -28,131 +13,265 @@ class WelcomePage extends StatefulWidget {
   State<WelcomePage> createState() => _WelcomePageState();
 }
 
-class _WelcomePageState extends State<WelcomePage> {
+class _WelcomePageState extends State<WelcomePage> with TickerProviderStateMixin {
+  static const List<String> _images = [
+    AppIcons.onboarding1,
+    AppIcons.onboarding2,
+    AppIcons.onboarding3,
+    AppIcons.onboarding4,
+    AppIcons.onboarding5,
+  ];
 
+  late final AnimationController _row1Controller;
+  late final AnimationController _row2Controller;
+  late final AnimationController _row3Controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _row1Controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 28),
+    )..repeat();
+    _row2Controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 32),
+    )..repeat();
+    _row3Controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 26),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _row1Controller.dispose();
+    _row2Controller.dispose();
+    _row3Controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return PrimaryGradientBackground(
-      child: Stack(
-        children: [
-          Column(children: [
+    return Scaffold(
+      backgroundColor: AppColors.lightGreyColor,
+      body: SafeArea(
+        child: Column(
+          spacing: 24,
+          children: [
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 65.0, bottom: 20),
-                child: CarouselSlider(
-                    items: [
-                      OnboardingModel(image: AppIcons.onboarding1, title: "Express Your Mood, Your Way! ", subTitle: "Discover a world where your mood shapes your feed. 🌈 "),
-                      OnboardingModel(image: AppIcons.onboarding2, title: "Your Mood, Your Feed!", subTitle: "Watch content that truly resonates with how you feel. ❤️"),
-                      OnboardingModel(image: AppIcons.onboarding3, title: "Share Your Feels! ", subTitle: "Let your emotions take center stage! 🎬 "),
-
-                    ].map((item){
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 14,
-                        children: [
-                          Text(item.title, style: AppTextStyles.headingTextStyle3),
-                          Text(item.subTitle, style: AppTextStyles.bodyTextStyle),
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.asset(item.image, fit: BoxFit.cover,),
-                            ),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                    options: CarouselOptions(
-                      height: size.height*0.75,
-                      aspectRatio: 16/9,
-                      viewportFraction: 0.85,
-                      initialPage: 0,
-                      enableInfiniteScroll: true,
-                      reverse: false,
-                      autoPlay: true,
-                      autoPlayInterval: Duration(seconds: 3),
-                      autoPlayAnimationDuration: Duration(milliseconds: 800),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                      enlargeCenterPage: true,
-                      enlargeFactor: 0.2,
-                      scrollDirection: Axis.horizontal,
-
-                    )
-                ),
+              flex: 5,
+              child: Column(
+                mainAxisAlignment: .center,
+                spacing: 14,
+                children: [
+                  _ScrollingImageRow(
+                    controller: _row1Controller,
+                    images: _images,
+                    reverse: false,
+                    itemSize: 92,
+                    gap: 14,
+                    isStadiumRow: false,
+                  ),
+                  _ScrollingImageRow(
+                    controller: _row2Controller,
+                    images: _images,
+                    reverse: true,
+                    itemSize: 100,
+                    gap: 14,
+                    isStadiumRow: true,
+                  ),
+                  _ScrollingImageRow(
+                    controller: _row3Controller,
+                    images: _images.reversed.toList(),
+                    reverse: false,
+                    itemSize: 92,
+                    gap: 14,
+                    isStadiumRow: false,
+                  ),
+                ],
               ),
             ),
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(32), topRight: Radius.circular(32)),
-                color: Colors.white,
-              ),
+            Expanded(
+              flex: 4,
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 47.0, horizontal: SpacingConstants.screenHorizontalPadding),
+                padding: const .symmetric(
+                  horizontal: SpacingConstants.screenHorizontalPadding,
+                ),
                 child: Column(
-                  spacing: 14,
                   children: [
-                    PrimaryBtn(btnText: "Continue with Email",
-                      icon: AppIcons.icMail,
-                      onTap: () => _onEmailTap(context),
-                      isPrefix: true,),
-                    Row(
-                      spacing: 20,
-                      children: [
-                        Expanded(child: SecondaryBtn(btnText: "Google", icon: AppIcons.icGoogle, onTap: ()=> _onSignInWithGoogleTap(context), isPrefix: true,borderRadius: 16,),),
-                        if(Platform.isIOS)
-                          Expanded(child: SecondaryBtn(btnText: "Apple", icon: AppIcons.icApple, onTap: (){}, isPrefix: true, borderRadius: 16,))
-
-                      ],
-                    )
+                    const Spacer(flex: 2),
+                    Text(
+                      'Your Daily Vibe',
+                      textAlign: .center,
+                      style: AppTextStyles.headingTextStyle.copyWith(
+                        color: AppColors.colorBlack,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Your emotional journey starts here.\nDiscover reels that match your energy.',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.regularTextStyle.copyWith(
+                        color: AppColors.greyTextColor,
+                        height: 1.45,
+                      ),
+                    ),
+                    const Spacer(flex: 3),
+                    _GetStartedButton(
+                      onTap: () =>
+                          context.push(RouterEnum.signupView.routeName),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Already a member?',
+                      style: AppTextStyles.smallTextStyle.copyWith(
+                        color: AppColors.greyTextColor,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    GestureDetector(
+                      onTap: () {
+                        debugPrint("On tap");
+                        context.push(RouterEnum.loginView.routeName);
+                      },
+                      child: Text(
+                        'Login',
+                        style: AppTextStyles.smallBoldTextStyle.copyWith(
+                          color: AppColors.colorBlack,
+                          decoration: .underline,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
                   ],
                 ),
               ),
-            )
-          ]),
-          BlocConsumer<AuthCubit, AuthStates>(builder: (_, state){
-            // debugPrint("State: ${state}");
-            if(state is SigningInGoogle){
-              return Container(
-                  width: size.width,
-                  height: size.height,
-                  color: Colors.black54,
-                  child: LoadingWidget()
-              );
-            }
-            
-            return SizedBox();
-          }, listener: (_, state){
-            if(state is SigningInFailed){
-              SnackbarMessagesHelper.showSnackBarMessage(context: context, title: "Sign in with Google Failed", message: state.errorMessage, isError: true);
-            }else if(state is SignedInGoogle){
-              SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedInSuccessTitle, message: AppConstants.signedInSuccessMessage);
-              while (context.canPop()) {
-                context.pop();
-              }
-              context.push(RouterEnum.videoFeedView.routeName);
-            }else if(state is SignedUpGoogle){
-              context.read<PersonalInfoProvider>().setUserName(state.user.user!.displayName ?? '');
-              SnackbarMessagesHelper.showSnackBarMessage(context: context, title: AppConstants.signedUpSuccessTitle, message: AppConstants.signedUpSuccessMessage);
-              //Initializing the Trending moods and Hashtags so that user don't have to wait
-              context.read<DiscoverProvider>();
-              while (context.canPop()) {
-                context.pop();
-              }
-              context.push(RouterEnum.personalizationView.routeName);
-            }
-          })
-        ],
-      )
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GetStartedButton extends StatelessWidget {
+  const _GetStartedButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: SpacingConstants.buttonHeight,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: AppColors.colorBlack,
+          borderRadius: BorderRadius.circular(SpacingConstants.buttonHeight),
+          boxShadow: const [
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.12),
+              blurRadius: 16,
+              offset: Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Text(
+          'Get Started',
+          style: AppTextStyles.buttonTextStyle.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ScrollingImageRow extends StatelessWidget {
+  const _ScrollingImageRow({
+    required this.controller,
+    required this.images,
+    required this.reverse,
+    required this.itemSize,
+    required this.gap,
+    required this.isStadiumRow,
+  });
+
+  final AnimationController controller;
+  final List<String> images;
+  final bool reverse;
+  final double itemSize;
+  final double gap;
+  final bool isStadiumRow;
+
+  double get _stadiumWidth => itemSize * 1.55;
+
+  double _itemWidth(int index) {
+    if (!isStadiumRow) return itemSize;
+    return index.isEven ? itemSize : _stadiumWidth;
+  }
+
+  double get _oneSetWidth {
+    double total = 0;
+    for (int i = 0; i < images.length; i++) {
+      total += _itemWidth(i) + gap;
+    }
+    return total;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final oneSetWidth = _oneSetWidth;
+
+    return SizedBox(
+      height: itemSize,
+      width: .infinity,
+      child: ClipRect(
+        child: AnimatedBuilder(
+          animation: controller,
+          builder: (context, child) {
+            final progress = controller.value;
+            final dx = reverse
+                ? -oneSetWidth * progress
+                : -oneSetWidth * (1 - progress);
+            return Transform.translate(
+              offset: Offset(dx, 0),
+              child: child,
+            );
+          },
+          child: Row(
+            children: [
+              ..._buildItems(),
+              ..._buildItems(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  void _onEmailTap(BuildContext context){
-    context.push(RouterEnum.loginView.routeName);
-  }
-
-  void _onSignInWithGoogleTap(BuildContext context){
-    context.read<AuthCubit>().onGoogleSignInTap();
+  List<Widget> _buildItems() {
+    return List.generate(images.length, (index) {
+      final isStadium = isStadiumRow && index.isOdd;
+      final width = isStadium ? _stadiumWidth : itemSize;
+      return Padding(
+        padding: EdgeInsets.only(right: gap),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(isStadium ? itemSize / 2 : itemSize / 2,),
+          child: SizedBox(
+            width: width,
+            height: itemSize,
+            child: Image.asset(
+              images[index],
+              fit: .cover,
+            ),
+          ),
+        ),
+      );
+    });
   }
 }

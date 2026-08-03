@@ -136,7 +136,7 @@ class _DraftFeelsWidgetState extends State<DraftFeelsWidget> {
 
                                   CircleAvatar(
                                     radius: 20,
-                                    backgroundColor: AppColors.purpleColor,
+                                    backgroundColor: AppColors.primaryColor,
                                     child: CircleAvatar(
                                       backgroundColor: Colors.white,
                                       radius: 19,

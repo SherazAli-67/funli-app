@@ -56,6 +56,42 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:41844358248:android:ea48fd87ad627c0d9b8fdd",
+        "android_client_info": {
+          "package_name": "com.sherazapps.moodstream"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "41844358248-r405kggl01sgb61b1nbi4v7trtotbiai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuPUvNNrRuMuNj3pPzIeXyYGbiYFRyLao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "41844358248-r405kggl01sgb61b1nbi4v7trtotbiai.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "41844358248-u5ku7rabb2nmc0mf0epae88a5hrt0no2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.funliApp"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

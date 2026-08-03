@@ -493,7 +493,7 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
         // Buffering indicator
         if (_controller!.value.isBuffering)
           Center(
-            child: LoadingWidget(color: AppColors.purpleColor),
+            child: LoadingWidget(color: AppColors.primaryColor),
           ),
 
         // Play/Pause overlay

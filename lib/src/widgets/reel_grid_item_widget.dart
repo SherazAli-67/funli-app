@@ -52,7 +52,7 @@ class ReelGridItemWidget extends StatelessWidget {
 
                       CircleAvatar(
                         radius: 20,
-                        backgroundColor: AppColors.purpleColor,
+                        backgroundColor: AppColors.primaryColor,
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
                           radius: 19,

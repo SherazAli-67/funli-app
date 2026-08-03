@@ -214,7 +214,7 @@ class MoodCard extends StatelessWidget {
                 style: TextStyle(fontSize: 30),),
             ),
             title: Text(mood.mood,
-              style: AppTextStyles.bodyTextStyle.copyWith(
+              style: AppTextStyles.regularTextStyle.copyWith(
                   fontWeight: FontWeight.w700),),
             subtitle: Text('${mood.reelsCount} feels',
               style: AppTextStyles.captionTextStyle

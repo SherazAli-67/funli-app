@@ -1,4 +1,5 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:funli_app/src/models/reel_model.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/testing/social_media/social_api_service.dart';
@@ -29,7 +30,7 @@ class AppData {
   ];
 
   static List<ReelModel> getReels(){
-    String userID = 'RurOyejb8iQERN1R9OqJ81eokg02';
+    String userID = FirebaseAuth.instance.currentUser!.uid;
     String reelID = DateTime.now().microsecondsSinceEpoch.toString();
 
     List<String> urls = [

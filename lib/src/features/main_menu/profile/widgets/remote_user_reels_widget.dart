@@ -213,7 +213,7 @@ class _RemoteUserReelsWidgetState extends State<RemoteUserReelsWidget> {
 
                                       CircleAvatar(
                                         radius: 20,
-                                        backgroundColor: AppColors.purpleColor,
+                                        backgroundColor: AppColors.primaryColor,
                                         child: CircleAvatar(
                                           backgroundColor: Colors.white,
                                           radius: 19,

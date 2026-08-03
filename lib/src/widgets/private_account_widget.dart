@@ -24,7 +24,7 @@ class PrivateAccountWidget extends StatelessWidget {
           child:  SvgPicture.asset(AppIcons.icPasswordLock, color: Colors.black,),
         ),
         Text("This Account is Private", style: AppTextStyles.subHeadingTextStyle,),
-        Text("Follow this account to see their FEELS", style: AppTextStyles.bodyTextStyle, textAlign: TextAlign.center,)
+        Text("Follow this account to see their FEELS", style: AppTextStyles.regularTextStyle, textAlign: TextAlign.center,)
       ],
     );
   }

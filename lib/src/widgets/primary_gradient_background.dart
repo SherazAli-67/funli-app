@@ -9,6 +9,7 @@ class PrimaryGradientBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       // Allows body to extend behind AppBar if you use one
       // extendBodyBehindAppBar: true,
       body: Stack(

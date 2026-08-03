@@ -32,7 +32,7 @@ class SettingsItemWidget extends StatelessWidget {
         title: Text(_title, style: _isLogout ? AppTextStyles.buttonTextStyle.copyWith(color: AppColors.logoutRedColor) : AppTextStyles.buttonTextStyle,),
         trailing: _isSwitch ?  CupertinoSwitch(
             inactiveTrackColor:  AppColors.switchTrackColor,
-            activeTrackColor: AppColors.purpleColor,
+            activeTrackColor: AppColors.primaryColor,
             value: _switchValue, onChanged: _onSwitchChange) : !_isLogout ? Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: Icon(Icons.navigate_next_outlined),

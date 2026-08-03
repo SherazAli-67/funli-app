@@ -317,7 +317,7 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
       _trimmer.videoPlayerController!.play();
     },
         child: Text("${playbackSpeedTxt}x",
-          style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white,
+          style: AppTextStyles.regularTextStyle.copyWith(color: Colors.white,
               fontWeight: isSelected ? FontWeight.w900 : FontWeight.w300),));
   }
 

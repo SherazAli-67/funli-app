@@ -112,24 +112,24 @@ class _SearchPageState extends State<SearchPage> {
                         height: 35,
                         width: 100,
                         child: selectedIndex == 0
-                            ?  PrimaryBtn(btnText: "Feels", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
-                            : SecondaryBtn(btnText: "Feels", icon: '', onTap: ()=> _onSelectFilterTypeTap(0), textStyle: AppTextStyles.bodyTextStyle,),
+                            ?  PrimaryBtn(btnText: "Feels", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.regularTextStyle,)
+                            : SecondaryBtn(btnText: "Feels", icon: '', onTap: ()=> _onSelectFilterTypeTap(0), textStyle: AppTextStyles.regularTextStyle,),
                       ),
 
                       SizedBox(
                         height: 35,
                         width: 100,
                         child: selectedIndex == 1
-                            ?  PrimaryBtn(btnText: "Users", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
-                            : SecondaryBtn(btnText: "Users", icon: '', onTap: ()=> _onSelectFilterTypeTap(1), textStyle: AppTextStyles.bodyTextStyle,),
+                            ?  PrimaryBtn(btnText: "Users", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.regularTextStyle,)
+                            : SecondaryBtn(btnText: "Users", icon: '', onTap: ()=> _onSelectFilterTypeTap(1), textStyle: AppTextStyles.regularTextStyle,),
                       ),
 
                       SizedBox(
                         height: 35,
                         width: 127,
                         child: selectedIndex == 2
-                            ?  PrimaryBtn(btnText: "Hashtags", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.bodyTextStyle,)
-                            : SecondaryBtn(btnText: "Hashtags", icon: '', onTap: ()=> _onSelectFilterTypeTap(2), textStyle: AppTextStyles.bodyTextStyle,),
+                            ?  PrimaryBtn(btnText: "Hashtags", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.regularTextStyle,)
+                            : SecondaryBtn(btnText: "Hashtags", icon: '', onTap: ()=> _onSelectFilterTypeTap(2), textStyle: AppTextStyles.regularTextStyle,),
                       ),
                     ],
                   ),
@@ -181,7 +181,7 @@ class _SearchPageState extends State<SearchPage> {
               horizontalTitleGap: 5,
               contentPadding: EdgeInsets.symmetric(vertical: 12),
               leading: ProfilePictureWidget(profilePicture: user.profilePicture),
-              title: Text(user.userName, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w700),),
+              title: Text(user.userName, style: AppTextStyles.regularTextStyle.copyWith(fontWeight: FontWeight.w700),),
               trailing: ConstrainedBox(constraints: BoxConstraints(maxWidth: 120, minWidth: 80), child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
                 if(snapshot.hasData){
                   return snapshot.requireData
@@ -256,7 +256,7 @@ class _SearchPageState extends State<SearchPage> {
 
                             CircleAvatar(
                               radius: 20,
-                              backgroundColor: AppColors.purpleColor,
+                              backgroundColor: AppColors.primaryColor,
                               child: CircleAvatar(
                                 backgroundColor: Colors.white,
                                 radius: 19,

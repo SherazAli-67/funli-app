@@ -16,6 +16,7 @@ import 'package:funli_app/src/providers/report_content_provider.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/providers/tab_change_provider.dart';
 import 'package:funli_app/src/providers/users_search_provider.dart';
+import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:funli_app/src/services/enhanced_video_feed_service.dart';
@@ -77,7 +78,7 @@ class MyApp extends StatelessWidget {
         locale: DevicePreview.locale(context),
         builder: DevicePreview.appBuilder,*/
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
           fontFamily: AppConstants.appFontFamily,
           scaffoldBackgroundColor: Colors.white
       ),

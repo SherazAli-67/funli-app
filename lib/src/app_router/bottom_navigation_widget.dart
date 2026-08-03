@@ -102,7 +102,7 @@ class _BottomNavigationWidgetState extends State<BottomNavigationWidget> {
   }
 
   Widget _buildBottomNavigationItemWidget({required String icon, required bool isSelected, required VoidCallback onTap}) =>
-      IconButton(onPressed: onTap, icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode( isSelected ? AppColors.purpleColor : Colors.white, BlendMode.srcIn)));
+      IconButton(onPressed: onTap, icon: SvgPicture.asset(icon, colorFilter: ColorFilter.mode( isSelected ? AppColors.primaryColor : Colors.white, BlendMode.srcIn)));
 
   void _initNotificationService()async{
     //Get notification permission then

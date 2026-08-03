@@ -38,6 +38,7 @@ enum RouterEnum {
   reportContentView('/reportContent-view'),
   deepLinkViewer('/deepLink-view'),
   //BottomNav
+  homeView('/home_view'),
   discoverView('/discover_view'),
   videoFeedView('/video_feed_view'),
   notificationView('/notification_view'),

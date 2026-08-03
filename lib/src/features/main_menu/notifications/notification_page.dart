@@ -149,7 +149,7 @@ class _NotificationPageState extends State<NotificationPage> {
         children: [
           GradientIcon(icon: Icons.notifications_none_rounded, size: 55, gradient: AppGradients.primaryGradient),
           Text("No Notifications Right Now!", style: AppTextStyles.tileTitleTextStyle, textAlign: TextAlign.center,),
-          Text("You're up to date", style: AppTextStyles.bodyTextStyle,)
+          Text("You're up to date", style: AppTextStyles.regularTextStyle,)
         ],
       ),
     );

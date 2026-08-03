@@ -123,7 +123,7 @@ class _SocialTextFieldState extends State<SocialTextField> {
       text: widget.initialText,
       onHashtagEntered: _onHashtagEntered,
       onMentionEntered: _onMentionEntered,
-      hashtagStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor), mentionStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor)
+      hashtagStyle: AppTextStyles.regularTextStyle.copyWith(color: AppColors.primaryColor), mentionStyle: AppTextStyles.regularTextStyle.copyWith(color: AppColors.primaryColor)
     );
     
     // Initialize focus node

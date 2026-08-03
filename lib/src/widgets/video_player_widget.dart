@@ -147,7 +147,7 @@ class VideoPlayerWidgetState extends State<VideoPlayerWidget> with TickerProvide
                   : AspectRatio(aspectRatio: _controller.value.aspectRatio, child: child),
             ),
             if (_isBuffering)
-              LoadingWidget(color: AppColors.purpleColor),
+              LoadingWidget(color: AppColors.primaryColor),
             if (_showPlayPauseOverlay)
               PlayPauseWidget(isPlaying: _controller.value.isPlaying),
 

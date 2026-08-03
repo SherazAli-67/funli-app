@@ -60,7 +60,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       body: Consumer<ProfileProvider>(builder: (ctx, provider, _) {
         return provider.isProfileLoading
-            ? LoadingWidget(color: AppColors.purpleColor)
+            ? LoadingWidget(color: AppColors.primaryColor)
             : Stack(
           children: [
             SingleChildScrollView(
@@ -126,7 +126,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           hintText: 'Gender',
                           titleText: 'Gender',
                           isReadOnly: true,
-                          suffixIcon: Icon(Icons.keyboard_arrow_down_rounded),
+                          // suffixIcon: Icon(Icons.keyboard_arrow_down_rounded),
                           onTap: () {
                             _onGenderTap(selectedGender: provider.gender, onSelectGender: (gender) {
                               provider.setGender(gender);
@@ -141,7 +141,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           hintText: 'Age',
                           titleText: 'Age',
                           isReadOnly: true,
-                          suffixIcon: Icon(Icons.keyboard_arrow_down_rounded),
+                          // suffixIcon: Icon(Icons.keyboard_arrow_down_rounded),
                           onTap: () {
                             _onDOBChangeTap(
                               selectedMonth: provider.selectedMonth,

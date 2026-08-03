@@ -264,7 +264,7 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage>
     return RefreshIndicator(
       onRefresh: _refreshFeed,
       backgroundColor: Colors.black,
-      color: AppColors.purpleColor,
+      color: AppColors.primaryColor,
       child: PreloadPageView.builder(
         controller: _pageController,
         scrollDirection: Axis.vertical,
@@ -303,7 +303,7 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage>
               color: Colors.black.withValues(alpha: 0.3),
               child: const Center(
                 child: CircularProgressIndicator(
-                  color: AppColors.purpleColor,
+                  color: AppColors.primaryColor,
                 ),
               ),
             ),
@@ -327,7 +327,7 @@ class _UpdatedReelsPageState extends State<UpdatedReelsPage>
       color: Colors.black,
       child: const Center(
         child: CircularProgressIndicator(
-          color: AppColors.purpleColor,
+          color: AppColors.primaryColor,
         ),
       ),
     );
@@ -555,7 +555,7 @@ class ReelInfoOverlay extends StatelessWidget {
             child: Text(
               '#${reel.moodTag}',
               style: const TextStyle(
-                color: AppColors.purpleColor,
+                color: AppColors.primaryColor,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),

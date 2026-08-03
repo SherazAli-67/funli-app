@@ -1,7 +1,7 @@
 class AppConstants {
   static const appTitle = 'FEELz';
   // static const appFontFamily = 'Poppins';
-  static const appFontFamily = 'Montserrat';
+  static const appFontFamily = 'Urbanist';
 
   static const signedUpSuccessTitle = 'You’re In! 🎉';
   static const signedUpSuccessMessage = 'Account created—let the magic begin!';
@@ -24,4 +24,8 @@ class AppConstants {
 
   static const comingFromSearch = 'comingFromSearch';
   static const comingFromDeepLink ='deeplink';
+
+  static String termsOfUseUrl = '';
+  static String privacyPolicyUrl = '';
+
 }

@@ -39,35 +39,20 @@ class PrimaryBtn extends StatelessWidget {
       onTap: _onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.purpleColor,
-          // gradient: AppGradients.btnOuterGradient,
-            boxShadow: [
-              BoxShadow(
-                  color: Color.fromRGBO(201, 186, 255, 1),
-                  blurRadius: 17.6,
-                  offset: Offset(0, 6)
-              )
-            ],
-          borderRadius: BorderRadius.circular(_borderRadius),
+          color: AppColors.colorBlack,
+          borderRadius: .circular(_borderRadius),
         ),
-        // padding: EdgeInsets.all(2),
-        child: Container(
-          width: double.infinity,
-          height: SpacingConstants.buttonHeight,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(_borderRadius),
-          ),
-          child: _isLoading ? LoadingWidget() : Row(
-            spacing: _icon.isNotEmpty ? 10 : 0,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if(_isPrefix && _icon.isNotEmpty)
-                SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,),
-              Text(_text, style: _textStyle.copyWith(color: Colors.white),),
-              if(!_isPrefix && _icon.isNotEmpty)
-                SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,)
-            ],
-          ),
+        padding: EdgeInsets.all(15),
+        child: _isLoading ? LoadingWidget() : Row(
+          spacing: _icon.isNotEmpty ? 10 : 0,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if(_isPrefix && _icon.isNotEmpty)
+              SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,),
+            Text(_text, style: _textStyle.copyWith(color: Colors.white),),
+            // if(!_isPrefix && _icon.isNotEmpty)
+            //   SvgPicture.asset(_icon, colorFilter: _iconColor != null ? ColorFilter.mode(_iconColor, BlendMode.srcIn) :null,)
+          ],
         ),
       ),
     );

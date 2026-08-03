@@ -99,7 +99,7 @@ class _ContentPreferencesPageState extends State<ContentPreferencesPage> {
                               children: [
                                 Padding(
                                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                                    child: Text(interest, style: AppTextStyles.bodyTextStyle.copyWith(color: txtIconColor),)
+                                    child: Text(interest, style: AppTextStyles.regularTextStyle.copyWith(color: txtIconColor),)
                                 ),
                               ],
                             ),

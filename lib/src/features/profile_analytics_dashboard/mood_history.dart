@@ -550,7 +550,7 @@ class AnalyticsMoodHistory extends StatelessWidget{
             const SizedBox(width: 4),
             Text(
               days,
-              style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400)
+              style: AppTextStyles.regularTextStyle.copyWith(fontWeight: FontWeight.w400)
             ),
           ],
         ),

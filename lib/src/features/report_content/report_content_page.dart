@@ -84,7 +84,7 @@ class ReportContentPage extends StatelessWidget{
                     contentPadding: EdgeInsets.zero,
                     value: false, groupValue: '', onChanged: (val){}, title: Text(reason, style: AppTextStyles.smallTextStyle.copyWith(fontSize: 16),),);*/
                 })),
-           provider.isReporting ? LoadingWidget(color: AppColors.purpleColor,) : Row(
+           provider.isReporting ? LoadingWidget(color: AppColors.primaryColor,) : Row(
               spacing: 20,
               children: [
                 Expanded(child: SecondaryBtn(

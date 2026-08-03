@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>41844358248-u5ku7rabb2nmc0mf0epae88a5hrt0no2.apps.googleusercontent.com</string>
+	<string>41844358248-g9kdkvhpt8nqn4b7q0k732v0tpf7639h.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.41844358248-u5ku7rabb2nmc0mf0epae88a5hrt0no2</string>
+	<string>com.googleusercontent.apps.41844358248-g9kdkvhpt8nqn4b7q0k732v0tpf7639h</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>41844358248-5i6gvlrli1qnis80314mrq47bp2eacdd.apps.googleusercontent.com</string>
+	<string>41844358248-4cj99mp1bsl7nhmo63jbhsl6ha2b06c5.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDunAEFpdu4SxwKOZD6fqdzBpiLFKkEQnU</string>
 	<key>GCM_SENDER_ID</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.funliApp</string>
+	<string>com.sherazapps.moodstream</string>
 	<key>PROJECT_ID</key>
 	<string>funli-app</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:41844358248:ios:ac5d368c9cc94f6b9b8fdd</string>
+	<string>1:41844358248:ios:2c277a75e0b8d6c89b8fdd</string>
 </dict>
 </plist>

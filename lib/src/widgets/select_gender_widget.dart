@@ -96,7 +96,7 @@ class SelectGenderWidget extends StatelessWidget{
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(9),
         side: BorderSide(
-          color: isSelected ? AppColors.purpleColor : AppColors.genderBorderColor
+          color: isSelected ? AppColors.primaryColor : AppColors.genderBorderColor
         )
       ),
       value: isSelected,
@@ -105,7 +105,7 @@ class SelectGenderWidget extends StatelessWidget{
           _onSelectGender(gender);
         }
       },
-      title: Text(gender, style: AppTextStyles.bodyTextStyle.copyWith(color: txtIconColor),),
+      title: Text(gender, style: AppTextStyles.regularTextStyle.copyWith(color: txtIconColor),),
       secondary: SvgPicture.asset(icon, colorFilter: ColorFilter.mode(txtIconColor, BlendMode.srcIn),),
       checkboxShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(99),side: BorderSide(color: txtIconColor)

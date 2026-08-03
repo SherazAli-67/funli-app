@@ -69,7 +69,7 @@ class ProfileSettingsPage extends StatelessWidget{
                 ],
               ),
             ),
-            Center(child: Text("V1.0.1", style: AppTextStyles.bodyTextStyle,),),
+            Center(child: Text("V1.0.1", style: AppTextStyles.regularTextStyle,),),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: SettingsItemWidget(title: "Logout", icon: AppIcons.icLogout, isLogout: true, onTap: ()=> _onLogoutTap(context),),

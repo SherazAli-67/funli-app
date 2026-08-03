@@ -58,7 +58,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               spacing: 10,
               children: [
                 Text("Mood",
-                  style: AppTextStyles.bodyTextStyle.copyWith(
+                  style: AppTextStyles.regularTextStyle.copyWith(
                       fontWeight: FontWeight.w400),),
                 Wrap(
                   spacing: 10,
@@ -94,7 +94,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               spacing: 10,
               children: [
                 Text("Popularity",
-                  style: AppTextStyles.bodyTextStyle.copyWith(
+                  style: AppTextStyles.regularTextStyle.copyWith(
                       fontWeight: FontWeight.w400),),
                 Wrap(
                   spacing: 10,

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_data.dart';
@@ -15,6 +16,10 @@ import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/widgets/enhanced_video_feed_item.dart';
 import 'package:preload_page_view/preload_page_view.dart';
+
+import '../../../services/publish_reel_service.dart';
+
+import '../../../services/publish_reel_service.dart';
 
 class VideoFeedView extends StatefulWidget {
   final String? initialMood;
@@ -170,36 +175,37 @@ class VideoFeedViewState extends State<VideoFeedView>
     }
   }
 
+  Future<void> uploadFeels() async {
+    AppData.getReels().forEach((reel) async {
+
+      bool isUploaded = await PublishReelService.uploadReel(reel: reel);
+      debugPrint("isUploaded: $isUploaded");
+    });
+  }
+
   Future<void> _initializeVideoFeed() async {
     setState(()=>  _isLoading = true);
 
     try {
-      // Initialize the enhanced video service
       await _videoService.initialize();
       
-      // Get initial mood and reels
       _currentMood = widget.initialMood ?? await ReelsCacheService.getCurrentMood();
       
-      // Use provided reels or get from cache/generate
       if (widget.initialReels != null && widget.initialReels!.isNotEmpty) {
         _reels = widget.initialReels!;
       } else {
-        // Try to get cached reels first
         _reels = await ReelsCacheService.getCachedReels(_currentMood);
         debugPrint("Cached reels: ${_reels.length}");
-        // If no cached reels, fetch from Firebase
         if (_reels.isEmpty) {
           debugPrint('No cached reels found, fetching from Firebase');
           _reels = await _fetchFreshReelsFromFirebase();
           
-          // Cache the fetched reels for future use
           if (_reels.isNotEmpty) {
             await ReelsCacheService.cacheReels(_reels, _currentMood);
           }
         }
       }
       
-      // Initialize reels cubit
       _reelsCubit = ReelsCubit(
         ReelsRepository(
           initialReels: _reels,
@@ -208,7 +214,6 @@ class VideoFeedViewState extends State<VideoFeedView>
         ),
       );
       
-      // Start smart preloading
       await _startSmartPreloading();
       
       setState(() {
@@ -218,7 +223,6 @@ class VideoFeedViewState extends State<VideoFeedView>
       
       _initCompleter.complete();
       
-      // Start background optimizations
       _startBackgroundOptimizations();
       
     } catch (e) {
@@ -227,7 +231,6 @@ class VideoFeedViewState extends State<VideoFeedView>
         _isLoading = false;
       });
       
-      // In production, try one more time to get reels from Firebase
       try {
         debugPrint('Initialization failed, attempting emergency Firebase fetch');
         _reels = await _fetchFreshReelsFromFirebase();
@@ -470,7 +473,7 @@ class VideoFeedViewState extends State<VideoFeedView>
       color: Colors.black,
       child: const Center(
         child: CircularProgressIndicator(
-          color: AppColors.purpleColor,
+          color: AppColors.primaryColor,
         ),
       ),
     );
@@ -506,7 +509,7 @@ class VideoFeedViewState extends State<VideoFeedView>
             ElevatedButton(
               onPressed: () => _initializeVideoFeed(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.purpleColor,
+                backgroundColor: AppColors.primaryColor,
                 foregroundColor: Colors.white,
               ),
               child: Text(
@@ -621,13 +624,13 @@ class VideoFeedViewState extends State<VideoFeedView>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const CircularProgressIndicator(
-                      color: AppColors.purpleColor,
+                      color: AppColors.primaryColor,
                     ),
                     if (_isRefreshing) ...[ 
                       const SizedBox(height: 16),
                       Text(
                         'Refreshing feed...',
-                        style: AppTextStyles.bodyTextStyle.copyWith(
+                        style: AppTextStyles.regularTextStyle.copyWith(
                           color: Colors.white,
                         ),
                       ),

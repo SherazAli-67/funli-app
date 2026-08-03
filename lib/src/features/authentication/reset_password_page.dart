@@ -69,7 +69,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             const SizedBox(height: 14,),
                             SizedBox(
                                 width: size.width*0.8,
-                                child: Text("Nice! Reset your password and don’t worry if you forgot again.", style: AppTextStyles.bodyTextStyle,))
+                                child: Text("Nice! Reset your password and don’t worry if you forgot again.", style: AppTextStyles.regularTextStyle,))
                           ],
                         ),
                       ],

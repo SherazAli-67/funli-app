@@ -62,13 +62,13 @@ class _CommentItemWidgetState extends State<CommentItemWidget> {
               GestureDetector(onTap: (){
                 _showReplies = true;
                 setState(() { });
-              }, child: Text(snapshot.requireData > 1 ?  "View ${snapshot.requireData} replies" : "View ${snapshot.requireData} reply", style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.purpleColor, fontWeight: FontWeight.w600),)),
+              }, child: Text(snapshot.requireData > 1 ?  "View ${snapshot.requireData} replies" : "View ${snapshot.requireData} reply", style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.primaryColor, fontWeight: FontWeight.w600),)),
               
               if(_showReplies)
               GestureDetector(onTap: (){
                 _showReplies = false;
                 setState(() { });
-              }, child: Text("Hide replies", style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.purpleColor, fontWeight: FontWeight.w600),)),
+              }, child: Text("Hide replies", style: AppTextStyles.smallTextStyle.copyWith(color: AppColors.primaryColor, fontWeight: FontWeight.w600),)),
 
               //Replies widget
               if(_showReplies)
@@ -88,7 +88,7 @@ class _CommentItemWidgetState extends State<CommentItemWidget> {
                             );
                           });
                     }else if(snapshot.connectionState == ConnectionState.waiting){
-                      return LoadingWidget(color: AppColors.purpleColor,);
+                      return LoadingWidget(color: AppColors.primaryColor,);
                     }
 
                     return SizedBox();

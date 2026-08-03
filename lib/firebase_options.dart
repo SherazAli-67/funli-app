@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -49,20 +46,30 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCJbOvP0SR9GLWpC6Ga60l0-jyk5VB-JZA',
+    appId: '1:41844358248:web:93badbda127a25439b8fdd',
+    messagingSenderId: '41844358248',
+    projectId: 'funli-app',
+    authDomain: 'funli-app.firebaseapp.com',
+    storageBucket: 'funli-app.firebasestorage.app',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCuPUvNNrRuMuNj3pPzIeXyYGbiYFRyLao',
-    appId: '1:41844358248:android:dc5458bc9ba7d41c9b8fdd',
+    appId: '1:41844358248:android:ea48fd87ad627c0d9b8fdd',
     messagingSenderId: '41844358248',
     projectId: 'funli-app',
     storageBucket: 'funli-app.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDunAEFpdu4SxwKOZD6fqdzBpiLFKkEQnU',
-    appId: '1:41844358248:ios:ac5d368c9cc94f6b9b8fdd',
+    appId: '1:41844358248:ios:2c277a75e0b8d6c89b8fdd',
     messagingSenderId: '41844358248',
     projectId: 'funli-app',
     storageBucket: 'funli-app.firebasestorage.app',
-    iosBundleId: 'com.example.funliApp',
+    androidClientId: '41844358248-4cj99mp1bsl7nhmo63jbhsl6ha2b06c5.apps.googleusercontent.com',
+    iosClientId: '41844358248-g9kdkvhpt8nqn4b7q0k732v0tpf7639h.apps.googleusercontent.com',
+    iosBundleId: 'com.sherazapps.moodstream',
   );
 }

@@ -94,7 +94,7 @@ class PostCommentWidget extends StatelessWidget{
             if(totalComments != 0)
               IconButton(
                   onPressed: null,
-                  icon: Text( "$totalComments", style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white),))
+                  icon: Text( "$totalComments", style: AppTextStyles.regularTextStyle.copyWith(color: Colors.white),))
           ],
         );
   }

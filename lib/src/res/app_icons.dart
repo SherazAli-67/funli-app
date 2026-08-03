@@ -77,9 +77,11 @@ class AppIcons {
   static const String circleBtnGradient = 'assets/icons/ic_circle_btn_gradient.svg';
   //Pngs
   static const String icSplashLogo = 'assets/icons/ic_splash_logo.png';
-  static const String onboarding1 = 'assets/icons/onboarding_img1.png';
-  static const String onboarding2 = 'assets/icons/onboarding_img2.png';
-  static const String onboarding3 = 'assets/icons/onboarding_img3.png';
+  static const String onboarding1 = 'assets/icons/pngs/onboarding1.png';
+  static const String onboarding2 = 'assets/icons/pngs/onboarding2.png';
+  static const String onboarding3 = 'assets/icons/pngs/onboarding3.png';
+  static const String onboarding4 = 'assets/icons/pngs/onboarding4.png';
+  static const String onboarding5 = 'assets/icons/pngs/onboarding5.png';
   static const emojiHappyMoodDetected = 'assets/icons/ic_mood_happy_detected.png';
 
 

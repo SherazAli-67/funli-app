@@ -1,6 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 
 class AuthService {
@@ -22,12 +23,8 @@ class AuthService {
   Future<UserCredential?> signupUsingEmail({required String userName, required String email, required String password}) async {
     UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
     if (userCredential.user != null) {
-      Map<String, dynamic> userMap = {
-        'userID': userCredential.user!.uid,
-        'userName': userName,
-        'email': email
-      };
-      await _userColRef.doc(userCredential.user!.uid).set(userMap);
+      UserModel user = UserModel(userID: userCredential.user!.uid, userName: userName, email: email);
+      await _userColRef.doc(userCredential.user!.uid).set(user.toMap());
       return userCredential;
     }
 

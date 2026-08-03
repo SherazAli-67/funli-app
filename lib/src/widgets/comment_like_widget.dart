@@ -57,11 +57,11 @@ class CommentLikeWidget extends StatelessWidget{
             return text == '0' ? const SizedBox(): isSelected
                 ? Text(
               text,
-              style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
+              style: AppTextStyles.regularTextStyle.copyWith(color: AppColors.primaryColor),
             )
                 : Text(
               text,
-              style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
+              style: AppTextStyles.regularTextStyle.copyWith(color: iconColor),
             );
           },
         );

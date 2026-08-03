@@ -7,6 +7,8 @@ import 'package:funli_app/src/features/deep_link_handler.dart';
 import 'package:funli_app/src/features/hashtagged_reels_page/hashtag_reels_page.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/discover_page.dart';
 import 'package:funli_app/src/features/main_menu/discover_page/filtered_reels_page.dart';
+import 'package:funli_app/src/features/main_menu/homepage/homepage.dart';
+import 'package:funli_app/src/features/main_menu/main_menu_page.dart';
 import 'package:funli_app/src/features/main_menu/notifications/notification_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/edit_profile_page.dart';
 import 'package:funli_app/src/features/main_menu/profile/remote_user_profile_page.dart';
@@ -51,12 +53,29 @@ class AppRouter {
     observers: [routeObserver],
     initialLocation: RouterEnum.welcomeView.routeName,
     routes: [
-      ShellRoute(
+      StatefulShellRoute.indexedStack(
+          builder: (_, state, navigationShell)=> MainMenuPage(navigationShell: navigationShell),
+          branches: [
+            StatefulShellBranch(routes: [
+              GoRoute(path: RouterEnum.homeView.routeName, builder: (ctx, state) => Homepage()),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(path: RouterEnum.discoverView.routeName,
+                  builder: (ctx, state) => DiscoverPage()),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(path: RouterEnum.notificationView.routeName,
+                  builder: (ctx, state) => NotificationPage()),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(path: RouterEnum.profileView.routeName,
+                  builder: (ctx, state) => UserProfilePage()),
+            ]),
+
+          ]),
+     /* ShellRoute(
         navigatorKey: _shellNavigatorKey,
-        pageBuilder: (context, state, child) => customPageBuilderWidget(
-          context,
-          state,
-          BottomNavigationWidget(
+        pageBuilder: (context, state, child) => customPageBuilderWidget(context, state, BottomNavigationWidget(
             location: state.uri.toString(),
             backgroundColor:
             state.uri.toString() == RouterEnum.videoFeedView.routeName
@@ -70,8 +89,7 @@ class AppRouter {
             path: RouterEnum.videoFeedView.routeName,
             pageBuilder: (context, state) => customPageBuilderWidget(
               context,
-              state,
-              SizedBox.expand(child: VideoFeedView(key: videoFeedViewKey)),
+              state, SizedBox.expand(child: VideoFeedView(key: videoFeedViewKey)),
             ),
           ),
           GoRoute(
@@ -99,28 +117,23 @@ class AppRouter {
             ),
           ),
         ],
-      ),
+      ),*/
 
+      GoRoute(path: RouterEnum.videoFeedView.routeName,
+          builder: (ctx, state) => VideoFeedView()),
       GoRoute(
         path: RouterEnum.welcomeView.routeName,
-        builder: (BuildContext context, GoRouterState state) =>
-        const WelcomePage(),
+        builder: (BuildContext context, GoRouterState state) => const WelcomePage(),
       ),
       GoRoute(
         path: RouterEnum.loginView.routeName,
-        builder: (BuildContext context, GoRouterState state) =>
-        const LoginPage(),
-      ),
+        builder: (BuildContext context, GoRouterState state) => const LoginPage(),),
       GoRoute(
         path: RouterEnum.forgetPassView.routeName,
-        builder: (BuildContext context, GoRouterState state) =>
-        const ForgetPasswordPage(),
-      ),
+        builder: (BuildContext context, GoRouterState state) => const ForgetPasswordPage(),),
       GoRoute(
         path: RouterEnum.signupView.routeName,
-        builder: (BuildContext context, GoRouterState state) =>
-        const SignupPage(),
-      ),
+        builder: (BuildContext context, GoRouterState state) => const SignupPage(),),
       GoRoute(
         path: RouterEnum.personalizationView.routeName,
         builder: (BuildContext context, GoRouterState state) =>
@@ -323,6 +336,7 @@ class AppRouter {
         RouterEnum.welcomeView.routeName,
         RouterEnum.loginView.routeName,
         RouterEnum.signupView.routeName,
+        RouterEnum.forgetPassView.routeName,
       ];
 
       if (!loggedIn && !publicPaths.contains(goingTo)) {
@@ -332,7 +346,7 @@ class AppRouter {
 
       if (loggedIn && publicPaths.contains(goingTo)) {
         // Logged in and trying to access public route (e.g., login or welcome)
-        return RouterEnum.videoFeedView.routeName;
+        return RouterEnum.homeView.routeName;
       }
 
       return null;

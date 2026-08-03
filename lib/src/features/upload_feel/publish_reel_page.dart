@@ -143,8 +143,8 @@ class _PublishReelPageState extends State<PublishReelPage> {
                             maxLines: 5,
                             minLines: 3,
 
-                            hashtagStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.pinkColor),
-                            mentionStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontWeight: FontWeight.w600),
+                            hashtagStyle: AppTextStyles.regularTextStyle.copyWith(color: AppColors.pinkColor),
+                            mentionStyle: AppTextStyles.regularTextStyle.copyWith(color: AppColors.primaryColor, fontWeight: FontWeight.w600),
                             onChanged: (text) {
                               captionController.text = text;
 
@@ -300,7 +300,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
           children: [
             Lottie.asset(AppIcons.icSuccessAnim, height: 150, repeat: false,),
             Text("Awesome! You  expressed your feelings☺", textAlign: TextAlign.center, style: AppTextStyles.headingTextStyle3,),
-            Text("You can check feel uploading progress in the notification", textAlign: TextAlign.center, style: AppTextStyles.bodyTextStyle,),
+            Text("You can check feel uploading progress in the notification", textAlign: TextAlign.center, style: AppTextStyles.regularTextStyle,),
 
             const SizedBox(height: 20,),
             Padding(
@@ -331,7 +331,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
             spacing: 10,
             children: [
               Text("Save as draft?", textAlign: TextAlign.center, style: AppTextStyles.headingTextStyle3,),
-              Text("Drafts let you save your edits, so you can come back later", style: AppTextStyles.bodyTextStyle,),
+              Text("Drafts let you save your edits, so you can come back later", style: AppTextStyles.regularTextStyle,),
 
             ],
           ),

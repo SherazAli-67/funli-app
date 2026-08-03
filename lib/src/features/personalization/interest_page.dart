@@ -37,7 +37,7 @@ class _InterestPageState extends State<InterestPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
                       border: Border.all(color: AppColors.borderColor),
-                      color: !isSelected ? Colors.white : AppColors.purpleColor,
+                      color: !isSelected ? Colors.white : AppColors.primaryColor,
                       // gradient: isSelected ? AppGradients.interestItemGradient : null
                     ),
                     child: Stack(
@@ -45,7 +45,7 @@ class _InterestPageState extends State<InterestPage> {
                       children: [
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                          child: Text(interest, style: AppTextStyles.bodyTextStyle.copyWith(color: txtIconColor),)
+                          child: Text(interest, style: AppTextStyles.regularTextStyle.copyWith(color: txtIconColor),)
                         ),
                       ],
                     ),

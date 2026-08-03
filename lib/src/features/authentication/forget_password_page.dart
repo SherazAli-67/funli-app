@@ -33,78 +33,64 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   }
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return PrimaryGradientBackground(
-      child: Column(
-        children: [
-          AuthPagesHeaderTextWidget(),
+    return Scaffold(
+      body: SafeArea(child: Padding(
+        padding: .symmetric(horizontal: SpacingConstants.screenHorizontalPadding, vertical: 30),
+        child: Column(
+          crossAxisAlignment: .start,
+          spacing: 28,
+          children: [
+            Row(
+              crossAxisAlignment: .start,
+              spacing: 15,
+              children: [
 
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(31), topRight: Radius.circular(31))
-              ),
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: SpacingConstants.screenHorizontalPadding, vertical: 30),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 28,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 15,
-                      children: [
-
-                        AppBackButton(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text("Forgot Password", style: AppTextStyles.headingTextStyle3,),
-                            const SizedBox(height: 14,),
-                            Text("Let’s find your user account! 👊", style: AppTextStyles.bodyTextStyle,)
-                          ],
-                        ),
-                      ],
-                    ),
-
-                  AppTextField(textController: _emailController,
-                    prefixIcon: AppIcons.icLoginEmail,
-                    hintText: "ie johndoe@gmail.com",
-                    titleText: "Email address",),
-                     SizedBox(height: size.height*0.25,),
-                    BlocConsumer<AuthCubit, AuthStates>(
-                      builder: (_, state){
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 25.0),
-                          child: PrimaryBtn(btnText: "Let’s Go!", icon: AppIcons.icArrowNext, onTap: (){
-
-                            String email = _emailController.text.trim();
-                            if(email.isNotEmpty){
-                              context.read<AuthCubit>().onForgetPassTap(email: email);
-                            }
-                          }, isLoading: state is SendingForgetPassLink,),
-                        );
-                      },
-                      listener: (_, state){
-                        if(state is SentForgetPassLink){
-                          showModalBottomSheet(
-                              backgroundColor: Colors.white,
-                              context: context, builder: (ctx){
-                            return _buildEmailResetLinkSent(context);
-                          });
-                        }
-                      },
-                    ),
-                  ],
+                AppBackButton(),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: .start,
+                    mainAxisAlignment: .start,
+                    spacing: 12,
+                    children: [
+                      Text("Forgot Password", style: AppTextStyles.headingTextStyle3,),
+                      Text("Please provide email address for further instructions.", style: AppTextStyles.regularTextStyle,)
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          )
-        ],
-      ),
+
+            AppTextField(textController: _emailController,
+              prefixIcon: AppIcons.icLoginEmail,
+              hintText: "ie johndoe@gmail.com",
+              titleText: "Email address",),
+            const Spacer(),
+            BlocConsumer<AuthCubit, AuthStates>(
+              builder: (_, state){
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 25.0),
+                  child: PrimaryBtn(btnText: "Let’s Go!", icon: AppIcons.icArrowNext, onTap: (){
+
+                    String email = _emailController.text.trim();
+                    if(email.isNotEmpty){
+                      context.read<AuthCubit>().onForgetPassTap(email: email);
+                    }
+                  }, isLoading: state is SendingForgetPassLink,),
+                );
+              },
+              listener: (_, state){
+                if(state is SentForgetPassLink){
+                  showModalBottomSheet(
+                      backgroundColor: Colors.white,
+                      context: context, builder: (ctx){
+                    return _buildEmailResetLinkSent(context);
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      )),
     );
   }
 

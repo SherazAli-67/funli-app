@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: 3.8.1
+   sdk: ^3.10.7
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -54,7 +54,11 @@ dependencies:
   awesome_snackbar_content: ^0.1.5
   fluttertoast: ^8.2.12
   extended_text_field: ^16.0.2
-  circle_wheel_scroll: ^0.0.3
+  # Vendored locally (packages/circle_wheel_scroll) with a fix for newer
+  # Flutter versions; the pub.dev package (0.0.3) is unmaintained and no
+  # longer compiles.
+  circle_wheel_scroll:
+    path: packages/circle_wheel_scroll
   file_picker: ^10.1.9
   video_compress: ^3.1.4
   firebase_storage: ^12.4.6
@@ -74,13 +78,15 @@ dependencies:
   equatable: ^2.0.7
   flutter_cache_manager: ^3.4.1
   preload_page_view: ^0.2.0
-  go_router: ^15.2.0
+  go_router: ^17.3.0
   fl_chart: ^0.66.2
   emoji_picker_flutter: ^4.3.0
   device_preview: ^1.2.0
   uni_links: ^0.5.1
   share_plus: ^11.0.0
   connectivity_plus: ^6.0.5
+  url_launcher: ^6.3.2
+  salomon_bottom_bar: ^3.3.2
 #  visibility_detector: ^0.4.0+2
 
 dev_dependencies:
@@ -110,6 +116,7 @@ flutter:
     - assets/icons/
     - assets/anims/
     - assets/icons/contact_us/
+    - assets/icons/pngs/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -124,11 +131,17 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Montserrat
+    - family: Urbanist
       fonts:
-        - asset: assets/fonts/Montserrat-Regular.ttf
-        - asset: assets/fonts/Montserrat-Medium.ttf
-        - asset: assets/fonts/Montserrat-Bold.ttf
+        - asset: assets/fonts/Urbanist-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Urbanist-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Urbanist-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Urbanist-Bold.ttf
+          weight: 700
+
 #          weight: 700
 #          style: italic
   #   - family: Trajan Pro

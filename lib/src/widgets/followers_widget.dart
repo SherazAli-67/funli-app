@@ -152,7 +152,7 @@ class _FollowingAndFollowersBottomSheetState extends State<FollowingAndFollowers
                         horizontalTitleGap: 0,
                         contentPadding: EdgeInsets.symmetric(vertical: 12),
                         leading: ProfilePictureWidget(profilePicture: user.profilePicture),
-                        title: Text(user.userName, style: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w700),),
+                        title: Text(user.userName, style: AppTextStyles.regularTextStyle.copyWith(fontWeight: FontWeight.w700),),
                         trailing: user.userID != currentUID ? ConstrainedBox(constraints: BoxConstraints(maxWidth: 120, minWidth: 80), child: StreamBuilder(stream: UserService.getIsFollowingStream(user.userID), builder: (ctx, snapshot){
                           if(snapshot.hasData){
                             return snapshot.requireData
@@ -160,7 +160,7 @@ class _FollowingAndFollowersBottomSheetState extends State<FollowingAndFollowers
                                 : SizedBox(
                               height: 38,
                               width: 75,
-                              child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=> UserService.onFollowTap(remoteUID: user.userID, userName: user.userName, isPrivateAccount: user.visibility == ProfileVisibility.followersOnly), bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallBoldTextStyle,),
+                              child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=> UserService.onFollowTap(remoteUID: user.userID, userName: user.userName, isPrivateAccount: user.visibility == ProfileVisibility.followersOnly),textStyle: AppTextStyles.smallBoldTextStyle,),
                             );
                           }else if(snapshot.connectionState == ConnectionState.waiting){
                             return LoadingWidget();

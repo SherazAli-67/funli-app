@@ -76,11 +76,11 @@ class PostLikeWidget extends StatelessWidget{
                   ? GradientTextWidget(
                 gradient: AppGradients.primaryGradient,
                 text: likedUsers.length.toString(),
-                textStyle: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor),
+                textStyle: AppTextStyles.regularTextStyle.copyWith(color: AppColors.primaryColor),
               )
                   : Text(
                 text,
-                style: AppTextStyles.bodyTextStyle.copyWith(color: iconColor),
+                style: AppTextStyles.regularTextStyle.copyWith(color: iconColor),
               ),
             );
           },

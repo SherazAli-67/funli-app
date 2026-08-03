@@ -152,7 +152,7 @@ class _CommentsPageState extends State<CommentsPage> {
         children: [
           SizedBox(height: 50), // Reduced spacing for better sizing
           Text("No Comments Yet", style: AppTextStyles.headingTextStyle3,),
-          Text("Be the first to comment on the reel", style: AppTextStyles.bodyTextStyle,),
+          Text("Be the first to comment on the reel", style: AppTextStyles.regularTextStyle,),
           SizedBox(height: 50), // Reduced spacing for better sizing
         ],
       );
@@ -215,7 +215,7 @@ class _CommentsPageState extends State<CommentsPage> {
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           hintText: "Say something nice...",
-                          hintStyle: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.commentHintTextColor)
+                          hintStyle: AppTextStyles.regularTextStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.commentHintTextColor)
                       ),
                     ))
                   ],
@@ -246,8 +246,8 @@ class _CommentsPageState extends State<CommentsPage> {
               skinToneConfig: const SkinToneConfig(),
               categoryViewConfig: const CategoryViewConfig(),
               bottomActionBarConfig: const BottomActionBarConfig(
-                backgroundColor: AppColors.purpleColor,
-                buttonColor: AppColors.purpleColor
+                backgroundColor: AppColors.primaryColor,
+                buttonColor: AppColors.primaryColor
               ),
               searchViewConfig: const SearchViewConfig(
 
@@ -322,7 +322,7 @@ class _CommentsPageState extends State<CommentsPage> {
               children: [
                 SizedBox(height: 100), // Add some spacing for empty state
                 Text("No Comments Yet", style: AppTextStyles.headingTextStyle3,),
-                Text("Be the first to comment on the reel", style: AppTextStyles.bodyTextStyle,),
+                Text("Be the first to comment on the reel", style: AppTextStyles.regularTextStyle,),
                 SizedBox(height: 100), // Add some spacing for empty state
               ],
             );
@@ -383,7 +383,7 @@ class _CommentsPageState extends State<CommentsPage> {
                                 enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
                                 hintText: "Say something nice...",
-                                hintStyle: AppTextStyles.bodyTextStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.commentHintTextColor)
+                                hintStyle: AppTextStyles.regularTextStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.commentHintTextColor)
                             ),
                           ))
                         ],
@@ -414,8 +414,8 @@ class _CommentsPageState extends State<CommentsPage> {
                     skinToneConfig: const SkinToneConfig(),
                     categoryViewConfig: const CategoryViewConfig(),
                     bottomActionBarConfig: const BottomActionBarConfig(
-                      backgroundColor: AppColors.purpleColor,
-                      buttonColor: AppColors.purpleColor
+                      backgroundColor: AppColors.primaryColor,
+                      buttonColor: AppColors.primaryColor
                     ),
                     searchViewConfig: const SearchViewConfig(
 

@@ -24,7 +24,7 @@ class AppTextWidget extends StatelessWidget {
           if (word.startsWith('#')) {
             return TextSpan(
               text: '$word ',
-              style: AppTextStyles.bodyTextStyle.copyWith(color: AppColors.purpleColor, fontFamily: AppConstants.appFontFamily),
+              style: AppTextStyles.regularTextStyle.copyWith(color: AppColors.primaryColor, fontFamily: AppConstants.appFontFamily),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                 Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=> HashtagReelsPage(hashtag: word.substring(1, word.length))));
@@ -33,7 +33,7 @@ class AppTextWidget extends StatelessWidget {
           } else {
             return TextSpan(
               text: '$word ',
-              style: AppTextStyles.bodyTextStyle.copyWith(color: Colors.white, fontFamily: AppConstants.appFontFamily),
+              style: AppTextStyles.regularTextStyle.copyWith(color: Colors.white, fontFamily: AppConstants.appFontFamily),
             );
           }
         }).toList(),
