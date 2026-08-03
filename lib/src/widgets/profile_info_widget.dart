@@ -17,7 +17,6 @@ class ProfileInfoWidget extends StatelessWidget{
     return Column(
       spacing: 12,
       children: [
-
         FutureBuilder(future: UserService.getUserByID(userID: _userID), builder: (ctx, snapshot){
           if(snapshot.hasData){
             UserModel user = snapshot.requireData!;

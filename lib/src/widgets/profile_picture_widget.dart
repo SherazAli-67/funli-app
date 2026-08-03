@@ -9,20 +9,23 @@ class ProfilePictureWidget extends StatelessWidget {
     required String? profilePicture,
     this.onTap,
     this.heroTag,
+    this.radius = 35,
+    this.childRadius = 33
   }) : _profilePicture = profilePicture;
 
   final String? _profilePicture;
   final VoidCallback? onTap;
   final String? heroTag;
-
+  final double radius;
+  final double childRadius;
   @override
   Widget build(BuildContext context) {
     Widget avatar = CircleAvatar(
-      radius: 35,
+      radius: radius,
       backgroundColor: AppColors.amberYellowColor,
       child: CircleAvatar(
         backgroundColor: AppColors.amberYellowColor,
-        radius: _profilePicture  != null ? 33 :22,
+        radius: _profilePicture  != null ? childRadius:15,
         backgroundImage: _profilePicture != null
             ? CachedNetworkImageProvider(_profilePicture)
             : CachedNetworkImageProvider(AppIcons.icDummyImgUrl),

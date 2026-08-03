@@ -105,6 +105,7 @@ class UserService {
 
   static Stream<UserModel> getCurrentUserStream() {
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    debugPrint("UserID: $currentUID");
     return _fireStore.collection(
         FirebaseConstants.userCollection).doc(currentUID).snapshots().map((snapshot)=> UserModel.fromMap(snapshot.data()!));
   }
