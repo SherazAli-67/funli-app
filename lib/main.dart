@@ -21,10 +21,8 @@ final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  // Initialize dependency injection
   injectionSetup();
   
-  // Initialize enhanced video feed service for optimal performance
   try {
     await EnhancedVideoFeedService().initialize();
     debugPrint('Enhanced video feed service initialized successfully');
