@@ -259,7 +259,7 @@ class _CommentsPageState extends State<CommentsPage> {
     );
   }
 
-  // Keep the old structure as fallback
+/*  // Keep the old structure as fallback
   Widget _buildLegacyContent() {
     return Column(
       spacing: 14,
@@ -427,7 +427,7 @@ class _CommentsPageState extends State<CommentsPage> {
           )
         ],
       );
-  }
+  }*/
 
   void _onReplyTap(String userName, String commentID){
     setState(()=>  _isReplying = true);

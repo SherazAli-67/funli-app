@@ -9,7 +9,6 @@ import '../app_router/router_enum.dart';
 import '../models/follow_model.dart';
 import '../models/user_model.dart';
 import '../res/app_colors.dart';
-import '../res/app_icons.dart';
 import '../res/app_textstyles.dart';
 import '../res/firebase_constants.dart';
 import '../services/user_service.dart';

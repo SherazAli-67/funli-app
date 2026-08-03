@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_data.dart';
@@ -16,9 +14,6 @@ import 'package:funli_app/src/services/reels_cache_service.dart';
 import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/widgets/enhanced_video_feed_item.dart';
 import 'package:preload_page_view/preload_page_view.dart';
-
-import '../../../services/publish_reel_service.dart';
-
 import '../../../services/publish_reel_service.dart';
 
 class VideoFeedView extends StatefulWidget {

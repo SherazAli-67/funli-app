@@ -5,7 +5,6 @@ import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/res/firebase_constants.dart';
 import 'package:funli_app/src/features/profile_analytics_dashboard/reel_views_chart.dart';
 
-import '../models/reel_model.dart';
 
 class SettingsService {
   static final CollectionReference _userColRef = FirebaseFirestore.instance.collection(FirebaseConstants.userCollection);

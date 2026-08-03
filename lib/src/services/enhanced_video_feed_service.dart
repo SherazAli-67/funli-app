@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:io';
 import 'dart:isolate';
-import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -34,7 +32,7 @@ class EnhancedVideoFeedService {
   Timer? _fastScrollTimer;
   
   // Priority queue for downloads
-  final PriorityQueue<_DownloadTask> _downloadQueue = PriorityQueue<_DownloadTask>();
+  // final PriorityQueue<_DownloadTask> _downloadQueue = PriorityQueue<_DownloadTask>();
   final Map<String, Completer<File>> _activeDownloads = {};
   
   // Network monitoring
@@ -51,7 +49,7 @@ class EnhancedVideoFeedService {
   
   // Configuration based on network speed
   static const int _maxMemoryCache = 8; // Videos in memory
-  static const int _maxDiskCache = 50;  // Videos on disk
+  // static const int _maxDiskCache = 50;  // Videos on disk
   
   // Background processing isolate
   Isolate? _backgroundIsolate;
@@ -140,7 +138,7 @@ class EnhancedVideoFeedService {
   static void _backgroundPreloadVideos(Map task, SendPort sendPort) {
     // Implement background video preloading logic
     final List<String> urls = List<String>.from(task['urls'] ?? []);
-    final int priority = task['priority'] ?? 3;
+    // final int priority = task['priority'] ?? 3;
     
     // Process preloading in background
     for (String url in urls) {
@@ -359,11 +357,11 @@ class EnhancedVideoFeedService {
     }
     
     // Add to download queue with priority
-    final task = _DownloadTask(
+  /*  final task = _DownloadTask(
       url: videoUrl,
       priority: priority,
       networkSpeed: _currentNetworkSpeed,
-    );
+    );*/
     
     // Check if already downloading
     if (_activeDownloads.containsKey(videoUrl)) {
@@ -576,9 +574,9 @@ class EnhancedVideoFeedService {
   }
 
   /// Legacy dispose method - now uses safe disposal
-  Future<void> _disposeController(String reelId) async {
+/*  Future<void> _disposeController(String reelId) async {
     await _safeDisposeController(reelId);
-  }
+  }*/
 
   /// Handle scroll away from video (smart cleanup)
   Future<void> onScrollAwayFromVideo(String reelId) async {
@@ -843,7 +841,7 @@ class _PrefetchStrategy {
 }
 
 /// Download task for priority queue
-class _DownloadTask implements Comparable<_DownloadTask> {
+/*class _DownloadTask implements Comparable<_DownloadTask> {
   final String url;
   final int priority;
   final NetworkSpeed networkSpeed;
@@ -860,7 +858,7 @@ class _DownloadTask implements Comparable<_DownloadTask> {
     // Lower number = higher priority
     return priority.compareTo(other.priority);
   }
-}
+}*/
 
 /// Preload item configuration
 class _PreloadItem {

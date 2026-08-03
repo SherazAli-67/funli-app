@@ -82,7 +82,7 @@ class CircleListChildListDelegate extends CircleListChildDelegate {
   @override
   Widget? build(BuildContext context, int index) {
     if (index < 0 || index >= children.length) return null;
-    return IndexedSemantics(child: children[index], index: index);
+    return IndexedSemantics(index: index, child: children[index]);
   }
 
   @override
@@ -128,7 +128,8 @@ class CircleListChildLoopingListDelegate extends CircleListChildDelegate {
   Widget? build(BuildContext context, int index) {
     if (children.isEmpty) return null;
     return IndexedSemantics(
-        child: children[index % children.length], index: index);
+        index: index,
+        child: children[index % children.length]);
   }
 
   @override
@@ -171,10 +172,10 @@ class CircleListChildBuilderDelegate extends CircleListChildDelegate {
   Widget? build(BuildContext context, int index) {
     if (childCount == null) {
       final Widget child = builder(context, index);
-      return IndexedSemantics(child: child, index: index);
+      return IndexedSemantics(index: index, child: child);
     }
     if (index < 0 || index >= childCount!) return null;
-    return IndexedSemantics(child: builder(context, index), index: index);
+    return IndexedSemantics(index: index, child: builder(context, index));
   }
 
   @override

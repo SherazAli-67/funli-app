@@ -8,7 +8,6 @@ import 'package:funli_app/src/providers/discover_provider.dart';
 import 'package:funli_app/src/providers/personal_info_provider.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/providers/record_upload_provider.dart';
-import 'package:funli_app/src/providers/report_content_provider.dart';
 import 'package:funli_app/src/providers/size_provider.dart';
 import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_constants.dart';
@@ -40,7 +39,6 @@ void main() async{
         ChangeNotifierProvider(create: (_)=> SizeProvider()),
         ChangeNotifierProvider(create: (_)=> ProfileProvider()..initUserProfile()),
         ChangeNotifierProvider(create: (_) => DiscoverProvider()..loadAll()),
-        ChangeNotifierProvider(create: (_) => ReportContentProvider()),
       ],
       child: const MyApp()));
 }

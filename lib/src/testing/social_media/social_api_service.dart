@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 /// API service for fetching hashtag and mention suggestions
@@ -218,7 +217,7 @@ class SocialApiService {
     return filteredUsers.take(limit).toList();
   }
   
-  /// Real API call for trending hashtags (example implementation)
+/*  /// Real API call for trending hashtags (example implementation)
   Future<List<HashtagSuggestion>> _fetchTrendingHashtags(String query, int limit) async {
     try {
       final response = await _client.get(
@@ -237,9 +236,9 @@ class SocialApiService {
       print('Error fetching trending hashtags: $e');
       return [];
     }
-  }
+  }*/
   
-  /// Real API call for user suggestions (example implementation)
+/*  /// Real API call for user suggestions (example implementation)
   Future<List<UserSuggestion>> _fetchUserSuggestions(String query, int limit) async {
     try {
       final response = await _client.get(
@@ -258,7 +257,7 @@ class SocialApiService {
       print('Error fetching user suggestions: $e');
       return [];
     }
-  }
+  }*/
   
   /// Dispose resources
   void dispose() {

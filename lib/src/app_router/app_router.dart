@@ -32,6 +32,7 @@ import 'package:funli_app/src/features/upload_feel/publish_reel_page.dart';
 import 'package:funli_app/src/features/welcome_page.dart';
 import 'package:funli_app/src/providers/feels_search_provider.dart';
 import 'package:funli_app/src/providers/hashtag_search_provider.dart';
+import 'package:funli_app/src/providers/report_content_provider.dart';
 import 'package:funli_app/src/providers/users_search_provider.dart';
 import 'package:funli_app/src/widgets/video_player_widget.dart';
 import 'package:go_router/go_router.dart';
@@ -302,8 +303,11 @@ class AppRouter {
           final extras = state.extra! as Map<String, dynamic>;
 
           return MaterialPage(
-            child: ReportContentPage(
-              reel: extras['reel'],
+            child: ChangeNotifierProvider(
+              create: (_)=> ReportContentProvider(),
+              child: ReportContentPage(
+                reel: extras['reel'],
+              ),
             ),
           );
         },

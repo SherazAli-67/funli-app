@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:go_router/go_router.dart';
-
 import '../app_router/router_enum.dart';
 import '../services/reels_service.dart';
 

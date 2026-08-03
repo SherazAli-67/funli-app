@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:funli_app/src/services/settings_service.dart';
 import 'package:funli_app/src/features/profile_analytics_dashboard/reel_views_chart.dart';

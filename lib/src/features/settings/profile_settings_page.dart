@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/settings/widgets/settings_item_widget.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';

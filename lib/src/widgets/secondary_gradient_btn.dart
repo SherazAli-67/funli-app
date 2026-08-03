@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/widgets/gradient_text_widget.dart';
-import '../res/app_colors.dart';
-import '../res/app_textstyles.dart';
 import '../res/spacing_constants.dart';
 
 class SecondaryGradientBtn extends StatelessWidget {

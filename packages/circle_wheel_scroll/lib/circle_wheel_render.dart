@@ -262,8 +262,9 @@ class RenderCircleListViewport extends RenderBox
 
   @override
   void setupParentData(RenderObject child) {
-    if (child.parentData is! CircleListParentData)
+    if (child.parentData is! CircleListParentData) {
       child.parentData = CircleListParentData();
+    }
   }
 
   @override
@@ -482,14 +483,20 @@ class RenderCircleListViewport extends RenderBox
 
     // Validates the target index range.
     while (!childManager.childExistsAt(targetFirstIndex) &&
-        targetFirstIndex <= targetLastIndex) targetFirstIndex++;
+        targetFirstIndex <= targetLastIndex) {
+      targetFirstIndex++;
+    }
     while (!childManager.childExistsAt(targetLastIndex) &&
-        targetFirstIndex <= targetLastIndex) targetLastIndex--;
+        targetFirstIndex <= targetLastIndex) {
+      targetLastIndex--;
+    }
 
     // If it turns out there's no children to layout, we remove old children and
     // return.
     if (targetFirstIndex > targetLastIndex) {
-      while (firstChild != null) _destroyChild(firstChild);
+      while (firstChild != null) {
+        _destroyChild(firstChild);
+      }
       return;
     }
 
@@ -505,7 +512,9 @@ class RenderCircleListViewport extends RenderBox
     if (childCount > 0 &&
         (indexOf(firstChild!)! > targetLastIndex ||
             indexOf(lastChild!)! < targetFirstIndex)) {
-      while (firstChild != null) _destroyChild(firstChild);
+      while (firstChild != null) {
+        _destroyChild(firstChild);
+      }
     }
 
     // If there is no child at this stage, we add the first one that is in
@@ -727,7 +736,9 @@ class RenderCircleListViewport extends RenderBox
 
     // `child` will be the last RenderObject before the viewport when walking up from `target`.
     RenderObject child = target;
-    while (child.parent != this) child = child.parent as RenderObject;
+    while (child.parent != this) {
+      child = child.parent as RenderObject;
+    }
 
     final CircleListParentData? parentData =
         child.parentData as CircleListParentData?;

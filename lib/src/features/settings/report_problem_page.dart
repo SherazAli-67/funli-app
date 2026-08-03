@@ -1,7 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/services/settings_service.dart';
@@ -24,7 +22,7 @@ class ReportProblemPageState extends State<ReportProblemPage> {
   final TextEditingController _feedbackController = TextEditingController();
 
   bool _sendingReport = false;
-  bool _reportSent = false;
+  // bool _reportSent = false;
 
   @override
   Widget build(BuildContext context) {

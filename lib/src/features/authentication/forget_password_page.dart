@@ -8,9 +8,7 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/res/spacing_constants.dart';
 import 'package:funli_app/src/widgets/app_back_button.dart';
 import 'package:funli_app/src/widgets/app_textfield.dart';
-import 'package:funli_app/src/widgets/auth_pages_header_text_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
-import 'package:funli_app/src/widgets/primary_gradient_background.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 

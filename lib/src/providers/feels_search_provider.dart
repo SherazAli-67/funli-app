@@ -32,7 +32,7 @@ class FeelsSearchProvider extends ChangeNotifier {
     try {
       // Search for users with case-insensitive approach
       String lowerQuery = query.toLowerCase();
-      String upperQuery = query.toUpperCase();
+      // String upperQuery = query.toUpperCase();
       
       // First, get users that match the query (case-insensitive)
       final userQuerySnap = await FirebaseFirestore.instance
@@ -41,7 +41,7 @@ class FeelsSearchProvider extends ChangeNotifier {
       
       // Filter users client-side for better case-insensitive matching
       final matchingUsers = userQuerySnap.docs.where((doc) {
-        final userData = doc.data() as Map<String, dynamic>;
+        final userData = doc.data();
         final userName = userData['userName']?.toString().toLowerCase() ?? '';
         return userName.contains(lowerQuery);
       }).toList();
@@ -81,7 +81,7 @@ class FeelsSearchProvider extends ChangeNotifier {
       }
 
       // Sort by creation date and take first 20
-      allReels.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
+      allReels.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       _reels.addAll(allReels.take(20));
 
       if (allReels.isNotEmpty) {

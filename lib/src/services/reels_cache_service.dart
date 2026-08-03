@@ -9,7 +9,6 @@ import 'package:funli_app/src/models/reel_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:async/async.dart' show unawaited;
 
 /// A service to handle persistent caching of reels data and files
 /// Enhanced for TikTok-like performance with multi-level caching
@@ -19,10 +18,10 @@ class ReelsCacheService {
   static const String _currentMoodKey = 'current_mood_key';
   static const String _preloadedMoodsKey = 'preloaded_moods_key';
   static const String _recentMoodsKey = 'recent_moods_key';
-  static const String _videoLoadStatsKey = 'video_load_stats_key';
+  // static const String _videoLoadStatsKey = 'video_load_stats_key';
   static const String _userReelsCacheKey = 'cached_user_reels_data';
   static const String _userBookmarksCacheKey = 'cached_user_bookmarks_data';
-  static const String _userDraftsCacheKey = 'drafts_user_bookmarks_data';
+  // static const String _userDraftsCacheKey = 'drafts_user_bookmarks_data';
 
   static const String _lastUserReelsFetchTimeKey = 'last_user_reels_fetch_time';
   static const String _lastUserBookmarksFetchTimeKey = 'last_user_bookmarks_fetch_time';
@@ -416,12 +415,10 @@ class ReelsCacheService {
       FileInfo? fileInfo;
       
       // Try current mood cache first for fastest access
-      if (fileInfo == null) {
-        try {
-          fileInfo = await currentMoodCacheManager.getFileFromCache(url);
-        } catch (e) {
-          // Ignore errors and try next cache
-        }
+      try {
+        fileInfo = await currentMoodCacheManager.getFileFromCache(url);
+      } catch (e) {
+        // Ignore errors and try next cache
       }
       
       // Then try priority cache

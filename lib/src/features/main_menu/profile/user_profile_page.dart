@@ -5,12 +5,10 @@ import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/main_menu/profile/widgets/user_drafts_feels.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/res/app_icons.dart';
-import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/gradient_icon.dart';
 import 'package:funli_app/src/widgets/profile_info_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
 import '../../../res/app_gradients.dart';
 import 'widgets/remote_user_bookmark_widget.dart';
 import 'widgets/remote_user_reels_widget.dart';
