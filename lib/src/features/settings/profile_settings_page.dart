@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/settings/widgets/settings_item_widget.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
-import 'package:funli_app/src/res/app_gradients.dart';
+import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/widgets/profile_picture_widget.dart';
@@ -42,7 +42,8 @@ class ProfileSettingsPage extends StatelessWidget{
                       margin: EdgeInsets.only(right: 10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        gradient: AppGradients.primaryGradient,
+                        color: AppColors.colorBlack
+                        // gradient: AppGradients.primaryGradient,
 
                       ),
                       child: Icon(Icons.edit, color: Colors.white,)
@@ -68,10 +69,14 @@ class ProfileSettingsPage extends StatelessWidget{
                 ],
               ),
             ),
-            Center(child: Text("V1.0.1", style: AppTextStyles.regularTextStyle,),),
             Padding(
               padding: const EdgeInsets.all(10.0),
-              child: SettingsItemWidget(title: "Logout", icon: AppIcons.icLogout, isLogout: true, onTap: ()=> _onLogoutTap(context),),
+              child: Column(
+                children: [
+                  SettingsItemWidget(title: "Logout", icon: AppIcons.icLogout, isLogout: true, onTap: ()=> _onLogoutTap(context),),
+                  SettingsItemWidget(title: "Delete Account", icon: AppIcons.icDelete, isLogout: true, onTap: (){}),
+                ],
+              ),
             )
           ],
         ),

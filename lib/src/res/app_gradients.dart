@@ -91,4 +91,13 @@ class AppGradients {
     end: Alignment.bottomRight,
   );
 
+  static final LinearGradient vibeSeekerRingGradient = LinearGradient(
+    colors: [
+      Color(0xFFFF8A00),
+      Color(0xFFFF2D55),
+      Color(0xFFFF47DD),
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 }

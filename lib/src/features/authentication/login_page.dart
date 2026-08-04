@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                           while(context.canPop()){
                             context.pop();
                           }
-                          context.push(RouterEnum.videoFeedView.routeName);
+                          context.push(RouterEnum.homeView.routeName);
                           // context.push(RouterEnum.personalizationView.routeName);
                         }
                       },

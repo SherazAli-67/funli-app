@@ -61,7 +61,7 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler> {
             SnackBar(content: Text('Reel not found. Please try another link.')),
           );
           // Navigate to a default page if needed
-          context.go(RouterEnum.videoFeedView.routeName);
+          context.go(RouterEnum.homeView.routeName);
         });
       }
     } catch (e) {
@@ -72,7 +72,7 @@ class _DeepLinkHandlerState extends State<DeepLinkHandler> {
           SnackBar(content: Text('Error loading reel. Please try again later.')),
         );
         // Navigate to a default page
-        context.go(RouterEnum.videoFeedView.routeName);
+        context.go(RouterEnum.homeView.routeName);
       });
     }
   }

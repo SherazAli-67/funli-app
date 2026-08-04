@@ -100,7 +100,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
     return WillPopScope(
       onWillPop: () async {
         _onBackPress(context);
-        context.go(RouterEnum.videoFeedView.routeName);
+        context.go(RouterEnum.homeView.routeName);
         return false;
       },
       child: Scaffold(
@@ -237,7 +237,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                                     // Reset shouldPauseVideo to false when returning to video feed
                                     // Ensure we trigger preloading when returning to feed
                                     _onBackPress(context);
-                                    GoRouter.of(context).go(RouterEnum.videoFeedView.routeName);
+                                    GoRouter.of(context).go(RouterEnum.homeView.routeName);
                                   },
                                   icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white,)
                               ),

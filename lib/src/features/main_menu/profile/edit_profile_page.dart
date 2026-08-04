@@ -8,6 +8,7 @@ import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/services/auth_service.dart';
 import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
+import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_btn.dart';
 import 'package:funli_app/src/widgets/select_gender_widget.dart';
 import 'package:provider/provider.dart';
@@ -90,8 +91,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 margin: EdgeInsets.only(right: 10),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  gradient: AppGradients.primaryGradient,
-
+                                  // gradient: AppGradients.primaryGradient,
+                                  color: AppColors.colorBlack
                                 ),
                                 child: Icon(Icons.edit, color: Colors.white,)
                             ),),
@@ -155,7 +156,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ],
                     ),
                     const Spacer(),
-                    PrimaryGradientBtn(btnText: "Save Changes",
+                    PrimaryBtn(btnText: "Save Changes",
                       icon: AppIcons.icArrowNext,
                       onTap: (){
                         String userName = _nameController.text.trim();

@@ -79,7 +79,7 @@ class _PersonalizationPageState extends State<PersonalizationPage> {
                   while(context.canPop()){
                     context.pop();
                   }
-                  context.push(RouterEnum.videoFeedView.routeName);
+                  context.push(RouterEnum.homeView.routeName);
                 }
               },
               builder: (_, state) {

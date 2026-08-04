@@ -5,6 +5,7 @@ import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/services/auth_service.dart';
 import 'package:funli_app/src/services/settings_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
+import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_btn.dart';
 
 import '../../app_data.dart';
@@ -91,8 +92,8 @@ class _ContentPreferencesPageState extends State<ContentPreferencesPage> {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(SpacingConstants.btnBorderRadius),
                                 border: Border.all(color: AppColors.borderColor),
-                                color: !isSelected ? Colors.white : null,
-                                gradient: isSelected ? AppGradients.interestItemGradient : null
+                                color: isSelected ? AppColors.colorBlack : Colors.white,
+                                // gradient: isSelected ? AppGradients.interestItemGradient : null
                             ),
                             child: Stack(
                               alignment: Alignment.center,
@@ -111,7 +112,7 @@ class _ContentPreferencesPageState extends State<ContentPreferencesPage> {
                 ),
               ),
 
-            PrimaryGradientBtn(btnText: "Save Changes", icon: '', onTap: _onSaveChangesTap, isLoading: _onSavingChanges,)
+            PrimaryBtn(btnText: "Save Changes", icon: '', onTap: _onSaveChangesTap, isLoading: _onSavingChanges,)
           ],
         ),
       )),

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:funli_app/src/app_data.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/helpers/formatting_helpers.dart';
 import 'package:funli_app/src/models/mood_model.dart';
@@ -14,43 +15,50 @@ class MoodCarouselCard extends StatelessWidget {
     super.key,
     required MoodModel mood,
     required List<ReelModel> reels,
+    this.showStats = true,
   })  : _mood = mood,
         _reels = reels;
 
   final MoodModel _mood;
   final List<ReelModel> _reels;
+  final bool showStats;
 
   @override
   Widget build(BuildContext context) {
     final featuredReel = _reels.isNotEmpty ? _reels.first : null;
-    final thumbnailUrl = featuredReel?.thumbnailUrl ?? AppIcons.icDefaultThumbnailUrl;
+    final thumbnailUrl =
+        featuredReel?.thumbnailUrl ?? AppIcons.icDefaultThumbnailUrl;
     final headline = _resolveHeadline(featuredReel?.caption);
     final viewsCount =
         _reels.fold<int>(0, (sum, reel) => sum + reel.viewsCount);
+    final emoji = AppData.getEmojiByMood(_mood.mood);
 
     return GestureDetector(
-      onTap: () => context.push(RouterEnum.moodReelsView.routeName, extra: {'mood': _mood.mood},),
+      onTap: () => context.push(
+        RouterEnum.moodReelsView.routeName,
+        extra: {'mood': _mood.mood},
+      ),
       child: ClipRRect(
-        borderRadius: .circular(24),
+        borderRadius: BorderRadius.circular(24),
         child: Stack(
-          fit: .expand,
+          fit: StackFit.expand,
           children: [
             CachedNetworkImage(
               imageUrl: thumbnailUrl,
-              fit: .cover,
+              fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
               placeholder: (context, url) => Container(color: Colors.grey[300]),
               errorWidget: (context, url, error) => CachedNetworkImage(
                 imageUrl: AppIcons.icDummyImgUrl,
-                fit: .cover,
+                fit: BoxFit.cover,
               ),
             ),
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: .topCenter,
-                  end: .bottomCenter,
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
                     Colors.black.withValues(alpha: 0.15),
@@ -61,53 +69,68 @@ class MoodCarouselCard extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: 20,
-              right: 20,
-              bottom: 24,
+              left: showStats ? 20 : 16,
+              right: showStats ? 20 : 16,
+              bottom: showStats ? 24 : 16,
               child: Column(
-                crossAxisAlignment: .start,
-                spacing: 10,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: showStats ? 10 : 6,
                 children: [
-                  Container(
-                    padding: .symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppColors.yellowAccentColor,
-                      borderRadius: .circular(20),
-                    ),
-                    child: Text(
-                      _mood.mood,
+                  if (showStats)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.yellowAccentColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        _mood.mood,
+                        style: AppTextStyles.smallBoldTextStyle.copyWith(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    )
+                  else
+                    Text(
+                      '$emoji ${_mood.mood.toUpperCase()}',
                       style: AppTextStyles.smallBoldTextStyle.copyWith(
-                        color: Colors.black,
-                        fontWeight: .w700,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
                       ),
                     ),
-                  ),
                   Text(
                     headline,
                     maxLines: 2,
-                    overflow: .ellipsis,
-                    style: AppTextStyles.headingTextStyle3.copyWith(
+                    overflow: TextOverflow.ellipsis,
+                    style: (showStats
+                            ? AppTextStyles.headingTextStyle3
+                            : AppTextStyles.tileTitleTextStyle)
+                        .copyWith(
                       color: Colors.white,
-                      fontWeight: .w700,
+                      fontWeight: FontWeight.w700,
                       height: 1.15,
                     ),
                   ),
-                  Column(
-                    crossAxisAlignment: .start,
-                    spacing: 6,
-                    children: [
-                      _StatRow(
-                        icon: Icons.movie_filter_outlined,
-                        label:
-                            'Total Reels: ${FormatingHelpers.formatNumber(_mood.reelsCount)} streams',
-                      ),
-                      _StatRow(
-                        icon: Icons.visibility_outlined,
-                        label:
-                            'Views count: ${FormatingHelpers.formatNumber(viewsCount)} Views',
-                      ),
-                    ],
-                  ),
+                  if (showStats)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 6,
+                      children: [
+                        _StatRow(
+                          icon: Icons.movie_filter_outlined,
+                          label:
+                              'Total Reels: ${FormatingHelpers.formatNumber(_mood.reelsCount)} streams',
+                        ),
+                        _StatRow(
+                          icon: Icons.visibility_outlined,
+                          label:
+                              'Views count: ${FormatingHelpers.formatNumber(viewsCount)} Views',
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),

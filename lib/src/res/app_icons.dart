@@ -60,6 +60,7 @@ class AppIcons {
   static const icSecurity = 'assets/icons/ic_security.svg';
   static const icHelpCenter = 'assets/icons/ic_help_center.svg';
   static const icLogout = 'assets/icons/ic_logout.svg';
+  static const icDelete = 'assets/icons/ic_delete.svg';
 
 
   //Contact us

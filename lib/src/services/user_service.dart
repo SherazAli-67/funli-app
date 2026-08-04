@@ -130,6 +130,19 @@ class UserService {
 
     return 0;
   }
+
+  static Future<List<UserModel>> getTopUsersByReelsPosted({int limit = 15}) async {
+    final snapshot = await _fireStore
+        .collection(FirebaseConstants.userCollection)
+        .orderBy('reelsPosted', descending: true)
+        .limit(limit)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => UserModel.fromMap(doc.data()))
+        .where((user) => user.reelsPosted > 0)
+        .toList();
+  }
   static Future<int> getUserFollowersCount({required String userID}) async{
     final countQuery = await FirebaseFirestore.instance
         .collection(FirebaseConstants.userCollection)

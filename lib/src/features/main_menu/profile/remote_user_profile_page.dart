@@ -115,7 +115,6 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
                 child: SizedBox(
-                  height: 45,
                   child: Row(
                     spacing: 12,
                     children: [

@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/services/settings_service.dart';
+import 'package:funli_app/src/widgets/primary_btn.dart';
 import 'package:funli_app/src/widgets/primary_gradient_btn.dart';
 import 'package:go_router/go_router.dart';
 
@@ -95,7 +96,7 @@ class ReportProblemPageState extends State<ReportProblemPage> {
                const Spacer(),
 
                 // Gradient Button
-                PrimaryGradientBtn(btnText: "Report Problem", icon: '', onTap: _onReportProblemTap, borderRadius: 16, isLoading: _sendingReport,)
+                PrimaryBtn(btnText: "Report Problem", icon: '', onTap: _onReportProblemTap, borderRadius: 16, isLoading: _sendingReport,)
               ],
             ),
           ),

@@ -60,7 +60,7 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
     _provider = Provider.of<RecordUploadProvider>(context);
     return WillPopScope(
       onWillPop: ()async{
-        context.go(RouterEnum.videoFeedView.routeName);
+        context.go(RouterEnum.homeView.routeName);
         return false;
       },
       child: Scaffold(
@@ -100,7 +100,7 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              context.go(RouterEnum.videoFeedView.routeName);
+                              context.go(RouterEnum.homeView.routeName);
                               /*// Reset shouldPauseVideo to false when returning to video feed
                               // Ensure we trigger preloading when returning to feed
                               final cubit = context.read<UpdatedFeedCubit>();

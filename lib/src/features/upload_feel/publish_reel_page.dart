@@ -61,7 +61,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
         cubit.setShouldPauseVideo(false);
         // Trigger preloading before navigation
         cubit.preloadNextVideos();*/
-        context.go(RouterEnum.videoFeedView.routeName);
+        context.go(RouterEnum.homeView.routeName);
         return false;
       },
       child: Scaffold(
@@ -77,7 +77,7 @@ class _PublishReelPageState extends State<PublishReelPage> {
                 cubit.setShouldPauseVideo(false);
                 // Trigger preloading before navigation
                 cubit.preloadNextVideos();*/
-                context.go(RouterEnum.videoFeedView.routeName);
+                context.go(RouterEnum.homeView.routeName);
               },
               child: AppBackButton(),
             ),
@@ -363,6 +363,6 @@ class _PublishReelPageState extends State<PublishReelPage> {
     cubit.setShouldPauseVideo(false);
     // Trigger preloading before navigation
     cubit.preloadNextVideos();*/
-    context.go(RouterEnum.videoFeedView.routeName);
+    context.go(RouterEnum.homeView.routeName);
   }
 }

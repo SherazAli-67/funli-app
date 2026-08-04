@@ -40,6 +40,7 @@ class UserModel {
   final String? profilePicture;
   final String? gender;
   final ProfileVisibility visibility;
+  final int reelsPosted;
 
   UserModel({
     required this.userID,
@@ -51,6 +52,7 @@ class UserModel {
     this.profilePicture,
     this.gender,
     this.visibility = ProfileVisibility.public,
+    this.reelsPosted = 0,
     List<String>? interests,
   }) : interests = interests ?? [];
 
@@ -81,6 +83,7 @@ class UserModel {
       interests: List<String>.from(map['interests'] ?? []),
       gender: map['gender'],
       visibility: ProfileVisibilityExtension.fromString(map['visibility'] ?? 'public'),
+      reelsPosted: map['reelsPosted'] ?? 0,
     );
   }
 }
