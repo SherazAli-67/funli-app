@@ -41,7 +41,7 @@ class Homepage extends StatelessWidget {
                         const Duration(milliseconds: 800),
                     autoPlayCurve: Curves.fastOutSlowIn,
                     enlargeCenterPage: true,
-                    enlargeFactor: 0.3,
+                    enlargeFactor: 0.2,
                     scrollDirection: .horizontal,
                   ),
                 );

@@ -38,7 +38,7 @@ class PostLikeWidget extends StatelessWidget{
     String reelID = reel.reelID;
     bool isLiked = likedUsers.contains(FirebaseAuth.instance.currentUser!.uid);
     return LikeButton(
-          size: 30,
+          size: 24,
           mainAxisAlignment: MainAxisAlignment.start,
           circleSize: 24,
           isLiked: isLiked,

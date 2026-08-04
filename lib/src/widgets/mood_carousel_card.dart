@@ -29,10 +29,7 @@ class MoodCarouselCard extends StatelessWidget {
         _reels.fold<int>(0, (sum, reel) => sum + reel.viewsCount);
 
     return GestureDetector(
-      onTap: () => context.push(
-        RouterEnum.moodReelsView.routeName,
-        extra: {'mood': _mood.mood},
-      ),
+      onTap: () => context.push(RouterEnum.moodReelsView.routeName, extra: {'mood': _mood.mood},),
       child: ClipRRect(
         borderRadius: .circular(24),
         child: Stack(

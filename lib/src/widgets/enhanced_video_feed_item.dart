@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/models/notification_model.dart';
 import 'package:funli_app/src/models/user_model.dart';
 import 'package:funli_app/src/services/notifications_service.dart';
@@ -477,18 +476,31 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
       return _buildLoadingWidget();
     }
 
+    final size = _controller!.value.size;
+    final isPortrait = size.height > size.width;
+
+    final video = RepaintBoundary(child: VideoPlayer(_controller!));
+    final videoLayer = isPortrait
+        ? SizedBox.expand(
+      child: FittedBox(
+        fit: BoxFit.cover,
+        child: SizedBox(
+          width: size.width,
+          height: size.height,
+          child: video,
+        ),
+      ),
+    )
+        : Center(
+      child: AspectRatio(
+        aspectRatio: _controller!.value.aspectRatio,
+        child: video,
+      ),
+    );
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Video player with optimized rendering
-        Center(
-          child: AspectRatio(
-            aspectRatio: _controller!.value.aspectRatio,
-            child: RepaintBoundary(
-              child: VideoPlayer(_controller!),
-            ),
-          ),
-        ),
+      videoLayer,
 
         // Buffering indicator
         if (_controller!.value.isBuffering)
@@ -614,9 +626,9 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
 
   Positioned _buildUserNameCaptionWidget() {
     return Positioned(
-      bottom:  80,
-      left: 0,
-      right: 0,
+      bottom:  90,
+      left: 10,
+      right: 40,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -638,38 +650,69 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
                       ],
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        constraints: const BoxConstraints(
-                          maxHeight: 300,
-                        ),
-                        child: SingleChildScrollView(
-                          child: Padding(
-                            padding:
-                            const EdgeInsets.only(right: 50, left: 10,bottom: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                  child:   Container(
+                    constraints: const BoxConstraints(maxHeight: 300,),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: .start,
+                        spacing: 10,
+                        children: [
+                          if(_userModel != null)
+                            GestureDetector(onTap: _onUserProfileTap, child: Row(
+                              crossAxisAlignment: .center,
+                              spacing: 10,
                               children: [
-                                if(_userModel != null)
-                                  TextButton(onPressed: _onUserProfileTap, child: Text(
-                                    _userModel!.userName,
-                                    style: AppTextStyles
-                                        .buttonTextStyle
-                                        .copyWith(
-                                        color: Colors.white, fontWeight: FontWeight.w700),),),
-                                AppTextWidget(text: widget.reel.caption,),
+                                GestureDetector(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.white, width: 2),
+                                        shape: BoxShape.circle
+                                    ),
+                                    child: CircleAvatar(
+                                      radius: 20,
+                                      backgroundImage: CachedNetworkImageProvider(_userModel != null ? _userModel!.profilePicture ?? AppIcons.icDummyImgUrl: AppIcons.icDummyImgUrl),
+                                    ),
+                                  ),
+                                ),
+                                Text(_userModel!.userName, style: AppTextStyles.buttonTextStyle.copyWith(color: Colors.white, fontWeight: FontWeight.w700),),
+                                StreamBuilder(stream: UserService.getIsFollowingStream(widget.reel.userID), builder: (ctx, snapshot){
+                                  if(snapshot.hasData){
+                                    bool isFollowing = snapshot.requireData;
+                                    return Container(
+                                        decoration: BoxDecoration(
+                                            color: AppColors.deepPurpleColor,
+                                            shape: BoxShape.circle
+                                        ),
+                                        child: GestureDetector(
+                                            onTap: () {
+                                              bool isPrivateAccount = false;
+                                              String userName = '';
+                                              if(_userModel != null){
+                                                isPrivateAccount = _userModel!.visibility  == ProfileVisibility.followersOnly;
+                                                userName = _userModel!.userName;
+                                              }
+                                              UserService.onFollowTap(remoteUID: widget.reel.userID, userName: userName, isPrivateAccount: isPrivateAccount);
+                                            },
+                                            child: Container(
+                                              padding: .symmetric(horizontal: 15, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                border: .all(color: AppColors.lightGreyColor),
+                                                borderRadius: .circular(99)
+                                              ),
+                                              child: isFollowing ? Text("Following", style: AppTextStyles.captionTextStyle.copyWith(fontWeight: .bold),) : Text("Follow", style: AppTextStyles.captionTextStyle.copyWith(fontWeight: .bold),),
+                                            ))
+                                    );
+                                  }
+
+                                  return SizedBox();
+                                })
                               ],
-                            ),
-                          ),
-                        ),
+                            ),),
+                          AppTextWidget(text: widget.reel.caption,),
+                        ],
                       ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               );
@@ -687,61 +730,10 @@ class _EnhancedVideoFeedItemState extends State<EnhancedVideoFeedItem>
       child: Column(
         spacing: 7,
         children: [
-          Stack(
-            children: [
-              GestureDetector(
-                onTap: _onUserProfileTap,
-                child: Container(
-                  margin: EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white, width: 2),
-                      shape: BoxShape.circle
-                  ),
-                  child: CircleAvatar(
-                    radius: 30,
-                    backgroundImage: CachedNetworkImageProvider(_userModel != null ? _userModel!.profilePicture ?? AppIcons.icDummyImgUrl: AppIcons.icDummyImgUrl),
-                  ),
-                ),
-              ),
-              Positioned(
-                  bottom: 0,
-                  right: 0,
-                  left: 0,
-                  child: StreamBuilder(stream: UserService.getIsFollowingStream(widget.reel.userID), builder: (ctx, snapshot){
-                    if(snapshot.hasData){
-                      bool isFollowing = snapshot.requireData;
-                      return Container(
-                          decoration: BoxDecoration(
-                              color: AppColors.deepPurpleColor,
-                              shape: BoxShape.circle
-                          ),
-                          child: GestureDetector(
-                              // padding: EdgeInsets.zero,
-                              // style: const ButtonStyle(
-                              //   tapTargetSize: MaterialTapTargetSize.shrinkWrap,),
-                              onTap: () {
-                                bool isPrivateAccount = false;
-                                String userName = '';
-                                if(_userModel != null){
-                                  isPrivateAccount = _userModel!.visibility  == ProfileVisibility.followersOnly;
-                                  userName = _userModel!.userName;
-                                }
-                                UserService.onFollowTap(remoteUID: widget.reel.userID, userName: userName, isPrivateAccount: isPrivateAccount);
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.all(8),
-                                child: isFollowing ? Icon(Icons.done_rounded, color: Colors.white, size: 20,) :  SvgPicture.asset(AppIcons.icAdd, height: 15,),
-                              ))
-                      );
-                    }
-
-                    return SizedBox();
-                  })
-              ),
-            ],
-          ),
           PostLikeWidget(reel: widget.reel, iconColor: Colors.white, isReel: true,),
           PostCommentWidget(iconColor: Colors.white, isReel: true, reel: widget.reel,comingFromHome: widget.comingFromHome,),
+
+
           PostShareWidget(iconColor: Colors.white, reel: widget.reel, onShareTap: _onShareTap),
           // IconButton(onPressed: _onMoreTap, icon: Icon(Icons.more_horiz, color: Colors.white,))
         ],
