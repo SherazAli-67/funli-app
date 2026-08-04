@@ -146,7 +146,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                       btnText: "Follow",
                                       icon: '',
                                       textStyle: AppTextStyles.smallBoldTextStyle,
-                                      onTap: () => HashtagService.onFollowTap(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
+                                      onTap: () => HashtagService.onFollowTap(hashtag: hashtag.tag),));
                               }
 
                               return SizedBox();

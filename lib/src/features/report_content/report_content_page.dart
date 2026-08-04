@@ -94,8 +94,7 @@ class ReportContentPage extends StatelessWidget{
                   onTap: ()async{
                     await provider.onReportContentTap(reelID: _reel.reelID);
                     context.pop();
-                  },
-                  bgGradient: AppIcons.primaryBgGradient, borderRadius: 16,)),
+                  }, borderRadius: 16,)),
 
               ],
             )

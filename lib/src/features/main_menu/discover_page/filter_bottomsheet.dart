@@ -70,8 +70,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                         width: 100,
                         height: 38,
                         child: PrimaryBtn(
-                            bgGradient: AppIcons
-                                .primaryBgGradient,
                             btnText: mood.name,
                             icon: '',
                             onTap: () {
@@ -107,7 +105,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                         width: 150,
                         height: 38,
                         child: PrimaryBtn(
-                          bgGradient: AppIcons.primaryBgGradient,
                           btnText: FilterBottomSheet._popularityLabel(popularity), icon: '', onTap: ()=> setState(() => selectedPopularity = popularity),),
                       ) : SecondaryGradientBtn(
                         btnText: FilterBottomSheet._popularityLabel(popularity), icon: '', onTap: ()=> setState(() => selectedPopularity = popularity), buttonHeight: 38,),
@@ -139,8 +136,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                         selectedMood: selectedMood,
                         selectedPopularity: selectedPopularity,
                         ));
-                  },
-                  bgGradient: AppIcons.primaryBgGradient,)),
+                  },)),
 
               ],
             )

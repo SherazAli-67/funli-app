@@ -132,11 +132,11 @@ class _RemoteUserProfilePageState extends State<RemoteUserProfilePage> with Tick
                               isPrefix: true,
                               icon: AppIcons.icAddUser,
                               onTap: () => UserService.onFollowTap(remoteUID: widget._userID, userName: widget._userName ?? '', isPrivateAccount: _isPrivateAccount),
-                              bgGradient: AppIcons.primaryBgGradient,
+
                               iconColor: Colors.white,);
                           }
 
-                          return PrimaryBtn(btnText: "Follow",isPrefix: true, icon: AppIcons.icAddUser, onTap: ()=> UserService.onFollowTap(remoteUID: widget._userID, userName: widget._userName ?? '', isPrivateAccount: _isPrivateAccount), bgGradient: AppIcons.primaryBgGradient,);
+                          return PrimaryBtn(btnText: "Follow",isPrefix: true, icon: AppIcons.icAddUser, onTap: ()=> UserService.onFollowTap(remoteUID: widget._userID, userName: widget._userName ?? '', isPrivateAccount: _isPrivateAccount),);
                         }),
                       ),
                       // Expanded(child: SecondaryGradientBtn(btnText: "Message",isPrefix: true, icon: AppIcons.gradientChatIcon, onTap: (){}, )),

@@ -46,7 +46,7 @@ class HashtagReelsPage extends StatelessWidget{
                         : SizedBox(
                         height: 40,
                         width: 100,
-                        child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.onFollowTap(hashtag: _hashtag), bgGradient: AppIcons.primaryBgGradient,));
+                        child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.onFollowTap(hashtag: _hashtag), ));
                   }
 
                   return SizedBox();

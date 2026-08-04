@@ -106,7 +106,7 @@ class _SearchPageState extends State<SearchPage> {
                         height: 35,
                         width: 100,
                         child: selectedIndex == 0
-                            ?  PrimaryBtn(btnText: "Feels", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.regularTextStyle,)
+                            ?  PrimaryBtn(btnText: "Feels", icon: '', onTap: (){},textStyle: AppTextStyles.regularTextStyle,)
                             : SecondaryBtn(btnText: "Feels", icon: '', onTap: ()=> _onSelectFilterTypeTap(0), textStyle: AppTextStyles.regularTextStyle,),
                       ),
 
@@ -114,7 +114,7 @@ class _SearchPageState extends State<SearchPage> {
                         height: 35,
                         width: 100,
                         child: selectedIndex == 1
-                            ?  PrimaryBtn(btnText: "Users", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.regularTextStyle,)
+                            ?  PrimaryBtn(btnText: "Users", icon: '', onTap: (){}, textStyle: AppTextStyles.regularTextStyle,)
                             : SecondaryBtn(btnText: "Users", icon: '', onTap: ()=> _onSelectFilterTypeTap(1), textStyle: AppTextStyles.regularTextStyle,),
                       ),
 
@@ -122,7 +122,7 @@ class _SearchPageState extends State<SearchPage> {
                         height: 35,
                         width: 127,
                         child: selectedIndex == 2
-                            ?  PrimaryBtn(btnText: "Hashtags", icon: '', onTap: (){}, bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.regularTextStyle,)
+                            ?  PrimaryBtn(btnText: "Hashtags", icon: '', onTap: (){}, textStyle: AppTextStyles.regularTextStyle,)
                             : SecondaryBtn(btnText: "Hashtags", icon: '', onTap: ()=> _onSelectFilterTypeTap(2), textStyle: AppTextStyles.regularTextStyle,),
                       ),
                     ],
@@ -188,7 +188,7 @@ class _SearchPageState extends State<SearchPage> {
                       : SizedBox(
                     height: 38,
                     width: 75,
-                    child: PrimaryBtn(btnText: "Follow", icon: '',  onTap: ()=> UserService.onFollowTap(remoteUID: user.userID, userName: user.userName, isPrivateAccount: user.visibility == ProfileVisibility.followersOnly), bgGradient: AppIcons.primaryBgGradient, textStyle: AppTextStyles.smallBoldTextStyle,),
+                    child: PrimaryBtn(btnText: "Follow", icon: '',  onTap: ()=> UserService.onFollowTap(remoteUID: user.userID, userName: user.userName, isPrivateAccount: user.visibility == ProfileVisibility.followersOnly),textStyle: AppTextStyles.smallBoldTextStyle,),
                   );
                 }else if(snapshot.connectionState == ConnectionState.waiting){
                   return LoadingWidget();
@@ -343,7 +343,7 @@ class _SearchPageState extends State<SearchPage> {
                             : SizedBox(
                             height: 40,
                             width: 100,
-                            child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.onFollowTap(hashtag: hashtag.tag), bgGradient: AppIcons.primaryBgGradient,));
+                            child: PrimaryBtn(btnText: "Follow", icon: '', onTap: ()=>HashtagService.onFollowTap(hashtag: hashtag.tag),));
                       }
 
                       return SizedBox();

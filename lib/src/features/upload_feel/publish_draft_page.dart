@@ -158,7 +158,6 @@ class _PublishDraftPageState extends State<PublishDraftPage> {
                         btnText: "Publish",
                         icon: "",
                         onTap: _onPublishReelTap,
-                        bgGradient: AppIcons.primaryBgGradient,
                         borderRadius: 16,),
                       SizedBox(
                         width: double.infinity,

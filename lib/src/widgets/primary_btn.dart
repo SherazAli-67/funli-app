@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/res/app_colors.dart';
-import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import '../res/app_textstyles.dart';
 import '../res/spacing_constants.dart';
@@ -9,8 +8,7 @@ import '../res/spacing_constants.dart';
 class PrimaryBtn extends StatelessWidget {
   const PrimaryBtn({
     super.key,
-    required String btnText, required String icon, required VoidCallback onTap, String bgGradient = AppIcons
-        .btnBgGradient, bool isPrefix = false, bool isLoading = false, double borderRadius = SpacingConstants
+    required String btnText, required String icon, required VoidCallback onTap,  bool isPrefix = false, bool isLoading = false, double borderRadius = SpacingConstants
         .btnBorderRadius, Color? iconColor,
     TextStyle textStyle = AppTextStyles.buttonTextStyle
   })
@@ -19,7 +17,6 @@ class PrimaryBtn extends StatelessWidget {
         _onTap = onTap,
         _isPrefix = isPrefix,
         _isLoading = isLoading,
-        _bgGradient = bgGradient,
         _borderRadius = borderRadius,
         _iconColor = iconColor,
   _textStyle = textStyle
@@ -29,7 +26,6 @@ class PrimaryBtn extends StatelessWidget {
   final VoidCallback _onTap;
   final bool _isPrefix;
   final bool _isLoading;
-  final String _bgGradient;
   final double _borderRadius;
   final Color? _iconColor;
   final TextStyle _textStyle;
