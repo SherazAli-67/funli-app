@@ -164,6 +164,7 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                                           painter: CircularProgressPainter(progress: value),
                                           size: Size(80, 80),
                                         );
+
                                       },
                                     ),
                                     Container(
@@ -171,7 +172,8 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                                       height: 30,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
-                                        gradient: AppGradients.primaryGradient,
+                                        // gradient: AppGradients.primaryGradient,
+                                        color: AppColors.colorBlack
                                       ),
                                     ),
                                     Positioned(
@@ -192,7 +194,8 @@ class CreateUploadFeelPageState extends State<CreateUploadFeelPage> with Widgets
                                 child: Container(
                                   decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      gradient: AppGradients.primaryGradient
+                                      // gradient: AppGradients.primaryGradient
+                                    color: AppColors.colorBlack
                                   ),
                                   margin: EdgeInsets.all(5),
                                   padding: EdgeInsets.all(10),
@@ -416,7 +419,7 @@ class CircularProgressPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
 
-    final gradient = SweepGradient(
+/*    final gradient = SweepGradient(
       colors: [
         Colors.yellow,
         Colors.orange,
@@ -427,12 +430,10 @@ class CircularProgressPainter extends CustomPainter {
         Colors.yellow,
       ],
       stops: [0.0, 0.16, 0.33, 0.5, 0.66, 0.83, 1.0],
-    );
+    );*/
 
     final foregroundPaint = Paint()
-      ..shader = gradient.createShader(
-        Rect.fromCircle(center: center, radius: radius),
-      )
+      ..color = AppColors.colorBlack
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;

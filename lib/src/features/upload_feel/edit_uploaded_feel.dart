@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
+import 'package:funli_app/src/res/app_colors.dart';
 import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:go_router/go_router.dart';
@@ -58,6 +59,26 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
   @override
   Widget build(BuildContext context) {
     _provider = Provider.of<RecordUploadProvider>(context);
+    final size = _trimmer.videoPlayerController!.value.size;
+    final isPortrait = size.height > size.width;
+    final video = RepaintBoundary(child: VideoViewer(trimmer: _trimmer),);
+    final videoLayer = isPortrait
+        ? SizedBox.expand(
+      child: FittedBox(
+        fit: BoxFit.cover,
+        child: SizedBox(
+          width: size.width,
+          height: size.height,
+          child: video,
+        ),
+      ),
+    )
+        : Center(
+      child: AspectRatio(
+        aspectRatio: _trimmer.videoPlayerController!.value.aspectRatio,
+        child: video,
+      ),
+    );
     return WillPopScope(
       onWillPop: ()async{
         context.go(RouterEnum.homeView.routeName);
@@ -80,8 +101,8 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-
-                    VideoViewer(trimmer: _trimmer), // fallback
+                  videoLayer,
+                  // VideoViewer(trimmer: _trimmer), // fallback
                   PlayPauseWidget(isPlaying: _isPlaying)
                 ],
               ),
@@ -141,7 +162,7 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 29, vertical: 5),
                     decoration: BoxDecoration(
-                        gradient: AppGradients.primaryGradient,
+                        // gradient: AppGradients.primaryGradient,
                         borderRadius: BorderRadius.circular(24)
                     ),
                     child:  _buildTrimmerWidget()
@@ -159,7 +180,8 @@ class _EditUploadedFeelPageState extends State<EditUploadedFeelPage> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 29, vertical: 5),
                   decoration: BoxDecoration(
-                      gradient: AppGradients.primaryGradient,
+                      // gradient: AppGradients.primaryGradient,
+                    color: AppColors.colorBlack,
                       borderRadius: BorderRadius.circular(24)
                   ),
                   child: _showPlaybackSpeed

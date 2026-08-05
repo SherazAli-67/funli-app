@@ -235,7 +235,7 @@ class _TrendingVibesSection extends StatelessWidget {
                   child: Text(
                     'VIEW ALL',
                     style: AppTextStyles.smallBoldTextStyle.copyWith(
-                      color: AppColors.logoutRedColor,
+                      color: AppColors.primaryColor,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
