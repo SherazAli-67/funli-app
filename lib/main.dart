@@ -51,15 +51,10 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_)=> AuthCubit()),
-        // BlocProvider(create: (_) => getIt<UpdatedFeedCubit>(),)
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: appRouter.router,
-
-        /* useInheritedMediaQuery: true,
-        locale: DevicePreview.locale(context),
-        builder: DevicePreview.appBuilder,*/
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
           fontFamily: AppConstants.appFontFamily,

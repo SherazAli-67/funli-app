@@ -46,7 +46,7 @@ class MainMenuPage extends StatelessWidget{
             mainAxisAlignment: .spaceBetween,
             children: [
               _buildNavigationBarItemWidget(icon: AppIcons.icHome, label: 'Today', index: 0),
-              _buildNavigationBarItemWidget(icon: AppIcons.icSearch,  label: 'Workout', index: 1),
+              _buildNavigationBarItemWidget(icon: AppIcons.icSearch,  label: 'Browse', index: 1),
               GestureDetector(
                   onTap: ()=> context.push(RouterEnum.createUploadReelView.routeName),
                   child: Container(
@@ -58,7 +58,7 @@ class MainMenuPage extends StatelessWidget{
                     child:  Icon(Icons.add, size: 24, color: Colors.white,),
                   )
               ),
-              _buildNavigationBarItemWidget(icon:  AppIcons.icNotification, label: 'Progress', index: 2),
+              _buildNavigationBarItemWidget(icon:  AppIcons.icNotification, label: 'Notifications', index: 2),
               _buildNavigationBarItemWidget(icon:  AppIcons.icUserProfile,  label: 'Profile', index: 3),
 
             ],

@@ -43,12 +43,7 @@ import '../features/reels_page/updated_reels_page.dart';
 
 
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
-  debugLabel: 'root',
-);
-/*final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
-  debugLabel: 'shell',
-);*/
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root',);
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
 class AppRouter {
@@ -75,53 +70,7 @@ class AppRouter {
               GoRoute(path: RouterEnum.profileView.routeName,
                   builder: (ctx, state) => UserProfilePage()),
             ]),
-
           ]),
-     /* ShellRoute(
-        navigatorKey: _shellNavigatorKey,
-        pageBuilder: (context, state, child) => customPageBuilderWidget(context, state, BottomNavigationWidget(
-            location: state.uri.toString(),
-            backgroundColor:
-            state.uri.toString() == RouterEnum.videoFeedView.routeName
-                ? Colors.black
-                : null,
-            child: child,
-          ),
-        ),
-        routes: [
-          GoRoute(
-            path: RouterEnum.videoFeedView.routeName,
-            pageBuilder: (context, state) => customPageBuilderWidget(
-              context,
-              state, SizedBox.expand(child: VideoFeedView(key: videoFeedViewKey)),
-            ),
-          ),
-          GoRoute(
-            path: RouterEnum.notificationView.routeName,
-            pageBuilder: (context, state) => customPageBuilderWidget(
-              context,
-              state,
-              const NotificationPage(),
-            ),
-          ),
-          GoRoute(
-            path: RouterEnum.discoverView.routeName,
-            pageBuilder: (context, state) => customPageBuilderWidget(
-              context,
-              state,
-              const DiscoverPage(),
-            ),
-          ),
-          GoRoute(
-            path: RouterEnum.profileView.routeName,
-            pageBuilder: (context, state) => customPageBuilderWidget(
-              context,
-              state,
-              const UserProfilePage(),
-            ),
-          ),
-        ],
-      ),*/
 
       GoRoute(path: RouterEnum.videoFeedView.routeName,
           builder: (ctx, state) => VideoFeedView()),

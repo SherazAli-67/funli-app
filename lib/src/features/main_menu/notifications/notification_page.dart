@@ -87,30 +87,27 @@ class _NotificationPageState extends State<NotificationPage> {
               ? ListView.builder(itemCount: 10, itemBuilder: (ctx, index)=> NotificationShimmerItemWidget())
               : _notifications.isEmpty
               ? _buildEmptyNotesPage()
-              : Padding(
-                padding: const EdgeInsets.only(bottom: 100.0),
-                child: ListView(
-                controller: _scrollController,
-                children: grouped.entries.map((entry) {
-                  final sectionTitle = entry.key;
-                  final notifications = entry.value;
+              : ListView(
+              controller: _scrollController,
+              children: grouped.entries.map((entry) {
+                final sectionTitle = entry.key;
+                final notifications = entry.value;
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        child: Text(
-                          sectionTitle,
-                          style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),
-                        ),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Text(
+                        sectionTitle,
+                        style: AppTextStyles.buttonTextStyle.copyWith(fontWeight: FontWeight.w700),
                       ),
-                      ...notifications.map((notification) => NotificationItemWidget(notification: notification)),
-                    ],
-                  );
-                }).toList()
                     ),
-              )
+                    ...notifications.map((notification) => NotificationItemWidget(notification: notification)),
+                  ],
+                );
+              }).toList()
+          )
 
           )
         ],

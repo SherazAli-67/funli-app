@@ -227,27 +227,38 @@ class _ScrollingImageRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final oneSetWidth = _oneSetWidth;
 
+    final stripWidth = oneSetWidth * 2;
+
     return SizedBox(
       height: itemSize,
       width: .infinity,
       child: ClipRect(
-        child: AnimatedBuilder(
-          animation: controller,
-          builder: (context, child) {
-            final progress = controller.value;
-            final dx = reverse
-                ? -oneSetWidth * progress
-                : -oneSetWidth * (1 - progress);
-            return Transform.translate(
-              offset: Offset(dx, 0),
-              child: child,
-            );
-          },
-          child: Row(
-            children: [
-              ..._buildItems(),
-              ..._buildItems(),
-            ],
+        child: OverflowBox(
+          maxWidth: stripWidth,
+          alignment: Alignment.centerLeft,
+          child: AnimatedBuilder(
+            animation: controller,
+            builder: (context, child) {
+              final progress = controller.value;
+              final dx = reverse
+                  ? -oneSetWidth * progress
+                  : -oneSetWidth * (1 - progress);
+              return Transform.translate(
+                offset: Offset(dx, 0),
+                child: child,
+              );
+            },
+            child: SizedBox(
+              width: stripWidth,
+              height: itemSize,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ..._buildItems(),
+                  ..._buildItems(),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -265,10 +276,7 @@ class _ScrollingImageRow extends StatelessWidget {
           child: SizedBox(
             width: width,
             height: itemSize,
-            child: Image.asset(
-              images[index],
-              fit: .cover,
-            ),
+            child: Image.asset(images[index], fit: .cover,),
           ),
         ),
       );
