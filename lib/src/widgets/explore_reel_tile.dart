@@ -106,7 +106,7 @@ class ExploreReelTile extends StatelessWidget {
                   ),
                 ),
 
-              if (caption.isNotEmpty)
+              if (views != null)
               Positioned(
                 right: 10,
                 bottom: 12,

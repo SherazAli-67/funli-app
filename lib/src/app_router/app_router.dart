@@ -41,8 +41,6 @@ import 'package:provider/provider.dart';
 import '../features/authentication/login_page.dart';
 import '../features/reels_page/updated_reels_page.dart';
 
-
-
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root',);
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 

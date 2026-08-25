@@ -10,6 +10,7 @@ import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/notifications_service.dart';
 import 'package:funli_app/src/services/reels_service.dart';
 import 'package:funli_app/src/widgets/gradient_text_widget.dart';
+import 'package:funli_app/src/widgets/liquid_glass_icon_widget.dart';
 import 'package:funli_app/src/widgets/reel_liked_users_widget.dart';
 import 'package:like_button/like_button.dart';
 
@@ -37,7 +38,33 @@ class PostLikeWidget extends StatelessWidget{
   Widget _buildLikeButton(BuildContext context, List<String> likedUsers) {
     String reelID = reel.reelID;
     bool isLiked = likedUsers.contains(FirebaseAuth.instance.currentUser!.uid);
-    return LikeButton(
+    return Column(
+      children: [
+        GestureDetector(
+            onTap: (){
+              ReelsService.addLikeToReel(reelID: reelID, isRemove: isLiked);
+              if(!isLiked){
+                NotificationsService.sendNotificationToUser(
+                    receiverID: reel.userID,
+                    reelID: reelID,
+                    description: "Liked your video",
+                    notificationType: NotificationType.like);
+              }
+            },
+            child: LiquidGlassIconWidget(icon:AppIcons.icLike, iconColor: isLiked ? Colors.black : Colors.white,)),
+        GestureDetector(
+            onTap: (){
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (_) => ReelLikedCommentUsersWidget(reelID: reelID,),
+              );
+            },
+            child: Text(likedUsers.length.toString(), style: AppTextStyles.regularTextStyle.copyWith(color: isLiked ? Colors.black : Colors.white, fontWeight: .bold),))
+      ],
+    );
+    /*return LikeButton(
           size: 24,
           mainAxisAlignment: MainAxisAlignment.start,
           circleSize: 24,
@@ -84,7 +111,7 @@ class PostLikeWidget extends StatelessWidget{
               ),
             );
           },
-        );
+        );*/
   }
 
 }

@@ -5,11 +5,9 @@ import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/features/main_menu/profile/widgets/user_drafts_feels.dart';
 import 'package:funli_app/src/providers/profile_provider.dart';
 import 'package:funli_app/src/res/app_icons.dart';
-import 'package:funli_app/src/widgets/gradient_icon.dart';
 import 'package:funli_app/src/widgets/profile_info_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../res/app_gradients.dart';
 import 'widgets/remote_user_bookmark_widget.dart';
 import 'widgets/remote_user_reels_widget.dart';
 
@@ -93,10 +91,12 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
                       shape: UnderlineInputBorder(
                         borderSide: BorderSide.none,
                       ),
-                      gradient: AppGradients.primaryGradient,
+                      color: Colors.black
+                      // gradient: AppGradients.primaryGradient,
                     ),
                     labelColor: Colors.black,
                     unselectedLabelColor: Colors.black54,
+
                     onTap: (index)=> provider.onTabChange(index),
                     tabs: [
                       Container(
@@ -104,29 +104,18 @@ class _UserProfilePageState extends State<UserProfilePage> with TickerProviderSt
 
                         alignment: Alignment.center,
                         color: Colors.white,
-                        child: SvgPicture.asset(
-                          provider.selectedTab == 0 ? AppIcons.icSelectedCategory : AppIcons.icCategory,
-                        ),
+                        child: SvgPicture.asset( AppIcons.icCategory, colorFilter: provider.selectedTab == 0 ? .mode(Colors.black, .srcIn) : null,),),
+                      Container(
+                        height: 50,
+                        alignment: Alignment.center,
+                        color: Colors.white,
+                        child: SvgPicture.asset( AppIcons.icBookMark, colorFilter: provider.selectedTab == 1 ? .mode(Colors.black, .srcIn) : null,),
                       ),
                       Container(
                         height: 50,
                         alignment: Alignment.center,
                         color: Colors.white,
-                        child: SvgPicture.asset(
-                          provider.selectedTab == 1 ? AppIcons.icSelectedBookMark : AppIcons.icBookMark,
-                        ),
-                      ),
-                      Container(
-                        height: 50,
-                        alignment: Alignment.center,
-                        color: Colors.white,
-                          child: provider.selectedTab == 2 ? GradientIcon(
-                              icon: Icons.video_collection_rounded,
-                              size: 20,
-                              gradient: AppGradients.primaryGradient) : Icon(
-                              Icons.video_collection_rounded)
-
-                      ),
+                        child: Icon(Icons.video_collection_rounded, color: provider.selectedTab == 2 ? Colors.black : null,),),
                     ],
                   ),
                 ),
