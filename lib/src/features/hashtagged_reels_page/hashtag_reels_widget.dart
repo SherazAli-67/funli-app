@@ -128,7 +128,7 @@ class _HashtagReelsGridState extends State<HashtagReelsGrid> {
     _cleanUpControllers();
   }
 
-  void _initializeControllerIfNeeded(String reelID, String videoUrl, {bool shouldPlay = false}) async {
+  void _initializeControllerIfNeeded(String reelID, String videoUrl,) async {
     if (_controllerCache.containsKey(reelID)) {
       _accessOrder.remove(reelID);
       _accessOrder.insert(0, reelID);

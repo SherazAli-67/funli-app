@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 /// A custom text editing controller that detects hashtags and mentions
 class SocialTextEditingController extends TextEditingController {

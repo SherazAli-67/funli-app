@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:go_router/go_router.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
-
 import '../../res/app_colors.dart';
 import '../../res/app_icons.dart';
-import '../../res/app_textstyles.dart';
 
 class MainMenuPage extends StatelessWidget{
   final StatefulNavigationShell navigationShell;

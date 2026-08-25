@@ -4,12 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:funli_app/src/app_router/router_enum.dart';
 import 'package:funli_app/src/res/app_colors.dart';
-import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:video_trimmer/video_trimmer.dart';
-
 import '../../providers/record_upload_provider.dart';
 import '../../res/app_textstyles.dart';
 import '../../widgets/app_back_button.dart';

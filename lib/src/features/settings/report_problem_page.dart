@@ -4,9 +4,7 @@ import 'package:funli_app/src/helpers/snackbar_messages_helper.dart';
 import 'package:funli_app/src/res/app_constants.dart';
 import 'package:funli_app/src/services/settings_service.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
-import 'package:funli_app/src/widgets/primary_gradient_btn.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../res/app_icons.dart';
 import '../../res/app_textstyles.dart';
 

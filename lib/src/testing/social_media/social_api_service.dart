@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 /// API service for fetching hashtag and mention suggestions
@@ -80,7 +81,7 @@ class SocialApiService {
       
       return suggestions;
     } catch (e) {
-      print('Error fetching user suggestions: $e');
+      debugPrint('Error fetching user suggestions: $e');
       return [];
     }
   }

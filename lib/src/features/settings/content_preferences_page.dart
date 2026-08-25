@@ -6,11 +6,8 @@ import 'package:funli_app/src/services/auth_service.dart';
 import 'package:funli_app/src/services/settings_service.dart';
 import 'package:funli_app/src/services/user_service.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
-import 'package:funli_app/src/widgets/primary_gradient_btn.dart';
-
 import '../../app_data.dart';
 import '../../res/app_colors.dart';
-import '../../res/app_gradients.dart';
 import '../../res/app_textstyles.dart';
 import '../../res/spacing_constants.dart';
 

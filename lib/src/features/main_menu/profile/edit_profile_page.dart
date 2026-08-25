@@ -9,11 +9,8 @@ import 'package:funli_app/src/services/auth_service.dart';
 import 'package:funli_app/src/widgets/app_textfield.dart';
 import 'package:funli_app/src/widgets/loading_widget.dart';
 import 'package:funli_app/src/widgets/primary_btn.dart';
-import 'package:funli_app/src/widgets/primary_gradient_btn.dart';
 import 'package:funli_app/src/widgets/select_gender_widget.dart';
 import 'package:provider/provider.dart';
-
-import '../../../res/app_gradients.dart';
 import '../../../res/app_textstyles.dart';
 
 class EditProfilePage extends StatefulWidget{

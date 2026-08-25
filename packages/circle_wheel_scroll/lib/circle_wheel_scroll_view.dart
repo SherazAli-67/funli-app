@@ -300,19 +300,14 @@ class FixedExtentMetrics extends FixedScrollMetrics {
   /// Creates an immutable snapshot of values associated with a
   /// [CircleListScrollView].
   FixedExtentMetrics({
-    required double minScrollExtent,
-    required double maxScrollExtent,
-    required double pixels,
-    required double viewportDimension,
-    required AxisDirection axisDirection,
+    required double super.minScrollExtent,
+    required double super.maxScrollExtent,
+    required double super.pixels,
+    required double super.viewportDimension,
+    required super.axisDirection,
     required this.itemIndex,
     required this.devicePixelRatio,
   }) : super(
-          minScrollExtent: minScrollExtent,
-          maxScrollExtent: maxScrollExtent,
-          pixels: pixels,
-          viewportDimension: viewportDimension,
-          axisDirection: axisDirection,
           devicePixelRatio: devicePixelRatio,
         );
 

@@ -1,18 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:funli_app/src/models/notification_model.dart';
 import 'package:funli_app/src/models/reel_model.dart';
-import 'package:funli_app/src/res/app_colors.dart';
-import 'package:funli_app/src/res/app_gradients.dart';
 import 'package:funli_app/src/res/app_icons.dart';
 import 'package:funli_app/src/res/app_textstyles.dart';
 import 'package:funli_app/src/services/notifications_service.dart';
 import 'package:funli_app/src/services/reels_service.dart';
-import 'package:funli_app/src/widgets/gradient_text_widget.dart';
 import 'package:funli_app/src/widgets/liquid_glass_icon_widget.dart';
 import 'package:funli_app/src/widgets/reel_liked_users_widget.dart';
-import 'package:like_button/like_button.dart';
 
 class PostLikeWidget extends StatelessWidget{
   final Color iconColor;
