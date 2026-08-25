@@ -27,20 +27,20 @@ class EnhancedSocialTextField extends StatefulWidget {
 
   /// Constructor with only the required parameters
   const EnhancedSocialTextField({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.maxLines,
     required this.minLines,
     required this.hashtagStyle,
     required this.mentionStyle,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
-  _EnhancedSocialTextFieldState createState() => _EnhancedSocialTextFieldState();
+  EnhancedSocialTextFieldState createState() => EnhancedSocialTextFieldState();
 }
 
-class _EnhancedSocialTextFieldState extends State<EnhancedSocialTextField> {
+class EnhancedSocialTextFieldState extends State<EnhancedSocialTextField> {
   /// Controller for the text field
   late _SocialTextEditingController _controller;
 
@@ -243,7 +243,7 @@ class _EnhancedSocialTextFieldState extends State<EnhancedSocialTextField> {
                 ),
               ],
             ),
-            tileColor: _selectedIndex == index ? Colors.grey.withOpacity(0.2) : null,
+            tileColor: _selectedIndex == index ? Colors.grey.withValues(alpha: 0.2) : null,
             onTap: () => _selectHashtagSuggestion(index),
           );
         },
@@ -287,7 +287,7 @@ class _EnhancedSocialTextFieldState extends State<EnhancedSocialTextField> {
               '@${user.username}',
               style: widget.mentionStyle,
             ),
-            tileColor: _selectedIndex == index ? Colors.grey.withOpacity(0.2) : null,
+            tileColor: _selectedIndex == index ? Colors.grey.withValues(alpha: 0.2) : null,
             onTap: () => _selectUserSuggestion(index),
           );
         },
@@ -432,12 +432,11 @@ class _SocialTextEditingController extends TextEditingController {
 
   // Constructor
   _SocialTextEditingController({
-    String? text,
     this.onHashtagEntered,
     this.onMentionEntered,
     required this.hashtagStyle,
     required this.mentionStyle,
-  }) : super(text: text) {
+  }) {
     addListener(_textEditingListener);
   }
 

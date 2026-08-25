@@ -132,7 +132,7 @@ class SettingsService {
     String mostFrequentMood = 'Happy'; // default
     int maxCount = 0;
 
-    moodCount.forEach((mood, count) {
+    moodCount.forEach((mood, int count) {
       if (count > maxCount) {
         mostFrequentMood = mood;
         maxCount = count;
@@ -241,7 +241,7 @@ class SettingsService {
       String dominantMood = '';
       int maxCount = 0;
       
-      moodCounts.forEach((mood, count) {
+      moodCounts.forEach((mood, int count) {
         if (count > maxCount) {
           maxCount = count;
           dominantMood = mood;

@@ -83,7 +83,6 @@ class DeepLinkService {
 
   void navigateToProfile(String userId) {
     // Implement navigation logic
-    print('Navigating to profile: $userId');
     // Example: _appRouter.pushNamed('/profile', extra: userId);
   }
 

@@ -124,7 +124,7 @@ class ExploreReelTile extends StatelessWidget {
                       const Icon(Icons.play_arrow_rounded,
                           color: Colors.white, size: 14),
                       Text(
-                        '$views',
+                        views,
                         style: AppTextStyles.smallBoldTextStyle.copyWith(
                           color: Colors.white,
                           fontSize: 11,

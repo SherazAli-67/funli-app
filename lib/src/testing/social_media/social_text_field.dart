@@ -62,7 +62,7 @@ class SocialTextField extends StatefulWidget {
   
   /// Constructor
   const SocialTextField({
-    Key? key,
+    super.key,
     this.initialText,
     this.hintText,
     this.maxLines,
@@ -80,7 +80,7 @@ class SocialTextField extends StatefulWidget {
     this.onChanged,
     this.onSubmitted,
     this.apiService,
-  }) : super(key: key);
+  });
   
   @override
   _SocialTextFieldState createState() => _SocialTextFieldState();
@@ -294,7 +294,7 @@ class _SocialTextFieldState extends State<SocialTextField> {
                 ),
               ],
             ),
-            tileColor: _selectedIndex == index ? Colors.grey.withOpacity(0.2) : null,
+            tileColor: _selectedIndex == index ? Colors.grey.withValues(alpha: 0.2) : null,
             onTap: () => _selectHashtagSuggestion(index),
           );
         },
@@ -335,7 +335,7 @@ class _SocialTextFieldState extends State<SocialTextField> {
               ],
             ),
             subtitle: Text('@${user.username}'),
-            tileColor: _selectedIndex == index ? Colors.grey.withOpacity(0.2) : null,
+            tileColor: _selectedIndex == index ? Colors.grey.withValues(alpha: 0.2) : null,
             onTap: () => _selectUserSuggestion(index),
           );
         },
